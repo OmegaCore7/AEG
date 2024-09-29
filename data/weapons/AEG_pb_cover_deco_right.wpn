@@ -1,0 +1,46 @@
+{
+  "id": "AEG_pb_cover_deco_right",
+  "specClass": "projectile",
+  "projectileSpecId": "AEG_dummy_invisible",
+  "type": "DECORATIVE",
+  "size": "SMALL",
+  "turretSprite": "graphics/weapons/vengeance/mark7phasorcover_right.png",
+  "hardpointSprite": "graphics/weapons/vengeance/mark7phasorcover_right.png",
+  "glowColor": [
+    255,
+    255,
+    255,
+    255
+  ],
+  "turretOffsets": [
+    0,
+    0
+  ],
+  "turretAngleOffsets": [
+    0
+  ],
+  "hardpointOffsets": [
+    0,
+    0
+  ],
+  "hardpointAngleOffsets": [
+    0
+  ],
+  "showDamageWhenDecorative": "TRUE",
+  "barrelMode": "ALTERNATING",
+  "animationType": "GLOW_AND_FLASH",
+  "muzzleFlashSpec": {
+    "length": 0,
+    "spread": 0,
+    "particleSizeMin": 0,
+    "particleSizeRange": 0,
+    "particleDuration": 0,
+    "particleCount": 0,
+    "particleColor": [
+      0,
+      0,
+      0,
+      0
+    ]
+  }
+}

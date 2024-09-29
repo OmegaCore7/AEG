@@ -1,0 +1,28 @@
+{
+  "id": "AEG", # For the convenience of troubleshooters, include your name and the mod name, not just an acronym.
+  "name": "Astral Explorer Guild", # Displayed to the player
+  "author": "Omega9999999",
+  "utility": false,
+  "version": { "major": '.01', "minor": '0', "patch": '0' },
+  "description": "A humble mech and ship pack for now.",
+  "gameVersion": "0.97a-RC11",
+  "jars": [ "jars/AEG.jar" ],
+  #"modPlugin": "author.modname.TemplateModPlugin",
+  "dependencies": [
+    #{
+    #    "id": "lw_lazylib",
+    #    "name": "LazyLib",
+    #    #"version": "2.7b"
+    #},
+    #{
+    #    "id": "MagicLib",
+    #    "name": "MagicLib",
+    #    #"version": "0.34"
+    #},
+    #{
+    #    "id": "shaderLib",
+    #    "name": "GraphicsLib",
+    #    #"version": "1.5.1"
+    #}
+  ],
+}

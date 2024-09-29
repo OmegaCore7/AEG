@@ -1,0 +1,67 @@
+{
+  "id": "AEG_torparray_right",
+  "specClass": "projectile",
+  "projectileSpecId": "amsrm_srm",
+  "type": "MISSILE",
+  "size": "LARGE",
+  "turretSprite": "graphics/weapons/vengeance/photon_volley_right.png",
+  "turretGlowSprite": "graphics/weapons/vengeance/photon_volley_glow_right.png",
+  "hardpointSprite": "graphics/weapons/vengeance/photon_volley_right.png",
+  "hardpointGlowSprite": "graphics/weapons/vengeance/photon_volley_glow_right.png",
+  "glowColor": [
+    50,
+    5,
+    255,
+    255
+  ],
+  "turretOffsets": [
+    17,
+    6,
+    6,
+    2,
+    -5,
+    -3,
+    -16,
+    -7
+  ],
+  "turretAngleOffsets": [
+    -63.5,
+    -63.5,
+    -63.5,
+    -63.5
+  ],
+  "hardpointOffsets": [
+    27,
+    6,
+    16,
+    2,
+    5,
+    -3,
+    -6,
+    -7
+  ],
+  "hardpointAngleOffsets": [
+    -63.5,
+    -63.5,
+    -63.5,
+    -63.5
+  ],
+  "barrelMode": "ALTERNATING",
+  "animationType": "GLOW_AND_FLASH",
+  "autocharge": true,
+  "muzzleFlashSpec": {
+    "length": 30,
+    "spread": 5,
+    "particleSizeMin": 15,
+    "particleSizeRange": 20,
+    "particleDuration": 0.12,
+    "particleCount": 10,
+    "particleColor": [
+      50,
+      0,
+      255,
+      255
+    ]
+  },
+  "fireSoundTwo": "amsrm_fire"
+}
