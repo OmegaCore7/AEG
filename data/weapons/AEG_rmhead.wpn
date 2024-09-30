@@ -1,0 +1,81 @@
+{
+  "id": "AEG_rmhead",
+  "specClass": "beam",
+  "type": "ENERGY",
+  "size": "SMALL",
+  "beamEffect": "com.fs.starfarer.api.impl.combat.PaladinEffect",
+  "collisionClass": "RAY_FIGHTER",
+  "collisionClassByFighter": "RAY_FIGHTER",
+  "turretSprite": "graphics/ships/red_menace/rmhead.png",
+  "turretGlowSprite": "graphics/ships/red_menace/rmhead_glow.png",
+  "hardpointSprite": "graphics/ships/red_menace/rmhead.png",
+  "hardpointGlowSprite": "graphics/ships/red_menace/rmhead_glow.png",
+  "glowColor": [
+    255,
+    255,
+    100,
+    255
+  ],
+  "hitGlowRadius": 0,
+  "turretOffsets": [
+    14,
+    0,
+    4,
+    -7,
+    11.5,
+    -3,
+    11.5,
+    3,
+    4,
+    7
+  ],
+  "turretAngleOffsets": [
+    0,
+    0,
+    0,
+    0,
+    0
+  ],
+  "hardpointOffsets": [
+    23.5,
+    0,
+    13.5,
+    -7,
+    21,
+    -3,
+    21,
+    3,
+    13.5,
+    7
+  ],
+  "hardpointAngleOffsets": [
+    0,
+    0,
+    0,
+    0,
+    0
+  ],
+  "fringeColor": [
+    255,
+    255,
+    100,
+    255
+  ],
+  "coreColor": [
+    255,
+    255,
+    255,
+    100
+  ],
+  "convergeOnPoint": true,
+  "width": 8,
+  "textureType": SMOOTH,
+  "textureScrollSpeed": 292,
+  "pixelsPerTexel": 5,
+  "pierceSet": [
+    PROJECTILE_FF,
+    PROJECTILE_NO_FF,
+    PROJECTILE_FIGHTER
+  ],
+  "fireSoundOne": "guardian_pd_fire"
+}

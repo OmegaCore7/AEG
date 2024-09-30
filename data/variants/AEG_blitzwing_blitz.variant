@@ -1,0 +1,28 @@
+{
+  "variantId": "AEG_blitzwing_blitz",
+  "hullId": "AEG_blitzwing",
+  "displayName": "Blitzkrieg",
+  "goalVariant": true,
+  "fluxCapacitors": 0,
+  "fluxVents": 0,
+  "quality": 1,
+  "permaMods": [],
+  "hullMods": [],
+  "weaponGroups": [
+    {
+      "autofire": false,
+      "mode": "LINKED",
+      "weapons": {
+        "WS0001": "AEG_bw_chestarmor",
+        "WS0002": "AEG_bw_Rarm_nullrayblaster",
+        "WS0003": "AEG_Blitzwing_Jetpack",
+        "WS0004": "AEG_bw_Larm_minigun",
+        "WS0005": "AEG_BlitzTorpLauncher",
+        "WS0006": "AEG_bw_mhead",
+        "WS0007": "AEG_BlitzTorpLauncher"
+      }
+    }
+  ],
+  "modules": [],
+  "wings": []
+}

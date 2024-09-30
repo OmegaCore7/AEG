@@ -1,0 +1,34 @@
+{
+  "variantId": "AEG_red_menace_fullarmor",
+  "hullId": "AEG_red_menace",
+  "displayName": "Crimson Cascade eXtreme Full Armorment",
+  "goalVariant": false,
+  "fluxCapacitors": 1,
+  "fluxVents": 0,
+  "quality": 1,
+  "permaMods": [],
+  "hullMods": [],
+  "weaponGroups": [
+    {
+      "autofire": false,
+      "mode": "LINKED",
+      "weapons": {
+        "WS0006": "AEG_rmhead",
+        "WS0007": "AEG_rmleftarm",
+        "WS0008": "AEG_rmrightarm"
+      }
+    }
+  ],
+  "modules": [
+    {
+      "WS0003": "AEG_module_rm_cannon_standard"
+    },
+    {
+      "WS0002": "AEG_module_rightbooster_standard"
+    },
+    {
+      "WS0001": "AEG_module_leftbooster_standard"
+    }
+  ],
+  "wings": []
+}

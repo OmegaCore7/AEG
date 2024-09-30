@@ -1,0 +1,34 @@
+{
+  "variantId": "AEG_module_rm_cannon_standard",
+  "hullId": "AEG_module_rm_cannon",
+  "displayName": "Red Menace Cannon Module Standard",
+  "goalVariant": false,
+  "fluxCapacitors": 0,
+  "fluxVents": 0,
+  "quality": 1,
+  "permaMods": [],
+  "hullMods": [],
+  "weaponGroups": [
+    {
+      "autofire": false,
+      "mode": "LINKED",
+      "weapons": {
+        "WS0001": "riftcascade",
+        "WS0002": "hil",
+        "WS0003": "hil",
+        "WS0004": "tachyonlance",
+        "WS0005": "tachyonlance",
+        "WS0006": "tpc",
+        "WS0007": "tpc",
+        "WS0008": "swarmer_fighter",
+        "WS0009": "swarmer_fighter",
+        "WS0010": "sabotpod",
+        "WS0011": "sabotpod",
+        "WS0012": "amsrm",
+        "WS0013": "amsrm"
+      }
+    }
+  ],
+  "modules": [],
+  "wings": []
+}

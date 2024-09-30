@@ -1,0 +1,61 @@
+{
+  "id": "AEG_Blitzwing_Jetpack",
+  "specClass": "projectile",
+  "projectileSpecId": "sabot_srm",
+  "type": "MISSILE",
+  "size": "SMALL",
+  "displayArcRadius": 300,
+  "turretSprite": "graphics/ships/blitzwing/Blitzwing_Jetpack00.png",
+  "hardpointSprite": "graphics/ships/blitzwing/Blitzwing_Jetpack00.png",
+  "turretOffsets": [
+    -7,
+    7,
+    -7,
+    -7,
+    -7,
+    10,
+    -7,
+    -10,
+    -7,
+    13,
+    -7,
+    -13
+  ],
+  "turretAngleOffsets": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+  ],
+  "hardpointOffsets": [
+    8,
+    8
+  ],
+  "hardpointAngleOffsets": [
+    0
+  ],
+  "barrelMode": "ALTERNATING",
+  "animationType": "SMOKE",
+  "numFrames": 10,
+  "frameRate": 20,
+  "smokeSpec": {
+    "particleSizeMin": 20,
+    "particleSizeRange": 20,
+    "cloudParticleCount": 3,
+    "cloudDuration": 1,
+    "cloudRadius": 10,
+    "blowbackParticleCount": 3,
+    "blowbackDuration": 2,
+    "blowbackLength": 30,
+    "blowbackSpread": 10,
+    "particleColor": [
+      100,
+      100,
+      100,
+      200
+    ]
+  },
+  "fireSoundTwo": "sabot_srm_fire"
+}

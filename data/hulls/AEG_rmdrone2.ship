@@ -1,0 +1,94 @@
+{
+  "hullName": "Red Menace Small Drone",
+  "hullId": "AEG_rmdrone2",
+  "hullSize": "FIGHTER",
+  "spriteName": "graphics/ships/red_menace/rmdrone2.png",
+  "style": "HIGH_TECH",
+  "height": 22,
+  "width": 12,
+  "center": [6, 11],
+  "collisionRadius": 12,
+  "shieldCenter": [0, -0],
+  "shieldRadius": 11.5,
+  "viewOffset": 0,
+  "builtInWeapons": {
+    "WS0001": "tachyonlance"
+  },
+  "weaponSlots": [
+    {
+      "id": "WS0001",
+      "size": "LARGE",
+      "type": "BUILT_IN",
+      "mount": "HIDDEN",
+      "arc": 5,
+      "angle": 0,
+      "locations": [-17, -0]
+    }
+  ],
+  "engineSlots": [
+    {
+      "location": [-9, -0],
+      "length": 20.5,
+      "width": 6,
+      "angle": 180,
+      "contrailSize": 6,
+      "style": "HIGH_TECH"
+    },
+    {
+      "location": [-8, 3],
+      "length": 13,
+      "width": 3,
+      "angle": 180,
+      "contrailSize": 3,
+      "style": "HIGH_TECH"
+    },
+    {
+      "location": [-8, -3],
+      "length": 13,
+      "width": 3,
+      "angle": -180,
+      "contrailSize": 3,
+      "style": "HIGH_TECH"
+    },
+    {
+      "location": [-4, 5],
+      "length": 5.5,
+      "width": 2,
+      "angle": 135,
+      "contrailSize": 2,
+      "style": "HIGH_TECH"
+    },
+    {
+      "location": [-4, -5],
+      "length": 5.5,
+      "width": 2,
+      "angle": -135,
+      "contrailSize": 2,
+      "style": "HIGH_TECH"
+    },
+    {
+      "location": [2, 5],
+      "length": 5.5,
+      "width": 2,
+      "angle": 45,
+      "contrailSize": 2,
+      "style": "HIGH_TECH"
+    },
+    {
+      "location": [2, -5],
+      "length": 5.5,
+      "width": 2,
+      "angle": -45,
+      "contrailSize": 2,
+      "style": "HIGH_TECH"
+    }
+  ],
+  "bounds": [
+    -10, -2.5,
+    -0.5, -5,
+    10, -1.5,
+    10, 1.5,
+    -0.5, 5,
+    -10, 2.5
+  ]
+}

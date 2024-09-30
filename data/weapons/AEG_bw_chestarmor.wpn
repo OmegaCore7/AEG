@@ -1,0 +1,28 @@
+{
+  "id": "AEG_bw_chestarmor",
+  "specClass": "projectile",
+  "projectileSpecId": "amsrm_srm",
+  "type": "MISSILE",
+  "size": "SMALL",
+  "turretSprite": "graphics/ships/blitzwing/Blitzwing_chest00.png",
+  "hardpointSprite": "graphics/ships/blitzwing/Blitzwing_chest00.png",
+  "turretOffsets": [
+    3,
+    0
+  ],
+  "turretAngleOffsets": [
+    0
+  ],
+  "hardpointOffsets": [
+    15.5,
+    0
+  ],
+  "hardpointAngleOffsets": [
+    0
+  ],
+  "barrelMode": "ALTERNATING",
+  "animationType": "NONE",
+  "numFrames": 6,
+  "frameRate": 20,
+  "fireSoundTwo": "amsrm_fire"
+}

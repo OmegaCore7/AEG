@@ -1,0 +1,168 @@
+{
+  "hullName": "Crimson Cascade Cannon Module",
+  "hullId": "AEG_module_rm_cannon",
+  "hullSize": "CRUISER",
+  "spriteName": "graphics/ships/red_menace/red_menace_cannon_module.png",
+  "style": "HIGH_TECH",
+  "height": 492,
+  "width": 123,
+  "center": [61.5, 246],
+  "collisionRadius": 246.5,
+  "shieldCenter": [0, -0],
+  "shieldRadius": 245.5,
+  "viewOffset": 0,
+  "builtInMods": [
+    "always_detaches",
+    "reduced_explosion",
+    "supercomputer",
+    "fluxbreakers",
+    "fluxcoil",
+    "fluxdistributor",
+    "hardened_subsystems",
+    "missile_reload",
+    "do_not_fire_through"
+  ],
+  "builtInWeapons": {
+    "WS0001": "riftcascade",
+    "WS0002": "hil",
+    "WS0003": "hil",
+    "WS0004": "tachyonlance",
+    "WS0005": "tachyonlance",
+    "WS0006": "tpc",
+    "WS0007": "tpc",
+    "WS0008": "swarmer_fighter",
+    "WS0009": "swarmer_fighter",
+    "WS0010": "sabotpod",
+    "WS0011": "sabotpod",
+    "WS0012": "amsrm",
+    "WS0013": "amsrm"
+  },
+  "weaponSlots": [
+    {
+      "id": "WS0001",
+      "size": "LARGE",
+      "type": "BUILT_IN",
+      "mount": "HIDDEN",
+      "arc": 26,
+      "angle": 0,
+      "locations": [204, -0]
+    },
+    {
+      "id": "WS0002",
+      "size": "LARGE",
+      "type": "BUILT_IN",
+      "mount": "HIDDEN",
+      "arc": 19,
+      "angle": 0,
+      "locations": [202, 5.5]
+    },
+    {
+      "id": "WS0003",
+      "size": "LARGE",
+      "type": "BUILT_IN",
+      "mount": "HIDDEN",
+      "arc": 19,
+      "angle": -0,
+      "locations": [202, -5.5]
+    },
+    {
+      "id": "WS0004",
+      "size": "LARGE",
+      "type": "BUILT_IN",
+      "mount": "HIDDEN",
+      "arc": 0,
+      "angle": 0,
+      "locations": [188.5, 10]
+    },
+    {
+      "id": "WS0005",
+      "size": "LARGE",
+      "type": "BUILT_IN",
+      "mount": "HIDDEN",
+      "arc": 0,
+      "angle": -0,
+      "locations": [188.5, -10]
+    },
+    {
+      "id": "WS0006",
+      "size": "LARGE",
+      "type": "BUILT_IN",
+      "mount": "HIDDEN",
+      "arc": 8,
+      "angle": 0,
+      "locations": [-31, 37]
+    },
+    {
+      "id": "WS0007",
+      "size": "LARGE",
+      "type": "BUILT_IN",
+      "mount": "HIDDEN",
+      "arc": 8,
+      "angle": -0,
+      "locations": [-31, -37]
+    },
+    {
+      "id": "WS0008",
+      "size": "SMALL",
+      "type": "BUILT_IN",
+      "mount": "HIDDEN",
+      "arc": 360,
+      "angle": 0,
+      "locations": [-115, 15.5]
+    },
+    {
+      "id": "WS0009",
+      "size": "SMALL",
+      "type": "BUILT_IN",
+      "mount": "HIDDEN",
+      "arc": 360,
+      "angle": -0,
+      "locations": [-115, -15.5]
+    },
+    {
+      "id": "WS0010",
+      "size": "MEDIUM",
+      "type": "BUILT_IN",
+      "mount": "HIDDEN",
+      "arc": 360,
+      "angle": 0,
+      "locations": [-200, 26]
+    },
+    {
+      "id": "WS0011",
+      "size": "MEDIUM",
+      "type": "BUILT_IN",
+      "mount": "HIDDEN",
+      "arc": 360,
+      "angle": -0,
+      "locations": [-200, -26]
+    },
+    {
+      "id": "WS0012",
+      "size": "SMALL",
+      "type": "BUILT_IN",
+      "mount": "HIDDEN",
+      "arc": 360,
+      "angle": 0,
+      "locations": [-116, 37]
+    },
+    {
+      "id": "WS0013",
+      "size": "SMALL",
+      "type": "BUILT_IN",
+      "mount": "HIDDEN",
+      "arc": 360,
+      "angle": -0,
+      "locations": [-116, -37]
+    }
+  ],
+  "engineSlots": [],
+  "bounds": [
+    -224.5, -44.5,
+    -44.5, -60,
+    239, -4,
+    239, 4,
+    -44.5, 60,
+    -224.5, 44.5
+  ]
+}

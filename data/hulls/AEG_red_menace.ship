@@ -1,0 +1,142 @@
+{
+  "hullName": "Crimson Cascade",
+  "hullId": "AEG_red_menace",
+  "hullSize": "DESTROYER",
+  "spriteName": "graphics/ships/red_menace/red_menace_body.png",
+  "style": "HIGH_TECH",
+  "height": 70,
+  "width": 58,
+  "center": [29, 32.5],
+  "collisionRadius": 100,
+  "shieldCenter": [0, -0],
+  "shieldRadius": 98.5,
+  "viewOffset": 0,
+  "builtInMods": [
+    "vastbulk"
+  ],
+  "builtInWeapons": {
+    "WS0004": "AEG_rm_leftshoulder",
+    "WS0005": "AEG_rm_rightshoulder",
+    "WS0006": "AEG_rmhead",
+    "WS0007": "AEG_rmleftarm",
+    "WS0008": "AEG_rmrightarm"
+  },
+  "weaponSlots": [
+    {
+      "id": "WS0003",
+      "size": "MEDIUM",
+      "type": "STATION_MODULE",
+      "mount": "HARDPOINT",
+      "arc": 34,
+      "angle": 0,
+      "locations": [115, -80.5]
+    },
+    {
+      "id": "WS0002",
+      "size": "MEDIUM",
+      "type": "STATION_MODULE",
+      "mount": "HARDPOINT",
+      "arc": 25,
+      "angle": 0,
+      "locations": [-104, -60.5]
+    },
+    {
+      "id": "WS0001",
+      "size": "MEDIUM",
+      "type": "STATION_MODULE",
+      "mount": "HARDPOINT",
+      "arc": 25,
+      "angle": 0,
+      "locations": [-104, 60.5]
+    },
+    {
+      "id": "WS0004",
+      "size": "SMALL",
+      "type": "DECORATIVE",
+      "mount": "TURRET",
+      "arc": 30,
+      "angle": 0,
+      "locations": [4.5, 26.5],
+      "renderOrderMod": 1
+    },
+    {
+      "id": "WS0005",
+      "size": "SMALL",
+      "type": "DECORATIVE",
+      "mount": "TURRET",
+      "arc": 24,
+      "angle": 0,
+      "locations": [4.5, -26.5],
+      "renderOrderMod": 1
+    },
+    {
+      "id": "WS0006",
+      "size": "SMALL",
+      "type": "BUILT_IN",
+      "mount": "TURRET",
+      "arc": 79,
+      "angle": 0,
+      "locations": [-1, -0]
+    },
+    {
+      "id": "WS0007",
+      "size": "SMALL",
+      "type": "BUILT_IN",
+      "mount": "TURRET",
+      "arc": 151,
+      "angle": -0,
+      "locations": [15, 36.5]
+    },
+    {
+      "id": "WS0008",
+      "size": "SMALL",
+      "type": "BUILT_IN",
+      "mount": "TURRET",
+      "arc": 151,
+      "angle": 0,
+      "locations": [15, -36.5]
+    }
+  ],
+  "engineSlots": [
+    {
+      "location": [-26.5, 10],
+      "length": 41.822186,
+      "width": 7.785869,
+      "angle": -175.5,
+      "contrailSize": 7.785869,
+      "style": "HIGH_TECH"
+    },
+    {
+      "location": [-26.5, -10],
+      "length": 41.822186,
+      "width": 7.785869,
+      "angle": 175.5,
+      "contrailSize": 7.785869,
+      "style": "HIGH_TECH"
+    },
+    {
+      "location": [-29.5, 3.5],
+      "length": 76.462181,
+      "width": 9.334855,
+      "angle": 180,
+      "contrailSize": 9.334855,
+      "style": "HIGH_TECH"
+    },
+    {
+      "location": [-29.5, -3.5],
+      "length": 76.462181,
+      "width": 9.334855,
+      "angle": -180,
+      "contrailSize": 9.334855,
+      "style": "HIGH_TECH"
+    }
+  ],
+  "bounds": [
+    -28, -58.5,
+    -12, -68,
+    28, -56,
+    28, -31,
+    -12, -19,
+    -28, -28.5
+  ]
+}

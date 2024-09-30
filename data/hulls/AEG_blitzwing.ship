@@ -1,0 +1,119 @@
+{
+  "hullName": "BlitzWing",
+  "hullId": "AEG_blitzwing",
+  "hullSize": "FRIGATE",
+  "spriteName": "graphics/ships/blitzwing/Blitzwing_body.png",
+  "style": "HIGH_TECH",
+  "height": 28,
+  "width": 28,
+  "center": [14, 14.5],
+  "collisionRadius": 61,
+  "shieldCenter": [0, -0],
+  "shieldRadius": 60,
+  "viewOffset": 0,
+  "builtInWeapons": {
+    "WS0001": "AEG_bw_chestarmor",
+    "WS0002": "AEG_bw_Rarm_nullrayblaster",
+    "WS0003": "AEG_Blitzwing_Jetpack",
+    "WS0004": "AEG_bw_Larm_minigun",
+    "WS0006": "AEG_bw_mhead"
+  },
+  "weaponSlots": [
+    {
+      "id": "WS0001",
+      "size": "SMALL",
+      "type": "BUILT_IN",
+      "mount": "TURRET",
+      "arc": 9,
+      "angle": 0,
+      "locations": [12.5, -0]
+    },
+    {
+      "id": "WS0002",
+      "size": "SMALL",
+      "type": "BUILT_IN",
+      "mount": "TURRET",
+      "arc": 90,
+      "angle": -0,
+      "locations": [2.5, -11]
+    },
+    {
+      "id": "WS0003",
+      "size": "SMALL",
+      "type": "BUILT_IN",
+      "mount": "TURRET",
+      "arc": 19,
+      "angle": 0,
+      "locations": [0.5, -0],
+      "renderOrderMod": 2
+    },
+    {
+      "id": "WS0004",
+      "size": "SMALL",
+      "type": "BUILT_IN",
+      "mount": "TURRET",
+      "arc": 90,
+      "angle": 0,
+      "locations": [2.5, 11]
+    },
+    {
+      "id": "WS0006",
+      "size": "SMALL",
+      "type": "BUILT_IN",
+      "mount": "TURRET",
+      "arc": 103,
+      "angle": 0,
+      "locations": [-0.5, -0]
+    },
+    {
+      "id": "WS0005",
+      "size": "SMALL",
+      "type": "MISSILE",
+      "mount": "HIDDEN",
+      "arc": 15,
+      "angle": 0,
+      "locations": [14.5, 11]
+    },
+    {
+      "id": "WS0007",
+      "size": "SMALL",
+      "type": "MISSILE",
+      "mount": "HIDDEN",
+      "arc": 15,
+      "angle": -0,
+      "locations": [14.5, -11]
+    }
+  ],
+  "engineSlots": [
+    {
+      "location": [-20.5, -0],
+      "length": 30,
+      "width": 10,
+      "angle": 180,
+      "contrailSize": 30,
+      "style": "HIGH_TECH"
+    },
+    {
+      "location": [-18.5, 25],
+      "length": 26.158424,
+      "width": 6.320393,
+      "angle": 153.5,
+      "contrailSize": 6.320393,
+      "style": "HIGH_TECH"
+    },
+    {
+      "location": [-18.5, -25],
+      "length": 26.158424,
+      "width": 6.320393,
+      "angle": -153.5,
+      "contrailSize": 6.320393,
+      "style": "HIGH_TECH"
+    }
+  ],
+  "bounds": [
+    -5.5, -10.5,
+    13.5, -5,
+    13.5, 5,
+    -5.5, 10.5
+  ]
+}

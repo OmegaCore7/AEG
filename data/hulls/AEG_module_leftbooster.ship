@@ -1,0 +1,75 @@
+{
+  "hullName": "Crimson Cascade Left Booster Module",
+  "hullId": "AEG_module_leftbooster",
+  "hullSize": "DESTROYER",
+  "spriteName": "graphics/ships/red_menace/rmleftbooster.png",
+  "style": "HIGH_TECH",
+  "height": 260,
+  "width": 124,
+  "center": [55.5, 106.5],
+  "collisionRadius": 116,
+  "shieldCenter": [0, -0],
+  "shieldRadius": 115,
+  "viewOffset": 0,
+  "builtInMods": [
+    "always_detaches",
+    "reduced_explosion",
+    "hardened_subsystems",
+    "missile_reload",
+    "insulatedengine",
+    "advancedshieldemitter"
+  ],
+  "builtInWings": [
+    "AEG_rmdrone"
+  ],
+  "builtInWeapons": {
+    "WS0001": "locust",
+    "WS0002": "locust"
+  },
+  "weaponSlots": [
+    {
+      "id": "WS0001",
+      "size": "LARGE",
+      "type": "BUILT_IN",
+      "mount": "HIDDEN",
+      "arc": 268,
+      "angle": 58.5,
+      "locations": [23, -2]
+    },
+    {
+      "id": "WS0002",
+      "size": "LARGE",
+      "type": "BUILT_IN",
+      "mount": "HIDDEN",
+      "arc": 268,
+      "angle": -120.5,
+      "locations": [19, -19]
+    },
+    {
+      "id": "LB 1",
+      "size": "LARGE",
+      "type": "LAUNCH_BAY",
+      "mount": "HIDDEN",
+      "arc": 360,
+      "angle": 0,
+      "locations": [63.5, -36]
+    }
+  ],
+  "engineSlots": [
+    {
+      "location": [-39.5, 21.5],
+      "length": 261.470154,
+      "width": 119.425392,
+      "angle": 160,
+      "contrailSize": 119.425392,
+      "style": "HIGH_TECH"
+    }
+  ],
+  "bounds": [
+    90.5, -37,
+    45.5, 17.5,
+    -43, 43,
+    -63, 1.5,
+    68, -65
+  ]
+}
