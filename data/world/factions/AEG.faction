@@ -21,6 +21,7 @@
       "standard_female":[
          "graphics/portraits/Isabell.png",
          "graphics/portraits/Jennifer.png",
+	 "graphics/portraits/Lucille.png",
       ],
    },
    "fleetCompositions":{ #Here's the meat of the faction file for now.

@@ -1,0 +1,16 @@
+{
+	"portraits":{
+		"standard_male":[
+			"graphics/portraits/Axel.png",
+			"graphics/portraits/Genos.png",
+			"graphics/portraits/Guy_Shishioh.png",
+			"graphics/portraits/Simon.png",
+			"graphics/portraits/unknow32323n.png",
+		],
+		"standard_female":[
+			"graphics/portraits/Isabell.png",
+			"graphics/portraits/Jennifer.png",
+			"graphics/portraits/Lucille.png",
+		],
+	},
+},
