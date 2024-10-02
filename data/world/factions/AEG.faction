@@ -1,0 +1,111 @@
+{
+   id:"AEG", #This is the ID of the faction that you'll refer to it by in scripts.
+   "color":[35,106,155,255], #The color for the faction, using an RGBA color code
+   "displayName":"Astral Explorer Guild", #The name as it appears ingame
+   "displayNameWithArticle":"Astral Explorer Guild",
+   "displayNameIsOrAre":"is",
+   "description":"An organization consisting the collective of exceptional individuals from all walks of life across the sector. They have one thing in common and that is to Explore and go where no one has gone before.",
+   "logo":"graphics/factions/AEG_flag.png",
+   "crest":"graphics/factions/AEG_crest.png",
+   "names":{ #The character names the faction will use.
+      "modern":1,
+   },
+   "portraits":{ #The portraits that the faction will use.
+      "standard_male":[
+         "graphics/portraits/Axel.png",
+         "graphics/portraits/Simon.png",
+         "graphics/portraits/Guy_Shishioh.png",
+         "graphics/portraits/Genos.png",
+         "graphics/portraits/unknow32323n.png",
+      ],
+      "standard_female":[
+         "graphics/portraits/Isabell.png",
+         "graphics/portraits/Jennifer.png",
+      ],
+   },
+   "fleetCompositions":{ #Here's the meat of the faction file for now.
+      "scout":{ #The ID of your fleet.
+         "displayName":"AEG Scout", #The name displayed – will read Factionname Scout.
+         "maxFleetPoints":111, #The max fleet points used for randomly generated fleets.
+         "daysWorthOfSupplies":[30, 50], #The stuff the fleet spawns with –  supplies, fuel, extra crew, marines.
+         "lyWorthOfFuel":[40, 60],
+         "extraCrewPercent":[20, 30],
+         "marinesPercent":[5, 10],
+         "ships":{ #The make up of the fleet. You have “variant ID”:[min, max],.
+            "AEG_red_menace_fullarmor":[1, 1],
+            "tempest_Attack":[1, 1],  #Here we have minimum 1 tempest attack, and below 1 wasp wing. These fleets will not be random.
+            "AEG_blitzwing_blitz":[1, 1],
+         },
+      },
+      "raiders":{
+         "displayName":"Raiders",
+         "maxFleetPoints":30,
+         "daysWorthOfSupplies":[30, 50],
+         "lyWorthOfFuel":[40, 60],
+         "extraCrewPercent":[20, 30],
+         "marinesPercent":[5, 10],
+         "ships":{ #This fleet IS random, thanks to min and max values. The game will generate the ships listed randomly within the min and max, but keep it all within the max fleet points given above.
+            "tempest_Attack":[0, 3],
+            "AEG_red_menace_fullarmor":[1, 2],
+            "wolf_Assault":[0, 2],
+            "AEG_blitzwing_blitz":[1, 2],
+         },
+      },
+      "attackFleet":{
+         "displayName":"Attack Fleet",
+         "maxFleetPoints":50,
+         "daysWorthOfSupplies":[30, 50],
+         "lyWorthOfFuel":[40, 60],
+         "extraCrewPercent":[50, 70],
+         "marinesPercent":[10, 20],
+         "ships":{
+            "aurora_Balanced":[1, 1],
+            "medusa_Attack":[0, 2],
+            "medusa_CS":[0, 2],
+            "tempest_Attack":[0, 3],
+            "AEG_blitzwing_blitz":[1, 2],
+            "AEG_red_menace_fullarmor":[1, 2],
+            "wasp_wing":[0, 2],
+         },
+      },
+      "securityDetachment":{
+         "displayName":"Security Detachment",
+         "maxFleetPoints":130,
+         "daysWorthOfSupplies":[30, 50],
+         "lyWorthOfFuel":[40, 60],
+         "extraCrewPercent":[50, 70],
+         "marinesPercent":[20, 30],
+         "ships":{
+            "odyssey_Balanced":[0, 1],
+            "paragon_Elite":[0, 1],
+            "astral_Elite":[0, 1],
+            "aurora_Balanced":[0, 2],
+            "AEG_vengeance_v":[1, 2],
+            "tempest_Attack":[0, 3],
+            "AEG_red_menace_fullarmor":[1, 2],
+            "AEG_blitzwing_blitz":[1, 2],
+            "xyphos_wing":[0, 2],
+            "wasp_wing":[0, 2],
+         },
+      },
+   },
+   "traits":{
+      "admiral":{
+
+      },
+      "captain":{ #Affects AI captain behavior in battle.
+         "cowardly":1,
+         "cautious":1,
+         "steady":1,
+         "aggressive":1,
+         "suicidal":1,
+         "fearless":1,
+      },
+   },
+   "dialogue":{ #What the faction will tell players in the comm.
+      "greetingFriendly":"This AEG vessel is on a classified mission. Identity and friendly status confirmed.",
+      "greetingNeutral":"We of the Astral Explorer Guild have scanned your vessel and analyzed your tactical capabilities. Maintain your distance.",
+      "greetingHostileAggressive":"Attention. Your vessel has scanned and identified as hostile to the Astral Explorer Guild. Prepare for annihilation.",
+      "greetingHostileTimid":"Attention. Your vessel has scanned and identified as hostile to the Astral Explorer Guild. Further attempts at aggression will be recorded.",
+   }
+},
