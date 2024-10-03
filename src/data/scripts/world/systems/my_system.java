@@ -3,11 +3,16 @@ package data.scripts.world.systems;
 import com.fs.starfarer.api.campaign.PlanetAPI;
 import com.fs.starfarer.api.campaign.SectorAPI;
 import com.fs.starfarer.api.campaign.StarSystemAPI;
+import com.fs.starfarer.api.campaign.econ.MarketAPI;
+import com.fs.starfarer.api.impl.campaign.ids.Conditions;
+import com.fs.starfarer.api.impl.campaign.ids.Industries;
+import com.fs.starfarer.api.impl.campaign.ids.Submarkets;
 import com.fs.starfarer.api.impl.campaign.procgen.NebulaEditor;
 import com.fs.starfarer.api.impl.campaign.terrain.HyperspaceTerrainPlugin;
 import com.fs.starfarer.api.util.Misc;
-
 import java.awt.*;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 
 public class my_system {
@@ -36,6 +41,31 @@ public class my_system {
                 planet1Dist, //distance from star
                 700f); //how many days to orbit
         planet1.setCustomDescriptionId("Astral Guardians Homeworld"); //for custom descriptions
+
+        MarketAPI planet1_market = addMarketplace.addMarketplace("AEG", planet1,
+                null, //connected entities, like stations
+                "Valoria",
+                10, //size
+                new ArrayList<>(Arrays.asList( //these are conditions
+                        Conditions.POPULATION_10,
+                        Conditions.RUINS_VAST,
+                        Conditions.ORE_RICH,
+                        Conditions.FARMLAND_RICH )),
+                new ArrayList<>(Arrays.asList( //industries
+                        Industries.POPULATION,
+                        Industries.MEGAPORT,
+                        Industries.ORBITALSTATION,
+                        Industries.MINING,
+                        Industries.HIGHCOMMAND,
+                        Industries.ORBITALWORKS,
+                        Industries.TECHMINING
+                )),
+                new ArrayList<>(Arrays.asList(Submarkets.SUBMARKET_STORAGE, //and markets
+                        Submarkets.GENERIC_MILITARY,
+                        Submarkets.SUBMARKET_BLACK,
+                        Submarkets.SUBMARKET_OPEN)),
+                0.15f
+        );
 
         system.autogenerateHyperspaceJumpPoints(true, true); //generates jump points
 
