@@ -1,0 +1,91 @@
+package data.shipsystems.scripts;
+
+import com.fs.starfarer.api.combat.MutableShipStatsAPI;
+import com.fs.starfarer.api.combat.ShipAPI;
+import com.fs.starfarer.api.Global;
+import com.fs.starfarer.api.impl.combat.BaseShipSystemScript;
+import org.lwjgl.util.vector.Vector2f;
+
+public class AEG_giganticdriver extends BaseShipSystemScript {
+
+    private static final float RAM_RADIUS = 1000f;
+    private static final float RAM_FORCE = 1000f; // Adjusted value
+    private static final float RAM_DAMAGE = 1000f; // Damage to apply
+    private static final float COLLISION_THRESHOLD = 50f; // Threshold for collision detection
+
+    @Override
+    public void apply(MutableShipStatsAPI stats, String id, State state, float effectLevel) {
+        ShipAPI ship = (ShipAPI) stats.getEntity();
+        if (ship == null) return;
+
+        if (state == State.ACTIVE) {
+            // Make the player ship immune to damage from projectiles and missiles
+            ship.getMutableStats().getHullDamageTakenMult().modifyMult(id, 0f);
+            ship.getMutableStats().getArmorDamageTakenMult().modifyMult(id, 0f);
+            ship.getMutableStats().getShieldDamageTakenMult().modifyMult(id, 0f);
+            ship.getMutableStats().getEmpDamageTakenMult().modifyMult(id, 0f);
+
+            // Apply ramming force and damage
+            for (ShipAPI target : Global.getCombatEngine().getShips()) {
+                if (target.getOwner() != ship.getOwner()) {
+                    Vector2f diff = Vector2f.sub(target.getLocation(), ship.getLocation(), null);
+                    float distance = diff.length();
+                    if (distance <= RAM_RADIUS) {
+                        diff.normalise();
+                        diff.scale(RAM_FORCE * effectLevel);
+                        ship.getVelocity().set(diff);
+
+                        // Check for collision
+                        if (distance <= COLLISION_THRESHOLD) {
+                            // Apply damage to the target's shield if it has one, otherwise to the hull
+                            if (target.getShield() != null && target.getShield().isOn()) {
+                                target.getFluxTracker().increaseFlux(RAM_DAMAGE * 3 * effectLevel, true);
+                            } else {
+                                // Apply damage considering the armor system
+                                float armorValue = target.getArmorGrid().getArmorRating() * target.getArmorGrid().getMaxArmorInCell();
+                                float effectiveDamage = RAM_DAMAGE * effectLevel * (1 - armorValue / (armorValue + RAM_DAMAGE));
+                                target.getMutableStats().getHullDamageTakenMult().modifyMult(id, 1 + (effectiveDamage / target.getMaxHitpoints()));
+                            }
+                        }
+                        break;
+                    }
+                }
+            }
+        }
+
+        // Remove immunity and reset velocity after the duration
+        if (state == State.OUT) {
+            ship.getMutableStats().getHullDamageTakenMult().unmodify(id);
+            ship.getMutableStats().getArmorDamageTakenMult().unmodify(id);
+            ship.getMutableStats().getShieldDamageTakenMult().unmodify(id);
+            ship.getMutableStats().getEmpDamageTakenMult().unmodify(id);
+
+            // Slow down the ship and stop spinning
+            ship.getVelocity().scale(0.75f); // Reduce speed by half
+            ship.setAngularVelocity(0); // Stop spinning
+        }
+    }
+
+    @Override
+    public void unapply(MutableShipStatsAPI stats, String id) {
+        ShipAPI ship = (ShipAPI) stats.getEntity();
+        if (ship != null) {
+            ship.getMutableStats().getHullDamageTakenMult().unmodify(id);
+            ship.getMutableStats().getArmorDamageTakenMult().unmodify(id);
+            ship.getMutableStats().getShieldDamageTakenMult().unmodify(id);
+            ship.getMutableStats().getEmpDamageTakenMult().unmodify(id);
+
+            // Slow down the ship and stop spinning
+            ship.getVelocity().scale(0.5f); // Reduce speed by half
+            ship.setAngularVelocity(0); // Stop spinning
+        }
+    }
+
+    @Override
+    public StatusData getStatusData(int index, State state, float effectLevel) {
+        if (index == 0) {
+            return new StatusData("Gigantic Driver!", false);
+        }
+        return null;
+    }
+}

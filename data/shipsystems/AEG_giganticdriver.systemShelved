@@ -1,20 +1,20 @@
 {
-	"id":"AEG_warp",
-	"type":"ENGINE_MOD",
-    "aiType":"BURN_DRIVE",
+	"id":"AEG_giganticdriver",
+	"type":"STAT_MOD",
+	"aiType":"NONE",
 
-	"statsScript":"data.shipsystems.scripts.AEG_warpstats",
+	"statsScript":"data.shipsystems.scripts.AEG_giganticdriver",
 
-	"engineGlowColor":[100,50,255,255],
+	"engineGlowColor":[100,255,100,255],
 	"engineGlowLengthMult":3,
 	"engineGlowWidthMult":1.5,
 	"engineGlowGlowMult":3,
 
 	"flameoutOnImpactChance":0,
 
-	"clampTurnRateAfter":false,
+	"clampTurnRateAfter":true,
 	"clampMaxSpeedAfter":true,
-	"alwaysAccelerate":true,
+	"alwaysAccelerate":false,
 
 	"useSound":"system_plasma_burn",
 	"loopSound":"system_plasma_burn_loop",
@@ -23,6 +23,6 @@
 	"aiHints":{
 		"activeSpeedIncrease":1000,
 		"burstMovementPotential":1000,
-		"averageSpeedIncrease":1000,
+		"averageSpeedIncrease":1000
 	}
 }
