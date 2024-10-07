@@ -1,0 +1,81 @@
+package data.hullmods;
+
+import com.fs.starfarer.api.combat.ShipAPI;
+import com.fs.starfarer.api.hullmods.HullModDescription;
+import com.fs.starfarer.api.hullmods.HullModSpecAPI;
+
+public class AEG_tenacity extends HullModDescription {
+
+    private static final float HULL_REGEN_RATE = 10f; // Hull regeneration per second
+    private static final float ARMOR_REGEN_RATE = 5f; // Armor regeneration per second (half of hull)
+    private static final float SLOWED_HULL_REGEN_RATE = 2f; // Hull regeneration per second when above 80%
+    private static final float SLOWED_ARMOR_REGEN_RATE = 1f; // Armor regeneration per second when above 80%
+
+    private static final float HULL_BONUS = 0.40f; // 40% hull bonus
+    private boolean hasUsedCharge = false;
+
+    @Override
+    public void applyEffectsBeforeShipCreation(HullModSpecAPI spec, ShipAPI ship) {
+        // Check for compatibility with reinforced bulkheads
+        if (ship.getHullMod("reinforced_bulkheads") != null) {
+            // Incompatible with reinforced bulkheads, do not apply hull bonus
+            return;
+        }
+
+        // Apply hull integrity bonus
+        ship.getMutableStats().getHullBonus().modifyMult(spec.getId(), 1 + HULL_BONUS);
+        ship.setRecoverable(true); // Make ship always recoverable
+    }
+
+    @Override
+    public void advanceInCombat(ShipAPI ship, float amount) {
+        // Check if the ship is alive and not destroyed
+        if (ship.isAlive() && !ship.isHulk()) {
+            float hullPercentage = ship.getHitpoints() / ship.getMaxHitpoints();
+            if (hullPercentage <= 0.3f && !hasUsedCharge) {
+                regenerateHull(ship, amount);
+                regenerateArmor(ship, amount);
+            }
+        }
+    }
+
+    private void regenerateHull(ShipAPI ship, float amount) {
+        float currentHitpoints = ship.getHitpoints();
+        if (currentHitpoints < ship.getMaxHitpoints()) {
+            float hullToRegenerate = (currentHitpoints > 0.8f * ship.getMaxHitpoints())
+                    ? SLOWED_HULL_REGEN_RATE * amount
+                    : HULL_REGEN_RATE * amount;
+
+            // Ensure the hull does not exceed the max limit
+            if (currentHitpoints + hullToRegenerate >= ship.getMaxHitpoints()) {
+                hullToRegenerate = ship.getMaxHitpoints() - currentHitpoints;
+                hasUsedCharge = true; // Mark charge as used
+            }
+            ship.setHitpoints(Math.min(ship.getMaxHitpoints(), currentHitpoints + hullToRegenerate));
+        }
+    }
+
+    private void regenerateArmor(ShipAPI ship, float amount) {
+        float currentArmor = ship.getArmor().getTotalArmorValue();
+        if (currentArmor < ship.getArmor().getMaxArmorValue()) {
+            float armorToRegenerate = (ship.getHitpoints() > 0.8f * ship.getMaxHitpoints())
+                    ? SLOWED_ARMOR_REGEN_RATE * amount
+                    : ARMOR_REGEN_RATE * amount;
+
+            // Ensure the armor does not exceed the max limit
+            if (currentArmor + armorToRegenerate >= ship.getArmor().getMaxArmorValue()) {
+                armorToRegenerate = ship.getArmor().getMaxArmorValue() - currentArmor;
+                hasUsedCharge = true; // Mark charge as used
+            }
+            ship.getArmor().setTotalArmorValue(Math.min(ship.getArmor().getMaxArmorValue(), currentArmor + armorToRegenerate));
+        }
+    }
+
+    @Override
+    public void applyEffectsAfterShipCreation(HullModSpecAPI spec, ShipAPI ship) {
+        // Check if the mod is S-Modded for extra charge
+        if (ship.isSModded(spec)) {
+            hasUsedCharge = false; // Reset charge if S-Modded
+        }
+    }
+}
