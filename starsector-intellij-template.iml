@@ -11,5 +11,6 @@
     <orderEntry type="library" exported="" name="LazyLib-Console" level="project" />
     <orderEntry type="library" exported="" name="Graphics" level="project" />
     <orderEntry type="library" exported="" name="ExerelinCore" level="project" />
+    <orderEntry type="library" exported="" name="MagicLib" level="project" />
   </component>
 </module>
