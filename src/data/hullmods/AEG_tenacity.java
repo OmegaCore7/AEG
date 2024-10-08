@@ -12,7 +12,7 @@ public class AEG_tenacity extends BaseHullMod {
     public static final float HULL_REGEN_RATE = 1.0f; // Hull regeneration rate per second (doubled)
     public static final float ARMOR_REGEN_RATE = 0.4f; // Armor regeneration rate per second (doubled)
     public static final float REGEN_THRESHOLD = 0.45f; // 45% HP threshold
-    private static final String CHARGE_KEY = "ReinforcedBulkheadsCharge";
+    private static final String CHARGE_KEY = "TENACITYCharge";
 
     @Override
     public void applyEffectsBeforeShipCreation(HullSize hullSize, MutableShipStatsAPI stats, String id) {
@@ -42,9 +42,11 @@ public class AEG_tenacity extends BaseHullMod {
             // Regenerate armor
             float armorRegen = ARMOR_REGEN_RATE * amount;
             for (int i = 0; i < ship.getArmorGrid().getGrid().length; i++) {
-                float currentArmor = ship.getArmorGrid().getGrid()[i];
-                float maxArmor = ship.getArmorGrid().getMaxArmorInCell();
-                ship.getArmorGrid().getGrid()[i] = Math.min(currentArmor + armorRegen, maxArmor);
+                for (int j = 0; j < ship.getArmorGrid().getGrid()[i].length; j++) {
+                    float currentArmor = ship.getArmorGrid().getGrid()[i][j];
+                    float maxArmor = ship.getArmorGrid().getMaxArmorInCell();
+                    ship.getArmorGrid().getGrid()[i][j] = Math.min(currentArmor + armorRegen, maxArmor);
+                }
             }
 
             // Decrease charge if fully healed
@@ -56,15 +58,17 @@ public class AEG_tenacity extends BaseHullMod {
     }
 
     private boolean isArmorFullyRepaired(ShipAPI ship) {
-        for (float armor : ship.getArmorGrid().getGrid()) {
-            if (armor < ship.getArmorGrid().getMaxArmorInCell()) {
-                return false;
+        for (float[] row : ship.getArmorGrid().getGrid()) {
+            for (float armor : row) {
+                if (armor < ship.getArmorGrid().getMaxArmorInCell()) {
+                    return false;
+                }
             }
         }
         return true;
     }
 
-    @Override
+
     public void unapply(MutableShipStatsAPI stats, String id) {
         // No need to unapply anything specific for this hull mod
     }
@@ -80,4 +84,3 @@ public class AEG_tenacity extends BaseHullMod {
         return null;
     }
 }
-

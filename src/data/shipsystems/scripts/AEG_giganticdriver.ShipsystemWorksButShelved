@@ -1,90 +1,100 @@
-package data.shipsystems.scripts;
+package data.hullmods;
 
+import com.fs.starfarer.api.combat.BaseHullMod;
 import com.fs.starfarer.api.combat.MutableShipStatsAPI;
 import com.fs.starfarer.api.combat.ShipAPI;
-import com.fs.starfarer.api.Global;
-import com.fs.starfarer.api.impl.combat.BaseShipSystemScript;
-import org.lwjgl.util.vector.Vector2f;
+import com.fs.starfarer.api.combat.ShipAPI.HullSize;
+import com.fs.starfarer.api.impl.campaign.ids.Stats;
+import org.lazywizard.lazylib.MathUtils;
+import org.lazywizard.lazylib.combat.CombatUtils;
 
-public class AEG_giganticdriver extends BaseShipSystemScript {
+public class AEG_PowerGauge extends BaseHullMod {
 
-    private static final float RAM_RADIUS = 1000f;
-    private static final float RAM_FORCE = 1000f; // Adjusted value
-    private static final float RAM_DAMAGE = 1000f; // Damage to apply
-    private static final float COLLISION_THRESHOLD = 50f; // Threshold for collision detection
+    private static final String GAUGE_KEY = "AEG_PowerGauge";
+    private static final String SYSTEM_ID = "AEG_GiganticCatastraphe";
+    private static final float GAUGE_INCREMENT = 1f;
+    private static final float ENEMY_PROXIMITY_BONUS = 0.5f; // Extra gauge fill per enemy within 4000f
+    private static final float ENEMY_PROXIMITY_RANGE = 4000f;
 
     @Override
-    public void apply(MutableShipStatsAPI stats, String id, State state, float effectLevel) {
-        ShipAPI ship = (ShipAPI) stats.getEntity();
-        if (ship == null) return;
+    public void applyEffectsBeforeShipCreation(HullSize hullSize, MutableShipStatsAPI stats, String id) {
+        // Any initial effects can be applied here
+    }
 
-        if (state == State.ACTIVE) {
-            // Make the player ship immune to damage from projectiles and missiles
-            ship.getMutableStats().getHullDamageTakenMult().modifyMult(id, 0f);
-            ship.getMutableStats().getArmorDamageTakenMult().modifyMult(id, 0f);
-            ship.getMutableStats().getShieldDamageTakenMult().modifyMult(id, 0f);
-            ship.getMutableStats().getEmpDamageTakenMult().modifyMult(id, 0f);
+    @Override
+    public void advanceInCombat(ShipAPI ship, float amount) {
+        if (ship == null || !ship.isAlive()) return;
 
-            // Apply ramming force and damage
-            for (ShipAPI target : Global.getCombatEngine().getShips()) {
-                if (target.getOwner() != ship.getOwner()) {
-                    Vector2f diff = Vector2f.sub(target.getLocation(), ship.getLocation(), null);
-                    float distance = diff.length();
-                    if (distance <= RAM_RADIUS) {
-                        diff.normalise();
-                        diff.scale(RAM_FORCE * effectLevel);
-                        ship.getVelocity().set(diff);
-
-                        // Check for collision
-                        if (distance <= COLLISION_THRESHOLD) {
-                            // Apply damage to the target's shield if it has one, otherwise to the hull
-                            if (target.getShield() != null && target.getShield().isOn()) {
-                                target.getFluxTracker().increaseFlux(RAM_DAMAGE * 3 * effectLevel, true);
-                            } else {
-                                // Apply damage considering the armor system
-                                float armorValue = target.getArmorGrid().getArmorRating() * target.getArmorGrid().getMaxArmorInCell();
-                                float effectiveDamage = RAM_DAMAGE * effectLevel * (1 - armorValue / (armorValue + RAM_DAMAGE));
-                                target.getMutableStats().getHullDamageTakenMult().modifyMult(id, 1 + (effectiveDamage / target.getMaxHitpoints()));
-                            }
-                        }
-                        break;
-                    }
-                }
-            }
+        // Initialize gauge if not already done
+        if (!ship.getCustomData().containsKey(GAUGE_KEY)) {
+            ship.setCustomData(GAUGE_KEY, 0f);
         }
 
-        // Remove immunity and reset velocity after the duration
-        if (state == State.OUT) {
-            ship.getMutableStats().getHullDamageTakenMult().unmodify(id);
-            ship.getMutableStats().getArmorDamageTakenMult().unmodify(id);
-            ship.getMutableStats().getShieldDamageTakenMult().unmodify(id);
-            ship.getMutableStats().getEmpDamageTakenMult().unmodify(id);
+        float gauge = (float) ship.getCustomData().get(GAUGE_KEY);
+        gauge += GAUGE_INCREMENT * amount;
 
-            // Slow down the ship and stop spinning
-            ship.getVelocity().scale(0.75f); // Reduce speed by half
-            ship.setAngularVelocity(0); // Stop spinning
+        // Check for enemies within proximity
+        int nearbyEnemies = 0;
+        for (ShipAPI enemy : CombatUtils.getShipsWithinRange(ship.getLocation(), ENEMY_PROXIMITY_RANGE)) {
+            if (enemy.getOwner() != ship.getOwner()) {
+                nearbyEnemies++;
+            }
+        }
+        gauge += nearbyEnemies * ENEMY_PROXIMITY_BONUS * amount;
+
+        gauge = MathUtils.clamp(gauge, 0f, 100f);
+        ship.setCustomData(GAUGE_KEY, gauge);
+
+        if (gauge >= 50f) {
+            ship.getMutableStats().getDamageToArmorMult().modifyPercent(id, 25f); // Example of Polarized Armor Skill buff
+            ship.getMutableStats().getShieldDamageTakenMult().modifyMult(id, 0.75f); // Example of Shield Shunt buff
+        }
+        if (gauge >= 75f) {
+            ship.getMutableStats().getBallisticRoFMult().modifyPercent(id, 25f);
+            ship.getMutableStats().getEnergyRoFMult().modifyPercent(id, 25f);
+            ship.getMutableStats().getMissileRoFMult().modifyPercent(id, 25f);
+        }
+        if (gauge >= 100f) {
+            ship.getMutableStats().getEnergyWeaponDamageMult().modifyPercent(id, 50f);
+        }
+
+        // Reset gauge after using ship system or hold for 10 seconds if not present
+        if (ship.getSystem().getId().equals(SYSTEM_ID) && ship.getSystem().isActive()) {
+            ship.setCustomData(GAUGE_KEY, 0f);
+        } else if (!ship.getSystem().getId().equals(SYSTEM_ID) && gauge >= 100f) {
+            ship.getMutableStats().getTimeMult().modifyMult(id, 0.1f); // Hold bonuses for 10 seconds
         }
     }
 
     @Override
     public void unapply(MutableShipStatsAPI stats, String id) {
-        ShipAPI ship = (ShipAPI) stats.getEntity();
-        if (ship != null) {
-            ship.getMutableStats().getHullDamageTakenMult().unmodify(id);
-            ship.getMutableStats().getArmorDamageTakenMult().unmodify(id);
-            ship.getMutableStats().getShieldDamageTakenMult().unmodify(id);
-            ship.getMutableStats().getEmpDamageTakenMult().unmodify(id);
+        // Revert all bonuses here
+        stats.getDamageToArmorMult().unmodify(id);
+        stats.getShieldDamageTakenMult().unmodify(id);
+        stats.getBallisticRoFMult().unmodify(id);
+        stats.getEnergyRoFMult().unmodify(id);
+        stats.getMissileRoFMult().unmodify(id);
+        stats.getEnergyWeaponDamageMult().unmodify(id);
+        stats.getTimeMult().unmodify(id); // Revert time multiplier
+    }
 
-            // Slow down the ship and stop spinning
-            ship.getVelocity().scale(0.5f); // Reduce speed by half
-            ship.setAngularVelocity(0); // Stop spinning
-        }
+    @Override
+    public String getDescriptionParam(int index, HullSize hullSize) {
+        if (index == 0) return "50%";
+        if (index == 1) return "25%";
+        if (index == 2) return "75%";
+        if (index == 3) return "25%";
+        if (index == 4) return "100%";
+        if (index == 5) return "50%";
+        if (index == 6) return "AEG_GiganticCatastraphe";
+        return null;
     }
 
     @Override
     public StatusData getStatusData(int index, State state, float effectLevel) {
         if (index == 0) {
-            return new StatusData("Gigantic Driver!", false);
+            float gauge = (float) ship.getCustomData().get(GAUGE_KEY);
+            return new StatusData("Power Gauge: " + (int) gauge + "%", false);
         }
         return null;
     }
