@@ -1,0 +1,14 @@
+{
+    "id": "AEG_Gigantic_Catastraphe",
+    "type": "OTHER",
+    "aiType": "MANEUVERING_JETS",
+    "statsScript": "data.shipsystems.scripts.CombinedSystemStats",
+    "useSound": "system_plasma_jets",
+    "loopSound": "system_plasma_jets_loop",
+    "outOfUsesSound": "engine_disabled",
+    "aiHints": {
+        "activeSpeedIncrease": 125,
+        "burstMovementPotential": 0,
+        "averageSpeedIncrease": 80
+    }
+}
