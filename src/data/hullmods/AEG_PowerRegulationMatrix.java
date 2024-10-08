@@ -4,7 +4,7 @@ import com.fs.starfarer.api.combat.BaseHullMod;
 import com.fs.starfarer.api.combat.MutableShipStatsAPI;
 import com.fs.starfarer.api.combat.ShipAPI;
 import com.fs.starfarer.api.impl.campaign.ids.Stats;
-import com.fs.starfarer.api.impl.campaign.abilities.BaseAbilityPlugin;
+
 public class AEG_PowerRegulationMatrix extends BaseHullMod {
 
     @Override
@@ -12,10 +12,10 @@ public class AEG_PowerRegulationMatrix extends BaseHullMod {
         // Campaign-related boosts
         stats.getFuelUseMod().modifyMult(id, 0.8f); // Reduces fuel consumption by 20%
         stats.getSuppliesPerMonth().modifyMult(id, 0.85f); // Reduces supply consumption by 15%
-        stats.getSensorRangeMod().modifyMult(id, 1.25f); // Increases sensor range by 25%
+        stats.getSensorStrength().modifyMult(id, 1.25f); // Increases sensor range by 25%
         stats.getDynamic().getMod(Stats.SURVEY_COST_REDUCTION).modifyMult(id, 0.7f); // Reduces supply cost for surveying by 30%
-        stats.getDynamic().getMod(Stats.SALVAGE_VALUE_MULT).modifyMult(id, 1.2f); // Increases salvage yield by 20%
-        stats.getFleetwideMaxBurnMod().modifyFlat(id, 1f); // Increases fleet travel speed by 1 burn level
+        stats.getDynamic().getMod(Stats.SALVAGE_VALUE_MULT_MOD).modifyMult(id, 1.2f); // Increases salvage yield by 20%
+        stats.getMaxBurnLevel().modifyFlat(id, 2f); // Increases fleet travel speed by 1 burn level
     }
 
     @Override
