@@ -4,7 +4,7 @@ import com.fs.starfarer.api.combat.BaseHullMod;
 import com.fs.starfarer.api.combat.MutableShipStatsAPI;
 import com.fs.starfarer.api.combat.ShipAPI;
 import com.fs.starfarer.api.impl.campaign.ids.Stats;
-
+import com.fs.starfarer.api.impl.campaign.abilities.BaseAbilityPlugin;
 public class AEG_PowerRegulationMatrix extends BaseHullMod {
 
     @Override
