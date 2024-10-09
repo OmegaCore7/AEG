@@ -1,0 +1,22 @@
+{
+    "id": "AEG_GDBreaker",
+    "type": "ENGINE_MOD",
+    "aiType": "BURN_DRIVE",
+    "statsScript": "data.shipsystems.scripts.AEG_GDBreaker",
+    "flameoutOnImpactChance": 0,
+
+    "clampTurnRateAfter": true,
+    "clampMaxSpeedAfter": true,
+    "alwaysAccelerate": true,
+
+    "useSound": "system_plasma_burn",
+    "loopSound": "system_plasma_burn_loop",
+    "outOfUsesSound": "engine_disabled",
+
+    "aiHints":{
+        "USE_VS_FRIGATES":True,
+        "USE_VS_DESTROYERS":True,
+        "USE_VS_CRUISERS":True,
+        "USE_VS_CAPITALS":True
+    }
+}

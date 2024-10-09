@@ -1,21 +1,15 @@
 package data.shipsystems.scripts;
 
-import com.fs.starfarer.api.Global;
-import com.fs.starfarer.api.combat.*;
+import com.fs.starfarer.api.combat.MutableShipStatsAPI;
+import com.fs.starfarer.api.combat.ShipAPI;
 import com.fs.starfarer.api.impl.combat.BaseShipSystemScript;
-import com.fs.starfarer.api.plugins.ShipSystemStatsScript;
-import org.lazywizard.lazylib.MathUtils;
-import org.lwjgl.util.vector.Vector2f;
 
-import java.awt.Color;
-import java.util.List;
+import java.awt.*;
 
 public class AEG_Gigantic_Catastraphe extends BaseShipSystemScript {
 
-    public static float DAMAGE_MULT = 0.9f;
+    public static float DAMAGE_MULT = 1.2f; // Increase damage by 20%
     private static final Color SHIELD_COLOR = new Color(100, 220, 100, 225); // Green color with some transparency
-    private static final float PUSH_RADIUS = 300f;
-    private static final float BASE_PUSH_FORCE = 500f;
 
     @Override
     public void apply(MutableShipStatsAPI stats, String id, State state, float effectLevel) {
@@ -36,69 +30,25 @@ public class AEG_Gigantic_Catastraphe extends BaseShipSystemScript {
             stats.getMaxTurnRate().modifyPercent(id, 100f);
         }
 
-        // Fortress Shield effect
+        // Blaster Shell effect
         if (state == State.ACTIVE) {
             stats.getShieldDamageTakenMult().modifyMult(id, 1f - DAMAGE_MULT * effectLevel);
             stats.getShieldUpkeepMult().modifyMult(id, 0f);
 
             // Activate shield and change color
-            if (!ship.getShield().isOn()) {
+            if (ship.getShield() != null && !ship.getShield().isOn()) {
                 ship.getShield().toggleOn();
-            }
-            ship.getShield().setRingColor(SHIELD_COLOR);
-            ship.getShield().setInnerColor(SHIELD_COLOR);
-
-            // Apply pushing force
-            applyPushingForce(ship);
-        }
-
-        // Fire all weapons
-        if (state == State.ACTIVE) {
-            for (WeaponAPI weapon : ship.getAllWeapons()) {
-                if (weapon.isDisabled() || weapon.isPermanentlyDisabled()) continue;
-                int maxAmmo = weapon.getMaxAmmo(); //get weapons max ammo
-                weapon.setAmmo(maxAmmo);    // Refill the weapon's ammo to the maximum
-                weapon.setRemainingCooldownTo(0f); // Reduce Cool down to zero
-            }
-        }
-    }
-
-    private void applyPushingForce(ShipAPI ship) {
-        List<ShipAPI> entities = Global.getCombatEngine().getShips();
-        for (CombatEntityAPI entity : entities) {
-            if (entity == ship) continue;
-            float distance = MathUtils.getDistance(ship, entity);
-            if (distance > PUSH_RADIUS) continue;
-
-            float force = BASE_PUSH_FORCE;
-            if (entity instanceof MissileAPI || entity instanceof FighterWingAPI) {
-                force *= 1.0f;
-            } else if (entity instanceof ShipAPI) {
-                ShipAPI targetShip = (ShipAPI) entity;
-                switch (targetShip.getHullSize()) {
-                    case FRIGATE:
-                        force *= 0.75f;
-                        break;
-                    case DESTROYER:
-                        force *= 0.5f;
-                        break;
-                    case CRUISER:
-                        force *= 0.25f;
-                        break;
-                    case CAPITAL_SHIP:
-                        force *= 0.125f;
-                        break;
-                    default:
-                        break;
-                }
-            } else {
-                continue;
+                ship.getShield().setRingColor(SHIELD_COLOR);
+                ship.getShield().setInnerColor(SHIELD_COLOR);
             }
 
-            Vector2f direction = Vector2f.sub(entity.getLocation(), ship.getLocation(), new Vector2f());
-            direction = direction.normalise(direction);
-            direction.scale(force);
-            entity.getVelocity().set(direction);
+            // Apply range, turn rate, and damage buffs
+            stats.getBallisticWeaponRangeBonus().modifyPercent(id, 20f * effectLevel);
+            stats.getEnergyWeaponRangeBonus().modifyPercent(id, 20f * effectLevel);
+            stats.getMissileWeaponRangeBonus().modifyPercent(id, 20f * effectLevel);
+            stats.getBallisticWeaponDamageMult().modifyMult(id, DAMAGE_MULT);
+            stats.getEnergyWeaponDamageMult().modifyMult(id, DAMAGE_MULT);
+            stats.getMissileWeaponDamageMult().modifyMult(id, DAMAGE_MULT);
         }
     }
 
@@ -118,6 +68,12 @@ public class AEG_Gigantic_Catastraphe extends BaseShipSystemScript {
         stats.getDeceleration().unmodify(id);
         stats.getShieldDamageTakenMult().unmodify(id);
         stats.getShieldUpkeepMult().unmodify(id);
+        stats.getBallisticWeaponRangeBonus().unmodify(id);
+        stats.getEnergyWeaponRangeBonus().unmodify(id);
+        stats.getMissileWeaponRangeBonus().unmodify(id);
+        stats.getBallisticWeaponDamageMult().unmodify(id);
+        stats.getEnergyWeaponDamageMult().unmodify(id);
+        stats.getMissileWeaponDamageMult().unmodify(id);
     }
 
     @Override
@@ -128,6 +84,8 @@ public class AEG_Gigantic_Catastraphe extends BaseShipSystemScript {
             return new StatusData("+50 top speed", false);
         } else if (index == 2) {
             return new StatusData("shield absorbs 10x damage", false);
+        } else if (index == 3) {
+            return new StatusData("increased weapon range and damage", false);
         }
         return null;
     }

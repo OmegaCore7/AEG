@@ -24,11 +24,14 @@ public class AEG_transformation extends BaseHullMod {
     private float powerGauge = 0f; // Current gauge value
 
     public void applyEffectsBeforeShipCreation(HullModSpecAPI spec, ShipAPI ship, List<ShipAPI> ships) {
+        if (ship == null) return;
         powerGauge = 0f; // Initialize gauge when applied
     }
 
     @Override
     public void advanceInCombat(ShipAPI ship, float amount) {
+        if (ship == null) return;
+
         // Increase the power gauge by 1% per second
         powerGauge = Math.min(powerGauge + (0.01f * amount), GAUGE_MAX);
         applyBuffs(ship);
@@ -41,6 +44,8 @@ public class AEG_transformation extends BaseHullMod {
     }
 
     public void render(ShipAPI ship, float alpha) {
+        if (ship == null) return;
+
         // Get the position to draw the gauge
         float x = ship.getLocation().x + 20; // Offset from the ship's position
         float y = ship.getLocation().y + 40; // Offset from the ship's position
@@ -68,6 +73,8 @@ public class AEG_transformation extends BaseHullMod {
     }
 
     private void applyBuffs(ShipAPI ship) {
+        if (ship == null) return;
+
         for (float threshold : BOOST_THRESHOLDS) {
             if (powerGauge >= threshold) {
                 increaseArmorEffectiveness(ship);
@@ -79,18 +86,23 @@ public class AEG_transformation extends BaseHullMod {
     }
 
     private void increaseArmorEffectiveness(ShipAPI ship) {
+        if (ship == null) return;
         // Logic to increase effective armor reduction
     }
 
     private void increaseWeaponStats(ShipAPI ship) {
+        if (ship == null) return;
         // Logic to increase weapon reload, cooldown, and rate of fire
     }
 
     private void increaseEnergyDamage(ShipAPI ship) {
+        if (ship == null) return;
         // Logic to increase energy damage
     }
 
     private void triggerTransformation(final ShipAPI ship) {
+        if (ship == null) return;
+
         // Apply transformation effects
         ship.getMutableStats().getMaxSpeed().modifyFlat("super_saiyan", 100f);
         ship.getMutableStats().getBallisticWeaponDamageMult().modifyMult("super_saiyan", 2f);
@@ -109,7 +121,6 @@ public class AEG_transformation extends BaseHullMod {
         Global.getCombatEngine().addPlugin(new BaseEveryFrameCombatPlugin() {
             private float timer = TRANSFORMATION_DURATION;
 
-
             public void advance(float amount, List<InputEventAPI> events) {
                 timer -= amount;
                 if (timer <= 0) {
@@ -121,6 +132,8 @@ public class AEG_transformation extends BaseHullMod {
     }
 
     private void addAuraEffect(ShipAPI ship) {
+        if (ship == null) return;
+
         for (int i = 0; i < 360; i += 10) {
             float angle = (float) Math.toRadians(i);
             Vector2f offset = new Vector2f((float) Math.cos(angle) * ship.getCollisionRadius(), (float) Math.sin(angle) * ship.getCollisionRadius());
@@ -130,6 +143,8 @@ public class AEG_transformation extends BaseHullMod {
     }
 
     private void revertTransformation(ShipAPI ship) {
+        if (ship == null) return;
+
         // Revert transformation effects
         ship.getMutableStats().getMaxSpeed().unmodify("super_saiyan");
         ship.getMutableStats().getBallisticWeaponDamageMult().unmodify("super_saiyan");

@@ -3,10 +3,19 @@
     "type": "ENGINE_MOD",
     "aiType": "MANEUVERING_JETS",
     "statsScript": "data.shipsystems.scripts.AEG_Gigantic_Catastraphe",
+    "engineGlowColor":[100,220,100,255],
+    	"engineGlowLengthMult":3,
+    	"engineGlowWidthMult":1.5,
+    	"engineGlowGlowMult":3,
+
+    	"flameoutOnImpactChance":0,
+        "clampTurnRateAfter":true,
+    	"clampMaxSpeedAfter":true,
+        "alwaysAccelerate":false,
     "useSound": "system_plasma_jets",
     "loopSound": "system_plasma_jets_loop",
     "outOfUsesSound": "engine_disabled",
-    "aiHints": {
+    "aiHints":{
         "activeSpeedIncrease": 125,
         "burstMovementPotential": 0,
         "averageSpeedIncrease": 80

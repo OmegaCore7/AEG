@@ -23,21 +23,31 @@ public class AEG_GDBreaker implements EveryFrameWeaponEffectPlugin, OnFireEffect
         }
 
         ShipAPI ship = weapon.getShip();
+        if (ship == null) return;
+
         ShipSystemAPI system = ship.getSystem();
-        WeaponAPI drillWeapon = ship.getAllWeapons().stream()
-            .filter(w -> w.getId().equals("WS0006"))
-            .findFirst()
-            .orElse(null);
+        if (system == null) return;
+
+        WeaponAPI drillWeapon = null;
+        for (WeaponAPI w : ship.getAllWeapons()) {
+            if (w.getId().equals("WS0006")) {
+                drillWeapon = w;
+                break;
+            }
+        }
 
         if (drillWeapon != null) {
-            drillWeapon.setHidden(!system.isActive());
+            drillWeapon.getSprite().setAlphaMult(system.isActive() || system.isCoolingDown() ? 1.0f : 0.0f);
         }
 
         if (system.isActive()) {
-            if (firstRun) {
+            if (firstRun && drillWeapon != null) {
                 drillWeapon.getAnimation().setFrame(0);
                 drillWeapon.getAnimation().play();
                 firstRun = false;
+
+                // Add the notification text
+                engine.addFloatingText(ship.getLocation(), "GIGA DRILL BREAKER", 30f, Color.GREEN, ship, 1f, 2f);
             }
 
             Vector2f shipLocation = ship.getLocation();
@@ -49,6 +59,13 @@ public class AEG_GDBreaker implements EveryFrameWeaponEffectPlugin, OnFireEffect
                 }
             }
 
+            // Add micro explosions along the path only when the system is active
+            interval.advance(amount);
+            if (interval.intervalElapsed()) {
+                Vector2f explosionLocation = MathUtils.getRandomPointInCircle(shipLocation, 100f);
+                engine.spawnExplosion(explosionLocation, new Vector2f(), Color.ORANGE, 30f, 0.5f);
+            }
+
             ship.getMutableStats().getMaxSpeed().modifyFlat("drill_system", 200f);
             ship.getMutableStats().getAcceleration().modifyFlat("drill_system", 300f);
             ship.getMutableStats().getTurnAcceleration().modifyFlat("drill_system", 200f);
@@ -57,15 +74,18 @@ public class AEG_GDBreaker implements EveryFrameWeaponEffectPlugin, OnFireEffect
             engine.addSmoothParticle(ship.getLocation(), ship.getVelocity(), 100f, 1f, 0.5f, Color.GREEN);
 
             List<CombatEntityAPI> entities = CombatUtils.getEntitiesWithinRange(ship.getLocation(), 100f);
-            for (CombatEntityAPI entity : entities) {
-                if (entity instanceof ShipAPI && entity != ship) {
-                    float damage = 500f; // Example damage value
-                    engine.applyDamage(entity, entity.getLocation(), damage, DamageType.ENERGY, 0f, false, false, ship);
+            if (entities != null) {
+                for (CombatEntityAPI entity : entities) {
+                    if (entity instanceof ShipAPI && entity != ship) {
+                        float damage = 500f; // Example damage value
+                        engine.applyDamage(entity, entity.getLocation(), damage, DamageType.ENERGY, 0f, false, false, ship);
+                    }
                 }
             }
         } else {
             if (drillWeapon != null) {
-                drillWeapon.getAnimation().stop();
+                drillWeapon.getAnimation().pause();
+                drillWeapon.getAnimation().setFrame(0);
             }
             firstRun = true;
 

@@ -9,6 +9,8 @@ public class AEG_PowerRegulationMatrix extends BaseHullMod {
 
     @Override
     public void applyEffectsBeforeShipCreation(ShipAPI.HullSize hullSize, MutableShipStatsAPI stats, String id) {
+        if (stats == null) return;
+
         // Campaign-related boosts
         stats.getFuelUseMod().modifyMult(id, 0.8f); // Reduces fuel consumption by 20%
         stats.getSuppliesPerMonth().modifyMult(id, 0.85f); // Reduces supply consumption by 15%
@@ -20,11 +22,13 @@ public class AEG_PowerRegulationMatrix extends BaseHullMod {
 
     @Override
     public void applyEffectsAfterShipCreation(ShipAPI ship, String id) {
+        if (ship == null) return;
         // Additional effects can be applied here if needed
     }
 
     @Override
     public void advanceInCombat(ShipAPI ship, float amount) {
+        if (ship == null) return;
         // Combat-related effects can be applied here if needed
     }
 

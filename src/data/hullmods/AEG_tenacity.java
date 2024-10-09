@@ -16,6 +16,8 @@ public class AEG_tenacity extends BaseHullMod {
 
     @Override
     public void applyEffectsBeforeShipCreation(HullSize hullSize, MutableShipStatsAPI stats, String id) {
+        if (stats == null) return;
+
         stats.getHullBonus().modifyPercent(id, HULL_BONUS);
         stats.getDynamic().getMod(Stats.INDIVIDUAL_SHIP_RECOVERY_MOD).modifyFlat(id, 1000f);
         stats.getBreakProb().modifyMult(id, 0f);
@@ -58,6 +60,8 @@ public class AEG_tenacity extends BaseHullMod {
     }
 
     private boolean isArmorFullyRepaired(ShipAPI ship) {
+        if (ship == null) return false;
+
         for (float[] row : ship.getArmorGrid().getGrid()) {
             for (float armor : row) {
                 if (armor < ship.getArmorGrid().getMaxArmorInCell()) {
@@ -67,7 +71,6 @@ public class AEG_tenacity extends BaseHullMod {
         }
         return true;
     }
-
 
     public void unapply(MutableShipStatsAPI stats, String id) {
         // No need to unapply anything specific for this hull mod
