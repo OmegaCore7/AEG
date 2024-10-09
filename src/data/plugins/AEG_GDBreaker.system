@@ -1,0 +1,84 @@
+package data.shipsystems.scripts;
+
+import com.fs.starfarer.api.AnimationAPI;
+import com.fs.starfarer.api.combat.*;
+import com.fs.starfarer.api.util.IntervalUtil;
+import org.lazywizard.lazylib.MathUtils;
+import org.lazywizard.lazylib.combat.CombatUtils;
+import org.lwjgl.util.vector.Vector2f;
+
+import java.awt.*;
+import java.util.List;
+
+public class AEG_GDBreaker implements EveryFrameWeaponEffectPlugin, OnFireEffectPlugin {
+
+    private boolean firstRun = true;
+    private IntervalUtil interval = new IntervalUtil(0f, 0.1f);
+    private IntervalUtil particleInterval = new IntervalUtil(0f, 0.1f);
+
+    @Override
+    public void advance(float amount, CombatEngineAPI engine, WeaponAPI weapon) {
+        if (engine == null || engine.isPaused()) {
+            return;
+        }
+
+        ShipAPI ship = weapon.getShip();
+        ShipSystemAPI system = ship.getSystem();
+        WeaponAPI drillWeapon = ship.getAllWeapons().stream()
+            .filter(w -> w.getId().equals("WS0006"))
+            .findFirst()
+            .orElse(null);
+
+        if (drillWeapon != null) {
+            drillWeapon.setHidden(!system.isActive());
+        }
+
+        if (system.isActive()) {
+            if (firstRun) {
+                drillWeapon.getAnimation().setFrame(0);
+                drillWeapon.getAnimation().play();
+                firstRun = false;
+            }
+
+            Vector2f shipLocation = ship.getLocation();
+            particleInterval.advance(amount);
+            if (particleInterval.intervalElapsed()) {
+                for (int i = 0; i < 10; i++) {
+                    Vector2f particleLocation = MathUtils.getRandomPointInCircle(shipLocation, 50f);
+                    engine.addHitParticle(particleLocation, new Vector2f(), 10f, 1f, 0.5f, Color.GREEN);
+                }
+            }
+
+            ship.getMutableStats().getMaxSpeed().modifyFlat("drill_system", 200f);
+            ship.getMutableStats().getAcceleration().modifyFlat("drill_system", 300f);
+            ship.getMutableStats().getTurnAcceleration().modifyFlat("drill_system", 200f);
+            ship.getMutableStats().getMaxTurnRate().modifyFlat("drill_system", 100f);
+
+            engine.addSmoothParticle(ship.getLocation(), ship.getVelocity(), 100f, 1f, 0.5f, Color.GREEN);
+
+            List<CombatEntityAPI> entities = CombatUtils.getEntitiesWithinRange(ship.getLocation(), 100f);
+            for (CombatEntityAPI entity : entities) {
+                if (entity instanceof ShipAPI && entity != ship) {
+                    float damage = 500f; // Example damage value
+                    engine.applyDamage(entity, entity.getLocation(), damage, DamageType.ENERGY, 0f, false, false, ship);
+                }
+            }
+        } else {
+            if (drillWeapon != null) {
+                drillWeapon.getAnimation().stop();
+            }
+            firstRun = true;
+
+            // Reset the ship's stats
+            ship.getMutableStats().getMaxSpeed().unmodify("drill_system");
+            ship.getMutableStats().getAcceleration().unmodify("drill_system");
+            ship.getMutableStats().getTurnAcceleration().unmodify("drill_system");
+            ship.getMutableStats().getMaxTurnRate().unmodify("drill_system");
+        }
+    }
+
+    @Override
+    public void onFire(DamagingProjectileAPI projectile, WeaponAPI weapon, CombatEngineAPI engine) {
+        // Implement any additional effects when the weapon fires, if needed
+    }
+}
