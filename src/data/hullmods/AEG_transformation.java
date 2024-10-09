@@ -1,9 +1,11 @@
 package data.hullmods;
 
 import com.fs.starfarer.api.Global;
+import com.fs.starfarer.api.combat.BaseEveryFrameCombatPlugin;
 import com.fs.starfarer.api.combat.BaseHullMod;
 import com.fs.starfarer.api.combat.MutableShipStatsAPI;
 import com.fs.starfarer.api.combat.ShipAPI;
+import com.fs.starfarer.api.input.InputEventAPI;
 import com.fs.starfarer.api.loading.HullModSpecAPI;
 import com.fs.starfarer.api.plugins.ShipSystemStatsScript;
 import org.lwjgl.opengl.GL11;
@@ -21,7 +23,6 @@ public class AEG_transformation extends BaseHullMod {
 
     private float powerGauge = 0f; // Current gauge value
 
-    @Override
     public void applyEffectsBeforeShipCreation(HullModSpecAPI spec, ShipAPI ship, List<ShipAPI> ships) {
         powerGauge = 0f; // Initialize gauge when applied
     }
@@ -67,9 +68,14 @@ public class AEG_transformation extends BaseHullMod {
     }
 
     private void applyBuffs(ShipAPI ship) {
-        if (powerGauge >= BOOST_THRESHOLDS) increaseArmorEffectiveness(ship);
-        if (powerGauge >= BOOST_THRESHOLDS) increaseWeaponStats(ship);
-        if (powerGauge >= BOOST_THRESHOLDS) increaseEnergyDamage(ship);
+        for (float threshold : BOOST_THRESHOLDS) {
+            if (powerGauge >= threshold) {
+                increaseArmorEffectiveness(ship);
+                increaseWeaponStats(ship);
+                increaseEnergyDamage(ship);
+                break; // Exit the loop once the buffs are applied
+            }
+        }
     }
 
     private void increaseArmorEffectiveness(ShipAPI ship) {
@@ -103,7 +109,7 @@ public class AEG_transformation extends BaseHullMod {
         Global.getCombatEngine().addPlugin(new BaseEveryFrameCombatPlugin() {
             private float timer = TRANSFORMATION_DURATION;
 
-            @Override
+
             public void advance(float amount, List<InputEventAPI> events) {
                 timer -= amount;
                 if (timer <= 0) {

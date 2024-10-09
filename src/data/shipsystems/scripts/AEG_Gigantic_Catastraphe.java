@@ -1,12 +1,12 @@
 package data.shipsystems.scripts;
 
 import com.fs.starfarer.api.Global;
-import com.fs.starfarer.api.combat.MutableShipStatsAPI;
-import com.fs.starfarer.api.combat.ShipAPI;
-import com.fs.starfarer.api.combat.WeaponAPI;
-import com.fs.starfarer.api.combat.CombatEntityAPI;
+import com.fs.starfarer.api.combat.*;
 import com.fs.starfarer.api.impl.combat.BaseShipSystemScript;
 import com.fs.starfarer.api.plugins.ShipSystemStatsScript;
+import org.lazywizard.lazylib.MathUtils;
+import org.lwjgl.util.vector.Vector2f;
+
 import java.awt.Color;
 import java.util.List;
 
@@ -56,13 +56,15 @@ public class AEG_Gigantic_Catastraphe extends BaseShipSystemScript {
         if (state == State.ACTIVE) {
             for (WeaponAPI weapon : ship.getAllWeapons()) {
                 if (weapon.isDisabled() || weapon.isPermanentlyDisabled()) continue;
-                weapon.forceFire(ship);
+                int maxAmmo = weapon.getMaxAmmo(); //get weapons max ammo
+                weapon.setAmmo(maxAmmo);    // Refill the weapon's ammo to the maximum
+                weapon.setRemainingCooldownTo(0f); // Reduce Cool down to zero
             }
         }
     }
 
     private void applyPushingForce(ShipAPI ship) {
-        List<CombatEntityAPI> entities = Global.getCombatEngine().getAllEntities();
+        List<ShipAPI> entities = Global.getCombatEngine().getShips();
         for (CombatEntityAPI entity : entities) {
             if (entity == ship) continue;
             float distance = MathUtils.getDistance(ship, entity);
@@ -94,9 +96,9 @@ public class AEG_Gigantic_Catastraphe extends BaseShipSystemScript {
             }
 
             Vector2f direction = Vector2f.sub(entity.getLocation(), ship.getLocation(), new Vector2f());
-            direction = MathUtils.normalize(direction);
+            direction = direction.normalise(direction);
             direction.scale(force);
-            entity.getVelocity().add(direction);
+            entity.getVelocity().set(direction);
         }
     }
 
