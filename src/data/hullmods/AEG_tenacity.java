@@ -27,7 +27,7 @@ public class AEG_tenacity extends BaseHullMod {
 
         // Initialize charges if not already done
         if (!ship.getCustomData().containsKey(CHARGE_KEY)) {
-            int charges = ship.getVariant().hasHullMod("safetyoverrides") ? 2 : 1;
+            int charges = ship.getVariant().getSMods().contains("AEG_tenacity") ? 2 : 1;
             ship.setCustomData(CHARGE_KEY, charges);
         }
 
