@@ -4,6 +4,7 @@ import com.fs.starfarer.api.combat.DamageType;
 import com.fs.starfarer.api.combat.MutableShipStatsAPI;
 import com.fs.starfarer.api.combat.ShipAPI;
 import com.fs.starfarer.api.Global;
+import com.fs.starfarer.api.graphics.SpriteAPI;
 import com.fs.starfarer.api.impl.combat.BaseShipSystemScript;
 import com.fs.starfarer.api.combat.CombatEngineAPI;
 import com.fs.starfarer.api.util.Misc;
@@ -12,14 +13,14 @@ import java.awt.Color;
 
 public class AEG_SteelBarrage extends BaseShipSystemScript {
 
-    private static final float RAM_RADIUS = 3000f;
-    private static final float RAM_FORCE = 500f; // Adjusted value
-    private static final float RAM_DAMAGE = 1000f; // Damage to apply
-    private static final float COLLISION_THRESHOLD = 50f; // Threshold for collision detection
+    private static final float RAM_RADIUS = 1000f;
+    private static final float RAM_FORCE = 450f; // Adjusted value
+    private static final float RAM_DAMAGE = 2000f; // Damage to apply
+    private static final float COLLISION_THRESHOLD = 75f; // Threshold for collision detection
     private static final int RAM_COUNT = 5; // Number of rams
-    private static final float PAUSE_DURATION = 1f; // Pause duration in seconds
+    private static final float PAUSE_DURATION = 0.8f; // Pause duration in seconds
     private static final Color LIGHT_GREEN_COLOR = new Color(144, 238, 144, 255); // RGBA for light green
-    private static final Color EXPLOSION_COLOR = new Color(0, 255, 0, 255); // Bright green explosion color
+    private static final Color EXPLOSION_COLOR = new Color(175, 220, 120, 255); // Bright green explosion color
 
     private int ramCounter = 0;
     private float pauseTimer = 0f;
@@ -94,12 +95,12 @@ public class AEG_SteelBarrage extends BaseShipSystemScript {
 
     private void createMultipleEmpArcs(ShipAPI ship, ShipAPI target) {
         CombatEngineAPI engine = Global.getCombatEngine();
-        for (int i = 0; i < 3; i++) { // Create 3 EMP arcs at different locations
+        for (int i = 0; i < 5; i++) { // Create 3 EMP arcs at different locations
             Vector2f arcLocation = Misc.getPointAtRadius(target.getLocation(), target.getCollisionRadius() * (i + 1) / 3);
             engine.spawnEmpArc(
                     ship, ship.getLocation(), ship, target,
                     DamageType.ENERGY, // Damage type
-                    0f, // Damage amount
+                    150f, // Damage amount
                     1000f, // EMP amount
                     10000f, // Max range
                     "tachyon_lance_emp_impact", // Impact sound
@@ -148,7 +149,7 @@ public class AEG_SteelBarrage extends BaseShipSystemScript {
 
     private void createExplosion(ShipAPI ship, ShipAPI target) {
         CombatEngineAPI engine = Global.getCombatEngine();
-        engine.spawnExplosion(target.getLocation(), target.getVelocity(), EXPLOSION_COLOR, 200f, 2f);
+        engine.spawnExplosion(target.getLocation(), target.getVelocity(), EXPLOSION_COLOR, 300f, 2f);
     }
 
     private void performManeuvers(ShipAPI ship, ShipAPI target) {
@@ -187,17 +188,6 @@ public class AEG_SteelBarrage extends BaseShipSystemScript {
         targetDirection.scale(currentVelocity.length());
         ship.getVelocity().set(targetDirection);
 
-        // Create afterimages
-        createAfterimage(ship);
-    }
-
-    private void createAfterimage(ShipAPI ship) {
-        CombatEngineAPI engine = Global.getCombatEngine();
-        Vector2f afterimageLocation = new Vector2f(ship.getLocation());
-        Vector2f afterimageVelocity = new Vector2f(ship.getVelocity());
-        afterimageVelocity.scale(-0.5f); // Move the afterimage in the opposite direction
-
-        engine.addSmoothParticle(afterimageLocation, afterimageVelocity, ship.getCollisionRadius(), 1f, 0.5f, LIGHT_GREEN_COLOR);
     }
 
     @Override
