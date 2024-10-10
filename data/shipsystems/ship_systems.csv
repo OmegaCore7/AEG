@@ -1,5 +1,5 @@
 name,id,flux/second,f/s (base rate),f/s (base cap),flux/use,f/u (base rate),f/u (base cap),cr/u,max uses,regen,charge up,active,down,cooldown,toggle,noDissipation,noHardDissipation,hardFlux,noFiring,noTurning,noStrafing,noAccel,noShield,isPhaseCloak,noVent,tags,icon
 ,,,,,,,,,,,,,,,,,,,,,,,,,,,
 Combat Warp,AEG_warp,,,,,,,,,,,20,0.5,5,TRUE,,,TRUE,,,,,,,,,graphics/icons/hullsys/displacer.png
-Blaster Shell,AEG_BlasterShell,,,,,,,,,,,10,0.5,2,TRUE,,,,,,,,,,,,graphics/icons/hullsys/displacer.png
+Blaster Shell,AEG_BlasterShell,,,,,,,,,,,15,0.5,2,TRUE,,,,,,,,,,,,graphics/icons/hullsys/displacer.png
 Giga Drill Breaker,AEG_GDBreaker,,,,,,,,,,,10			,0.05,5,True,,,,,,,,,,,,graphics/icons/hullsys/displacer.png

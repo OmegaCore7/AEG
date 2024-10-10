@@ -1,5 +1,6 @@
 package data.shipsystems.scripts;
 
+import com.fs.starfarer.api.combat.DamageType;
 import com.fs.starfarer.api.combat.MutableShipStatsAPI;
 import com.fs.starfarer.api.combat.ShipAPI;
 import com.fs.starfarer.api.Global;
@@ -18,18 +19,19 @@ public class AEG_SteelBarrage extends BaseShipSystemScript {
     private static final int RAM_COUNT = 5; // Number of rams
     private static final float PAUSE_DURATION = 1f; // Pause duration in seconds
     private static final Color LIGHT_GREEN_COLOR = new Color(144, 238, 144, 255); // RGBA for light green
+    private static final Color EXPLOSION_COLOR = new Color(0, 255, 0, 255); // Bright green explosion color
 
     private int ramCounter = 0;
     private float pauseTimer = 0f;
     private ShipAPI targetShip = null;
+    private int maneuverStep = 0;
 
     @Override
     public void apply(MutableShipStatsAPI stats, String id, State state, float effectLevel) {
         ShipAPI ship = (ShipAPI) stats.getEntity();
         if (ship == null) return;
 
-        if (state == State.IN) {
-            // Initialize the system
+        if (state == State.ACTIVE) {
             if (ramCounter == 0) {
                 // Find the nearest enemy ship within the ram radius
                 targetShip = findClosestTarget(ship);
@@ -37,28 +39,36 @@ public class AEG_SteelBarrage extends BaseShipSystemScript {
                     ramCounter = RAM_COUNT;
                 }
             }
-        } else if (state == State.OUT) {
-            // Handle the phasing and ramming logic during the chargedown phase
+
             if (targetShip != null && ramCounter > 0) {
                 if (pauseTimer <= 0f) {
-                    // Teleport to a predefined location around the target ship
-                    Vector2f teleportLocation = getPredefinedLocationAroundTarget(targetShip, ramCounter);
-                    phaseTeleport(ship, teleportLocation);
-
-                    // Ensure the ship is not inside the enemy ship
-                    if (isInsideTarget(ship, targetShip)) {
-                        adjustPosition(ship, targetShip);
+                    if (maneuverStep == 0) {
+                        // Step 1: Create multiple EMP arcs to disable the enemy ship
+                        createMultipleEmpArcs(ship, targetShip);
                     }
 
-                    // Ensure the ship phases out before ramming
-                    ship.setPhased(false);
+                    // Perform maneuvers before ramming
+                    performManeuvers(ship, targetShip);
 
-                    // Apply ramming force and damage
-                    applyRammingForceAndDamage(ship, targetShip, id, effectLevel);
+                    if (maneuverStep >= 3) {
+                        // Step 2: Ensure the player ship is facing the target
+                        faceTarget(ship, targetShip);
 
-                    // Reset pause timer and decrement ram counter
-                    pauseTimer = PAUSE_DURATION;
-                    ramCounter--;
+                        // Step 3: Ram the target
+                        applyRammingForceAndDamage(ship, targetShip, id, effectLevel);
+
+                        // Step 4: Create a big green explosion
+                        createExplosion(ship, targetShip);
+
+                        // Reset maneuver step and pause timer
+                        maneuverStep = 0;
+                        pauseTimer = PAUSE_DURATION;
+                        ramCounter--;
+                    } else {
+                        // Increment maneuver step and reset pause timer
+                        maneuverStep++;
+                        pauseTimer = PAUSE_DURATION / 2; // Shorter pause between maneuvers
+                    }
                 } else {
                     // Decrease pause timer
                     pauseTimer -= Global.getCombatEngine().getElapsedInLastFrame();
@@ -82,25 +92,28 @@ public class AEG_SteelBarrage extends BaseShipSystemScript {
         return closestTarget;
     }
 
-    private Vector2f getPredefinedLocationAroundTarget(ShipAPI target, int ramCounter) {
-        float angle = (float) (Math.PI / 2 * ramCounter); // 90 degrees apart
-        float distance = 1500f; // Increase teleport distance to 1500f
-        float x = target.getLocation().x + (float) Math.cos(angle) * distance;
-        float y = target.getLocation().y + (float) Math.sin(angle) * distance;
-        return new Vector2f(x, y);
+    private void createMultipleEmpArcs(ShipAPI ship, ShipAPI target) {
+        CombatEngineAPI engine = Global.getCombatEngine();
+        for (int i = 0; i < 3; i++) { // Create 3 EMP arcs at different locations
+            Vector2f arcLocation = Misc.getPointAtRadius(target.getLocation(), target.getCollisionRadius() * (i + 1) / 3);
+            engine.spawnEmpArc(
+                    ship, ship.getLocation(), ship, target,
+                    DamageType.ENERGY, // Damage type
+                    0f, // Damage amount
+                    1000f, // EMP amount
+                    10000f, // Max range
+                    "tachyon_lance_emp_impact", // Impact sound
+                    10f, // Thickness
+                    LIGHT_GREEN_COLOR, // Fringe color
+                    LIGHT_GREEN_COLOR // Core color
+            );
+        }
     }
 
-    private boolean isInsideTarget(ShipAPI ship, ShipAPI target) {
-        float distance = Vector2f.sub(target.getLocation(), ship.getLocation(), null).length();
-        return distance < target.getCollisionRadius();
-    }
-
-    private void adjustPosition(ShipAPI ship, ShipAPI target) {
-        Vector2f direction = Vector2f.sub(ship.getLocation(), target.getLocation(), null);
-        direction.normalise();
-        direction.scale(target.getCollisionRadius() + ship.getCollisionRadius());
-        Vector2f newPosition = Vector2f.add(target.getLocation(), direction, null);
-        ship.setFixedLocation(newPosition);
+    private void faceTarget(ShipAPI ship, ShipAPI target) {
+        Vector2f direction = Vector2f.sub(target.getLocation(), ship.getLocation(), null);
+        float angle = Misc.getAngleInDegrees(direction);
+        ship.setFacing(angle);
     }
 
     private void applyRammingForceAndDamage(ShipAPI ship, ShipAPI target, String id, float effectLevel) {
@@ -133,12 +146,58 @@ public class AEG_SteelBarrage extends BaseShipSystemScript {
         }
     }
 
-    private void phaseTeleport(ShipAPI ship, Vector2f location) {
+    private void createExplosion(ShipAPI ship, ShipAPI target) {
         CombatEngineAPI engine = Global.getCombatEngine();
-        engine.spawnExplosion(ship.getLocation(), ship.getVelocity(), LIGHT_GREEN_COLOR, 100f, 1f);
-        ship.setFixedLocation(location);
-        engine.spawnExplosion(location, ship.getVelocity(), LIGHT_GREEN_COLOR, 100f, 1f);
-        ship.setPhased(true); // Phase in for teleport
+        engine.spawnExplosion(target.getLocation(), target.getVelocity(), EXPLOSION_COLOR, 200f, 2f);
+    }
+
+    private void performManeuvers(ShipAPI ship, ShipAPI target) {
+        // Perform different maneuvers like drifting, curving, and strafing
+        Vector2f direction = Vector2f.sub(target.getLocation(), ship.getLocation(), null);
+        direction.normalise();
+        Vector2f perpendicular = new Vector2f(-direction.y, direction.x); // Perpendicular vector for strafing
+
+        switch (maneuverStep) {
+            case 0:
+                // Example maneuver: Strafe to the right
+                perpendicular.scale(500f); // Adjust the strafing speed as needed
+                Vector2f.add(ship.getVelocity(), perpendicular, ship.getVelocity());
+                break;
+            case 1:
+                // Example maneuver: Drift
+                Vector2f drift = new Vector2f(direction);
+                drift.scale(200f); // Adjust the drifting speed as needed
+                Vector2f.add(ship.getVelocity(), drift, ship.getVelocity());
+                break;
+            case 2:
+                // Example maneuver: Curve
+                Vector2f curve = new Vector2f(direction);
+                curve.scale(300f); // Adjust the curving speed as needed
+                Vector2f.add(ship.getVelocity(), curve, ship.getVelocity());
+                break;
+        }
+
+        // Ensure the ship is facing the target during maneuvers
+        faceTarget(ship, target);
+
+        // Course correction logic to ensure the ship hits the target
+        Vector2f currentVelocity = ship.getVelocity();
+        Vector2f targetDirection = Vector2f.sub(target.getLocation(), ship.getLocation(), null);
+        targetDirection.normalise();
+        targetDirection.scale(currentVelocity.length());
+        ship.getVelocity().set(targetDirection);
+
+        // Create afterimages
+        createAfterimage(ship);
+    }
+
+    private void createAfterimage(ShipAPI ship) {
+        CombatEngineAPI engine = Global.getCombatEngine();
+        Vector2f afterimageLocation = new Vector2f(ship.getLocation());
+        Vector2f afterimageVelocity = new Vector2f(ship.getVelocity());
+        afterimageVelocity.scale(-0.5f); // Move the afterimage in the opposite direction
+
+        engine.addSmoothParticle(afterimageLocation, afterimageVelocity, ship.getCollisionRadius(), 1f, 0.5f, LIGHT_GREEN_COLOR);
     }
 
     @Override

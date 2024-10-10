@@ -1,23 +1,20 @@
 {
     "id": "AEG_BlasterShell",
-    "type": "TELEPORTER",
-    "aiType": "PHASE_SKIPPER",
+    "type": "DISPLACER",
+    "aiType": "PHASE_DISPLACER",
     "statsScript": "data.shipsystems.scripts.AEG_SteelBarrage",
-    "engineGlowColor": [100, 220, 100, 255],
-    "engineGlowLengthMult": 3,
-    "engineGlowWidthMult": 1.5,
-    "engineGlowGlowMult": 3,
-    "flameoutOnImpactChance": 0,
-    "clampTurnRateAfter": false,
-    "clampMaxSpeedAfter": false,
-    "alwaysAccelerate": true,
-    "useSound": "system_phase_skipper",
-    "loopSound": "system_phase_skipper_loop",
-    "outOfUsesSound": "engine_disabled",
-    "range": 1500,
+    "weaponGlowColor": [165, 220, 165, 155],
+    "weaponTypes": ["ENERGY"],
+    "engineGlowColor": [165, 220, 165, 155],
+    "range": 300,
+    "randomRange": 0,
+    "renderCopyDuringTeleport": false,
+    "fadeActivationSoundOnChargedown": false,
+    "useSound": "system_phase_skimmer",
+    "outOfUsesSound": "gun_out_of_ammo",
     "aiHints": {
-        "activeSpeedIncrease": 350,
-        "burstMovementPotential": 1500,
-        "averageSpeedIncrease": 350
+        "activeSpeedIncrease": 0,
+        "burstMovementPotential": 300,
+        "averageSpeedIncrease": 30
     }
 }
