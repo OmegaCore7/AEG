@@ -1,23 +1,23 @@
 {
     "id": "AEG_BlasterShell",
-    "type": "ENGINE_MOD",
-    "aiType": "BURN_DRIVE",
-    "statsScript": "data.shipsystems.scripts.AEG_BlasterShell",
-    "engineGlowColor":[100,220,100,255],
-    	"engineGlowLengthMult":3,
-    	"engineGlowWidthMult":1.5,
-    	"engineGlowGlowMult":3,
-
-    	"flameoutOnImpactChance":0,
-        "clampTurnRateAfter":FALSE,
-    	"clampMaxSpeedAfter":FALSE,
-        "alwaysAccelerate":TRUE,
-    "useSound": "system_plasma_jets",
-    "loopSound": "system_plasma_jets_loop",
+    "type": "TELEPORTER",
+    "aiType": "PHASE_SKIPPER",
+    "statsScript": "data.shipsystems.scripts.AEG_SteelBarrage",
+    "engineGlowColor": [100, 220, 100, 255],
+    "engineGlowLengthMult": 3,
+    "engineGlowWidthMult": 1.5,
+    "engineGlowGlowMult": 3,
+    "flameoutOnImpactChance": 0,
+    "clampTurnRateAfter": false,
+    "clampMaxSpeedAfter": false,
+    "alwaysAccelerate": true,
+    "useSound": "system_phase_skipper",
+    "loopSound": "system_phase_skipper_loop",
     "outOfUsesSound": "engine_disabled",
-    "aiHints":{
-        "activeSpeedIncrease": 125,
-        "burstMovementPotential": 0,
-        "averageSpeedIncrease": 80
+    "range": 1500,
+    "aiHints": {
+        "activeSpeedIncrease": 350,
+        "burstMovementPotential": 1500,
+        "averageSpeedIncrease": 350
     }
 }
