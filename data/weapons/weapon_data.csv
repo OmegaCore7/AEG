@@ -44,4 +44,6 @@ CCX Left U-Tech Plasma Cannon,AEG_rmleftarm,3,,7500,800,,400,,,20,30,,,,ENERGY,2
 CCX Right U-Tech Plasma Cannon,AEG_rmrightarm,3,,7500,800,,400,,,20,30,,,,ENERGY,250,,0.33,1.01,5,0.33,,,,,,750,,,500,,,"STRIKE, USE_VS_FRIGATES","energy20, rare_bp, hist1t, merc, ind",,,,General,,Excellent,,,,,,,,
 CCX U-TECH OPTIC BEAM,AEG_rmhead,2,0.5,5000,750,1000,,,0,75,18,20,1,,ENERGY,,750,0,0,0.2,0.1,,,,,1000000,,,,,,,"PD, ANTI_FTR","pd19, beam15, rare_bp, merc, ind",,,,Point Defense,,,,,"When all sub-beams impact a target in close proximity to each other, the spalling effect produces an explosion that deals up to 100 points of fragmentation damage to other nearby targets.",100 | fragmentation,,,,
 ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-Barrage Photon Beam,AEG_photonbarrage,,,200,2500,2500,,200,500,75,4,,,,ENERGY,,25,3,0.1,,,,,,,2400,,,,,,,,"beam9, LR, hightech_bp, midline_bp, merc, ind",,,,General,,,,,,,,,,18
+Barrage Photon Beam,AEG_photonbarrage,,,200,2500,2500,,200,500,75,4,,,,ENERGY,,25,3,0.1,,,,,,,2400,,,,,,,,"beam9, LR, hightech_bp, midline_bp, merc, ind",,,,General,,,,,,,,,,
+Chest Inferno,AEG_ChestInferno,,,100000,1800,,200,200,3,75,4,300,3,60,ENERGY,25,,5,0.05,2,0.05,0,0,0,0,,500,,,,,,,"energy15, SR, omega, restricted",,Unknown,,General,,,,,,,,,,
+,,3,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
