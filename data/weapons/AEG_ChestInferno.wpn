@@ -26,6 +26,6 @@
 		"particleColor":[255,165,0,255]
 	},
 	"autocharge":true,
-	"projectileSpecId":"cryoblaster_shot",
+	"projectileSpecId":"AEG_Inferno_shot",
 	"fireSoundTwo":"cryoblaster_fire"
 }
