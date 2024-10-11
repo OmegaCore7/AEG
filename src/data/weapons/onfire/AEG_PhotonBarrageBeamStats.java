@@ -1,49 +1,87 @@
 package data.weapons.onfire;
 
+import com.fs.starfarer.api.combat.BeamAPI;
+import com.fs.starfarer.api.combat.BeamEffectPlugin;
 import com.fs.starfarer.api.combat.CombatEngineAPI;
 import com.fs.starfarer.api.combat.DamageType;
-import com.fs.starfarer.api.combat.DamagingProjectileAPI;
-import com.fs.starfarer.api.combat.OnFireEffectPlugin;
-import com.fs.starfarer.api.combat.WeaponAPI;
 import com.fs.starfarer.api.util.IntervalUtil;
 import org.lwjgl.util.vector.Vector2f;
 
 import java.awt.Color;
 import java.util.Random;
 
-public class AEG_PhotonBarrageBeamStats implements OnFireEffectPlugin {
+public class AEG_PhotonBarrageBeamStats implements BeamEffectPlugin {
 
     private static final float INITIAL_DAMAGE = 2000f;
     private static final float SPLIT_BEAM_DAMAGE = 500f;
     private static final float RANGE = 1000f;
     private static final float BEAM_THICKNESS = 30f;
     private static final Color BEAM_COLOR = new Color(255, 255, 0, 255); // Bright yellow color
-    private static final Color PARTICLE_COLOR = new Color(255, 140, 0, 200); // Flame color
+    private static final Color PARTICLE_COLOR = new Color(220, 180, 100, 255); // Flame color
     private static final int PARTICLE_COUNT = 50;
     private static final float PARTICLE_SIZE = 10f;
     private static final float PARTICLE_LIFETIME = 1.0f;
     private static final float PARTICLE_SPEED = 100f;
     private static final float CHARGE_UP_TIME = 3.0f; // Charge-up time in seconds
 
+    private static final Color PLASMA_COLOR = new Color(255, 185, 0, 255); // Yellowish-orange color
+    private static final int PLASMA_COUNT = 20;
+    private static final float PLASMA_WIDTH = 5f;
+    private static final float PLASMA_LENGTH = 20f;
+    private static final float PLASMA_LIFETIME = 0.5f;
+    private static final float PLASMA_SPEED = 200f;
+    private static final float CONE_ANGLE = 45f; // Wide cone angle in degrees
+
     private final IntervalUtil fireInterval = new IntervalUtil(0.1f, 0.1f);
     private float chargeUpProgress = 0f;
     private final Random random = new Random();
 
     @Override
-    public void onFire(DamagingProjectileAPI projectile, WeaponAPI weapon, CombatEngineAPI engine) {
-        float amount = engine.getElapsedInLastFrame();
+    public void advance(float amount, CombatEngineAPI engine, BeamAPI beam) {
         chargeUpProgress += amount;
 
         if (chargeUpProgress < CHARGE_UP_TIME) {
-            // Create charging particle effects
+            // Calculate the size of the central ball based on charge-up progress
+            float centralBallSize = PARTICLE_SIZE * (chargeUpProgress / CHARGE_UP_TIME) * 5;
+
+            // Create the central ball
+            engine.addHitParticle(
+                    beam.getWeapon().getLocation(),
+                    new Vector2f(0, 0), // No velocity for the central ball
+                    centralBallSize,
+                    1.0f, // Brightness
+                    PARTICLE_LIFETIME,
+                    new Color(255, 255, 255, 255) // White core
+            );
+
+            // Create smaller balls moving towards the central ball
             for (int i = 0; i < PARTICLE_COUNT; i++) {
-                Vector2f particleLocation = new Vector2f(weapon.getLocation());
-                Vector2f particleVelocity = new Vector2f((float) Math.random() * PARTICLE_SPEED - PARTICLE_SPEED / 2, (float) Math.random() * PARTICLE_SPEED - PARTICLE_SPEED / 2);
+                float angle = random.nextFloat() * 360f; // Random angle in degrees
+                float distance = random.nextFloat() * 300f; // Reduced radius to 300
+                Vector2f startPosition = new Vector2f(
+                        (float) Math.cos(Math.toRadians(angle)) * distance,
+                        (float) Math.sin(Math.toRadians(angle)) * distance
+                );
+                Vector2f.add(startPosition, beam.getWeapon().getLocation(), startPosition);
+
+                // Calculate velocity towards the central ball
+                Vector2f velocity = new Vector2f(beam.getWeapon().getLocation());
+                Vector2f.sub(velocity, startPosition, velocity);
+                velocity.normalise();
+                velocity.scale(PARTICLE_SPEED);
+
+                // Stagger the particles so they don't reach the center at the same time
+                float staggerFactor = random.nextFloat() * 0.5f + 0.5f; // Between 0.5 and 1.0
+                velocity.scale(staggerFactor);
+
+                // Calculate transparency based on distance to the center
+                float transparency = 1.0f - (distance / 300f);
+
                 engine.addHitParticle(
-                        particleLocation,
-                        particleVelocity,
+                        startPosition,
+                        velocity,
                         PARTICLE_SIZE,
-                        1.0f, // Brightness
+                        transparency, // Adjust transparency
                         PARTICLE_LIFETIME,
                         PARTICLE_COLOR
                 );
@@ -52,21 +90,23 @@ public class AEG_PhotonBarrageBeamStats implements OnFireEffectPlugin {
             fireInterval.advance(amount);
             if (fireInterval.intervalElapsed()) {
                 // Fire the initial beam
-                engine.spawnEmpArcPierceShields(
-                        weapon.getShip(), weapon.getLocation(), weapon.getShip(), weapon.getShip().getShipTarget(),
-                        DamageType.ENERGY, // Damage type
-                        INITIAL_DAMAGE * fireInterval.getIntervalDuration(), // Damage amount
-                        0f, // EMP damage
-                        RANGE, // Max range
-                        "tachyon_lance_emp_impact", // Impact sound
-                        BEAM_THICKNESS, // Thickness
-                        BEAM_COLOR, // Fringe color
-                        BEAM_COLOR // Core color
-                );
+                if (beam.getWeapon().getShip().getShipTarget() != null) {
+                    engine.spawnEmpArcPierceShields(
+                            beam.getWeapon().getShip(), beam.getWeapon().getLocation(), beam.getWeapon().getShip(), beam.getWeapon().getShip().getShipTarget(),
+                            DamageType.ENERGY, // Damage type
+                            INITIAL_DAMAGE * fireInterval.getIntervalDuration(), // Damage amount
+                            0f, // EMP damage
+                            RANGE, // Max range
+                            "tachyon_lance_emp_impact", // Impact sound
+                            BEAM_THICKNESS, // Thickness
+                            BEAM_COLOR, // Fringe color
+                            new Color(255, 255, 255, 255) // White core
+                    );
+                }
 
                 // Create particle effects for the initial beam
                 for (int i = 0; i < PARTICLE_COUNT; i++) {
-                    Vector2f particleLocation = new Vector2f(weapon.getLocation());
+                    Vector2f particleLocation = new Vector2f(beam.getWeapon().getLocation());
                     Vector2f particleVelocity = new Vector2f((float) Math.random() * PARTICLE_SPEED - PARTICLE_SPEED / 2, (float) Math.random() * PARTICLE_SPEED - PARTICLE_SPEED / 2);
                     engine.addHitParticle(
                             particleLocation,
@@ -74,7 +114,36 @@ public class AEG_PhotonBarrageBeamStats implements OnFireEffectPlugin {
                             PARTICLE_SIZE,
                             1.0f, // Brightness
                             PARTICLE_LIFETIME,
-                            PARTICLE_COLOR
+                            new Color(255, 255, 255, 255) // White core
+                    );
+                }
+
+                // Create plasma projectiles in a wide cone
+                for (int i = 0; i < PLASMA_COUNT; i++) {
+                    float angle = (random.nextFloat() * CONE_ANGLE) - (CONE_ANGLE / 2); // Random angle within the cone
+                    Vector2f plasmaDirection = new Vector2f((float) Math.cos(Math.toRadians(angle)), (float) Math.sin(Math.toRadians(angle)));
+                    plasmaDirection.scale(PLASMA_SPEED);
+
+                    Vector2f plasmaLocation = new Vector2f(beam.getWeapon().getLocation());
+                    engine.addHitParticle(
+                            plasmaLocation,
+                            plasmaDirection,
+                            PLASMA_WIDTH,
+                            1.0f, // Brightness
+                            PLASMA_LIFETIME,
+                            new Color(255, 255, 255, 255) // White core
+                    );
+
+                    // Create the beam-like spike effect
+                    Vector2f plasmaEndLocation = new Vector2f(plasmaLocation);
+                    Vector2f.add(plasmaEndLocation, (Vector2f) plasmaDirection.scale(PLASMA_LENGTH / PLASMA_SPEED), plasmaEndLocation);
+                    engine.addHitParticle(
+                            plasmaEndLocation,
+                            new Vector2f(0, 0), // No velocity for the end point
+                            PLASMA_WIDTH,
+                            1.0f, // Brightness
+                            PLASMA_LIFETIME,
+                            new Color(255, 255, 255, 255) // White core
                     );
                 }
 
@@ -84,20 +153,22 @@ public class AEG_PhotonBarrageBeamStats implements OnFireEffectPlugin {
                     Vector2f splitBeamDirection = new Vector2f((float) Math.cos(Math.toRadians(angle)), (float) Math.sin(Math.toRadians(angle)));
                     splitBeamDirection.scale(RANGE);
 
-                    Vector2f splitBeamLocation = new Vector2f(weapon.getLocation());
+                    Vector2f splitBeamLocation = new Vector2f(beam.getWeapon().getLocation());
                     Vector2f.add(splitBeamLocation, splitBeamDirection, splitBeamLocation);
 
-                    engine.spawnEmpArcPierceShields(
-                            weapon.getShip(), splitBeamLocation, weapon.getShip(), weapon.getShip().getShipTarget(),
-                            DamageType.ENERGY, // Damage type
-                            SPLIT_BEAM_DAMAGE, // Damage amount
-                            0f, // EMP damage
-                            RANGE, // Max range
-                            "tachyon_lance_emp_impact", // Impact sound
-                            BEAM_THICKNESS / 2, // Thickness
-                            BEAM_COLOR, // Fringe color
-                            BEAM_COLOR // Core color
-                    );
+                    if (beam.getWeapon().getShip().getShipTarget() != null) {
+                        engine.spawnEmpArcPierceShields(
+                                beam.getWeapon().getShip(), splitBeamLocation, beam.getWeapon().getShip(), beam.getWeapon().getShip().getShipTarget(),
+                                DamageType.ENERGY, // Damage type
+                                SPLIT_BEAM_DAMAGE, // Damage amount
+                                0f, // EMP damage
+                                RANGE, // Max range
+                                "tachyon_lance_emp_impact", // Impact sound
+                                BEAM_THICKNESS / 2, // Thickness
+                                BEAM_COLOR, // Fringe color
+                                new Color(255, 255, 255, 255) // White core
+                        );
+                    }
                 }
             }
         }
