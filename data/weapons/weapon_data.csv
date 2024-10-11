@@ -43,3 +43,5 @@ Optic PD Beams,AEG_bw_mhead,1,,200,400,75,,,0,100,4,,,,ENERGY,,40,0,0.25,,,,,,,2
 CCX Left U-Tech Plasma Cannon,AEG_rmleftarm,3,,7500,800,,400,,,20,30,,,,ENERGY,250,,0.33,1.01,5,0.33,,,,,,750,,,500,,,"STRIKE, USE_VS_FRIGATES","energy20, rare_bp, hist1t, merc, ind",,,,General,,Excellent,,,,,,,,26
 CCX Right U-Tech Plasma Cannon,AEG_rmrightarm,3,,7500,800,,400,,,20,30,,,,ENERGY,250,,0.33,1.01,5,0.33,,,,,,750,,,500,,,"STRIKE, USE_VS_FRIGATES","energy20, rare_bp, hist1t, merc, ind",,,,General,,Excellent,,,,,,,,
 CCX U-TECH OPTIC BEAM,AEG_rmhead,2,0.5,5000,750,1000,,,0,75,18,20,1,,ENERGY,,750,0,0,0.2,0.1,,,,,1000000,,,,,,,"PD, ANTI_FTR","pd19, beam15, rare_bp, merc, ind",,,,Point Defense,,,,,"When all sub-beams impact a target in close proximity to each other, the spalling effect produces an explosion that deals up to 100 points of fragmentation damage to other nearby targets.",100 | fragmentation,,,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+Barrage Photon Beam,AEG_photonbarrage,,,,5000,2000,,200,500,75,,,,,,,25,3,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,

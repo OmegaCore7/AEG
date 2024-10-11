@@ -1,0 +1,25 @@
+{
+    "specClass": "beam",
+    "id": "AEG_photonbarrage",
+    "type": "ENERGY",
+    "size": "LARGE",
+    "turretSprite": "graphics/weapons/photon_barrage_beam_turret.png",
+    "turretGlowSprite": "graphics/weapons/photon_barrage_beam_turret_glow.png",
+    "hardpointSprite": "graphics/weapons/photon_barrage_beam_hardpoint.png",
+    "hardpointGlowSprite": "graphics/weapons/photon_barrage_beam_hardpoint_glow.png",
+    "turretOffsets": [10, 0],
+    "turretAngleOffsets": ,
+    "hardpointOffsets": [15, 0],
+    "hardpointAngleOffsets": ,
+    "fringeColor": [255, 255, 0, 225], // Bright yellow color
+    "coreColor": [255, 255, 255, 255],
+    "glowColor": [255, 255, 0, 255],
+    "width": 30.0, // Increased width for a larger beam
+    "textureType": "ROUGH",
+    "textureScrollSpeed": 72.0,
+    "pixelsPerTexel": 5.0,
+    "pierceSet": ["PROJECTILE_FF", "PROJECTILE_NO_FF", "PROJECTILE_FIGHTER", "MISSILE_FF", "MISSILE_NO_FF"],
+    "fireSoundOne": "laser_intro",
+    "fireSoundTwo": "laser_loop",
+    "beamEffect": "data.weapons.scripts.AEG_PhotonBarrageBeamStats"
+}

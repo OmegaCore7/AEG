@@ -3,18 +3,21 @@
     "type": "DISPLACER",
     "aiType": "PHASE_DISPLACER",
     "statsScript": "data.shipsystems.scripts.AEG_SteelBarrage",
-    "weaponGlowColor": [165, 220, 165, 155],
+    "weaponGlowColor": [144, 238, 144, 255],
     "weaponTypes": ["ENERGY"],
-    "engineGlowColor": [165, 220, 165, 155],
+    "engineGlowColor": [144, 238, 144, 255],
+    "jitterCopies":5,
+    "jitterRange":0,
+    "jitterRangeRadiusFraction":0.5,
     "range": 300,
-    "randomRange": 0,
+    "randomRange": 250,
     "renderCopyDuringTeleport": false,
     "fadeActivationSoundOnChargedown": false,
     "useSound": "system_phase_skimmer",
     "outOfUsesSound": "gun_out_of_ammo",
     "aiHints": {
         "activeSpeedIncrease": 0,
-        "burstMovementPotential": 300,
-        "averageSpeedIncrease": 30
+        "burstMovementPotential": 450,
+        "averageSpeedIncrease": 300
     }
 }

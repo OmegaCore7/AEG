@@ -4,7 +4,6 @@ import com.fs.starfarer.api.combat.DamageType;
 import com.fs.starfarer.api.combat.MutableShipStatsAPI;
 import com.fs.starfarer.api.combat.ShipAPI;
 import com.fs.starfarer.api.Global;
-import com.fs.starfarer.api.graphics.SpriteAPI;
 import com.fs.starfarer.api.impl.combat.BaseShipSystemScript;
 import com.fs.starfarer.api.combat.CombatEngineAPI;
 import com.fs.starfarer.api.util.Misc;
@@ -76,6 +75,9 @@ public class AEG_SteelBarrage extends BaseShipSystemScript {
                 }
             }
         }
+
+        // Add jitter copies continuously
+        addJitterCopies(ship);
     }
 
     private ShipAPI findClosestTarget(ShipAPI ship) {
@@ -95,7 +97,7 @@ public class AEG_SteelBarrage extends BaseShipSystemScript {
 
     private void createMultipleEmpArcs(ShipAPI ship, ShipAPI target) {
         CombatEngineAPI engine = Global.getCombatEngine();
-        for (int i = 0; i < 5; i++) { // Create 3 EMP arcs at different locations
+        for (int i = 0; i < 5; i++) { // Create 5 EMP arcs at different locations
             Vector2f arcLocation = Misc.getPointAtRadius(target.getLocation(), target.getCollisionRadius() * (i + 1) / 3);
             engine.spawnEmpArc(
                     ship, ship.getLocation(), ship, target,
@@ -187,7 +189,16 @@ public class AEG_SteelBarrage extends BaseShipSystemScript {
         targetDirection.normalise();
         targetDirection.scale(currentVelocity.length());
         ship.getVelocity().set(targetDirection);
+    }
 
+    private void addJitterCopies(ShipAPI ship) {
+        Color jitterColor = new Color(144, 238, 144, 255); // Light blue color
+        float jitterDuration = 5.0f; // Duration of the jitter copy
+        float jitterRange = 5.0f; // Range of the jitter effect
+
+        for (int i = 0; i < 10; i++) { // Create 5 jitter copies
+            JitterEffectManager.addJitterCopy(ship, jitterColor, jitterDuration, jitterRange);
+        }
     }
 
     @Override
@@ -198,7 +209,7 @@ public class AEG_SteelBarrage extends BaseShipSystemScript {
     @Override
     public StatusData getStatusData(int index, State state, float effectLevel) {
         if (index == 0) {
-            return new StatusData("Ramming enemy ships!", false);
+            return new StatusData("True Destruction Steel Fist Barrage!", false);
         }
         return null;
     }
