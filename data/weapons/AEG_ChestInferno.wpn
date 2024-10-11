@@ -1,29 +1,31 @@
 {
-	"id": "AEG_ChestInferno",
-	"specClass": "projectile",
-	"type": "ENERGY",
-	"mountTypeOverride": "HYBRID",
-	"size": "MEDIUM",
+	"id":"AEG_ChestInferno",
+	"specClass":"projectile",
+	"type":"ENERGY",
+	"mountTypeOverride":"HYBRID",
+	"size":"MEDIUM",
+	"everyFrameEffect":"com.fs.starfarer.api.impl.combat.CryofluxTransducerEffect",
 	"turretSprite": "graphics/weapons/cryoblaster_turret_base.png",
 	"turretGlowSprite": "graphics/weapons/cryoblaster_turret_glow.png",
 	"hardpointSprite": "graphics/weapons/cryoblaster_hardpoint_base.png",
 	"hardpointGlowSprite": "graphics/weapons/cryoblaster_hardpoint_glow.png",
-	"glowColor": [255,140,0,255],  // Orange color
-	"turretOffsets": [10,0],
-	"turretAngleOffsets": ,
-	"hardpointOffsets": [15,0],
-	"hardpointAngleOffsets": ,
-	"barrelMode": "ALTERNATING",  // or LINKED.  whether barrels fire at the same time or alternate.
-	"animationType": "GLOW_AND_FLASH",
-	"muzzleFlashSpec": {
-		"length": 40.0,  // only used if animationType = MUZZLE_FLASH
-		"spread": 15.0,
-		"particleSizeMin": 20.0,
-		"particleSizeRange": 10.0,
-		"particleDuration": 0.24,
-		"particleCount": 100,  // Increased particle count for a denser effect
-		"particleColor": [255, 165, 0, 255]  // Orange color
+	"glowColor":[255,200, 0, 255],
+	"turretOffsets":[10,0],
+	"turretAngleOffsets":[0],
+	"hardpointOffsets":[15,0],
+	"hardpointAngleOffsets":[0],
+	"barrelMode":"ALTERNATING",
+	"animationType":"GLOW_AND_FLASH",
+	"muzzleFlashSpec":{
+	    "length":40.0,
+		"spread":15.0,
+		"particleSizeMin":20.0,
+		"particleSizeRange":10.0,
+		"particleDuration":0.24,
+		"particleCount":100,
+		"particleColor":[255,165,0,255]
 	},
-	"projectileSpecId": "cryoblaster_shot",  // projectile that will be fired
-	"fireSoundTwo": "cryoblaster_fire"
+	"autocharge":true,
+	"projectileSpecId":"cryoblaster_shot",
+	"fireSoundTwo":"cryoblaster_fire"
 }
