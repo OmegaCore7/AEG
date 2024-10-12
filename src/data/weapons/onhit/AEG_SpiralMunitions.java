@@ -4,20 +4,21 @@ import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.combat.*;
 import com.fs.starfarer.api.combat.listeners.ApplyDamageResultAPI;
 import com.fs.starfarer.api.input.InputEventAPI;
-import com.fs.starfarer.api.util.IntervalUtil;
 import org.lwjgl.util.vector.Vector2f;
 
 import java.awt.Color;
 import java.util.List;
 
 public class AEG_SpiralMunitions implements OnHitEffectPlugin {
-    private static final float SLOW_DURATION = 5f; // Duration of the slow effect in seconds
-    private static final float RANGE_REDUCTION_DURATION = 5f; // Duration of the range reduction in seconds
-    private static final float RANGE_REDUCTION = 200f; // Reduced weapon range
+    private static final float SLOW_DURATION = 10f; // Duration of the slow effect in seconds
+    private static final float RANGE_REDUCTION_DURATION = 10f; // Duration of the range reduction in seconds
+    private static final float TARGET_RANGE = 200f; // Desired weapon range
     private static final float PARTICLE_SIZE = 20f;
     private static final float PARTICLE_DURATION = 1f;
     private static final float PARTICLE_BRIGHTNESS = 1f;
     private static final float EFFECT_RADIUS = 75f;
+    private static final float ATTRACTION_RADIUS = 500f; // Radius within which projectiles are attracted
+    private static final float ATTRACTION_FORCE = 500f; // Force of attraction
 
     private static final Color[] PARTICLE_COLORS = {
             new Color(0, 255, 0, 255), // Bright green
@@ -33,7 +34,11 @@ public class AEG_SpiralMunitions implements OnHitEffectPlugin {
         if (target instanceof ShipAPI) {
             final ShipAPI ship = (ShipAPI) target;
             ship.getMutableStats().getMaxSpeed().modifyMult("AEG_SpiralMunitions_slow", 0.5f);
-            ship.getMutableStats().getWeaponRangeThreshold().modifyFlat("AEG_SpiralMunitions_range", -RANGE_REDUCTION);
+
+            // Calculate the reduction needed to set the range to the target value
+            float currentRange = ship.getMutableStats().getWeaponRangeThreshold().getModifiedValue();
+            float reductionAmount = currentRange - TARGET_RANGE;
+            ship.getMutableStats().getWeaponRangeThreshold().modifyFlat("AEG_SpiralMunitions_range", -reductionAmount);
 
             // Schedule the removal of the effects after the duration
             Global.getCombatEngine().addPlugin(new BaseEveryFrameCombatPlugin() {
@@ -72,6 +77,15 @@ public class AEG_SpiralMunitions implements OnHitEffectPlugin {
                     particleColor
             );
         }
+
+        // Attract nearby projectiles to the target ship
+        for (DamagingProjectileAPI otherProj : engine.getProjectiles()) {
+            if (otherProj != proj && Vector2f.sub(point, otherProj.getLocation(), null).length() < ATTRACTION_RADIUS) {
+                Vector2f attraction = Vector2f.sub(point, otherProj.getLocation(), null);
+                attraction.normalise();
+                attraction.scale(ATTRACTION_FORCE * engine.getElapsedInLastFrame());
+                otherProj.getVelocity().translate(attraction.x, attraction.y);
+            }
+        }
     }
 }
-

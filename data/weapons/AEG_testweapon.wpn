@@ -4,7 +4,6 @@
 	"type":"BALLISTIC",
 	"size":"MEDIUM",
 	"onHitEffect": "data.weapons.onhit.AEG_SpiralMunitions",
-    "everyFrameEffect": "data.weapons.onhit.AEG_SpiralMunitions",
 	"turretSprite":"graphics/weapons/assault_chaingun_turret_base.png",
 	"turretGunSprite":"graphics/weapons/assault_chaingun_turret_recoil.png",
 	"hardpointSprite":"graphics/weapons/assault_chaingun_hardpoint_base.png",
