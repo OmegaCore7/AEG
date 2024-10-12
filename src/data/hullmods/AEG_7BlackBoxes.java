@@ -1,7 +1,5 @@
 package data.hullmods;
 
-package data.hullmods;
-
 import com.fs.starfarer.api.combat.BaseHullMod;
 import com.fs.starfarer.api.combat.MutableShipStatsAPI;
 import com.fs.starfarer.api.combat.ShipAPI;
@@ -25,36 +23,36 @@ public class AEG_7BlackBoxes extends BaseHullMod {
 
         // Regeneration
         if (ship.getHullLevel() < 1.0f) {
-            ship.getMutableStats().getHullRepairRatePercentPerSecond().modifyFlat("MazingerZeroHullMod", REGENERATION_RATE);
-            ship.getMutableStats().getArmorRepairRatePercentPerSecond().modifyFlat("MazingerZeroHullMod", REGENERATION_RATE);
+            ship.getMutableStats().getHullRepairRatePercentPerSecond().modifyFlat("AEG_7BlackBoxes", REGENERATION_RATE);
+            ship.getMutableStats().getDynamic().getStat("armorRepairRatePercentPerSecond").modifyFlat("AEG_7BlackBoxes", REGENERATION_RATE);
         }
 
         // Assimilation
-        ship.getMutableStats().getEnergyWeaponDamageMult().modifyMult("MazingerZeroHullMod", 1 + ASSIMILATION_DAMAGE_CONVERSION);
-        ship.getMutableStats().getHardFluxDissipationFraction().modifyFlat("MazingerZeroHullMod", ASSIMILATION_DAMAGE_CONVERSION);
+        ship.getMutableStats().getEnergyWeaponDamageMult().modifyMult("AEG_7BlackBoxes", 1 + ASSIMILATION_DAMAGE_CONVERSION);
+        ship.getMutableStats().getHardFluxDissipationFraction().modifyFlat("AEG_7BlackBoxes", ASSIMILATION_DAMAGE_CONVERSION);
 
         // Strengthening
-        ship.getMutableStats().getBallisticWeaponDamageMult().modifyMult("MazingerZeroHullMod", STRENGTHENING_MULT);
-        ship.getMutableStats().getEnergyWeaponDamageMult().modifyMult("MazingerZeroHullMod", STRENGTHENING_MULT);
-        ship.getMutableStats().getMissileWeaponDamageMult().modifyMult("MazingerZeroHullMod", STRENGTHENING_MULT);
-        ship.getMutableStats().getMaxSpeed().modifyMult("MazingerZeroHullMod", STRENGTHENING_MULT);
-        ship.getMutableStats().getAcceleration().modifyMult("MazingerZeroHullMod", STRENGTHENING_MULT);
-        ship.getMutableStats().getDeceleration().modifyMult("MazingerZeroHullMod", STRENGTHENING_MULT);
-        ship.getMutableStats().getTurnAcceleration().modifyMult("MazingerZeroHullMod", STRENGTHENING_MULT);
-        ship.getMutableStats().getMaxTurnRate().modifyMult("MazingerZeroHullMod", STRENGTHENING_MULT);
+        ship.getMutableStats().getBallisticWeaponDamageMult().modifyMult("AEG_7BlackBoxes", STRENGTHENING_MULT);
+        ship.getMutableStats().getEnergyWeaponDamageMult().modifyMult("AEG_7BlackBoxes", STRENGTHENING_MULT);
+        ship.getMutableStats().getMissileWeaponDamageMult().modifyMult("AEG_7BlackBoxes", STRENGTHENING_MULT);
+        ship.getMutableStats().getMaxSpeed().modifyMult("AEG_7BlackBoxes", STRENGTHENING_MULT);
+        ship.getMutableStats().getAcceleration().modifyMult("AEG_7BlackBoxes", STRENGTHENING_MULT);
+        ship.getMutableStats().getDeceleration().modifyMult("AEG_7BlackBoxes", STRENGTHENING_MULT);
+        ship.getMutableStats().getTurnAcceleration().modifyMult("AEG_7BlackBoxes", STRENGTHENING_MULT);
+        ship.getMutableStats().getMaxTurnRate().modifyMult("AEG_7BlackBoxes", STRENGTHENING_MULT);
 
         // Dimensional Prediction
         if (Math.random() < PREDICTION_EVASION_CHANCE) {
-            ship.getMutableStats().getHullDamageTakenMult().modifyMult("MazingerZeroHullMod", 0f);
-            ship.getMutableStats().getArmorDamageTakenMult().modifyMult("MazingerZeroHullMod", 0f);
+            ship.getMutableStats().getHullDamageTakenMult().modifyMult("AEG_7BlackBoxes", 0f);
+            ship.getMutableStats().getArmorDamageTakenMult().modifyMult("AEG_7BlackBoxes", 0f);
         }
-        ship.getMutableStats().getSensorStrength().modifyFlat("MazingerZeroHullMod", SENSOR_RANGE_BOOST);
+        ship.getMutableStats().getSensorStrength().modifyFlat("AEG_7BlackBoxes", SENSOR_RANGE_BOOST);
 
         // Adaptive Defense
         adaptiveDefenseTimer.advance(amount);
         if (adaptiveDefenseTimer.intervalElapsed()) {
-            ship.getMutableStats().getHullDamageTakenMult().modifyMult("MazingerZeroHullMod", ADAPTIVE_DEFENSE_REDUCTION);
-            ship.getMutableStats().getArmorDamageTakenMult().modifyMult("MazingerZeroHullMod", ADAPTIVE_DEFENSE_REDUCTION);
+            ship.getMutableStats().getHullDamageTakenMult().modifyMult("AEG_7BlackBoxes", ADAPTIVE_DEFENSE_REDUCTION);
+            ship.getMutableStats().getArmorDamageTakenMult().modifyMult("AEG_7BlackBoxes", ADAPTIVE_DEFENSE_REDUCTION);
         }
 
         // Last Stand Protocol
@@ -62,7 +60,7 @@ public class AEG_7BlackBoxes extends BaseHullMod {
             // Find the attacking ship and destroy it
             ShipAPI attacker = findAttackingShip(ship);
             if (attacker != null) {
-                attacker.getHull().setHitpoints(0);
+                attacker.setHitpoints(0);
                 ship.setHitpoints(ship.getMaxHitpoints() * 0.25f);
             }
         }
@@ -87,13 +85,20 @@ public class AEG_7BlackBoxes extends BaseHullMod {
     @Override
     public String getDescriptionParam(int index, ShipAPI.HullSize hullSize) {
         switch (index) {
-            case 0: return "rapid hull and armor regeneration";
-            case 1: return "converts incoming damage into a damage boost and converts hard flux to soft flux";
-            case 2: return "increases all ship attributes";
-            case 3: return "chance to evade incoming attacks and increases sensor range";
-            case 4: return "boosts damage reduction against a specific weapon type for 20 seconds after being hit by it";
-            case 5: return "one-time ability to destroy the attacking ship and recover 25% hull when the ship would be destroyed";
-            default: return null;
+            case 0:
+                return "Regeneration: Rapid hull and armor regeneration";
+            case 1:
+                return "Assimilation: Converts incoming damage into a damage boost and converts hard flux to soft flux";
+            case 2:
+                return "Strengthening: Increases all ship attributes";
+            case 3:
+                return "Dimensional Prediction: Chance to evade incoming attacks and increases sensor range";
+            case 4:
+                return "Adaptive Defense: Boosts damage reduction against a specific weapon type for 20 seconds after being hit by it";
+            case 5:
+                return "Causality Weapon: One-time ability to destroy the attacking ship and recover 25% hull when the ship would be destroyed";
+            default:
+                return null;
         }
     }
 }

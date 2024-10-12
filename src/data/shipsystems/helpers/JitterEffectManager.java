@@ -1,4 +1,4 @@
-package data.shipsystems.scripts;
+package data.shipsystems.helpers;
 
 import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.combat.CombatEngineLayers;

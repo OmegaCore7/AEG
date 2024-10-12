@@ -7,6 +7,7 @@ import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.impl.combat.BaseShipSystemScript;
 import com.fs.starfarer.api.combat.CombatEngineAPI;
 import com.fs.starfarer.api.util.Misc;
+import data.shipsystems.helpers.JitterEffectManager;
 import org.lwjgl.util.vector.Vector2f;
 import java.awt.Color;
 
