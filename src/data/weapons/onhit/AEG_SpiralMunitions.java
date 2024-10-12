@@ -12,13 +12,13 @@ import java.util.List;
 public class AEG_SpiralMunitions implements OnHitEffectPlugin {
     private static final float SLOW_DURATION = 10f; // Duration of the slow effect in seconds
     private static final float RANGE_REDUCTION_DURATION = 10f; // Duration of the range reduction in seconds
-    private static final float TARGET_RANGE = 200f; // Desired weapon range
+    private static final float TARGET_RANGE = 100f; // Desired weapon range
     private static final float PARTICLE_SIZE = 20f;
     private static final float PARTICLE_DURATION = 1f;
     private static final float PARTICLE_BRIGHTNESS = 1f;
     private static final float EFFECT_RADIUS = 75f;
-    private static final float ATTRACTION_RADIUS = 500f; // Radius within which projectiles are attracted
-    private static final float ATTRACTION_FORCE = 500f; // Force of attraction
+    private static final float ATTRACTION_RADIUS = 800f; // Radius within which projectiles are attracted
+    private static final float ATTRACTION_FORCE = 2000f; // Force of attraction
 
     private static final Color[] PARTICLE_COLORS = {
             new Color(0, 255, 0, 255), // Bright green
@@ -28,7 +28,10 @@ public class AEG_SpiralMunitions implements OnHitEffectPlugin {
 
     @Override
     public void onHit(DamagingProjectileAPI proj, CombatEntityAPI target, Vector2f point, boolean shieldHit, ApplyDamageResultAPI damageResult, CombatEngineAPI engine) {
-        if (proj == null || target == null || point == null || engine == null) return;
+        if (proj == null || target == null || point == null || engine == null) {
+            Global.getLogger(AEG_SpiralMunitions.class).warn("Null reference detected in onHit parameters");
+            return;
+        }
 
         // Apply slow effect
         if (target instanceof ShipAPI) {
@@ -82,9 +85,13 @@ public class AEG_SpiralMunitions implements OnHitEffectPlugin {
         for (DamagingProjectileAPI otherProj : engine.getProjectiles()) {
             if (otherProj != proj && Vector2f.sub(point, otherProj.getLocation(), null).length() < ATTRACTION_RADIUS) {
                 Vector2f attraction = Vector2f.sub(point, otherProj.getLocation(), null);
-                attraction.normalise();
-                attraction.scale(ATTRACTION_FORCE * engine.getElapsedInLastFrame());
-                otherProj.getVelocity().translate(attraction.x, attraction.y);
+                if (attraction.length() > 0) {
+                    attraction.normalise();
+                    attraction.scale(ATTRACTION_FORCE * engine.getElapsedInLastFrame());
+                    otherProj.getVelocity().translate(attraction.x, attraction.y);
+                } else {
+                    Global.getLogger(AEG_SpiralMunitions.class).warn("Zero length vector detected during attraction");
+                }
             }
         }
     }
