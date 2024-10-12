@@ -17,12 +17,12 @@
 	"barrelMode":"ALTERNATING",
 	"animationType":"GLOW_AND_FLASH",
 	"muzzleFlashSpec":{
-	    "length":40.0,
+	    "length":30.0,
 		"spread":15.0,
 		"particleSizeMin":20.0,
 		"particleSizeRange":10.0,
 		"particleDuration":0.24,
-		"particleCount":100,
+		"particleCount":5,
 		"particleColor":[255,165,0,255]
 	},
 	"autocharge":true,

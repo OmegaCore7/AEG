@@ -32,6 +32,8 @@ public class AEG_PhotonBarrageBeamStats implements BeamEffectPlugin {
     private static final float PLASMA_SPEED = 200f;
     private static final float CONE_ANGLE = 45f; // Wide cone angle in degrees
 
+    private static final float SPLIT_BEAM_SPREAD_RADIUS = 50f; // Spread radius for split beams
+
     private final IntervalUtil fireInterval = new IntervalUtil(0.1f, 0.1f);
     private float chargeUpProgress = 0f;
     private final Random random = new Random();
@@ -117,7 +119,6 @@ public class AEG_PhotonBarrageBeamStats implements BeamEffectPlugin {
                             new Color(255, 255, 255, 255) // White core
                     );
                 }
-
                 // Create plasma projectiles in a wide cone
                 for (int i = 0; i < PLASMA_COUNT; i++) {
                     float angle = (random.nextFloat() * CONE_ANGLE) - (CONE_ANGLE / 2); // Random angle within the cone
@@ -148,17 +149,39 @@ public class AEG_PhotonBarrageBeamStats implements BeamEffectPlugin {
                 }
 
                 // Split into smaller beams with random angles
+                Vector2f beamStart = beam.getWeapon().getLocation();
+                Vector2f beamEnd = new Vector2f(beamStart);
+                Vector2f beamDirection = new Vector2f((float) Math.cos(Math.toRadians(beam.getWeapon().getCurrAngle())), (float) Math.sin(Math.toRadians(beam.getWeapon().getCurrAngle())));
+                beamDirection.scale(RANGE);
+                Vector2f.add(beamEnd, beamDirection, beamEnd);
+
                 for (int i = 0; i < 5; i++) {
+                    // Random position along the initial beam
+                    float t = random.nextFloat(); // Random value between 0 and 1
+                    Vector2f splitBeamStart = new Vector2f(
+                            beamStart.x + t * (beamEnd.x - beamStart.x),
+                            beamStart.y + t * (beamEnd.y - beamStart.y)
+                    );
+
+                    // Random offset within a 50-unit radius
                     float angle = random.nextFloat() * 360f; // Random angle in degrees
+                    float distance = random.nextFloat() * SPLIT_BEAM_SPREAD_RADIUS; // Random distance within 50 units
+                    Vector2f offset = new Vector2f(
+                            (float) Math.cos(Math.toRadians(angle)) * distance,
+                            (float) Math.sin(Math.toRadians(angle)) * distance
+                    );
+                    Vector2f.add(splitBeamStart, offset, splitBeamStart);
+
+                    // Calculate the direction and end position of the split beam
                     Vector2f splitBeamDirection = new Vector2f((float) Math.cos(Math.toRadians(angle)), (float) Math.sin(Math.toRadians(angle)));
                     splitBeamDirection.scale(RANGE);
 
-                    Vector2f splitBeamLocation = new Vector2f(beam.getWeapon().getLocation());
-                    Vector2f.add(splitBeamLocation, splitBeamDirection, splitBeamLocation);
+                    Vector2f splitBeamEnd = new Vector2f(splitBeamStart);
+                    Vector2f.add(splitBeamEnd, splitBeamDirection, splitBeamEnd);
 
                     if (beam.getWeapon().getShip().getShipTarget() != null) {
                         engine.spawnEmpArcPierceShields(
-                                beam.getWeapon().getShip(), splitBeamLocation, beam.getWeapon().getShip(), beam.getWeapon().getShip().getShipTarget(),
+                                beam.getWeapon().getShip(), splitBeamStart, beam.getWeapon().getShip(), beam.getWeapon().getShip().getShipTarget(),
                                 DamageType.ENERGY, // Damage type
                                 SPLIT_BEAM_DAMAGE, // Damage amount
                                 0f, // EMP damage
