@@ -1,0 +1,13 @@
+{
+	"id":"lw_bhg_shot",
+	"specClass":"projectile",
+	"spawnType":"BALLISTIC",
+    "collisionClass":"PROJECTILE_NO_FF",
+    "collisionClassByFighter":"PROJECTILE_NO_FF",
+	"length":50.0,
+	"width":30.0,
+	"hitGlowRadius":50,
+	"fadeTime":0.5,
+	"fringeColor":[0,255,0,255],
+	"coreColor":[180,255,180,200],
+}

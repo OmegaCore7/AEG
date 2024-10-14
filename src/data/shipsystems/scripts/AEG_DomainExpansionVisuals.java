@@ -10,7 +10,7 @@ import java.util.Random;
 public class AEG_DomainExpansionVisuals {
 
     private static final float DOMAIN_RADIUS = 2000f;
-    private static final int PARTICLE_COUNT = 200;
+    private static final int PARTICLE_COUNT = 300;
     private static final float PARTICLE_SIZE = 10f;
     private static final float PARTICLE_LIFETIME = 2.0f;
     private static final Color[] PARTICLE_COLORS = {
