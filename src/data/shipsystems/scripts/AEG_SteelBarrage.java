@@ -193,7 +193,7 @@ public class AEG_SteelBarrage extends BaseShipSystemScript {
     }
 
     private void addJitterCopies(ShipAPI ship) {
-        Color jitterColor = new Color(144, 238, 144, 255); // Light blue color
+        Color jitterColor = new Color(144, 238, 144, 255); // Light green color
         float jitterDuration = 5.0f; // Duration of the jitter copy
         float jitterRange = 5.0f; // Range of the jitter effect
 
