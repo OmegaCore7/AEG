@@ -18,7 +18,7 @@ public class AEG_SteelBarrage extends BaseShipSystemScript {
     private static final float RAM_DAMAGE = 2000f; // Damage to apply
     private static final float COLLISION_THRESHOLD = 75f; // Threshold for collision detection
     private static final int RAM_COUNT = 5; // Number of rams
-    private static final float PAUSE_DURATION = 0.8f; // Pause duration in seconds
+    private static final float PAUSE_DURATION = 0.4f; // Reduced pause duration in seconds
     private static final Color LIGHT_GREEN_COLOR = new Color(144, 238, 144, 255); // RGBA for light green
     private static final Color EXPLOSION_COLOR = new Color(175, 220, 120, 255); // Bright green explosion color
 
@@ -44,21 +44,18 @@ public class AEG_SteelBarrage extends BaseShipSystemScript {
             if (targetShip != null && ramCounter > 0) {
                 if (pauseTimer <= 0f) {
                     if (maneuverStep == 0) {
-                        // Step 1: Create multiple EMP arcs to disable the enemy ship
-                        createMultipleEmpArcs(ship, targetShip);
+                        // Step 1: Create hitspark on the target ship
+                        createHitspark(ship, targetShip);
                     }
 
                     // Perform maneuvers before ramming
                     performManeuvers(ship, targetShip);
 
-                    if (maneuverStep >= 3) {
-                        // Step 2: Ensure the player ship is facing the target
-                        faceTarget(ship, targetShip);
-
-                        // Step 3: Ram the target
+                    if (maneuverStep >= 5) { // Adjusted for additional maneuvers
+                        // Step 2: Ram the target
                         applyRammingForceAndDamage(ship, targetShip, id, effectLevel);
 
-                        // Step 4: Create a big green explosion
+                        // Step 3: Create a big green explosion
                         createExplosion(ship, targetShip);
 
                         // Reset maneuver step and pause timer
@@ -68,7 +65,7 @@ public class AEG_SteelBarrage extends BaseShipSystemScript {
                     } else {
                         // Increment maneuver step and reset pause timer
                         maneuverStep++;
-                        pauseTimer = PAUSE_DURATION / 2; // Shorter pause between maneuvers
+                        pauseTimer = PAUSE_DURATION / 2f; // Shorter pause between maneuvers
                     }
                 } else {
                     // Decrease pause timer
@@ -96,22 +93,20 @@ public class AEG_SteelBarrage extends BaseShipSystemScript {
         return closestTarget;
     }
 
-    private void createMultipleEmpArcs(ShipAPI ship, ShipAPI target) {
+    private void createHitspark(ShipAPI ship, ShipAPI target) {
         CombatEngineAPI engine = Global.getCombatEngine();
-        for (int i = 0; i < 5; i++) { // Create 5 EMP arcs at different locations
-            Vector2f arcLocation = Misc.getPointAtRadius(target.getLocation(), target.getCollisionRadius() * (i + 1) / 3);
-            engine.spawnEmpArc(
-                    ship, ship.getLocation(), ship, target,
-                    DamageType.ENERGY, // Damage type
-                    150f, // Damage amount
-                    1000f, // EMP amount
-                    10000f, // Max range
-                    "tachyon_lance_emp_impact", // Impact sound
-                    10f, // Thickness
-                    LIGHT_GREEN_COLOR, // Fringe color
-                    LIGHT_GREEN_COLOR // Core color
-            );
-        }
+        Vector2f arcLocation = target.getLocation();
+        engine.spawnEmpArc(
+                ship, ship.getLocation(), ship, target,
+                DamageType.ENERGY, // Damage type
+                0f, // No damage
+                0f, // No EMP damage
+                100f, // Reduced range for small hitspark
+                "tachyon_lance_emp_impact", // Impact sound
+                5f, // Reduced thickness for small hitspark
+                LIGHT_GREEN_COLOR, // Fringe color
+                LIGHT_GREEN_COLOR // Core color
+        );
     }
 
     private void faceTarget(ShipAPI ship, ShipAPI target) {
@@ -131,20 +126,20 @@ public class AEG_SteelBarrage extends BaseShipSystemScript {
         if (distance <= COLLISION_THRESHOLD) {
             // Apply damage to the target's shield if it has one
             if (target.getShield() != null && target.getShield().isOn()) {
-                target.getFluxTracker().increaseFlux(RAM_DAMAGE * 2 * effectLevel, true);
+                target.getFluxTracker().increaseFlux(RAM_DAMAGE * 2f * effectLevel, true);
             } else {
                 // Apply damage to armor if present
                 float armorValue = target.getArmorGrid().getArmorRating() * target.getArmorGrid().getMaxArmorInCell();
                 if (armorValue > 0) {
-                    float effectiveDamage = RAM_DAMAGE * effectLevel * (1 - armorValue / (armorValue + RAM_DAMAGE));
+                    float effectiveDamage = RAM_DAMAGE * effectLevel * (1f - armorValue / (armorValue + RAM_DAMAGE));
                     // Convert Vector2f to integer coordinates
                     int x = (int) target.getLocation().x;
                     int y = (int) target.getLocation().y;
                     // Manually reduce armor
-                    target.getArmorGrid().setArmorValue(x, y, Math.max(0, armorValue - effectiveDamage));
+                    target.getArmorGrid().setArmorValue(x, y, Math.max(0f, armorValue - effectiveDamage));
                 } else {
                     // Apply full damage to hull if no armor
-                    target.getMutableStats().getHullDamageTakenMult().modifyMult(id, 1 + (RAM_DAMAGE * effectLevel / target.getMaxHitpoints()));
+                    target.getMutableStats().getHullDamageTakenMult().modifyMult(id, 1f + (RAM_DAMAGE * effectLevel / target.getMaxHitpoints()));
                 }
             }
         }
@@ -156,7 +151,6 @@ public class AEG_SteelBarrage extends BaseShipSystemScript {
     }
 
     private void performManeuvers(ShipAPI ship, ShipAPI target) {
-        // Perform different maneuvers like drifting, curving, and strafing
         Vector2f direction = Vector2f.sub(target.getLocation(), ship.getLocation(), null);
         direction.normalise();
         Vector2f perpendicular = new Vector2f(-direction.y, direction.x); // Perpendicular vector for strafing
@@ -179,10 +173,22 @@ public class AEG_SteelBarrage extends BaseShipSystemScript {
                 curve.scale(300f); // Adjust the curving speed as needed
                 Vector2f.add(ship.getVelocity(), curve, ship.getVelocity());
                 break;
+            case 3:
+                // Additional maneuver: Strafe to the left
+                perpendicular.scale(-500f); // Adjust the strafing speed as needed
+                Vector2f.add(ship.getVelocity(), perpendicular, ship.getVelocity());
+                break;
+            case 4:
+                // Additional maneuver: Reverse drift
+                Vector2f reverseDrift = new Vector2f(direction);
+                reverseDrift.scale(-200f); // Adjust the drifting speed as needed
+                Vector2f.add(ship.getVelocity(), reverseDrift, ship.getVelocity());
+                break;
         }
 
-        // Ensure the ship is facing the target during maneuvers
-        faceTarget(ship, target);
+        // Add random half rotations to simulate swinging fists
+        float randomRotation = (float) (Math.random() * 180 - 90); // Random angle between -90 and 90 degrees
+        ship.setFacing(ship.getFacing() + randomRotation);
 
         // Course correction logic to ensure the ship hits the target
         Vector2f currentVelocity = ship.getVelocity();
@@ -197,14 +203,14 @@ public class AEG_SteelBarrage extends BaseShipSystemScript {
         float jitterDuration = 5.0f; // Duration of the jitter copy
         float jitterRange = 5.0f; // Range of the jitter effect
 
-        for (int i = 0; i < 10; i++) { // Create 5 jitter copies
+        for (int i = 0; i < 10; i++) { // Create 10 jitter copies
             JitterEffectManager.addJitterCopy(ship, jitterColor, jitterDuration, jitterRange);
         }
     }
 
     @Override
     public void unapply(MutableShipStatsAPI stats, String id) {
-        // No need to unapply anything since we removed the damage immunity
+        // No time dilation to unapply, so this method can remain empty or handle other cleanup if needed
     }
 
     @Override
