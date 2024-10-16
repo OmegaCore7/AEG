@@ -2,7 +2,7 @@
     "id": "AEG_SteelBarrage",
     "type": "DISPLACER",
     "aiType": "PHASE_DISPLACER",
-    "statsScript": "data.shipsystems.scripts.AEG_MajinChange",
+    "statsScript": "data.shipsystems.scripts.AEG_SteelBarrage",
     "weaponGlowColor": [144, 238, 144, 255],
     "weaponTypes": ["ENERGY"],
     "engineGlowColor": [144, 238, 144, 255],
