@@ -1,0 +1,25 @@
+{
+  "id": "AEG_rm_leftshoulder",
+  "specClass": "projectile",
+  "projectileSpecId": "AEG_dummy_invisible",
+  "type": "DECORATIVE",
+  "size": "SMALL",
+  "turretSprite": "graphics/ships/red_menace/zero_shoulder_l.png",
+  "hardpointSprite": "",
+  "turretOffsets": [
+    0,
+    0
+  ],
+  "turretAngleOffsets": [
+    0
+  ],
+  "hardpointOffsets": [
+    0,
+    0
+  ],
+  "hardpointAngleOffsets": [
+    0
+  ],
+  "barrelMode": "ALTERNATING",
+  "animationType": "NONE"
+}
