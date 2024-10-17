@@ -1,0 +1,60 @@
+{
+  "hullName": "Zero Scrander",
+  "hullId": "AEG_zero_scrander",
+  "hullSize": "DESTROYER",
+  "spriteName": "graphics/ships/zero/zero_scrander.png",
+  "style": "OMEGA",
+  "height": 296,
+  "width": 676,
+  "center": [338, 148],
+  "collisionRadius": 382,
+  "shieldCenter": [0, 0],
+  "shieldRadius": 375,
+  "viewOffset": 0,
+  "builtInWeapons": {
+    "WS0001": "guardian",
+    "WS0002": "heavyburst"
+  },
+  "weaponSlots": [
+    {
+      "id": "WS0001",
+      "size": "LARGE",
+      "type": "BUILT_IN",
+      "mount": "HIDDEN",
+      "arc": 206,
+      "angle": 6.5,
+      "locations": [-49.5, 149.5]
+    },
+    {
+      "id": "WS0002",
+      "size": "MEDIUM",
+      "type": "BUILT_IN",
+      "mount": "HIDDEN",
+      "arc": 119,
+      "angle": -73.5,
+      "locations": [93, -210.5]
+    }
+  ],
+  "engineSlots": [],
+  "bounds": [
+    98.5, 116.5,
+    130.5, 10,
+    132.5, -69.5,
+    111.5, -169,
+    147, -338,
+    102, -285,
+    77, -263.5,
+    48.5, -259.5,
+    2, -281,
+    -50, -271,
+    -96, -230,
+    -124.5, -178.5,
+    -146.5, -83.5,
+    -145, 23.5,
+    -110.5, 121,
+    -133.5, 338,
+    -42, 192,
+    5, 194,
+    44.5, 178
+  ]
+}
