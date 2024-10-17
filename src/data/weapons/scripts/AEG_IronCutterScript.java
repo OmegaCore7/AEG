@@ -69,9 +69,19 @@ public class AEG_IronCutterScript implements EveryFrameWeaponEffectPlugin {
                 // Spawn the Iron Cutter ship
                 Vector2f spawnLocation = weapon.getLocation();
                 CombatFleetManagerAPI fleetManager = engine.getFleetManager(weapon.getShip().getOwner());
-                FleetMemberAPI member = Global.getFactory().createFleetMember(FleetMemberType.SHIP, "AEG_IronCutter_Hull");
+                FleetMemberAPI member = Global.getFactory().createFleetMember(FleetMemberType.SHIP, "AEG_IronCutter");
                 fleetManager.spawnFleetMember(member, spawnLocation, weapon.getShip().getFacing(), 0f);
                 final ShipAPI ironCutter = (ShipAPI) member.getStats().getEntity();
+
+                // Find the target of the beam/laser pointer
+                CombatEntityAPI target = weapon.getShip().getShipTarget();
+                if (target != null) {
+                    // Set the Iron Cutter to move towards the target
+                    Vector2f targetLocation = target.getLocation();
+                    Vector2f directionToTarget = VectorUtils.getDirectionalVector(ironCutter.getLocation(), targetLocation);
+                    directionToTarget.scale(ironCutter.getMaxSpeed());
+                    ironCutter.getVelocity().set(directionToTarget);
+                }
 
                 // Activate the ship system
                 ironCutter.useSystem();
