@@ -11,6 +11,11 @@
   "shieldCenter": [0, 0],
   "shieldRadius": 375,
   "viewOffset": 0,
+  "builtInMods": [
+    "always_detaches",
+    "supercomputer",
+    "reduced_explosion"
+  ],
   "builtInWeapons": {
     "WS0001": "guardian",
     "WS0002": "heavyburst"

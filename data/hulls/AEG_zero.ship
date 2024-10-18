@@ -12,8 +12,8 @@
   "shieldRadius": 83,
   "viewOffset": 0,
   "builtInMods": [
-    "advancedcore",
-    "vastbulk"
+    "vastbulk",
+    "supercomputer"
   ],
   "builtInWeapons": {
     "WS0002": "AEG_ChestInferno",
