@@ -3,7 +3,6 @@
   "specClass": "beam",
   "type": "ENERGY",
   "size": "SMALL",
-  "everyFrameEffect": "data.weapons.scripts.AEG_IronCutterScript",
   "collisionClass": "RAY",
   "collisionClassByFighter": "RAY_FIGHTER",
   "turretSprite": "graphics/ships/zero/zero_arm_r.png",
