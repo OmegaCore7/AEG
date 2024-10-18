@@ -1,16 +1,13 @@
 {
-  "variantId": "AEG_zero_scrander_0",
-  "hullId": "AEG_zero_scrander",
+  "variantId": "AEG_module_zero_scrander_variant",
+  "hullId": "AEG_module_zero_scrander",
   "displayName": "New Variant",
   "goalVariant": false,
   "fluxCapacitors": 0,
   "fluxVents": 0,
   "quality": 1,
   "permaMods": [],
-  "hullMods": [
-    "advancedcore",
-    "always_detaches"
-  ],
+  "hullMods": [],
   "weaponGroups": [
     {
       "autofire": false,

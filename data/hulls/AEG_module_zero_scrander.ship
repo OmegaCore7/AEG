@@ -1,6 +1,6 @@
 {
   "hullName": "Zero Scrander",
-  "hullId": "AEG_zero_scrander",
+  "hullId": "AEG_module_zero_scrander",
   "hullSize": "DESTROYER",
   "spriteName": "graphics/ships/zero/zero_scrander.png",
   "style": "OMEGA",

@@ -16,7 +16,6 @@
     "vastbulk"
   ],
   "builtInWeapons": {
-    "WS0001": "AEG_zero_scrander_0",
     "WS0002": "AEG_ChestInferno",
     "WS0003": "AEG_zero_shoulder_l",
     "WS0004": "AEG_zero_shoulder_r",
@@ -27,8 +26,8 @@
   },
   "weaponSlots": [
     {
-      "id": "WS0001",
-      "size": "SMALL",
+      "id": "LARGE",
+      "size": "LARGE",
       "type": "STATION_MODULE",
       "mount": "HARDPOINT",
       "arc": 35,
