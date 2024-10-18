@@ -33,4 +33,4 @@ CCX Blaster Drone,AEG_rmdrone2,CCX Mech Seconadary Drone,Unknown,highenergyfocus
 #Mazinger Zero,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 Anomaly 000: Zero,AEG_zero,Super Robot,Unknown,AEG_MajinChange,40,20000,2500,25000,31250,1250,370,4,170,99,99,99,99,9999,NONE,,,,,,,1,2,3000,0,0,60,10,50000000,4,20,720,0.25,60,60,SHIP_WITH_MODULES,,,,,,,,,,,,,,
 Gigantic Iron Cutter,AEG_IronCutter,Insane Rocket Punch,Unknown,AEG_warp,0,20000,1800,0,0,1250,0,,400,400,0,300,300,9999,NONE,,,,,,,0,0,0,0,0,0,0,0,0,0,720,0,0,0,"UNBOARDABLE, HIDE_IN_CODEX",,,,,,,,,,,,,,
-Zero Scrander,AEG_module_zero_scrander,Zero Scrander,Unknown,,0,20000,1800,25000,31250,1250,0,,400,400,0,300,300,9999,NONE,,,,,,,0,0,0,0,0,0,0,0,0,0,720,0,0,0,"UNBOARDABLE, HIDE_IN_CODEX",,,,,,,,,,,,,,
+Zero Scrander,AEG_module_zero_scrander,Zero Scrander,Unknown,highenergyfocus,0,20000,1800,25000,31250,1250,0,,400,400,0,300,300,9999,NONE,,,,,,,0,0,0,0,0,0,0,0,0,0,720,0,0,0,"UNBOARDABLE, HIDE_IN_CODEX",,,,,,,,,,,,,,

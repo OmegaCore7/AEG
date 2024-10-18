@@ -13,7 +13,6 @@
       "autofire": false,
       "mode": "LINKED",
       "weapons": {
-        "WS0001": "AEG_zero_scrander_0",
         "WS0002": "AEG_ChestInferno",
         "WS0005": "AEG_zero_arm_l",
         "WS0006": "AEG_zero_arm_r",
@@ -21,6 +20,11 @@
       }
     }
   ],
-  "modules": [],
+  "modules": [
+	{
+	"WS0001": "AEG_module_zero_scrander_0"
+	}
+    ],
+
   "wings": []
 }
