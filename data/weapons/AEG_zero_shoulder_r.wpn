@@ -6,6 +6,7 @@
   "size": "SMALL",
   "turretSprite": "graphics/ships/zero/zero_shoulder_r.png",
   "hardpointSprite": "graphics/ships/zero/zero_shoulder_r.png",
+  "showDamageWhenDecorative": "TRUE",
   "turretOffsets": [
     0,
     0

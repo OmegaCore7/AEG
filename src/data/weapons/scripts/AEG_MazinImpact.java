@@ -33,8 +33,8 @@ public class AEG_MazinImpact implements EveryFrameWeaponEffectPlugin {
         if (!(weapon.getShip() instanceof ShipAPI)) return;
         ShipAPI ship = (ShipAPI) weapon.getShip();
 
-        // Check if the weapon is in cooldown
-        if (weapon.getCooldownRemaining() > 0 && !charging && !backingUp && !secondCharge) {
+        // Check if the weapon is firing and not already charging
+        if (weapon.isFiring() && !charging && !backingUp && !secondCharge) {
             target = findNearestTarget(engine, ship);
             if (target != null) {
                 tiltShip(ship, -45);
