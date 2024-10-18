@@ -8,7 +8,19 @@
   "quality": 1,
   "permaMods": [],
   "hullMods": [],
-  "weaponGroups": [],
+  "weaponGroups": [
+    {
+      "autofire": false,
+      "mode": "LINKED",
+      "weapons": {
+        "WS0001": "AEG_zero_scrander_0",
+        "WS0002": "AEG_ChestInferno",
+        "WS0005": "AEG_zero_arm_l",
+        "WS0006": "AEG_zero_arm_r",
+        "WS0007": "AEG_photonbarrage"
+      }
+    }
+  ],
   "modules": [],
   "wings": []
 }

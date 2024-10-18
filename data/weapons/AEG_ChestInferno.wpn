@@ -1,31 +1,72 @@
 {
-	"id":"AEG_ChestInferno",
-	"specClass":"projectile",
-	"type":"ENERGY",
-	"mountTypeOverride":"HYBRID",
-	"size":"MEDIUM",
-	"everyFrameEffect":"com.fs.starfarer.api.impl.combat.CryofluxTransducerEffect",
-	"turretSprite": "graphics/weapons/cryoblaster_turret_base.png",
-	"turretGlowSprite": "graphics/weapons/cryoblaster_turret_glow.png",
-	"hardpointSprite": "graphics/weapons/cryoblaster_hardpoint_base.png",
-	"hardpointGlowSprite": "graphics/weapons/cryoblaster_hardpoint_glow.png",
-	"glowColor":[255,200, 0, 255],
-	"turretOffsets":[10,0],
-	"turretAngleOffsets":[0],
-	"hardpointOffsets":[15,0],
-	"hardpointAngleOffsets":[0],
-	"barrelMode":"ALTERNATING",
-	"animationType":"GLOW_AND_FLASH",
-	"muzzleFlashSpec":{
-	    "length":30.0,
-		"spread":15.0,
-		"particleSizeMin":20.0,
-		"particleSizeRange":10.0,
-		"particleDuration":0.24,
-		"particleCount":5,
-		"particleColor":[255,165,0,255]
-	},
-	"autocharge":true,
-	"projectileSpecId":"AEG_Inferno_shot",
-	"fireSoundTwo":"cryoblaster_fire"
+  "id": "AEG_ChestInferno",
+  "specClass": "projectile",
+  "projectileSpecId": "AEG_Inferno_shot",
+  "type": "ENERGY",
+  "mountTypeOverride": "HYBRID",
+  "size": "SMALL",
+  "everyFrameEffect": "com.fs.starfarer.api.impl.combat.CryofluxTransducerEffect",
+  "turretSprite": "graphics/ships/zero/zero_chest.png",
+  "turretGlowSprite": "graphics/ships/zero/zero_chest_glow.png",
+  "hardpointSprite": "graphics/ships/zero/zero_chest.png",
+  "hardpointGlowSprite": "graphics/ships/zero/zero_chest_glow.png",
+  "glowColor": [
+    155,
+    105,
+    105,
+    255
+  ],
+  "turretOffsets": [
+    4,
+    15,
+    4,
+    -15,
+    1.5,
+    25.5,
+    1.5,
+    -25.5,
+    -5.5,
+    36,
+    -5.5,
+    -36,
+    -14.5,
+    46,
+    -14.5,
+    -46
+  ],
+  "turretAngleOffsets": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+  ],
+  "hardpointOffsets": [
+    15,
+    0
+  ],
+  "hardpointAngleOffsets": [
+    0
+  ],
+  "barrelMode": "LINKED",
+  "animationType": "GLOW_AND_FLASH",
+  "autocharge": true,
+  "muzzleFlashSpec": {
+    "length": 30,
+    "spread": 15,
+    "particleSizeMin": 20,
+    "particleSizeRange": 10,
+    "particleDuration": 0.24,
+    "particleCount": 5,
+    "particleColor": [
+      255,
+      105,
+      105,
+      255
+    ]
+  },
+  "fireSoundTwo": "cryoblaster_fire"
 }

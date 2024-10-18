@@ -4,8 +4,8 @@
   "projectileSpecId": "AEG_dummy_invisible",
   "type": "DECORATIVE",
   "size": "SMALL",
-  "turretSprite": "graphics/ships/red_menace/zero_shoulder_l.png",
-  "hardpointSprite": "",
+  "turretSprite": "graphics/ships/zero/zero_shoulder_l.png",
+  "hardpointSprite": "graphics/ships/zero/zero_shoulder_l.png",
   "turretOffsets": [
     0,
     0

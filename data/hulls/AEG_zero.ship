@@ -7,10 +7,24 @@
   "height": 100,
   "width": 88,
   "center": [44, 50],
-  "collisionRadius": 52.5,
+  "collisionRadius": 84.5,
   "shieldCenter": [0, 0],
-  "shieldRadius": 51,
+  "shieldRadius": 83,
   "viewOffset": 0,
+  "builtInMods": [
+    "advancedcore",
+    "vastbulk"
+  ],
+  "builtInWeapons": {
+    "WS0001": "AEG_zero_scrander_0",
+    "WS0002": "AEG_ChestInferno",
+    "WS0003": "AEG_zero_shoulder_l",
+    "WS0004": "AEG_zero_shoulder_r",
+    "WS0005": "AEG_zero_arm_l",
+    "WS0006": "AEG_zero_arm_r",
+    "WS0007": "AEG_photonbarrage",
+    "WS0008": "AEG_zero_legs"
+  },
   "weaponSlots": [
     {
       "id": "WS0001",
@@ -28,13 +42,13 @@
       "mount": "TURRET",
       "arc": 25,
       "angle": 0,
-      "locations": [48.5, -0],
-      "renderOrderMod": 2
+      "locations": [38, -0],
+      "renderOrderMod": 5
     },
     {
       "id": "WS0003",
       "size": "SMALL",
-      "type": "BUILT_IN",
+      "type": "DECORATIVE",
       "mount": "TURRET",
       "arc": 15,
       "angle": 0,
@@ -44,7 +58,7 @@
     {
       "id": "WS0004",
       "size": "SMALL",
-      "type": "BUILT_IN",
+      "type": "DECORATIVE",
       "mount": "TURRET",
       "arc": 15,
       "angle": -0,
@@ -56,9 +70,9 @@
       "size": "SMALL",
       "type": "BUILT_IN",
       "mount": "TURRET",
-      "arc": 59,
-      "angle": 0,
-      "locations": [27, 57.5],
+      "arc": 103,
+      "angle": 28,
+      "locations": [8.5, 67],
       "renderOrderMod": 1
     },
     {
@@ -66,9 +80,9 @@
       "size": "SMALL",
       "type": "BUILT_IN",
       "mount": "TURRET",
-      "arc": 59,
-      "angle": -0,
-      "locations": [27, -57.5],
+      "arc": 103,
+      "angle": -28,
+      "locations": [8.5, -67],
       "renderOrderMod": 1
     },
     {
@@ -88,7 +102,7 @@
       "mount": "HARDPOINT",
       "arc": 125,
       "angle": 0,
-      "locations": [14.5, -0]
+      "locations": [-69, -0]
     },
     {
       "id": "WS0009",
@@ -97,7 +111,8 @@
       "mount": "TURRET",
       "arc": 125,
       "angle": 0,
-      "locations": [6.5, -0]
+      "locations": [17, -0],
+      "renderOrderMod": 8
     }
   ],
   "engineSlots": [
