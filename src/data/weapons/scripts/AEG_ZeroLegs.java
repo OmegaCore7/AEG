@@ -25,7 +25,7 @@ import com.fs.starfarer.api.Global;
 public class AEG_ZeroLegs implements EveryFrameWeaponEffectPlugin {
 
     private boolean runOnce = false, lockNloaded = false;
-    private WeaponAPI torso, rShould, lShould, lTurret, rTurret;
+    private WeaponAPI torso, lArm, rArm, photonBarrage, module;
     public int frame = 7;
     private IntervalUtil interval = new IntervalUtil(0.08f, 0.08f);
     private IntervalUtil interval2;
@@ -41,24 +41,24 @@ public class AEG_ZeroLegs implements EveryFrameWeaponEffectPlugin {
                         torso = w;
                     }
                     break;
-                case "LSHOULDER":
-                    if (lShould == null) {
-                        lShould = w;
-                    }
-                    break;
-                case "RSHOULDER":
-                    if (rShould == null) {
-                        rShould = w;
-                    }
-                    break;
                 case "WS0005":
-                    if (lTurret == null) {
-                        lTurret = w;
+                    if (lArm == null) {
+                        lArm = w;
                     }
                     break;
-                case "WS0004":
-                    if (rTurret == null) {
-                        rTurret = w;
+                case "WS0006":
+                    if (rArm == null) {
+                        rArm = w;
+                    }
+                    break;
+                case "WS0007":
+                    if (photonBarrage == null) {
+                        photonBarrage = w;
+                    }
+                    break;
+                case "WS0001":
+                    if (module == null) {
+                        module = w;
                     }
                     break;
             }
