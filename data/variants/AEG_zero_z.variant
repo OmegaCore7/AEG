@@ -15,6 +15,7 @@
       "weapons": {
         "WS0002": "AEG_ChestInferno",
         "WS0005": "AEG_zero_arm_l",
+        "WS0006": "AEG_zero_arm_r",
         "WS0007": "AEG_photonbarrage"
       }
     }
