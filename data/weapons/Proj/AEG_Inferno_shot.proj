@@ -6,14 +6,14 @@
 	"spawnType":"BALLISTIC_AS_BEAM",
 	"collisionClass":"RAY",
 	"collisionClassByFighter":"RAY_FIGHTER",
-	"length":50.0,
-	"width":30.0,
-	"hitGlowRadius":100,
+	"length":110.0,
+	"width":60.0,
+	"hitGlowRadius":200,
 	"fadeTime":0.5,
 	"fringeColor":[255,150,100,255],
 	"coreColor":[255,150,150,255],
 	#"coreColor":[255,255,255,50],
 	"textureType":"SMOOTH",  # only needed for BEAM spawnType
 	"textureScrollSpeed":-256,
-	"pixelsPerTexel":5.0
+	"pixelsPerTexel":10.0
 }

@@ -4,6 +4,7 @@
   "projectileSpecId": "annihilator_rocket",
   "type": "MISSILE",
   "size": "SMALL",
+  "OnFireEffect": "data.weapons.scripts.AEG_MazinImpact",
   "turretSprite": "graphics/ships/zero/zero_arm_l.png",
   "turretGlowSprite": "graphics/ships/zero/zero_arm_l_glow.png",
   "hardpointSprite": "graphics/ships/zero/zero_arm_l.png",

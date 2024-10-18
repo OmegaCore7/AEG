@@ -1,2 +1,1 @@
 name,id,tier,rarity,tech/manufacturer,tags,uiTags,base value,unlocked,hidden,hiddenEverywhere,cost_frigate,cost_dest,cost_cruiser,cost_capital,script,desc,short,sModDesc,sprite
-Zero Scrander ,AEG_ZeroScranderHullMod,,,Unknown,,,,,,,0,0,0,0,data.hullmods.AEG_ZeroScranderHullMod,"""Provides advanced capabilities including projectile absorption and homing blackhole attack.""",,,"""graphics/icons/hullsys/high_energy_focus.png"""
