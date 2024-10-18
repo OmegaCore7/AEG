@@ -26,14 +26,14 @@ public class AEG_IronCutterScript implements EveryFrameWeaponEffectPlugin {
             ShipAPI ship = weapon.getShip();
             Vector2f weaponLocation = weapon.getLocation();
 
-            // Calculate spawn location 100 units in front of the weapon
+            // Calculate spawn location 500 units in front of the weapon
             Vector2f spawnLocation = VectorUtils.getDirectionalVector(ship.getLocation(), weaponLocation);
-            spawnLocation.scale(100f);
+            spawnLocation.scale(500f);
             Vector2f.add(spawnLocation, weaponLocation, spawnLocation);
 
             // Spawn the Iron Cutter ship
             CombatFleetManagerAPI fleetManager = engine.getFleetManager(ship.getOwner());
-            FleetMemberAPI member = Global.getFactory().createFleetMember(FleetMemberType.SHIP, "AEG_IronCutter_x");
+            FleetMemberAPI member = Global.getFactory().createFleetMember(FleetMemberType.SHIP, "AEG_IronCutter");
             if (fleetManager != null && member != null) {
                 fleetManager.spawnFleetMember(member, spawnLocation, ship.getFacing(), 0f);
                 final ShipAPI ironCutter = (ShipAPI) member.getStats().getEntity();
@@ -50,10 +50,29 @@ public class AEG_IronCutterScript implements EveryFrameWeaponEffectPlugin {
                         Vector2f directionToTarget = VectorUtils.getDirectionalVector(ironCutter.getLocation(), targetLocation);
                         directionToTarget.scale(1000f);
                         ironCutter.getVelocity().set(directionToTarget);
-                    }
 
-                    // Activate the ship system
-                    ironCutter.useSystem();
+                        // Force accelerate towards the target
+                        final CombatEntityAPI finalTarget = target;
+                        Global.getCombatEngine().addPlugin(new BaseEveryFrameCombatPlugin() {
+                            @Override
+                            public void advance(float amount, List events) {
+                                if (engine.isPaused()) {
+                                    return;
+                                }
+
+                                if (ironCutter.isAlive()) {
+                                    Vector2f currentDirection = VectorUtils.getDirectionalVector(ironCutter.getLocation(), finalTarget.getLocation());
+                                    currentDirection.scale(1000f);
+                                    ironCutter.getVelocity().set(currentDirection);
+
+                                    // Activate the ship system
+                                    ironCutter.useSystem();
+                                } else {
+                                    engine.removePlugin(this);
+                                }
+                            }
+                        });
+                    }
                 }
             }
         }

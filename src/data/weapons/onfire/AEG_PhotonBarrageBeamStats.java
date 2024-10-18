@@ -69,8 +69,16 @@ public class AEG_PhotonBarrageBeamStats implements BeamEffectPlugin {
                 // Calculate velocity towards the central ball
                 Vector2f velocity = new Vector2f(beam.getWeapon().getLocation());
                 Vector2f.sub(velocity, startPosition, velocity);
-                velocity.normalise();
-                velocity.scale(PARTICLE_SPEED);
+
+                // Check if the velocity vector is zero
+                if (velocity.lengthSquared() > 0) {
+                    velocity.normalise();
+                    velocity.scale(PARTICLE_SPEED);
+                } else {
+                    // Handle the zero vector case, e.g., set a default direction or skip this iteration
+                    velocity.set(1, 0); // Example: setting a default direction
+                    velocity.scale(PARTICLE_SPEED);
+                }
 
                 // Stagger the particles so they don't reach the center at the same time
                 float staggerFactor = random.nextFloat() * 0.5f + 0.5f; // Between 0.5 and 1.0
