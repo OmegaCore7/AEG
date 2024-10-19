@@ -12,17 +12,18 @@
   "shieldRadius": 83,
   "viewOffset": 0,
   "builtInMods": [
-    "vastbulk",
     "supercomputer"
   ],
   "builtInWeapons": {
+    "WS0001": "AEG_thunderbreaker",
     "WS0002": "AEG_ChestInferno",
     "WS0003": "AEG_zero_shoulder_l",
     "WS0004": "AEG_zero_shoulder_r",
     "WS0005": "AEG_zero_arm_l",
     "WS0006": "AEG_zero_arm_r",
     "WS0007": "AEG_photonbarrage",
-    "WS0008": "AEG_zero_legs"
+    "WS0008": "AEG_zero_legs",
+    "WS0009": "AEG_rust"
   },
   "weaponSlots": [
     {
@@ -32,7 +33,7 @@
       "mount": "TURRET",
       "arc": 15,
       "angle": 0,
-      "locations": [38, 0],
+      "locations": [38, -0],
       "renderOrderMod": 5
     },
     {
@@ -41,7 +42,7 @@
       "type": "DECORATIVE",
       "mount": "TURRET",
       "arc": 15,
-      "angle": 0,
+      "angle": -0,
       "locations": [0, 42],
       "renderOrderMod": 4
     },
@@ -61,8 +62,8 @@
       "type": "BUILT_IN",
       "mount": "TURRET",
       "arc": 103,
-      "angle": 28,
-      "locations": [8.5, 67],
+      "angle": 24,
+      "locations": [9, 68],
       "renderOrderMod": 1
     },
     {
@@ -82,7 +83,7 @@
       "mount": "TURRET",
       "arc": 125,
       "angle": 0,
-      "locations": [0, 0],
+      "locations": [2, -0],
       "renderOrderMod": 6
     },
     {
@@ -101,17 +102,17 @@
       "mount": "TURRET",
       "arc": 125,
       "angle": 0,
-      "locations": [17, 0],
+      "locations": [2, 0],
       "renderOrderMod": 8
     },
     {
       "id": "WS0001",
-      "size": "SMALL",
-      "type": "ENERGY",
+      "size": "LARGE",
+      "type": "BUILT_IN",
       "mount": "TURRET",
       "arc": 25,
       "angle": 0,
-      "locations": [-77, -0]
+      "locations": [-95, -0.5]
     }
   ],
   "engineSlots": [

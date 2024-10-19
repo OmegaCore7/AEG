@@ -10,15 +10,15 @@ import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.util.IntervalUtil;
 import com.fs.starfarer.api.util.Misc;
 
-public class AEG_GodTB implements EveryFrameWeaponEffectPlugin {
+public class AEG_GodTB implements BeamEffectPlugin {
 
     private static final Color[] LIGHTNING_COLORS = {
-            new Color(255, 255, 255), // white core
-            new Color(0, 255, 255),   // cyan fringe
-            new Color(255, 255, 255), // white core
-            new Color(0, 0, 255),     // blue fringe
-            new Color(255, 0, 255),   // magenta core
-            new Color(75, 0, 130)     // dark purple fringe
+            new Color(255, 255, 255),
+            new Color(255, 230, 192),
+            new Color(255, 207, 92),
+            new Color(255, 130, 8),
+            new Color(255, 38, 0),
+            new Color(130, 4, 0)
     };
 
     private IntervalUtil interval = new IntervalUtil(0.1f, 0.2f);
@@ -31,9 +31,9 @@ public class AEG_GodTB implements EveryFrameWeaponEffectPlugin {
     private List<Vector2f> targetLocations = new ArrayList<>();
 
     @Override
-    public void advance(float amount, CombatEngineAPI engine, WeaponAPI weapon) {
-        if (!(weapon.getShip() instanceof ShipAPI)) return;
-        ShipAPI ship = (ShipAPI) weapon.getShip();
+    public void advance(float amount, CombatEngineAPI engine, BeamAPI beam) {
+        if (!(beam.getSource() instanceof ShipAPI)) return;
+        ShipAPI ship = (ShipAPI) beam.getSource();
 
         interval.advance(amount);
         if (interval.intervalElapsed() && !doneStriking) {

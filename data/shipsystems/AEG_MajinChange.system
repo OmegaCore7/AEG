@@ -3,7 +3,7 @@
 	"type":"ENGINE_MOD",
     "aiType":"BURN_DRIVE",
 	
-	"statsScript": "data.weapons.scripts.AEG_MajinChange",
+	"statsScript": "data.shipsystems.scripts.AEG_MajinChange",
 	
 	"engineGlowColor":[155,105,105,255],
     	"engineGlowLengthMult":3,

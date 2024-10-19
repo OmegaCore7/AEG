@@ -122,7 +122,7 @@ Reality Disruptor,realitydisruptor,3,,250000,1000,,25,1500,10,5,30,,,,ENERGY,200
 ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 Antimatter SRM Launcher,amsrm,3,,40000,1200,,1000,,15,50,7,3,0.05,,ENERGY,1000,,0,0.5,1,,0,0,0,0,,1000,200,3,250,,,"DO_NOT_AIM, DO_NOT_CONSERVE","utility8, missile9, strike7, omega, restricted",,Unknown,,Anti Small Craft,Extremely Fast,Excellent,,,,,,,TRUE,10
 Resonator MRM Launcher,resonatormrm,3,,100000,2500,,250,,15,20,16,8,0.4,4,KINETIC,50,,0,1.25,4,0.25,0,0,0,,,400,200,10,250,,,"DO_NOT_AIM, DO_NOT_CONSERVE","missile15, strike11, omega, restricted",,Unknown,,Anti Shield,Fast,Excellent,,,,,,,,12
-Rift Torpedo Launcher,rifttorpedo,3,,500000,2000,,6000,,75,10,30,1,0.05,,ENERGY,3000,,0,1,1,,0,0,0,0,,200,100,15,3000,,,"STRIKE, DO_NOT_AIM","strike20, missile20, omega, restricted",,Unknown,,Guided Torpedo,Slow,Excellent,,,,,,,TRUE,9
+Rift Torpedo Launcher,rifttorpedo,3,,500000,2000,,6000,,75,10,30,1,0.05,,ENERGY,3000,,0,1,1,,0,0,0,0,,200,100,15,3000,,,"STRIKE, DO_NOT_AIM","strike20, missile20, omega, restricted",,Unknown,,Guided Torpedo,Slow,Excellent,,,,,,,TRUE,
 ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,31
 ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,32

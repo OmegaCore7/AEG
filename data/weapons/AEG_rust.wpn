@@ -1,0 +1,48 @@
+{
+  "id": "AEG_rust",
+  "specClass": "projectile",
+  "projectileSpecId": "rift_torp",
+  "type": "MISSILE",
+  "mountTypeOverride": "SYNERGY",
+  "size": "SMALL",
+  "everyFrameEffect": "data.weapons.scripts.AEG_RustHurricane",
+  "turretSprite": "graphics/ships/zero/zero_mouth.png",
+  "turretGlowSprite": "graphics/ships/zero/zero_mouth_glow.png",
+  "hardpointSprite": "graphics/ships/zero/zero_mouth.png",
+  "hardpointGlowSprite": "graphics/ships/zero/zero_mouth_glow.png",
+  "glowColor": [
+    155,
+    105,
+    105,
+    255
+  ],
+  "turretOffsets": [
+    17,
+    2,
+    17,
+    -2,
+    17,
+    -1,
+    17,
+    1,
+    17,
+    0
+  ],
+  "turretAngleOffsets": [
+    -0,
+    0,
+    -0,
+    0,
+    0
+  ],
+  "hardpointOffsets": [
+    34,
+    0
+  ],
+  "hardpointAngleOffsets": [
+    0
+  ],
+  "barrelMode": "ALTERNATING",
+  "animationType": "GLOW",
+  "fireSoundTwo": "rifttorpedo_fire"
+}

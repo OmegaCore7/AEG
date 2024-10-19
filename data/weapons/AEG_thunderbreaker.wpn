@@ -1,0 +1,97 @@
+{
+  "id": "AEG_thunderbreaker",
+  "specClass": "beam",
+  "type": "ENERGY",
+  "size": "LARGE",
+  "beamEffect": "data.weapons.scripts.AEG_GodTB",
+  "everyFrameEffect": "data.weapons.scripts.AEG_ThunderbreakerHover",
+  "collisionClass": "RAY",
+  "collisionClassByFighter": "RAY_FIGHTER",
+  "turretSprite": "graphics/ships/zero/zero_scrander.png",
+  "turretGlowSprite": "graphics/ships/zero/zero_scrander_glow.png",
+  "hardpointSprite": "graphics/ships/zero/zero_scrander.png",
+  "hardpointGlowSprite": "graphics/ships/zero/zero_scrander_glow.png",
+  "renderOrderMod": -1,
+  "glowColor": [
+    165,
+    105,
+    105,
+    255
+  ],
+  "hitGlowRadius": 0,
+  "turretOffsets": [
+    -94.5,
+    395,
+    -91.5,
+    191,
+    -27.5,
+    261,
+    -117,
+    -49.5,
+    -118.5,
+    67.5,
+    -61,
+    -220.5,
+    -105,
+    -132.5,
+    16.5,
+    -240,
+    67.5,
+    -306,
+    63.5,
+    -297,
+    70,
+    -283.5,
+    48.5,
+    185.5,
+    26.5,
+    239.5
+  ],
+  "turretAngleOffsets": [
+    0,
+    170,
+    53,
+    -176.5,
+    170,
+    -133.5,
+    -160.5,
+    -106.5,
+    -81,
+    -151,
+    -43,
+    33.5,
+    50
+  ],
+  "hardpointOffsets": [
+    -30,
+    389.5
+  ],
+  "hardpointAngleOffsets": [
+    0
+  ],
+  "fringeColor": [
+    155,
+    105,
+    105,
+    255
+  ],
+  "coreColor": [
+    255,
+    255,
+    255,
+    255
+  ],
+  "convergeOnPoint": true,
+  "width": 40,
+  "textureType": ROUGH,
+  "textureScrollSpeed": 192,
+  "pixelsPerTexel": 5,
+  "pierceSet": [
+    PROJECTILE_FF,
+    PROJECTILE_NO_FF,
+    PROJECTILE_FIGHTER,
+    MISSILE_FF,
+    MISSILE_NO_FF
+  ],
+  "fireSoundTwo": "tachyon_lance_fire"
+}
