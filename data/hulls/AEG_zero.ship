@@ -19,12 +19,11 @@
     "WS0002": "AEG_ChestInferno",
     "WS0003": "AEG_zero_shoulder_l",
     "WS0004": "AEG_zero_shoulder_r",
-    "WS0005": "AEG_zero_arm_l",
+    "WS0005": "AEG_ironcutter_l",
     "WS0006": "AEG_zero_arm_r",
     "WS0007": "AEG_photonbarrage",
     "WS0008": "AEG_zero_legs",
-    "WS0009": "AEG_rust",
-    "WS0010": "AEG_ironcutter_l"
+    "WS0009": "AEG_rust"
   },
   "weaponSlots": [
     {
@@ -40,7 +39,7 @@
     {
       "id": "WS0003",
       "size": "SMALL",
-      "type": "DECORATIVE",
+      "type": "BUILT_IN",
       "mount": "TURRET",
       "arc": 15,
       "angle": 0,
@@ -62,20 +61,20 @@
       "size": "SMALL",
       "type": "BUILT_IN",
       "mount": "TURRET",
-      "arc": 103,
-      "angle": 28,
-      "locations": [2, 69.5],
-      "renderOrderMod": 1
+      "arc": 75,
+      "angle": 15,
+      "locations": [8, 78],
+      "renderOrderMod": 2
     },
     {
       "id": "WS0006",
       "size": "SMALL",
       "type": "BUILT_IN",
       "mount": "TURRET",
-      "arc": 103,
-      "angle": -28,
-      "locations": [-1.5, -67],
-      "renderOrderMod": 1
+      "arc": 75,
+      "angle": -15,
+      "locations": [8, -78],
+      "renderOrderMod": 2
     },
     {
       "id": "WS0007",
@@ -111,18 +110,9 @@
       "size": "LARGE",
       "type": "BUILT_IN",
       "mount": "TURRET",
-      "arc": 62,
-      "angle": 0,
-      "locations": [-120, -0]
-    },
-    {
-      "id": "WS0010",
-      "size": "SMALL",
-      "type": "BUILT_IN",
-      "mount": "TURRET",
-      "arc": 103,
-      "angle": 28,
-      "locations": [2, 69.5]
+      "arc": 20,
+      "angle": 0.5,
+      "locations": [-125, -0]
     }
   ],
   "engineSlots": [

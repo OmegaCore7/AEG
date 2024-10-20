@@ -4,8 +4,8 @@
 	"missileType":"MISSILE",
 	"sprite":"graphics/missiles/AEG_ironcutter_torp.png",
 	"onHitEffect":"data.weapons.onhit.AEG_IronCutterPierce",
-	"size":[198,120],
-	"center":[0,0],
+	"size":[120,198],
+	"center":[60,50],
 	"collisionRadius":16,
 	"collisionClass":"MISSILE_NO_FF",
 	"explosionColor":[155,105,105,255],  # purely visual, will get a white additively blended core on top of this color
@@ -20,23 +20,23 @@
 				  "acc":1000,
 				  "dec":500},
 	"engineSlots":[{"id":"ES1",
-					"loc":[-13, 0],
-				    #"style":"MISSILE_HIGH_TECH",
+					"loc":[0,-50],
+				    #"style":"MISSILE_LOW_TECH",
 				    "style":"CUSTOM",
 					"styleSpec":{
 						"mode":"QUAD_STRIP", # PARTICLES or QUAD_STRIP, determines which params are used
-						"engineColor":[100,165,255,255],
+						"engineColor":[155,105,105,255],
 						"contrailDuration":1,
 						"contrailWidthMult":1,
 						"contrailWidthAddedFractionAtEnd":2.5,  # can be negative. makes trail spread out/narrow at the end
 						"contrailMinSeg":5, # min segment length, in pixels
 						"contrailMaxSpeedMult":0.5f,
 						"contrailAngularVelocityMult":0.5f,
-						"contrailColor":[100,165,255,75],
+						"contrailColor":[155,105,105,255],
 						"type":"SMOKE" # GLOW or SMOKE; additive or regular blend mode
 					},
-				    "width":7.0,
-				    "length":40.0,
+				    "width":42.0,
+				    "length":42.0,
 				    "angle":180.0},
 				    ]
 }

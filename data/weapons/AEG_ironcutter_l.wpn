@@ -6,9 +6,12 @@
   "size": "SMALL",
   "turretSprite": "graphics/weapons/ironcutter_arm_l.png",
   "hardpointSprite": "graphics/weapons/ironcutter_arm_l.png",
+  "renderHints": [
+    RENDER_LOADED_MISSILES
+  ],
   "turretOffsets": [
-    75.5,
-    13.5
+    -3,
+    12
   ],
   "turretAngleOffsets": [
     0

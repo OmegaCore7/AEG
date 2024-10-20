@@ -15,11 +15,11 @@
       "weapons": {
         "WS0001": "AEG_thunderbreaker",
         "WS0002": "AEG_ChestInferno",
-        "WS0005": "AEG_zero_arm_l",
+        "WS0003": "AEG_zero_shoulder_l",
+        "WS0005": "AEG_ironcutter_l",
         "WS0006": "AEG_zero_arm_r",
         "WS0007": "AEG_photonbarrage",
-        "WS0009": "AEG_rust",
-        "WS0010": "AEG_ironcutter_l"
+        "WS0009": "AEG_rust"
       }
     }
   ],

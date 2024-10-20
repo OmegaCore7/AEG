@@ -33,8 +33,8 @@ public class AEG_ZeroArmEffect implements EveryFrameWeaponEffectPlugin {
             weapon.getSprite().setColor(new Color(1, 1, 1, 0.5f));
         }
 
-        // Check if AEG_ironcutter_l has finished firing
-        if (ironcutter.getCooldownRemaining() <= 0) {
+        // Check if both AEG_zero_arm_l and AEG_ironcutter_l have finished their cooldowns
+        if (weapon.getCooldownRemaining() <= 0 && ironcutter.getCooldownRemaining() <= 0) {
             // Make AEG_zero_arm_l opaque again
             isTransparent = false;
             weapon.getSprite().setColor(new Color(1, 1, 1, 1));

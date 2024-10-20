@@ -12,9 +12,9 @@
   "hardpointSprite": "graphics/ships/zero/zero_scrander.png",
   "hardpointGlowSprite": "graphics/ships/zero/zero_scrander_glow.png",
   "glowColor": [
-    165,
-    105,
-    105,
+    255,
+    80,
+    0,
     255
   ],
   "hitGlowRadius": 0,
@@ -79,21 +79,21 @@
   ],
   "fringeColor": [
     255,
-    105,
-    105,
+    0,
+    0,
     255
   ],
   "coreColor": [
-    155,
     255,
-    255,
+    80,
+    0,
     255
   ],
   "convergeOnPoint": true,
   "width": 40,
   "textureType": ROUGH,
   "textureScrollSpeed": 192,
-  "pixelsPerTexel": 5,
+  "pixelsPerTexel": 10,
   "pierceSet": [
     PROJECTILE_FF,
     PROJECTILE_NO_FF,
