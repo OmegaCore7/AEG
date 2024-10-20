@@ -1,18 +1,30 @@
 {
   "id": "AEG_zero_shoulder_r",
   "specClass": "projectile",
-  "projectileSpecId": "AEG_dummy_invisible",
-  "type": "DECORATIVE",
+  "projectileSpecId": "type_1_srm",
+  "type": "MISSILE",
   "size": "SMALL",
+  "displayArcRadius": 500,
   "turretSprite": "graphics/ships/zero/zero_shoulder_r.png",
   "hardpointSprite": "graphics/ships/zero/zero_shoulder_r.png",
-  "showDamageWhenDecorative": "TRUE",
   "turretOffsets": [
-    0,
-    0
+    1,
+    -38.5,
+    5,
+    -36.5,
+    3,
+    -37.5,
+    9,
+    -34.5,
+    7,
+    -35.5
   ],
   "turretAngleOffsets": [
-    0
+    -40.5,
+    -45,
+    -45,
+    -45,
+    -45
   ],
   "hardpointOffsets": [
     0,
@@ -22,5 +34,23 @@
     0
   ],
   "barrelMode": "ALTERNATING",
-  "animationType": "NONE"
+  "animationType": "SMOKE",
+  "smokeSpec": {
+    "particleSizeMin": 10,
+    "particleSizeRange": 16,
+    "cloudParticleCount": 3,
+    "cloudDuration": 0.9,
+    "cloudRadius": 8,
+    "blowbackParticleCount": 4,
+    "blowbackDuration": 1.1,
+    "blowbackLength": 20,
+    "blowbackSpread": 10,
+    "particleColor": [
+      170,
+      160,
+      150,
+      130
+    ]
+  },
+  "fireSoundTwo": "swarmer_fire"
 }

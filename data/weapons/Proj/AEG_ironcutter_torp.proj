@@ -20,7 +20,7 @@
 				  "acc":1000,
 				  "dec":500},
 	"engineSlots":[{"id":"ES1",
-					"loc":[0,0],
+					"loc":[60,0],
 				    #"style":"MISSILE_LOW_TECH",
 				    "style":"CUSTOM",
 					"styleSpec":{

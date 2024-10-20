@@ -1,0 +1,25 @@
+{
+	"id":"AEG_ironcutter_G_shot",  # this id must match what's in the spreadsheet
+	"specClass":"projectile",
+	"type":"BALLISTIC",
+	"size":"LARGE",
+	"displayArcRadius":600,
+	"turretGunSprite":"graphics/weapons/hellbore_cannon_turret_recoil.png",
+	"hardpointGunSprite":"graphics/weapons/hellbore_cannon_hardpoint_recoil.png",	
+	"visualRecoil":10.0,  # the gun sprites are only used if this is non-0
+	"turretOffsets":[35, 0],
+	"turretAngleOffsets":[0],
+	"hardpointOffsets":[50, 0],
+	"hardpointAngleOffsets":[0],
+	"barrelMode":"ALTERNATING", # or LINKED.  whether barrels fire at the same time or alternate.
+	"animationType":"MUZZLE_FLASH",
+	"muzzleFlashSpec":{"length":100.0,   # only used if animationType = MUZZLE_FLASH
+					   "spread":80.0,
+					   "particleSizeMin":10.0,
+					   "particleSizeRange":50.0,
+					   "particleDuration":0.75,
+					   "particleCount":70,
+					   "particleColor":[255,105,105,245]},
+	"projectileSpecId":"AEG_ironcutter_G_shot",  # projectile that will be fired
+	"fireSoundTwo":"hellbore_fire",
+}
