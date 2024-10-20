@@ -1,10 +1,10 @@
 {
   "id": "AEG_zero_arm_l",
   "specClass": "projectile",
-  "projectileSpecId": "annihilator_rocket",
+  "projectileSpecId": "breach_srm",
   "type": "MISSILE",
   "size": "SMALL",
-  "OnFireEffect": "data.weapons.scripts.AEG_MazinImpact",
+  "everyFrameEffect": "data.weapons.scripts.AEG_ZeroArmEffect",
   "turretSprite": "graphics/ships/zero/zero_arm_l.png",
   "turretGlowSprite": "graphics/ships/zero/zero_arm_l_glow.png",
   "hardpointSprite": "graphics/ships/zero/zero_arm_l.png",
