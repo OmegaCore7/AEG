@@ -18,7 +18,8 @@
         "WS0005": "AEG_zero_arm_l",
         "WS0006": "AEG_zero_arm_r",
         "WS0007": "AEG_photonbarrage",
-        "WS0009": "AEG_rust"
+        "WS0009": "AEG_rust",
+        "WS0010": "AEG_ironcutter_l"
       }
     }
   ],
