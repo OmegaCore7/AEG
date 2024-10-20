@@ -110,7 +110,7 @@
       "size": "LARGE",
       "type": "BUILT_IN",
       "mount": "TURRET",
-      "arc": 20,
+      "arc": 10,
       "angle": 0.5,
       "locations": [-125, -0]
     }

@@ -1,7 +1,7 @@
 {
   "id": "AEG_zero_shoulder_l",
   "specClass": "projectile",
-  "projectileSpecId": "breach_srw",
+  "projectileSpecId": "breach_srm",
   "type": "MISSILE",
   "size": "SMALL",
   "turretSprite": "graphics/ships/zero/zero_shoulder_l.png",
