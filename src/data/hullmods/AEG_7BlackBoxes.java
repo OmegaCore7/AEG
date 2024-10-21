@@ -1,33 +1,35 @@
 package data.hullmods;
 
-import com.fs.starfarer.api.combat.ArmorGridAPI;
-import com.fs.starfarer.api.combat.BaseHullMod;
-import com.fs.starfarer.api.combat.MutableShipStatsAPI;
-import com.fs.starfarer.api.combat.ShipAPI;
-import com.fs.starfarer.api.impl.campaign.ids.Stats;
+import com.fs.starfarer.api.Global;
+import com.fs.starfarer.api.combat.*;
 import com.fs.starfarer.api.util.IntervalUtil;
+import org.lwjgl.util.vector.Vector2f;
 
 public class AEG_7BlackBoxes extends BaseHullMod {
 
-    private static final float REGENERATION_RATE = 0.05f;
-    private static final float ASSIMILATION_DAMAGE_CONVERSION = 0.1f;
-    private static final float STRENGTHENING_MULT = 1.1f;
-    private static final float PREDICTION_EVASION_CHANCE = 0.2f;
+    private static final float REGENERATION_RATE = 0.01f;
+    private static final float ASSIMILATION_DAMAGE_CONVERSION = 0.05f;
+    private static final float STRENGTHENING_MULT = 1.05f;
+    private static final float PREDICTION_EVASION_CHANCE = 0.1f;
     private static final float SENSOR_RANGE_BOOST = 200f;
-    private static final float ADAPTIVE_DEFENSE_DURATION = 20f;
-    private static final float ADAPTIVE_DEFENSE_REDUCTION = 0.5f;
+    private static final float ADAPTIVE_DEFENSE_DURATION = 10f; // Reduced from 20f
+    private static final float ADAPTIVE_DEFENSE_REDUCTION = 0.1f; // Reduced from 0.75f
+    private static final float ADAPTIVE_DEFENSE_COOLDOWN = 5f; // Added cooldown
+    private static final float DAMAGE_REDUCTION_DURATION = 5f; // Duration for reduced damage effect
 
-    private final IntervalUtil adaptiveDefenseTimer = new IntervalUtil(ADAPTIVE_DEFENSE_DURATION, ADAPTIVE_DEFENSE_DURATION);
+    private final IntervalUtil adaptiveDefenseTimer = new IntervalUtil(ADAPTIVE_DEFENSE_DURATION, ADAPTIVE_DEFENSE_DURATION + ADAPTIVE_DEFENSE_COOLDOWN);
+    private final IntervalUtil damageReductionTimer = new IntervalUtil(DAMAGE_REDUCTION_DURATION, DAMAGE_REDUCTION_DURATION);
     private boolean lastStandTriggered = false; // Flag to track if Last Stand Protocol has been triggered
+    private boolean damageReductionActive = false; // Flag to track if damage reduction is active
 
     @Override
     public void advanceInCombat(ShipAPI ship, float amount) {
         if (ship == null) return;
 
-        // Regeneration
+        // Continuous Regeneration
         if (ship.getHullLevel() < 1.0f) {
-            ship.getMutableStats().getHullCombatRepairRatePercentPerSecond().modifyFlat("AEG_7BlackBoxes", REGENERATION_RATE);
-            restoreArmor(ship, amount);
+            float newHitpoints = ship.getHitpoints() + (REGENERATION_RATE * ship.getMaxHitpoints() * amount);
+            ship.setHitpoints(Math.min(newHitpoints, ship.getMaxHitpoints()));
         }
 
         // Assimilation
@@ -56,38 +58,61 @@ public class AEG_7BlackBoxes extends BaseHullMod {
         if (adaptiveDefenseTimer.intervalElapsed()) {
             ship.getMutableStats().getHullDamageTakenMult().modifyMult("AEG_7BlackBoxes", ADAPTIVE_DEFENSE_REDUCTION);
             ship.getMutableStats().getArmorDamageTakenMult().modifyMult("AEG_7BlackBoxes", ADAPTIVE_DEFENSE_REDUCTION);
+        } else {
+            ship.getMutableStats().getHullDamageTakenMult().unmodify("AEG_7BlackBoxes");
+            ship.getMutableStats().getArmorDamageTakenMult().unmodify("AEG_7BlackBoxes");
         }
 
         // Last Stand Protocol
-        if (!lastStandTriggered && ship.getHullLevel() <= 0.05f) {
-            // Find the attacking ship and destroy it
+        if (!lastStandTriggered && (ship.getHullLevel() <= 0.05f || ship.getHitpoints() - ship.getMaxHitpoints() * 0.05f <= 4000)) {
+            Global.getLogger(this.getClass()).info("Last Stand Protocol triggered");
             ShipAPI attacker = findAttackingShip(ship);
             if (attacker != null) {
-                attacker.setHitpoints(0);
+                Global.getLogger(this.getClass()).info("Attacker found: " + attacker.getName());
+                dealFatalDamage(attacker);
                 ship.setHitpoints(ship.getMaxHitpoints() * 0.25f);
                 lastStandTriggered = true; // Set the flag to true after triggering
+                damageReductionActive = true; // Activate damage reduction
+                damageReductionTimer.advance(0); // Reset the timer
+            } else {
+                Global.getLogger(this.getClass()).info("No attacker found");
             }
+        }
+
+        // Damage Reduction
+        if (damageReductionActive) {
+            damageReductionTimer.advance(amount);
+            if (damageReductionTimer.intervalElapsed()) {
+                damageReductionActive = false; // Deactivate damage reduction after the duration
+            } else {
+                ship.getMutableStats().getHullDamageTakenMult().modifyFlat("AEG_7BlackBoxes_DamageReduction", 0.01f);
+                ship.getMutableStats().getArmorDamageTakenMult().modifyFlat("AEG_7BlackBoxes_DamageReduction", 0.01f);
+            }
+        } else {
+            ship.getMutableStats().getHullDamageTakenMult().unmodify("AEG_7BlackBoxes_DamageReduction");
+            ship.getMutableStats().getArmorDamageTakenMult().unmodify("AEG_7BlackBoxes_DamageReduction");
         }
     }
 
-    private void restoreArmor(ShipAPI ship, float amount) {
-        ArmorGridAPI armorGrid = ship.getArmorGrid();
-        float[][] armor = armorGrid.getGrid();
-        float maxArmor = armorGrid.getMaxArmorInCell();
-
-        for (int x = 0; x < armor.length; x++) {
-            for (int y = 0; y < armor[x].length; y++) {
-                float currentArmor = armor[x][y];
-                if (currentArmor < maxArmor) {
-                    armor[x][y] = Math.min(currentArmor + (REGENERATION_RATE * maxArmor * amount), maxArmor);
-                }
-            }
+    private void dealFatalDamage(ShipAPI attacker) {
+        CombatEngineAPI engine = Global.getCombatEngine();
+        if (engine != null) {
+            Vector2f location = attacker.getLocation();
+            engine.applyDamage(attacker, location, attacker.getMaxHitpoints(), DamageType.HIGH_EXPLOSIVE, 0f, true, false, null);
         }
     }
 
     private ShipAPI findAttackingShip(ShipAPI ship) {
-        // Implement logic to find the ship that last attacked this ship
-        // This is a placeholder and needs to be replaced with actual logic
+        CombatEngineAPI engine = Global.getCombatEngine();
+        if (engine == null) return null;
+
+        for (ShipAPI enemy : engine.getShips()) {
+            if (enemy.getOwner() != ship.getOwner() && enemy.isAlive() && !enemy.isFighter()) {
+                // Additional logic to determine if this enemy is the one that last attacked the ship
+                // This is a placeholder and needs to be replaced with actual logic
+                return enemy;
+            }
+        }
         return null;
     }
 
@@ -105,17 +130,17 @@ public class AEG_7BlackBoxes extends BaseHullMod {
     public String getDescriptionParam(int index, ShipAPI.HullSize hullSize) {
         switch (index) {
             case 0:
-                return "Regeneration: Rapid hull and armor regeneration";
+                return "Black Box 1: Continuous hull regeneration.";
             case 1:
-                return "Assimilation: Converts incoming damage into a damage boost and converts hard flux to soft flux";
+                return "Black Box 2: Converts incoming damage into a damage boost and converts hard flux to soft flux.";
             case 2:
-                return "Strengthening: Increases all ship attributes";
+                return "Black Box 3: Increases all ship attributes.";
             case 3:
-                return "Dimensional Prediction: Chance to evade incoming attacks and increases sensor range";
+                return "Black Box 4: Chance to evade incoming attacks and increases sensor range.";
             case 4:
-                return "Adaptive Defense: Boosts damage reduction against a specific weapon type for 20 seconds after being hit by it";
+                return "Black Box 5: Boosts damage reduction against a specific weapon type for 10 seconds after being hit by it, with a 5-second cooldown.";
             case 5:
-                return "Causality Weapon: One-time ability to destroy the attacking ship and recover 25% hull when the ship would be destroyed";
+                return "Black Box 6: One-time ability to destroy the attacking ship and recover 25% hull when the ship would be destroyed.";
             default:
                 return null;
         }

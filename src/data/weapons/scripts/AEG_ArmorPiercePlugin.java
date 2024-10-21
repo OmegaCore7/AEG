@@ -136,7 +136,7 @@ public class AEG_ArmorPiercePlugin extends BaseEveryFrameCombatPlugin
             }
 
             // Check if the projectile is a missile and its velocity is very low
-            if (proj instanceof MissileAPI && proj.getVelocity().length() < 200f) // Adjust the threshold as needed
+            if (proj instanceof MissileAPI && proj.getVelocity().length() < 400f) // Adjust the threshold as needed
             {
                 // Spawn an explosion at the projectile's location
                 engine.spawnExplosion(proj.getLocation(), proj.getVelocity(),

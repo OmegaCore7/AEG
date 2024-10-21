@@ -14,7 +14,8 @@ public class AEG_MajinChange extends BaseShipSystemScript {
 
     private static final float DOMAIN_RADIUS = 2500f;
     private static final float EXPANSION_SPEED = 500f; // Speed at which the effect expands
-    private static final float HEAL_PERCENTAGE = 0.25f; // Heal 25% of the damage
+    private static final float HEAL_PERCENTAGE = 0.50f; // Heal 50% of the damage
+    private static final float REFLECT_PERCENTAGE = 0.50f; // Reflect 50% of the damage
     private static final float SPEED_BOOST = 1.5f; // 50% speed boost
     private static final float MANEUVERABILITY_BOOST = 1.5f; // 50% maneuverability boost
     private final AEG_DomainExpansionVisuals visualsHelper = new AEG_DomainExpansionVisuals();
@@ -23,7 +24,7 @@ public class AEG_MajinChange extends BaseShipSystemScript {
     @Override
     public void apply(MutableShipStatsAPI stats, String id, State state, float effectLevel) {
         final ShipAPI ship = (ShipAPI) stats.getEntity();
-        CombatEngineAPI engine = Global.getCombatEngine();
+        final CombatEngineAPI engine = Global.getCombatEngine();
 
         if (ship == null) return;
 
@@ -37,8 +38,6 @@ public class AEG_MajinChange extends BaseShipSystemScript {
             visualsHelper.createDomainVisuals(engine, ship, true, currentRadius);
 
             // Boost all passive abilities
-            stats.getHullCombatRepairRatePercentPerSecond().modifyFlat(id, 1.0f); // Increased boost for testing
-            Global.getLogger(this.getClass()).info("Hull repair rate set to 1.0% per second for " + ship.getName());
             restoreArmor(ship, 0.1f * Global.getCombatEngine().getElapsedInLastFrame()); // Example boost for armor regeneration
             stats.getEnergyWeaponDamageMult().modifyMult(id, 1.5f); // Example boost for assimilation
             stats.getBallisticWeaponDamageMult().modifyMult(id, 1.5f); // Example boost for strengthening
@@ -60,23 +59,28 @@ public class AEG_MajinChange extends BaseShipSystemScript {
                 enemy.getMutableStats().getFluxDissipation().modifyMult(id, 0.5f); // Additional debuff
             }
 
-            // Ensure hull cannot be reduced below 1 while the domain is active
-            if (ship.getHullLevel() < 0.01f) {
-                ship.setHitpoints(1);
-            }
-
-            // Add damage taken modifier to handle last stand effect
+            // Full Power Causality Weapon
             ship.addListener(new DamageTakenModifier() {
                 @Override
                 public String modifyDamageTaken(Object param, CombatEntityAPI target, DamageAPI damage, Vector2f point, boolean shieldHit) {
                     if (target instanceof ShipAPI && target == ship) {
                         float hullLevel = ship.getHullLevel();
-                        float damageAmount = damage.getDamage();
-                        if (hullLevel * ship.getMaxHitpoints() - damageAmount < 1) {
+                        if (hullLevel <= 0.20f) {
+                            float damageAmount = damage.getDamage();
                             float healAmount = damageAmount * HEAL_PERCENTAGE;
+                            float reflectAmount = damageAmount * REFLECT_PERCENTAGE;
+
+                            // Heal the ship
                             ship.setHitpoints(ship.getHitpoints() + healAmount);
-                            damage.setDamage(0); // Nullify the fatal damage
-                            return "last_stand";
+
+                            // Reflect damage to enemies within the radius
+                            for (ShipAPI enemy : getEnemiesWithinRange(ship, currentRadius)) {
+                                engine.applyDamage(enemy, point, reflectAmount, damage.getType(), 0f, false, false, ship);
+                            }
+
+                            // Nullify the original damage
+                            damage.setDamage(0);
+                            return "full_power_causality_weapon";
                         }
                     }
                     return null;
@@ -116,7 +120,6 @@ public class AEG_MajinChange extends BaseShipSystemScript {
 
     private void deactivate(MutableShipStatsAPI stats, String id) {
         // Reset all stats to their original values
-        stats.getHullCombatRepairRatePercentPerSecond().unmodify(id);
         stats.getEnergyWeaponDamageMult().unmodify(id);
         stats.getBallisticWeaponDamageMult().unmodify(id);
         stats.getSensorStrength().unmodify(id);
