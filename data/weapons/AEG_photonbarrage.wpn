@@ -10,6 +10,7 @@
   "turretGlowSprite": "graphics/ships/zero/zero_head_glow.png",
   "hardpointSprite": "graphics/ships/zero/zero_head.png",
   "hardpointGlowSprite": "graphics/ships/zero/zero_head_glow.png",
+  "autocharge": true,
   "glowColor": [
     255,
     205,
