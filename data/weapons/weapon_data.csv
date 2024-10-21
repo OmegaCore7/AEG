@@ -52,11 +52,12 @@ Test Weapon,AEG_testweapon,2,,1200,2000,,100,,3,60,10,,,,ENERGY,15,,7,0.2,1,0.5,
 ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 #Mazinger Zero,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 ,AEG_zero_legs,,,,600,1,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-Mazin Impact,AEG_zero_shoulder_l,,,1200,2500,,200,,10,45,10,40,1,10,HIGH_EXPLOSIVE,0,,0,10,40,0.01,0.01,,,,,300,1000,1500,30,,,,,,,,General,,,,,,,,,,
-Cross Knife Swarmer PD,AEG_zero_shoulder_r,,,250,1000,,100,,15,50,3,80,"1		","10	",HIGH_EXPLOSIVE,0,,0,5,20,0.2,0,0,0,0,,300,100,5,50,,,"ANTI_FTR, DO_NOT_AIM, DO_NOT_CONSERVE","utility8, missile0, missile_bp, merc, ind",,,,Anti Small Craft,Fast,Excellent,,,,,,,,10
-Gigantic Iron Cutter,AEG_zero_arm_r,3,,500000,5000,,5000,5000,9999,45,10,1,1,1,HIGH_EXPLOSIVE,0,,30,2,1,0.25,0,0,0,,,1000,2000,30,100000,,,DO_NOT_AIM,"missile12, strike9, missile_bp, merc, ind",,,,Finisher,Fast,Excellent,,,,,,,TRUE,12
-Iron Cutter,AEG_ironcutter_l,,,1200,2500,,1200,,1000,45,10,1,1,1,HIGH_EXPLOSIVE,0,,0,5,1,0.25,0,0,0,,,300,500,1500,1000,,,DO_NOT_AIM,"missile12, strike9, missile_bp, merc, ind",,,,Finisher,Fast,Excellent,,,,,,,TRUE,12
-Barrage Photon Beam,AEG_photonbarrage,,,200,5000,2500,,200,500,55,4,,,,ENERGY,,25,3,20,,,,,,,2400,,,,,,,,"beam9, LR, hightech_bp, midline_bp, merc, ind",,,,General,,,,,,,,,,
-Chest Inferno,AEG_ChestInferno,,,100000,1500,,350,,3,35,4,300,0.5,20,ENERGY,2,,,15,300,0.05,0,0.01,0,0,,500,,,,,,,"energy15, SR, omega, restricted",,Unknown,,General,,,,,,,,,,
-Rust Hurrecane,AEG_rust,,,500000,2000,,200,,75,55,10,50,"0.5	",20,ENERGY,5,,2,10,50,0.05,0,0.1,0,0,,200,500,20,5000,,,"STRIKE, DO_NOT_AIM","strike20, missile20, omega, restricted",,Unknown,,Guided Torpedo,Slow,Excellent,,,,,,,TRUE,
-God ThunderBolt Breaker,AEG_thunderbreaker,,,5000,2000,,500,,100,5,25,,,,ENERGY,400,,0,0.65,,,7,14,0,0,,250,,,650,,,,"energy18, LR, rare_bp",,,,General,Slow,,,,,,,,,
+Mazin Impact,AEG_zero_shoulder_l,,,1200,2500,,300,,10,45,10,40,1,10,HIGH_EXPLOSIVE,10,,0,10,40,0.01,0.01,,,,,300,1000,1500,30,,,,,,,,General,,,,,,,,,,
+Cross Knife Swarmer PD,AEG_zero_shoulder_r,,,250,1000,,100,100,15,50,3,80,"1		","10	",HIGH_EXPLOSIVE,5,,0,5,20,0.2,0,0,0,0,,300,100,5,50,,,"ANTI_FTR, DO_NOT_AIM, DO_NOT_CONSERVE","utility8, missile0, missile_bp, merc, ind",,,,Anti Small Craft,Fast,Excellent,,,,,,,,10
+Gigantic Iron Cutter,AEG_zero_arm_r,3,,500000,5000,,5000,5000,9999,45,10,1,1,1,HIGH_EXPLOSIVE,1000,,30,2,1,0.25,0,0,0,,,1000,2000,30,100000,,,DO_NOT_AIM,"missile12, strike9, missile_bp, merc, ind",,,,Finisher,Fast,Excellent,,,,,,,TRUE,12
+Iron Cutter,AEG_ironcutter_l,,,1200,2500,,1200,,1000,45,10,1,1,1,HIGH_EXPLOSIVE,100,,0,5,1,0.25,0,0,0,,,300,500,1500,1000,,,DO_NOT_AIM,"missile12, strike9, missile_bp, merc, ind",,,,Finisher,Fast,Excellent,,,,,,,TRUE,12
+Barrage Photon Beam,AEG_photonbarrage,,,200,5000,2500,,200,500,55,4,,,,ENERGY,,500,3,20,,,,,,,2400,,,,,,,,"beam9, LR, hightech_bp, midline_bp, merc, ind",,,,General,,,,,,,,,,
+Chest Inferno,AEG_ChestInferno,,,100000,1500,,350,,5,35,4,300,0.5,20,ENERGY,20,,2,15,300,0.05,0,0.01,0,0,,500,,,,,,,"energy15, SR, omega, restricted",,Unknown,,General,,,,,,,,,,
+Rust Hurrecane,AEG_rust,,,500000,2000,,200,200,75,55,10,50,"0.5	",20,ENERGY,50,,2,10,50,0.05,0,0.1,0,0,,200,500,20,5000,,,"STRIKE, DO_NOT_AIM","strike20, missile20, omega, restricted",,Unknown,,Guided Torpedo,Slow,Excellent,,,,,,,TRUE,
+God ThunderBolt Breaker,AEG_thunderbreaker,,,5000,2500,,700,700,100,5,25,14,1,1,ENERGY,400,,,7,14	,,7,14,0,0,,1000,2000,,650,,,,"energy18, LR, rare_bp",,,,General,Slow,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,,,,,,,

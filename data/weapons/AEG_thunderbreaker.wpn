@@ -1,8 +1,9 @@
 {
   "id": "AEG_thunderbreaker",
-  "specClass":"projectile",
-  "type":"ENERGY",
-  "size":"LARGE",
+  "specClass": "projectile",
+  "projectileSpecId": "AEG_thunderstrike_shot",
+  "type": "ENERGY",
+  "size": "LARGE",
   "everyFrameEffect": "data.weapons.scripts.AEG_ThunderbreakerHover",
   "turretSprite": "graphics/ships/zero/zero_scrander.png",
   "turretGlowSprite": "graphics/ships/zero/zero_scrander_glow.png",
@@ -14,7 +15,6 @@
     0,
     255
   ],
-  "hitGlowRadius": 0,
   "turretOffsets": [
     -81,
     177,
@@ -50,16 +50,8 @@
   "hardpointAngleOffsets": [
     0
   ],
-  "convergeOnPoint": true,
-  "barrelMode":"ALTERNATING",
-  "animationType":"MUZZLE_FLASH",  # NONE, GLOW, MUZZLE_FLASH, SMOKE
-  "muzzleFlashSpec":{"length":34.0,   # only used if animationType = MUZZLE_FLASH
-					   "spread":10.0,
-					   "particleSizeMin":18.0,
-					   "particleSizeRange":24.0,
-					   "particleDuration":0.02,
-					   "particleCount":12,
-					   "particleColor":[205,105,105,240]},
-  "projectileSpecId":"AEG_thunderstrike_shot",
+  "barrelMode": "ALTERNATING",
+  "animationType": "GLOW",
+  "autocharge": true,
   "fireSoundTwo": "tachyon_lance_fire"
 }

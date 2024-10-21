@@ -1,6 +1,7 @@
 {
 	"id":"AEG_thunderstrike_shot",
 	"specClass":"projectile",
+	"onHitEffect":"data.weapons.onhit.AEG_ThunderBoltOnHitEffect",
 	"spawnType":"BALLISTIC_AS_BEAM",
 	#"spawnType":"BEAM",
 	"collisionClass":"RAY",
