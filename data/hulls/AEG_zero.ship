@@ -12,7 +12,8 @@
   "shieldRadius": 83,
   "viewOffset": 0,
   "builtInMods": [
-    "supercomputer"
+    "supercomputer",
+    "AEG_7BlackBoxes"
   ],
   "builtInWeapons": {
     "WS0001": "AEG_thunderbreaker",
