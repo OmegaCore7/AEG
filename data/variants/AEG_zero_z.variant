@@ -7,7 +7,18 @@
   "fluxVents": 20,
   "quality": 1,
   "permaMods": [],
-  "hullMods": [],
+  "hullMods": [
+    "reinforcedhull",
+    "repair_gantry",
+    "hardened_subsystems",
+    "heavyarmor",
+    "ecm",
+    "eccm",
+    "autorepair",
+    "armoredweapons",
+    "fluxcoil",
+    "fluxdistributor"
+  ],
   "weaponGroups": [
     {
       "autofire": false,
@@ -16,6 +27,7 @@
         "WS0001": "AEG_thunderbreaker",
         "WS0002": "AEG_ChestInferno",
         "WS0003": "AEG_zero_shoulder_l",
+        "WS0004": "AEG_zero_shoulder_r",
         "WS0005": "AEG_ironcutter_l",
         "WS0006": "AEG_zero_arm_r",
         "WS0007": "AEG_photonbarrage",

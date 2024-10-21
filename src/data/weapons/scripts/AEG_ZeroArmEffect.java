@@ -5,7 +5,9 @@ import org.lwjgl.util.vector.Vector2f;
 import java.awt.Color;
 
 public class AEG_ZeroArmEffect implements EveryFrameWeaponEffectPlugin {
-    private boolean isTransparent = false;
+    private boolean fired = false;
+    private float timer = 0f;
+    private static final float INVISIBILITY_DURATION = 10f;
 
     @Override
     public void advance(float amount, CombatEngineAPI engine, WeaponAPI weapon) {
@@ -13,52 +15,25 @@ public class AEG_ZeroArmEffect implements EveryFrameWeaponEffectPlugin {
             return;
         }
 
-        // Get the linked weapon
-        WeaponAPI ironcutter = findWeaponById(weapon.getShip(), "AEG_ironcutter_l");
-
-        if (ironcutter == null) {
+        // Check if the weapon is the specific one we want to alter
+        if (!"AEG_zero_arm_r".equals(weapon.getId())) {
             return;
         }
 
-        // Sync aiming
-        ironcutter.setCurrAngle(weapon.getCurrAngle());
-
-        // Check if AEG_zero_arm_l has finished firing
-        if (weapon.getChargeLevel() == 0 && weapon.isFiring()) {
-            // Force fire AEG_ironcutter_l
-            forceFireWeapon(weapon.getShip(), ironcutter);
-
-            // Make AEG_zero_arm_l transparent
-            isTransparent = true;
-            weapon.getSprite().setColor(new Color(1, 1, 1, 0.5f));
+        // Check if the weapon has fired
+        if (weapon.getCooldownRemaining() > 0 && !fired) {
+            fired = true;
+            timer = INVISIBILITY_DURATION;
+            weapon.getSprite().setAlphaMult(0f); // Make the weapon invisible
         }
 
-        // Check if both AEG_zero_arm_l and AEG_ironcutter_l have finished their cooldowns
-        if (weapon.getCooldownRemaining() <= 0 && ironcutter.getCooldownRemaining() <= 0) {
-            // Make AEG_zero_arm_l opaque again
-            isTransparent = false;
-            weapon.getSprite().setColor(new Color(1, 1, 1, 1));
-        }
-
-        // Prevent AEG_zero_arm_l from firing while transparent
-        if (isTransparent) {
-            weapon.setRemainingCooldownTo(weapon.getCooldown());
-        }
-    }
-
-    private WeaponAPI findWeaponById(ShipAPI ship, String weaponId) {
-        for (WeaponAPI weapon : ship.getAllWeapons()) {
-            if (weapon.getId().equals(weaponId)) {
-                return weapon;
+        // If the weapon has fired, count down the timer
+        if (fired) {
+            timer -= amount;
+            if (timer <= 0) {
+                fired = false;
+                weapon.getSprite().setAlphaMult(1f); // Make the weapon visible again
             }
-        }
-        return null;
-    }
-
-    private void forceFireWeapon(ShipAPI ship, WeaponAPI weapon) {
-        // Logic to force fire the weapon
-        if (weapon.getCooldownRemaining() <= 0) {
-            ship.giveCommand(ShipCommand.FIRE, weapon.getLocation(), 0);
         }
     }
 }

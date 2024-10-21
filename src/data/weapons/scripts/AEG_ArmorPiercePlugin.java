@@ -20,12 +20,15 @@ public class AEG_ArmorPiercePlugin extends BaseEveryFrameCombatPlugin
     private static final Map<String, Boolean> PROJ_IDS = new HashMap<>();
     // Keep track of the original collision class (used for shield hits)
     private static final Map<String, CollisionClass> originalCollisionClasses = new HashMap<>();
+    // Track whether the initial burst of damage has been applied
+    private static final Map<DamagingProjectileAPI, Boolean> initialHitApplied = new HashMap<>();
 
     static
     {
         // Add all projectiles that should pierce armor here
         // Format: Projectile ID (String), pierces shields (boolean)
         PROJ_IDS.put("lw_impaler_shot", false);
+        PROJ_IDS.put("AEG_ironcutter_G_torp", true);
     }
 
     @Override
@@ -42,7 +45,7 @@ public class AEG_ArmorPiercePlugin extends BaseEveryFrameCombatPlugin
             String spec = proj.getProjectileSpecId();
 
             // Is this projectile armor piercing?
-            if (proj instanceof MissileAPI || !PROJ_IDS.containsKey(spec))
+            if (!PROJ_IDS.containsKey(spec))
             {
                 continue;
             }
@@ -98,6 +101,14 @@ public class AEG_ArmorPiercePlugin extends BaseEveryFrameCombatPlugin
                 // Check if the projectile is inside the entity's bounds
                 else if (CollisionUtils.isPointWithinBounds(proj.getLocation(), entity))
                 {
+                    // Apply initial burst of damage if not already applied
+                    if (!initialHitApplied.containsKey(proj) || !initialHitApplied.get(proj))
+                    {
+                        engine.applyDamage(entity, proj.getLocation(), proj.getDamageAmount(),
+                                proj.getDamageType(), proj.getEmpAmount(), true, true, proj.getSource());
+                        initialHitApplied.put(proj, true);
+                    }
+
                     // Calculate projectile speed
                     float speed = proj.getVelocity().length();
 
@@ -122,6 +133,27 @@ public class AEG_ArmorPiercePlugin extends BaseEveryFrameCombatPlugin
                     Global.getSoundPlayer().playLoop(PIERCE_SOUND, proj, 1f, 1f,
                             proj.getLocation(), entity.getVelocity());
                 }
+            }
+
+            // Check if the projectile is a missile and its velocity is very low
+            if (proj instanceof MissileAPI && proj.getVelocity().length() < 200f) // Adjust the threshold as needed
+            {
+                // Spawn an explosion at the projectile's location
+                engine.spawnExplosion(proj.getLocation(), proj.getVelocity(),
+                        Color.ORANGE, proj.getCollisionRadius() * 3f, 1f);
+
+                // Find entities within the explosion radius
+                List<CombatEntityAPI> entities = CombatUtils.getEntitiesWithinRange(proj.getLocation(), proj.getCollisionRadius() * 3f);
+
+                // Apply explosion damage to each entity
+                for (CombatEntityAPI entity : entities)
+                {
+                    engine.applyDamage(entity, proj.getLocation(), proj.getDamageAmount(),
+                            proj.getDamageType(), proj.getEmpAmount(), true, true, proj.getSource());
+                }
+
+                // Remove the projectile from the game
+                engine.removeEntity(proj);
             }
         }
     }

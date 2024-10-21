@@ -34,10 +34,12 @@ public class AEG_MajinChange extends BaseShipSystemScript {
             currentRadius = Math.min(DOMAIN_RADIUS, currentRadius + EXPANSION_SPEED * Global.getCombatEngine().getElapsedInLastFrame());
 
             // Create visual effects within the current radius
-            visualsHelper.createDomainVisuals(engine, ship, isActive, currentRadius);
+            visualsHelper.createDomainVisuals(engine, ship, true, currentRadius);
 
             // Boost all passive abilities
-            stats.getHullRepairRatePercentPerSecond().modifyFlat(id, 0.1f); // Example boost for regeneration
+            stats.getHullCombatRepairRatePercentPerSecond().modifyFlat(id, 1.0f); // Increased boost for testing
+            Global.getLogger(this.getClass()).info("Hull repair rate set to 1.0% per second for " + ship.getName());
+            restoreArmor(ship, 0.1f * Global.getCombatEngine().getElapsedInLastFrame()); // Example boost for armor regeneration
             stats.getEnergyWeaponDamageMult().modifyMult(id, 1.5f); // Example boost for assimilation
             stats.getBallisticWeaponDamageMult().modifyMult(id, 1.5f); // Example boost for strengthening
             stats.getSensorStrength().modifyFlat(id, 200f); // Example boost for dimensional prediction
@@ -87,6 +89,21 @@ public class AEG_MajinChange extends BaseShipSystemScript {
         }
     }
 
+    private void restoreArmor(ShipAPI ship, float amount) {
+        ArmorGridAPI armorGrid = ship.getArmorGrid();
+        float[][] armor = armorGrid.getGrid();
+        float maxArmor = armorGrid.getMaxArmorInCell();
+
+        for (int x = 0; x < armor.length; x++) {
+            for (int y = 0; y < armor[x].length; y++) {
+                float currentArmor = armor[x][y];
+                if (currentArmor < maxArmor) {
+                    armor[x][y] = Math.min(currentArmor + (amount * maxArmor), maxArmor);
+                }
+            }
+        }
+    }
+
     private List<ShipAPI> getEnemiesWithinRange(ShipAPI ship, float range) {
         List<ShipAPI> enemies = new ArrayList<>();
         for (ShipAPI other : Global.getCombatEngine().getShips()) {
@@ -99,7 +116,7 @@ public class AEG_MajinChange extends BaseShipSystemScript {
 
     private void deactivate(MutableShipStatsAPI stats, String id) {
         // Reset all stats to their original values
-        stats.getHullRepairRatePercentPerSecond().unmodify(id);
+        stats.getHullCombatRepairRatePercentPerSecond().unmodify(id);
         stats.getEnergyWeaponDamageMult().unmodify(id);
         stats.getBallisticWeaponDamageMult().unmodify(id);
         stats.getSensorStrength().unmodify(id);

@@ -1,8 +1,10 @@
 package data.hullmods;
 
+import com.fs.starfarer.api.combat.ArmorGridAPI;
 import com.fs.starfarer.api.combat.BaseHullMod;
 import com.fs.starfarer.api.combat.MutableShipStatsAPI;
 import com.fs.starfarer.api.combat.ShipAPI;
+import com.fs.starfarer.api.impl.campaign.ids.Stats;
 import com.fs.starfarer.api.util.IntervalUtil;
 
 public class AEG_7BlackBoxes extends BaseHullMod {
@@ -16,6 +18,7 @@ public class AEG_7BlackBoxes extends BaseHullMod {
     private static final float ADAPTIVE_DEFENSE_REDUCTION = 0.5f;
 
     private final IntervalUtil adaptiveDefenseTimer = new IntervalUtil(ADAPTIVE_DEFENSE_DURATION, ADAPTIVE_DEFENSE_DURATION);
+    private boolean lastStandTriggered = false; // Flag to track if Last Stand Protocol has been triggered
 
     @Override
     public void advanceInCombat(ShipAPI ship, float amount) {
@@ -23,8 +26,8 @@ public class AEG_7BlackBoxes extends BaseHullMod {
 
         // Regeneration
         if (ship.getHullLevel() < 1.0f) {
-            ship.getMutableStats().getHullRepairRatePercentPerSecond().modifyFlat("AEG_7BlackBoxes", REGENERATION_RATE);
-            ship.getMutableStats().getDynamic().getStat("armorRepairRatePercentPerSecond").modifyFlat("AEG_7BlackBoxes", REGENERATION_RATE);
+            ship.getMutableStats().getHullCombatRepairRatePercentPerSecond().modifyFlat("AEG_7BlackBoxes", REGENERATION_RATE);
+            restoreArmor(ship, amount);
         }
 
         // Assimilation
@@ -56,12 +59,28 @@ public class AEG_7BlackBoxes extends BaseHullMod {
         }
 
         // Last Stand Protocol
-        if (ship.getHullLevel() <= 0.05f) {
+        if (!lastStandTriggered && ship.getHullLevel() <= 0.05f) {
             // Find the attacking ship and destroy it
             ShipAPI attacker = findAttackingShip(ship);
             if (attacker != null) {
                 attacker.setHitpoints(0);
                 ship.setHitpoints(ship.getMaxHitpoints() * 0.25f);
+                lastStandTriggered = true; // Set the flag to true after triggering
+            }
+        }
+    }
+
+    private void restoreArmor(ShipAPI ship, float amount) {
+        ArmorGridAPI armorGrid = ship.getArmorGrid();
+        float[][] armor = armorGrid.getGrid();
+        float maxArmor = armorGrid.getMaxArmorInCell();
+
+        for (int x = 0; x < armor.length; x++) {
+            for (int y = 0; y < armor[x].length; y++) {
+                float currentArmor = armor[x][y];
+                if (currentArmor < maxArmor) {
+                    armor[x][y] = Math.min(currentArmor + (REGENERATION_RATE * maxArmor * amount), maxArmor);
+                }
             }
         }
     }

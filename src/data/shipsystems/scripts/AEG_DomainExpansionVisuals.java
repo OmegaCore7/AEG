@@ -17,7 +17,7 @@ public class AEG_DomainExpansionVisuals {
     private static final Color[] PARTICLE_COLORS = {
             new Color(255, 255, 192, 255), // Bright yellow
             new Color(255, 199, 91, 255), // Orange
-            new Color(255, 69, 0, 255)   // Red
+            new Color(194, 130, 0, 255)   // Red
     };
 
     private final Random random = new Random();
@@ -38,7 +38,7 @@ public class AEG_DomainExpansionVisuals {
                 engine.addHitParticle(
                         particleLocation,
                         new Vector2f(0, 0), // No velocity
-                        PARTICLE_SIZE,
+                        PARTICLE_SIZE * 2, // Larger size for outer ring
                         1.0f, // Brightness
                         PARTICLE_LIFETIME,
                         particleColor
@@ -63,7 +63,7 @@ public class AEG_DomainExpansionVisuals {
                 engine.addHitParticle(
                         particleLocation,
                         velocity, // Velocity outward
-                        PARTICLE_SIZE,
+                        PARTICLE_SIZE * (1.0f + (distance / DOMAIN_RADIUS)), // Size increases with distance
                         transparency, // Brightness
                         PARTICLE_LIFETIME,
                         particleColor

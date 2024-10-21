@@ -1,12 +1,11 @@
 {
-	"id":"AEG_ironcutter_torp",
-	"specClass":"missile",	
+	"id":"AEG_ironcutter_G_torp",
+	"specClass":"missile",
 	"missileType":"MISSILE",
-	"sprite":"graphics/missiles/AEG_ironcutter_torp.png",
-	"onHitEffect":"data.weapons.onhit.AEG_IronCutterPierce",
-	"size":[120,198],
-	"center":[60,50],
-	"collisionRadius":16,
+	"sprite":"graphics/missiles/zero_ironcutter.png",
+	"size":[1852,364],
+	"center":[926,182],
+	"collisionRadius":364,
     "collisionClass":"PROJECTILE_NO_FF",
     "collisionClassByFighter":"PROJECTILE_NO_FF",
 	"explosionColor":[155,105,105,255],  # purely visual, will get a white additively blended core on top of this color
@@ -21,7 +20,7 @@
 				  "acc":1000,
 				  "dec":500},
 	"engineSlots":[{"id":"ES1",
-					"loc":[60,0],
+					"loc":[0,0],
 				    #"style":"MISSILE_LOW_TECH",
 				    "style":"CUSTOM",
 					"styleSpec":{
@@ -36,8 +35,8 @@
 						"contrailColor":[155,105,105,255],
 						"type":"SMOKE" # GLOW or SMOKE; additive or regular blend mode
 					},
-				    "width":42.0,
-				    "length":42.0,
+				    "width":100.0,
+				    "length":300.0,
 				    "angle":180.0},
 				    ]
 }

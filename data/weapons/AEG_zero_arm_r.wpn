@@ -1,56 +1,49 @@
 {
   "id": "AEG_zero_arm_r",
-  "specClass": "beam",
-  "type": "ENERGY",
+  "specClass": "projectile",
+  "projectileSpecId": "AEG_ironcutter_G_torp",
+  "type": "MISSILE",
   "size": "SMALL",
-  "collisionClass": "RAY",
-  "collisionClassByFighter": "RAY_FIGHTER",
   "turretSprite": "graphics/ships/zero/zero_arm_r.png",
   "turretGlowSprite": "graphics/ships/zero/zero_arm_r_glow.png",
   "hardpointSprite": "graphics/ships/zero/zero_arm_r.png",
   "hardpointGlowSprite": "graphics/ships/zero/zero_arm_r_glow.png",
   "glowColor": [
-    255,
-    100,
-    100,
-    255
-  ],
-  "hitGlowRadius": 0,
-  "turretOffsets": [
-    61,
-    0
-  ],
-  "turretAngleOffsets": [
-    0
-  ],
-  "hardpointOffsets": [
-    108.5,
-    0
-  ],
-  "hardpointAngleOffsets": [
-    0
-  ],
-  "fringeColor": [
     155,
     105,
     105,
     255
   ],
-  "coreColor": [
-    255,
-    255,
-    255,
-    255
+  "turretOffsets": [
+    78,
+    -10
   ],
-  "width": 6,
-  "textureType": ROUGH,
-  "textureScrollSpeed": 64,
-  "pixelsPerTexel": 5,
-  "pierceSet": [
-    PROJECTILE_FF,
-    PROJECTILE_NO_FF,
-    PROJECTILE_FIGHTER
+  "turretAngleOffsets": [
+    0
   ],
-  "fireSoundOne": "laser_intro",
-  "fireSoundTwo": "pd_laser_loop"
+  "hardpointOffsets": [
+    18,
+    0
+  ],
+  "hardpointAngleOffsets": [
+    0
+  ],
+  "barrelMode": "ALTERNATING",
+  "animationType": "GLOW_AND_FLASH",
+  "autocharge": true,
+  "muzzleFlashSpec": {
+    "length": 100,
+    "spread": 100,
+    "particleSizeMin": 30,
+    "particleSizeRange": 60,
+    "particleDuration": 0.12,
+    "particleCount": 30,
+    "particleColor": [
+      155,
+      105,
+      105,
+      255
+    ]
+  },
+  "fireSoundTwo": "rifttorpedo_fire"
 }
