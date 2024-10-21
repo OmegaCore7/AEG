@@ -1,3 +1,3 @@
 name,id,tier,rarity,tech/manufacturer,tags,uiTags,base value,unlocked,hidden,hiddenEverywhere,cost_frigate,cost_dest,cost_cruiser,cost_capital,script,desc,short,sModDesc,sprite
 # Accelerated Shields,advancedshieldemitter,0,,,"defensive, shields, merc, standard",Shields,3000,,FALSE,FALSE,3,6,9,15,data.hullmods.AcceleratedShieldEmitter,Increases the turn rate of the ship's shields by %s and the rate at which the shields are raised by %s.,Increases shield turn rate and extension speed.,Increases the shield's turn rate and raise rate by an additional %s.,graphics/hullmods/accelerated_shields.png
- 7 BlackBox System,AEG_7BlackBoxes,,,,,,,,FALSE,FALSE,3,6,9,15,data.hulls.AEG_7BlackBoxes,,,,graphics/hullmods/AEG_vdp.png
+ 7 BlackBox System,AEG_7BlackBoxes,,,,,,,,FALSE,FALSE,3,6,9,15,data.hullmods.AEG_7BlackBoxes,,,,graphics/hullmods/AEG_vdp.png
