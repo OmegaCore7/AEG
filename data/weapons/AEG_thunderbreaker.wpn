@@ -1,12 +1,9 @@
 {
   "id": "AEG_thunderbreaker",
-  "specClass": "beam",
-  "type": "ENERGY",
-  "size": "LARGE",
-  "beamEffect": "com.fs.starfarer.api.impl.combat.TachyonLanceEffect",
+  "specClass":"projectile",
+  "type":"ENERGY",
+  "size":"LARGE",
   "everyFrameEffect": "data.weapons.scripts.AEG_ThunderbreakerHover",
-  "collisionClass": "RAY",
-  "collisionClassByFighter": "RAY_FIGHTER",
   "turretSprite": "graphics/ships/zero/zero_scrander.png",
   "turretGlowSprite": "graphics/ships/zero/zero_scrander_glow.png",
   "hardpointSprite": "graphics/ships/zero/zero_scrander.png",
@@ -53,29 +50,16 @@
   "hardpointAngleOffsets": [
     0
   ],
-  "fringeColor": [
-    200,
-    40,
-    0,
-    255
-  ],
-  "coreColor": [
-    255,
-    80,
-    0,
-    255
-  ],
   "convergeOnPoint": true,
-  "width": 40,
-  "textureType": SMOOTH,
-  "textureScrollSpeed": 192,
-  "pixelsPerTexel": 10,
-  "pierceSet": [
-    PROJECTILE_FF,
-    PROJECTILE_NO_FF,
-    PROJECTILE_FIGHTER,
-    MISSILE_FF,
-    MISSILE_NO_FF
-  ],
+  "barrelMode":"ALTERNATING",
+  "animationType":"MUZZLE_FLASH",  # NONE, GLOW, MUZZLE_FLASH, SMOKE
+  "muzzleFlashSpec":{"length":34.0,   # only used if animationType = MUZZLE_FLASH
+					   "spread":10.0,
+					   "particleSizeMin":18.0,
+					   "particleSizeRange":24.0,
+					   "particleDuration":0.02,
+					   "particleCount":12,
+					   "particleColor":[205,105,105,240]},
+  "projectileSpecId":"AEG_thunderstrike_shot",
   "fireSoundTwo": "tachyon_lance_fire"
 }

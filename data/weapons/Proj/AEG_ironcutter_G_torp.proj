@@ -16,7 +16,7 @@
 #				  "acc":1000,
 #				  "dec":500},
 	"engineSpec":{"turnAcc":210,
-				  "turnRate":70,
+				  "turnRate":90,
 				  "acc":1000,
 				  "dec":500},
 	"engineSlots":[{"id":"ES1",
