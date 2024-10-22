@@ -11,9 +11,9 @@
   "hardpointSprite": "graphics/ships/zero/zero_chest.png",
   "hardpointGlowSprite": "graphics/ships/zero/zero_chest_glow.png",
   "glowColor": [
-    255,
-    255,
-    255,
+    155,
+    115,
+    115,
     255
   ],
   "turretOffsets": [
@@ -32,15 +32,9 @@
     -14.5,
     46,
     -14.5,
-    -46,
-    -20,
-    59,
-    -20,
-    -59
+    -46
   ],
   "turretAngleOffsets": [
-    0,
-    0,
     0,
     0,
     0,
