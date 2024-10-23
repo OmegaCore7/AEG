@@ -1,20 +1,23 @@
 {
   "id": "AEG_thunderbreaker",
-  "specClass": "projectile",
-  "projectileSpecId": "AEG_thunderstrike_shot",
+  "specClass": "beam",
   "type": "ENERGY",
   "size": "LARGE",
+  "beamEffect": "data.weapons.onhit.AEG_ThunderBoltOnHitEffect",
   "everyFrameEffect": "data.weapons.scripts.AEG_ThunderbreakerHover",
+  "collisionClass": "RAY",
+  "collisionClassByFighter": "RAY_FIGHTER",
   "turretSprite": "graphics/ships/zero/zero_scrander.png",
   "turretGlowSprite": "graphics/ships/zero/zero_scrander_glow.png",
   "hardpointSprite": "graphics/ships/zero/zero_scrander.png",
   "hardpointGlowSprite": "graphics/ships/zero/zero_scrander_glow.png",
   "glowColor": [
     255,
-    80,
-    0,
+    255,
+    255,
     255
   ],
+  "hitGlowRadius": 0,
   "turretOffsets": [
     -81,
     177,
@@ -35,12 +38,12 @@
   ],
   "turretAngleOffsets": [
     0,
-    4,
+    0,
     3,
     1.5,
     6,
     7,
-    6,
+    0,
     0
   ],
   "hardpointOffsets": [
@@ -50,8 +53,23 @@
   "hardpointAngleOffsets": [
     0
   ],
-  "barrelMode": "ALTERNATING",
-  "animationType": "GLOW",
-  "autocharge": true,
+  "beamFireOnlyOnFullCharge": true,
+  "fringeColor": [
+    255,
+    80,
+    0,
+    255
+  ],
+  "coreColor": [
+    255,
+    255,
+    255,
+    255
+  ],
+  "convergeOnPoint": true,
+  "width": 20,
+  "textureType": SMOOTH,
+  "textureScrollSpeed": 64,
+  "pixelsPerTexel": 5,
   "fireSoundTwo": "tachyon_lance_fire"
 }

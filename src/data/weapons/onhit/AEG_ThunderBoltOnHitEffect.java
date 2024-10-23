@@ -1,60 +1,80 @@
 package data.weapons.onhit;
 
 import com.fs.starfarer.api.combat.*;
-import com.fs.starfarer.api.combat.listeners.ApplyDamageResultAPI;
 import com.fs.starfarer.api.util.IntervalUtil;
-import org.lazywizard.lazylib.combat.CombatUtils;
 import org.lwjgl.util.vector.Vector2f;
+import java.awt.Color;
+import java.util.*;
 
-import java.awt.*;
-
-public class AEG_ThunderBoltOnHitEffect implements OnHitEffectPlugin {
-
-    private static final float PLASMA_BURST_DAMAGE = 100f;
-    private static final float PLASMA_BURST_RADIUS = 50f;
-    private static final float STATIC_FIELD_DURATION = 5f;
-    private static final float STATIC_FIELD_DAMAGE_PER_SECOND = 10f;
-    private static final float STATIC_FIELD_SLOW_EFFECT = 0.5f;
-    private static final float EMP_ARC_DAMAGE = 10f;
-    private static final float EMP_ARC_INTERVAL = 0.5f;
-    private static final int EMP_ARC_COUNT = 12; // Number of EMP arcs around the boundary
+public class AEG_ThunderBoltOnHitEffect implements BeamEffectPlugin {
+    private static final Color CORE_COLOR = new Color(255, 255, 255, 255);
+    private static final Color FRINGE_COLOR = new Color(105, 105, 255, 255);
+    private static final float INITIAL_CHAIN_RANGE = 1500f;
+    private static final float RANGE_RETENTION_PER_CHAIN = .75f;
+    private static final float DAMAGE_RETENTION_PER_CHAIN = .85f;
+    private static final int MAXIMUM_CHAINS = 5;
+    private final IntervalUtil fireInterval = new IntervalUtil(0.1f, 0.1f);
 
     @Override
-    public void onHit(DamagingProjectileAPI projectile, CombatEntityAPI target, Vector2f point,
-                      boolean shieldHit, ApplyDamageResultAPI damageResult, CombatEngineAPI engine) {
-        // Plasma Burst
-        engine.spawnExplosion(point, new Vector2f(0, 0), new Color(240, 80, 0), PLASMA_BURST_RADIUS, 1f);
-        engine.applyDamage(target, point, PLASMA_BURST_DAMAGE, DamageType.ENERGY, 0f, false, false, projectile.getSource());
-
-        // Static Field
-        IntervalUtil staticFieldInterval = new IntervalUtil(0.1f, 0.1f);
-        IntervalUtil empArcInterval = new IntervalUtil(EMP_ARC_INTERVAL, EMP_ARC_INTERVAL);
-        for (float t = 0; t < STATIC_FIELD_DURATION; t += 0.1f) {
-            staticFieldInterval.advance(0.1f);
-            empArcInterval.advance(0.1f);
-            if (staticFieldInterval.intervalElapsed()) {
-                engine.applyDamage(target, point, STATIC_FIELD_DAMAGE_PER_SECOND * 0.1f, DamageType.ENERGY, 0f, false, false, projectile.getSource());
-                // Apply slow effect (this is a simplified example)
-                if (target instanceof ShipAPI) {
-                    ((ShipAPI) target).getMutableStats().getMaxSpeed().modifyMult("static_field_slow", STATIC_FIELD_SLOW_EFFECT);
-                }
+    public void advance(float amount, CombatEngineAPI engine, BeamAPI beam) {
+        // Handle the lightning charging effect
+        if (beam.getWeapon().getChargeLevel() > 0) {
+            for (int i = 0; i < beam.getWeapon().getSpec().getHardpointAngleOffsets().size(); i++) {
+                Vector2f point = beam.getWeapon().getFirePoint(i);
+                engine.addHitParticle(point, new Vector2f(), 10f, beam.getWeapon().getChargeLevel(), 0.1f, CORE_COLOR);
             }
-            if (empArcInterval.intervalElapsed()) {
-                // Create EMP arcs along the boundary
-                for (int i = 0; i < EMP_ARC_COUNT; i++) {
-                    double angle = 2 * Math.PI * i / EMP_ARC_COUNT;
-                    Vector2f empPoint = new Vector2f(
-                            point.x + (float) Math.cos(angle) * PLASMA_BURST_RADIUS,
-                            point.y + (float) Math.sin(angle) * PLASMA_BURST_RADIUS
-                    );
-                    for (CombatEntityAPI nearbyEntity : CombatUtils.getEntitiesWithinRange(empPoint, PLASMA_BURST_RADIUS)) {
-                        if (nearbyEntity != target && nearbyEntity instanceof ShipAPI) {
-                            engine.spawnEmpArc(projectile.getSource(), empPoint, target, nearbyEntity,
-                                    DamageType.ENERGY, EMP_ARC_DAMAGE, EMP_ARC_DAMAGE, 1000f, null, 5f, new Color(25, 100, 155, 255), new Color(255, 255, 255, 255));
-                        }
-                    }
+        }
+
+        CombatEntityAPI target = beam.getDamageTarget();
+        if (target instanceof ShipAPI && (target.getShield() == null || !target.getShield().isWithinArc(beam.getTo()))) {
+            if (beam.getBrightness() >= 1f) {
+                fireInterval.advance(amount);
+                if (fireInterval.intervalElapsed()) {
+                    createChainLightning(beam, target, engine);
                 }
             }
         }
+    }
+
+    private void createChainLightning(BeamAPI beam, CombatEntityAPI initialTarget, CombatEngineAPI engine) {
+        CombatEntityAPI currentTarget = initialTarget;
+        Vector2f source = beam.getTo();
+        float range = INITIAL_CHAIN_RANGE;
+        float damage = beam.getWeapon().getDerivedStats().getDps() * beam.getSource().getMutableStats().getBeamWeaponDamageMult().getModifiedValue() * fireInterval.getIntervalDuration();
+        float emp = beam.getWeapon().getDerivedStats().getEmpPerSecond() * fireInterval.getIntervalDuration();
+        Set<CombatEntityAPI> struck = new HashSet<>();
+
+        for (int i = 0; i < MAXIMUM_CHAINS; i++) {
+            if (currentTarget == null) break;
+
+            engine.spawnEmpArc(beam.getSource(), source, currentTarget, currentTarget,
+                    DamageType.ENERGY, damage, emp, 100000f, "tachyon_lance_emp_impact", 15f, FRINGE_COLOR, CORE_COLOR);
+
+            struck.add(currentTarget);
+            range *= RANGE_RETENTION_PER_CHAIN;
+            damage *= DAMAGE_RETENTION_PER_CHAIN;
+            emp *= DAMAGE_RETENTION_PER_CHAIN;
+
+            List<CombatEntityAPI> enemies = getEnemiesInRange(currentTarget, range, beam.getSource().getOwner(), engine);
+            enemies.removeAll(struck);
+
+            if (enemies.isEmpty()) break;
+            currentTarget = enemies.get((int) (Math.random() * enemies.size()));
+            source = currentTarget.getLocation();
+        }
+    }
+
+    private List<CombatEntityAPI> getEnemiesInRange(CombatEntityAPI source, float range, int owner, CombatEngineAPI engine) {
+        List<CombatEntityAPI> enemies = new ArrayList<>();
+        for (ShipAPI entity : engine.getShips()) {
+            if (entity != null && entity.getOwner() != owner && !entity.isHulk() && getDistance(source.getLocation(), entity.getLocation()) <= range) {
+                enemies.add(entity);
+            }
+        }
+        return enemies;
+    }
+
+    private float getDistance(Vector2f point1, Vector2f point2) {
+        return (float) Math.hypot(point1.x - point2.x, point1.y - point2.y);
     }
 }

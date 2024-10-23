@@ -1,5 +1,4 @@
 package data.weapons.scripts;
-
 import com.fs.starfarer.api.combat.BeamAPI;
 import com.fs.starfarer.api.combat.BeamEffectPlugin;
 import com.fs.starfarer.api.combat.CombatEngineAPI;
@@ -10,7 +9,6 @@ import com.fs.starfarer.api.util.IntervalUtil;
 import java.awt.Color;
 import java.util.*;
 import org.lwjgl.util.vector.Vector2f;
-
 public class AEG_ChainLightningEffect implements BeamEffectPlugin
 {
     // If true, don't hit the same ship twice in the same burst
@@ -32,12 +30,10 @@ public class AEG_ChainLightningEffect implements BeamEffectPlugin
     // What color is the fringe of the arc?
     private static final Color FRINGE_COLOR = new Color(130, 204, 102, 255);
     private IntervalUtil fireInterval = new IntervalUtil(TIME_BETWEEN_BURSTS, TIME_BETWEEN_BURSTS);
-
     private static float getDistance(Vector2f point1, Vector2f point2)
     {
         return (float) Math.hypot(point1.x - point2.x, point1.y - point2.y);
     }
-
     private static List getEnemiesInRange(CombatEntityAPI ship, float range,
                                           int side, CombatEngineAPI engine)
     {
@@ -59,12 +55,10 @@ public class AEG_ChainLightningEffect implements BeamEffectPlugin
 
         return enemies;
     }
-
     @Override
     public void advance(float amount, CombatEngineAPI engine, BeamAPI beam)
     {
         CombatEntityAPI target = beam.getDamageTarget();
-
         // Check that we hit something and that it wasn't a shield hit
         if (target != null && target instanceof ShipAPI
                 && (target.getShield() == null || !target.getShield().isWithinArc(beam.getTo())))
@@ -76,12 +70,10 @@ public class AEG_ChainLightningEffect implements BeamEffectPlugin
                 {
                     // Count how many links are in the chain so far
                     int numStrikes = 0;
-
                     // Source of the current lightning chain
                     Vector2f source = beam.getFrom();
                     // Victim of the current lightning chain
                     CombatEntityAPI currentVictim = target;
-
                     float range = INITIAL_CHAIN_RANGE;
                     // Ensure we keep the same DPS as listed in the weapon's stats tooltip
                     float damage = beam.getWeapon().getDerivedStats().getDps()
@@ -93,7 +85,6 @@ public class AEG_ChainLightningEffect implements BeamEffectPlugin
                     // This is used to prevent hitting the same target twice
                     // if IGNORE_SAME_SHIP_IN_BURST is set to true
                     Set struck = new HashSet();
-
                     do
                     {
                         // Spawn this chain's lightning arc
@@ -108,7 +99,6 @@ public class AEG_ChainLightningEffect implements BeamEffectPlugin
                         {
                             return;
                         }
-
                         // Reduce the stats of the next chain
                         range *= RANGE_RETENTION_PER_CHAIN;
                         damage *= DAMAGE_RETENTION_PER_CHAIN;
