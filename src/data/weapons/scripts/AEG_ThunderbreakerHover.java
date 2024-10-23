@@ -4,6 +4,8 @@ import com.fs.starfarer.api.combat.CombatEngineAPI;
 import com.fs.starfarer.api.combat.EveryFrameWeaponEffectPlugin;
 import com.fs.starfarer.api.combat.WeaponAPI;
 import org.lwjgl.util.vector.Vector2f;
+import java.awt.Color;
+import com.fs.starfarer.api.util.IntervalUtil;
 
 public class AEG_ThunderbreakerHover implements EveryFrameWeaponEffectPlugin {
 
@@ -13,6 +15,9 @@ public class AEG_ThunderbreakerHover implements EveryFrameWeaponEffectPlugin {
     private static final float HOVER_AMPLITUDE = 1f; // Adjust as needed for up-down hover
     private static final float HOVER_FREQUENCY = 0.5f; // Adjust as needed for up-down hover
     private Vector2f originalLocation = null;
+    private final IntervalUtil empInterval = new IntervalUtil(2f, 3f);
+    private static final Color CORE_COLOR = new Color(255, 255, 255, 255);
+    private static final Color FRINGE_COLOR = new Color(105, 105, 255, 255);
 
     @Override
     public void advance(float amount, CombatEngineAPI engine, WeaponAPI weapon) {
@@ -39,5 +44,15 @@ public class AEG_ThunderbreakerHover implements EveryFrameWeaponEffectPlugin {
 
         Vector2f newLocation = new Vector2f(newX, newY);
         weapon.getSlot().getLocation().set(newLocation);
+
+        // Handle the passive lightning charging effect
+        empInterval.advance(amount);
+        if (empInterval.intervalElapsed()) {
+            for (int i = 0; i < weapon.getSpec().getHardpointAngleOffsets().size(); i++) {
+                Vector2f point = weapon.getFirePoint(i);
+                Vector2f randomPoint = new Vector2f(point.x + (float) (Math.random() * 100 - 50), point.y + (float) (Math.random() * 100 - 50));
+                engine.spawnEmpArcVisual(randomPoint, null, point, null, 10f, CORE_COLOR, FRINGE_COLOR);
+            }
+        }
     }
 }

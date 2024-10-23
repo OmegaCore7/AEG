@@ -19,32 +19,11 @@
   ],
   "hitGlowRadius": 0,
   "turretOffsets": [
-    -81,
-    177,
-    -41,
-    250.5,
-    -101,
-    -48,
-    -100.5,
-    63,
-    -56,
-    -207.5,
-    -87,
-    -125,
-    58,
-    -288,
-    -92,
-    383
+    -91.5,
+    382
   ],
   "turretAngleOffsets": [
-    0,
-    0,
-    3,
-    1.5,
-    6,
-    7,
-    0,
-    0
+    2
   ],
   "hardpointOffsets": [
     -30,
@@ -55,10 +34,10 @@
   ],
   "beamFireOnlyOnFullCharge": true,
   "fringeColor": [
-    255,
-    80,
-    0,
-    255
+    105,
+	105,
+	255,
+	255
   ],
   "coreColor": [
     255,
