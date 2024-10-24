@@ -1,7 +1,7 @@
 {
   "id": "AEG_gurrenl_arm_l",
   "specClass": "projectile",
-  "projectileSpecId": "sabot_srm",
+  "projectileSpecId": "AEG_drill_sabot",
   "type": "MISSILE",
   "size": "SMALL",
   "displayArcRadius": 300,
