@@ -16,13 +16,13 @@ name,id,tier,rarity,base value,range,damage/second,damage/shot,emp,impact,turn r
 ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 #Vengeance,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-Mark 7 Phasor Bank Array,AEG_Mark7pb_array,0,,100000,2500,,500,100,100,50,,30,1,,ENERGY,150,,0,0.2,1,,0,10,2,5,,1000,,,,,,"SYSTEM,SHOW_IN_CODEX",,,,,General,,,,,,,,,,
-Mark 7 Super Proton Torpedo Launcher,AEG_sp_torpedo_launcher,3,,500000,2500,,6000,,500,50,30,6,0.05,,ENERGY,200,,0,1,3,1,0,0,0,0,,1000,1000,1500,3000,,,"STRIKE, DO_NOT_AIM","strike20, missile20, omega, restricted",,Unknown,,Guided Torpedo,Fast,Excellent,Excellent,Excellent,,,,,TRUE,
-Mark 6 Point Defense Phasor Bank,AEG_pbpd,2,,600,500,350,,50,0,100,6,4,0.5,,ENERGY,,200,0.1,0.1,0.3,0.1,,,,,10000,,,,,,,"PD,ANTI_FTR","pd9, beam6, rare_bp, merc, ind",,,,Point Defense,,,,,,,,,,
-Mark 6 Phasor Bank (Auto),AEG_pbauto,1,,1200,600,,150,50,0,50,10,,,,ENERGY,80,,0.5,0.5,10,0.1,,,,,,1000,,,,,,,"energy13, base_bp, merc, ind",,,,General,,,,,,,,,,
-Mark 7 Phasor Beam,AEG_pbeam,3,,8000,1000,1700,,1000,0,50,25,,,,ENERGY,,200,0.5,1,2,3,,,,,10000,,,,,,,FIRE_WHEN_INEFFICIENT,"energy20, beam15, LR, rare_bp, hist1t, merc, ind",,,,Suppression,,,,,"Hits on hull or armor frequently arc to weapons and engines, dealing extra EMP and energy damage. Hits on shields have a chance to generate a shield-penetrating arc based on the target's hard flux level.",,,,,
-Mark 6 Photon Torpedo Array,AEG_torparray,3,,40000,1200,,1000,,15,50,7,12,0.05,,ENERGY,100,,0,0.5,8,0.1,0,0,0,0,,1000,500,20,300,,,"DO_NOT_AIM, DO_NOT_CONSERVE","utility8, missile9, strike7, omega, restricted",,Unknown,,Anti Small Craft,Extremely Fast,Excellent,,,,,,,TRUE,
-Mark 6 Photon Torpedo Array,AEG_torparray_right,3,,40000,1200,,400,,15,50,7,12,0.05,,ENERGY,100,,0,0.5,8,0.1,0,0,0,0,,1000,500,20,300,,,"DO_NOT_AIM, DO_NOT_CONSERVE","utility8, missile9, strike7, omega, restricted",,Unknown,,Anti Small Craft,Extremely Fast,Excellent,,,,,,,TRUE,
+Mark 7 Phasor Bank Array,AEG_Mark7pb_array,,,100000,2500,,500,100,100,50,,30,1,,ENERGY,150,,0,0.2,1,,0,10,2,5,,1000,,,,,,"SYSTEM,SHOW_IN_CODEX",no_drop,,,,General,,,,,,,,,,
+Mark 7 Super Proton Torpedo Launcher,AEG_sp_torpedo_launcher,,,500000,2500,,6000,,500,50,30,6,0.05,,ENERGY,200,,0,1,3,1,0,0,0,0,,1000,1000,1500,3000,,,"STRIKE, DO_NOT_AIM","strike20, missile20, omega, restricted, no_drop",,Unknown,,Guided Torpedo,Fast,Excellent,Excellent,Excellent,,,,,TRUE,
+Mark 6 Point Defense Phasor Bank,AEG_pbpd,,,600,500,350,,50,0,100,6,4,0.5,,ENERGY,,200,0.1,0.1,0.3,0.1,,,,,10000,,,,,,,"PD,ANTI_FTR","pd9, beam6, rare_bp, merc, ind, no_drop",,,,Point Defense,,,,,,,,,,
+Mark 6 Phasor Bank (Auto),AEG_pbauto,,,1200,600,,150,50,0,50,10,,,,ENERGY,80,,0.5,0.5,10,0.1,,,,,,1000,,,,,,,"energy13, base_bp, merc, ind, no_drop",,,,General,,,,,,,,,,
+Mark 7 Phasor Beam,AEG_pbeam,,,8000,1000,1700,,1000,0,50,25,,,,ENERGY,,200,0.5,1,2,3,,,,,10000,,,,,,,FIRE_WHEN_INEFFICIENT,"energy20, beam15, LR, rare_bp, hist1t, merc, ind, no_drop",,,,Suppression,,,,,"Hits on hull or armor frequently arc to weapons and engines, dealing extra EMP and energy damage. Hits on shields have a chance to generate a shield-penetrating arc based on the target's hard flux level.",,,,,
+Mark 6 Photon Torpedo Array,AEG_torparray,,,40000,1200,,1000,,15,50,7,12,0.05,,ENERGY,100,,0,0.5,8,0.1,0,0,0,0,,1000,500,20,300,,,"DO_NOT_AIM, DO_NOT_CONSERVE","utility8, missile9, strike7, omega, restricted, no_drop",,Unknown,,Anti Small Craft,Extremely Fast,Excellent,,,,,,,TRUE,
+Mark 6 Photon Torpedo Array,AEG_torparray_right,,,40000,1200,,400,,15,50,7,12,0.05,,ENERGY,100,,0,0.5,8,0.1,0,0,0,0,,1000,500,20,300,,,"DO_NOT_AIM, DO_NOT_CONSERVE","utility8, missile9, strike7, omega, restricted, no_drop",,Unknown,,Anti Small Craft,Extremely Fast,Excellent,,,,,,,TRUE,
 ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 #GRAPHICS,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 graphicsweapon,graphicsweapon,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
@@ -32,31 +32,39 @@ CCX Left Shoulder,AEG_rm_leftshoulder,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 CCX Right Shoulder,AEG_rm_rightshoulder,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,9.75
 #BLITZWING TRANSFORMER,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,10
-Blitz Torpedo Launcher,AEG_BlitzTorpLauncher,2,,300,1200,,1000,,40,10,1,1,,,HIGH_EXPLOSIVE,0,,0,1,1,,0,0,0,0,,400,150,4,300,,,GUIDED_POOR,"strike7, missile0, base_bp, ind, reload_1_and_a_half_pt",,Unknown,,Torpedo,Fast,Good,,,,,,,TRUE,19.75
-Blitzwing Chest Cannon,AEG_bw_chestarmor,3,,40000,1200,,1000,,15,50,7,3,0.05,,ENERGY,1000,,0,0.5,1,,0,0,0,0,,1000,200,3,250,,,"DO_NOT_AIM, DO_NOT_CONSERVE","utility8, missile9, strike7, omega, restricted",,Unknown,,Anti Small Craft,Extremely Fast,Excellent,,,,,,,TRUE,12.31
-Null-Ray Blaster,AEG_bw_Rarm_nullrayblaster,3,,900,1000,,1400,,0,30,9,20,,,ENERGY,800,,0.25,10,,,0,0,0,0,,1000,,,100,,,"STRIKE, USE_VS_FRIGATES, GROUP_ALTERNATING","strike10, rare_bp, hist1t, merc, ind",SR_strike_only,Unknown,,Strike,,,,,,,,,,4.5
-Dual Shoulder Sabot Launcher,AEG_Blitzwing_Jetpack,1,,1200,1200,,100,,15,10,10,12,,,KINETIC,0,,0,8.75,3,0.25,0,0,0,0,,150,50,8,300,,,GUIDED_POOR,"missile13, strike8, rare_bp, merc, ind",,Unknown,,Anti Shield,Slow,Poor,,,"Submunition hits on hull or armor have a %s chance to arc to weapons and engines, dealing %s EMP damage.",25% | 200,,,TRUE,17
-Blitz Assault Minigun,AEG_bw_Larm_minigun,1,,1000,600,,75,,3,30,10,,,,HIGH_EXPLOSIVE,60,,0,0.15,1,,0,20,1,10,,800,,,30,,,,"he15, SR, lowtech_bp, midline_bp, merc, ind",,Unknown,,Anti Armor,,,,,,,,,,
-Optic PD Beams,AEG_bw_mhead,1,,200,400,75,,,0,100,4,,,,ENERGY,,40,0,0.25,,,,,,,2400,,,,,,,PD,"pd7, beam7, SR, hightech_bp, midline_bp, merc, ind",,Unknown,,Point Defense,,,,,,,,,,
+Blitz Torpedo Launcher,AEG_BlitzTorpLauncher,,,300,1200,,1000,,40,10,1,1,,,HIGH_EXPLOSIVE,0,,0,1,1,,0,0,0,0,,400,150,4,300,,,GUIDED_POOR,"strike7, missile0, base_bp, ind, reload_1_and_a_half_pt, no_drop",,Unknown,,Torpedo,Fast,Good,,,,,,,TRUE,19.75
+Blitzwing Chest Cannon,AEG_bw_chestarmor,,,40000,1200,,1000,,15,50,7,3,0.05,,ENERGY,1000,,0,0.5,1,,0,0,0,0,,1000,200,3,250,,,"DO_NOT_AIM, DO_NOT_CONSERVE","utility8, missile9, strike7, omega, restricted, no_drop",,Unknown,,Anti Small Craft,Extremely Fast,Excellent,,,,,,,TRUE,12.31
+Null-Ray Blaster,AEG_bw_Rarm_nullrayblaster,,,900,1000,,1400,,0,30,9,20,,,ENERGY,800,,0.25,10,,,0,0,0,0,,1000,,,100,,,"STRIKE, USE_VS_FRIGATES, GROUP_ALTERNATING","strike10, rare_bp, hist1t, merc, ind, no_drop",SR_strike_only,Unknown,,Strike,,,,,,,,,,4.5
+Dual Shoulder Sabot Launcher,AEG_Blitzwing_Jetpack,,,1200,1200,,100,,15,10,10,12,,,KINETIC,0,,0,8.75,3,0.25,0,0,0,0,,150,50,8,300,,,GUIDED_POOR,"missile13, strike8, rare_bp, merc, ind, no_drop",,Unknown,,Anti Shield,Slow,Poor,,,"Submunition hits on hull or armor have a %s chance to arc to weapons and engines, dealing %s EMP damage.",25% | 200,,,TRUE,17
+Blitz Assault Minigun,AEG_bw_Larm_minigun,,,1000,600,,75,,3,30,10,,,,HIGH_EXPLOSIVE,60,,0,0.15,1,,0,20,1,10,,800,,,30,,,,"he15, SR, lowtech_bp, midline_bp, merc, ind, no_drop",,Unknown,,Anti Armor,,,,,,,,,,
+Optic PD Beams,AEG_bw_mhead,,,200,400,75,,,0,100,4,,,,ENERGY,,40,0,0.25,,,,,,,2400,,,,,,,PD,"pd7, beam7, SR, hightech_bp, midline_bp, merc, ind, no_drop",,Unknown,,Point Defense,,,,,,,,,,
 ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,23
 #Crimson Cascade,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,23
-CCX Left U-Tech Plasma Cannon,AEG_rmleftarm,3,,7500,800,,400,,,20,30,,,,ENERGY,250,,0.33,1.01,5,0.33,,,,,,750,,,500,,,"STRIKE, USE_VS_FRIGATES","energy20, rare_bp, hist1t, merc, ind",,,,General,,Excellent,,,,,,,,26
-CCX Right U-Tech Plasma Cannon,AEG_rmrightarm,3,,7500,800,,400,,,20,30,,,,ENERGY,250,,0.33,1.01,5,0.33,,,,,,750,,,500,,,"STRIKE, USE_VS_FRIGATES","energy20, rare_bp, hist1t, merc, ind",,,,General,,Excellent,,,,,,,,
-CCX U-TECH OPTIC BEAM,AEG_rmhead,2,,5000,750,1000,,,0,75,18,20,1,,ENERGY,,750,0,0,0.2,0.1,,,,,1000000,,,,,,,"PD, ANTI_FTR","pd19, beam15, rare_bp, merc, ind",,,,Point Defense,,,,,"When all sub-beams impact a target in close proximity to each other, the spalling effect produces an explosion that deals up to 100 points of fragmentation damage to other nearby targets.",100 | fragmentation,,,,
+CCX Left U-Tech Plasma Cannon,AEG_rmleftarm,,,7500,800,,400,,,20,30,,,,ENERGY,250,,0.33,1.01,5,0.33,,,,,,750,,,500,,,"STRIKE, USE_VS_FRIGATES","energy20, rare_bp, hist1t, merc, ind, no_drop",,,,General,,Excellent,,,,,,,,26
+CCX Right U-Tech Plasma Cannon,AEG_rmrightarm,,,7500,800,,400,,,20,30,,,,ENERGY,250,,0.33,1.01,5,0.33,,,,,,750,,,500,,,"STRIKE, USE_VS_FRIGATES","energy20, rare_bp, hist1t, merc, ind, no_drop",,,,General,,Excellent,,,,,,,,
+CCX U-TECH OPTIC BEAM,AEG_rmhead,,,5000,750,1000,,,0,75,18,20,1,,ENERGY,,750,0,0,0.2,0.1,,,,,1000000,,,,,,,"PD, ANTI_FTR","pd19, beam15, rare_bp, merc, ind, no_drop",,,,Point Defense,,,,,"When all sub-beams impact a target in close proximity to each other, the spalling effect produces an explosion that deals up to 100 points of fragmentation damage to other nearby targets.",100 | fragmentation,,,,
 ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-Test Weapon,AEG_testweapon,2,,1200,2000,,100,,3,60,10,,,,ENERGY,15,,7,0.2,1,0.5,0,5,1,15,,700,,,30,,,,"energy15, SR, omega, restricted",,,,,,,,,,,,,,3.85
+Test Weapon,AEG_testweapon,,,1200,2000,,100,,3,60,10,,,,ENERGY,15,,7,0.2,1,0.5,0,5,1,15,,700,,,30,,,,"energy15, SR, omega, restricted, no_drop",,,,,,,,,,,,,,3.85
 ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 #Mazinger Zero,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 ,AEG_zero_legs,,,500000,600,1,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-Mazin Impact,AEG_zero_shoulder_l,,,500000,2500,,300,,10,45,10,40,1,10,HIGH_EXPLOSIVE,10,,0,10,40,0.01,0.01,,,,,300,1000,1500,30,,,,,,,,General,,,,,,,,,,
-Cross Knife Swarmer PD,AEG_zero_shoulder_r,,,500000,1000,,100,100,15,50,3,80,"1		","10	",HIGH_EXPLOSIVE,5,,0,5,20,0.2,0,0,0,0,,300,100,5,50,,,"ANTI_FTR, DO_NOT_AIM, DO_NOT_CONSERVE","utility8, missile0, missile_bp, merc, ind",,,,Anti Small Craft,Fast,Excellent,,,,,,,,10
-Gigantic Iron Cutter,AEG_zero_arm_r,3,,500000,5000,,5000,5000,9999,45,10,1,1,1,HIGH_EXPLOSIVE,1000,,30,2,1,0.25,0,0,0,,,1000,2000,30,100000,,,DO_NOT_AIM,"missile12, strike9, missile_bp, merc, ind",,,,Finisher,Fast,Excellent,,,,,,,TRUE,12
-Iron Cutter,AEG_ironcutter_l,,,500000,2500,,1200,,1000,45,10,1,1,1,HIGH_EXPLOSIVE,100,,0,5,1,0.25,0,0,0,,,300,500,1500,1000,,,DO_NOT_AIM,"missile12, strike9, missile_bp, merc, ind",,,,Finisher,Fast,Excellent,,,,,,,TRUE,12
-Barrage Photon Beam,AEG_photonbarrage,,,500000,5000,2500,,200,500,55,4,,,,ENERGY,,500,3,5,,,,,,,2400,,,,,,,,"beam9, LR, hightech_bp, midline_bp, merc, ind",,,,General,,,,,,,,,,
-Chest Inferno,AEG_ChestInferno,,,100000,1500,,200,,3,60,4,200,6,20,ENERGY,2,,,10,200,0.05,0,0,0,0,,500,,,,,,,"energy15, SR, omega, restricted",,Unknown,,General,,,,,,,,,,
-Rust Hurrecane,AEG_rust,,,500000,2000,,200,200,75,55,10,50,"0.5	",20,ENERGY,50,,2,10,50,0.05,0,0.1,0,0,,200,500,20,5000,,,"STRIKE, DO_NOT_AIM","strike20, missile20, omega, restricted",,Unknown,,Guided Torpedo,Slow,Excellent,,,,,,,TRUE,
-God ThunderBolt Breaker,AEG_thunderbreaker,,,500000,2500,1400,0,100,0,5,25,0,0,0,ENERGY,0,700,2,0.05,0,0,0,0,0,0,10000,0,0,0,0,0,0,,,,,,General,,,,,,,,,
+Mazin Impact,AEG_zero_shoulder_l,,,500000,2500,,300,,10,45,10,40,1,10,HIGH_EXPLOSIVE,10,,0,5,40,0.01,0.01,,,,,300,1000,1500,30,,,,,,,,General,,,,,,,,,,
+Cross Knife Swarmer PD,AEG_zero_shoulder_r,,,500000,1000,,150,100,15,50,3,80,"1		","10	",HIGH_EXPLOSIVE,10,,0,5,40,0.2,0,0,0,0,,300,100,5,50,,,"ANTI_FTR, DO_NOT_AIM, DO_NOT_CONSERVE","utility8, missile0, missile_bp, merc, ind, no_drop",,,,Anti Small Craft,Fast,Excellent,,,,,,,,10
+Gigantic Iron Cutter,AEG_zero_arm_r,,,500000,5000,,5000,5000,9999,45,10,1,,,HIGH_EXPLOSIVE,1000,,"5		",2,1,0.25,0,0,0,,,1000,2000,30,100000,,,DO_NOT_AIM,"missile12, strike9, missile_bp, merc, ind, no_drop",,,,Finisher,Fast,Excellent,,,,,,,TRUE,12
+Iron Cutter,AEG_ironcutter_l,,,500000,2500,,1200,,1000,45,10,1,0.25,1,HIGH_EXPLOSIVE,200,,0,2,1,0.25,0,0,0,,,300,700,1500,1000,,,DO_NOT_AIM,"missile12, strike9, missile_bp, merc, ind, no_drop",,,,Finisher,Fast,Excellent,,,,,,,TRUE,12
+Barrage Photon Beam,AEG_photonbarrage,,,500000,5000,2500,,200,500,55,4,,,,ENERGY,,2700,3,3,,,,,,,2400,,,,,,,,"beam9, LR, hightech_bp, midline_bp, merc, ind, no_drop",,,,General,,,,,,,,,,
+Chest Inferno,AEG_ChestInferno,,,100000,1500,,200,,3,60,4,200,0.5,1,ENERGY,2,,0,0.01,200,0.05,0,0,0,0,,500,,,,,,,"energy15, SR, omega, restricted, no_drop",,Unknown,,General,,,,,,,,,,
+Rust Hurrecane,AEG_rust,,,500000,2000,,200,200,75,55,10,50,"0.5	",20,ENERGY,50,,2,10,50,0.05,0,0.1,0,0,,200,500,20,5000,,,"STRIKE, DO_NOT_AIM","strike20, missile20, omega, restricted, no_drop",,Unknown,,Guided Torpedo,Slow,Excellent,,,,,,,TRUE,
+God ThunderBolt Breaker,AEG_thunderbreaker,,,500000,2500,1400,0,100,0,25,25,0,0,0,ENERGY,0,700,2,0.05,0,0,0,0,0,0,10000,0,0,0,0,0,0,,,,,,General,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+#Gurren Lagann,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+Sabot SRM,sabot,,,200,1200,,100,,15,30,4,3,,,KINETIC,0,,0,1,1,,0,0,0,0,,150,50,8,300,,,GUIDED_POOR,"missile8, strike2, missile_bp, merc, ind, no_drop",,,,Anti Shield,Slow,Poor,,,"Submunition hits on hull or armor have a %s chance to arc to weapons and engines, dealing %s EMP damage.",25% | 200,,,TRUE,11.75
+Swarmer SRM Launcher,swarmer,,,250,1000,,100,,15,50,3,80,,,HIGH_EXPLOSIVE,0,,0,5,4,0.2,0,0,0,0,,300,100,5,50,,,"ANTI_FTR, DO_NOT_AIM, DO_NOT_CONSERVE","utility8, missile0, missile_bp, merc, ind, no_drop",,,,Anti Small Craft,Fast,Excellent,,,,,,,,10
+Hurricane MIRV Launcher,hurricane,,,4500,2500,,500,,50,10,25,10,,,HIGH_EXPLOSIVE,0,,0,15,1,,0,0,0,0,,250,50,12,350,,,"DO_NOT_AIM, CONSERVE_5","missile18, strike15, rare_bp, hist1t, merc, ind, no_drop",,,,Finisher,Medium,Good,,,,,,,TRUE,16
+Plasma Cannon,plasma,,,7500,700,,500,,,20,30,,,,ENERGY,550,,0.33,1.01,3,0.33,,,,,,750,,,500,,,"STRIKE, USE_VS_FRIGATES","energy20, rare_bp, hist1t, merc, ind, no_drop",,,,General,,,,,The targeting system is incapable of tracking fighters when on local/automatic control.,,,,,23
+Heavy Burst Laser,heavyburst,,,2000,600,450,,,0,40,9,6,0.5,,ENERGY,,300,0.1,0.1,0.3,0.1,,,,,10000,,,,,,,"PD,ANTI_FTR","pd15, beam10, rare_bp, merc, ind, no_drop",,,,Point Defense,,,,,,,,,,22.5
+High Intensity Laser,hil,,,4500,1000,500,,,0,5,20,,,,HIGH_EXPLOSIVE,,400,0.1,0.1,,,,,,,2400,,,,,,,,"beam20, LR, hightech_bp, merc, ind, no_drop",,,,Anti Armor,,,,,,,,,,24

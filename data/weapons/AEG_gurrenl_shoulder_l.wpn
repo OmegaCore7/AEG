@@ -1,0 +1,53 @@
+{
+  "id": "AEG_gurrenl_shoulder_l",
+  "specClass": "projectile",
+  "projectileSpecId": "type_1_srm",
+  "type": "MISSILE",
+  "size": "SMALL",
+  "displayArcRadius": 500,
+  "turretSprite": "graphics/ships/gurrenl/AEG_gurrenl_shoulder_l.png",
+  "hardpointSprite": "graphics/ships/gurrenl/AEG_gurrenl_shoulder_l.png",
+  "turretOffsets": [
+    10,
+    12.5,
+    10,
+    2.5,
+    -10,
+    12.5,
+    -10,
+    2.5
+  ],
+  "turretAngleOffsets": [
+    0,
+    0,
+    180,
+    180
+  ],
+  "hardpointOffsets": [
+    16.5,
+    12.5
+  ],
+  "hardpointAngleOffsets": [
+    0
+  ],
+  "barrelMode": "ALTERNATING",
+  "animationType": "SMOKE",
+  "smokeSpec": {
+    "particleSizeMin": 10,
+    "particleSizeRange": 16,
+    "cloudParticleCount": 3,
+    "cloudDuration": 0.9,
+    "cloudRadius": 8,
+    "blowbackParticleCount": 4,
+    "blowbackDuration": 1.1,
+    "blowbackLength": 20,
+    "blowbackSpread": 10,
+    "particleColor": [
+      170,
+      160,
+      150,
+      130
+    ]
+  },
+  "fireSoundTwo": "swarmer_fire"
+}

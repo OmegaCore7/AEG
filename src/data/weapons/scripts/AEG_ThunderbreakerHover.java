@@ -18,6 +18,11 @@ public class AEG_ThunderbreakerHover implements EveryFrameWeaponEffectPlugin {
     private final IntervalUtil empInterval = new IntervalUtil(2f, 3f);
     private static final Color CORE_COLOR = new Color(255, 255, 255, 255);
     private static final Color FRINGE_COLOR = new Color(105, 105, 255, 255);
+    private float empArcLength = 25f; // Default EMP arc length
+
+    public void setEmpArcLength(float length) {
+        this.empArcLength = length;
+    }
 
     @Override
     public void advance(float amount, CombatEngineAPI engine, WeaponAPI weapon) {
@@ -51,7 +56,7 @@ public class AEG_ThunderbreakerHover implements EveryFrameWeaponEffectPlugin {
             for (int i = 0; i < weapon.getSpec().getHardpointAngleOffsets().size(); i++) {
                 Vector2f point = weapon.getFirePoint(i);
                 Vector2f randomPoint = new Vector2f(point.x + (float) (Math.random() * 100 - 50), point.y + (float) (Math.random() * 100 - 50));
-                engine.spawnEmpArcVisual(randomPoint, null, point, null, 10f, CORE_COLOR, FRINGE_COLOR);
+                engine.spawnEmpArcVisual(randomPoint, null, point, null, empArcLength, CORE_COLOR, FRINGE_COLOR);
             }
         }
     }

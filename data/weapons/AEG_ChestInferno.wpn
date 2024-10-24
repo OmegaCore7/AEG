@@ -60,5 +60,6 @@
   "barrelMode": "LINKED",
   "animationType": "GLOW",
   "autocharge": true,
+  "requiresFullCharge": false,
   "fireSoundTwo": "cryoblaster_fire"
 }
