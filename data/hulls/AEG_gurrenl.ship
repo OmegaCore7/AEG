@@ -1,0 +1,268 @@
+{
+  "hullName": "Gurren Lagann",
+  "hullId": "AEG_gurrenl",
+  "hullSize": "FRIGATE",
+  "spriteName": "graphics/ships/gurrenl/AEG_gurrenl_body.png",
+  "style": "HIGH_TECH",
+  "height": 62,
+  "width": 56,
+  "center": [28, 31],
+  "collisionRadius": 46.5,
+  "shieldCenter": [0, 0],
+  "shieldRadius": 45.5,
+  "viewOffset": 0,
+  "builtInWeapons": {
+    "WS0001": "AEG_gurrenl_shoulder_l",
+    "WS0002": "AEG_gurrenl_shoulder_r",
+    "WS0003": "AEG_gurrenl_arm_l",
+    "WS0004": "AEG_gurrenl_arm_r",
+    "WS0005": "AEG_drillmirv",
+    "WS0008": "AEG_spiralcannon",
+    "WS0009": "AEG_gurrenl_legs",
+    "WS0010": "AEG_spiral_lance"
+  },
+  "weaponSlots": [
+    {
+      "id": "WS0001",
+      "size": "SMALL",
+      "type": "BUILT_IN",
+      "mount": "TURRET",
+      "arc": 25,
+      "angle": 0,
+      "locations": [0, 24],
+      "renderOrderMod": 2
+    },
+    {
+      "id": "WS0002",
+      "size": "SMALL",
+      "type": "BUILT_IN",
+      "mount": "TURRET",
+      "arc": 25,
+      "angle": -0,
+      "locations": [0, -24],
+      "renderOrderMod": 2
+    },
+    {
+      "id": "WS0003",
+      "size": "SMALL",
+      "type": "BUILT_IN",
+      "mount": "TURRET",
+      "arc": 75,
+      "angle": 0,
+      "locations": [8, 31]
+    },
+    {
+      "id": "WS0004",
+      "size": "SMALL",
+      "type": "BUILT_IN",
+      "mount": "TURRET",
+      "arc": 75,
+      "angle": -0,
+      "locations": [8, -31]
+    },
+    {
+      "id": "WS0005",
+      "size": "SMALL",
+      "type": "BUILT_IN",
+      "mount": "TURRET",
+      "arc": 0,
+      "angle": 0,
+      "locations": [0, -0],
+      "renderOrderMod": 4
+    },
+    {
+      "id": "WS0006",
+      "size": "SMALL",
+      "type": "DECORATIVE",
+      "mount": "TURRET",
+      "arc": 0,
+      "angle": 0,
+      "locations": [-22, -0],
+      "renderOrderMod": 10
+    },
+    {
+      "id": "WS0007",
+      "size": "MEDIUM",
+      "type": "MISSILE",
+      "mount": "TURRET",
+      "arc": 75,
+      "angle": 38,
+      "locations": [-24, 27],
+      "renderOrderMod": 8
+    },
+    {
+      "id": "WS0008",
+      "size": "SMALL",
+      "type": "BUILT_IN",
+      "mount": "TURRET",
+      "arc": 75,
+      "angle": -38,
+      "locations": [-24, -27],
+      "renderOrderMod": 8
+    },
+    {
+      "id": "WS0009",
+      "size": "SMALL",
+      "type": "DECORATIVE",
+      "mount": "TURRET",
+      "arc": 0,
+      "angle": 0,
+      "locations": [0, -0]
+    },
+    {
+      "id": "WS0010",
+      "size": "SMALL",
+      "type": "BUILT_IN",
+      "mount": "TURRET",
+      "arc": 75,
+      "angle": -0,
+      "locations": [0, 0],
+      "renderOrderMod": 6
+    }
+  ],
+  "engineSlots": [
+    {
+      "location": [-21, 5],
+      "length": 45,
+      "width": 10,
+      "angle": 168,
+      "contrailSize": 10,
+      "style": "CUSTOM",
+      "styleSpec": {
+        "type": "GLOW",
+        "engineColor": [
+          105,
+          255,
+          105,
+          255
+        ],
+        "engineCampaignColor": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "mode": "",
+        "contrailColor": [
+          105,
+          255,
+          105,
+          80
+        ],
+        "contrailCampaignColor": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "contrailParticleSizeMult": 1,
+        "contrailParticleFinalSizeMult": 0,
+        "contrailMaxSpeedMult": 0.075,
+        "contrailAngularVelocityMult": 0,
+        "contrailParticleDuration": 0.25
+      }
+    },
+    {
+      "location": [-21, -5],
+      "length": 45,
+      "width": 10,
+      "angle": -168,
+      "contrailSize": 10,
+      "style": "CUSTOM",
+      "styleSpec": {
+        "type": "GLOW",
+        "engineColor": [
+          105,
+          255,
+          105,
+          255
+        ],
+        "engineCampaignColor": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "mode": "",
+        "contrailColor": [
+          105,
+          255,
+          105,
+          80
+        ],
+        "contrailCampaignColor": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "contrailParticleSizeMult": 1,
+        "contrailParticleFinalSizeMult": 0,
+        "contrailMaxSpeedMult": 0.075,
+        "contrailAngularVelocityMult": 0,
+        "contrailParticleDuration": 0.25
+      }
+    },
+    {
+      "location": [-20, -0],
+      "length": 70,
+      "width": 20,
+      "angle": 180,
+      "contrailSize": 20,
+      "style": "CUSTOM",
+      "styleSpec": {
+        "type": "GLOW",
+        "engineColor": [
+          105,
+          255,
+          105,
+          255
+        ],
+        "engineCampaignColor": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "mode": "",
+        "contrailColor": [
+          105,
+          255,
+          105,
+          80
+        ],
+        "contrailCampaignColor": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "contrailParticleSizeMult": 1,
+        "contrailParticleFinalSizeMult": 0,
+        "contrailMaxSpeedMult": 0.075,
+        "contrailAngularVelocityMult": 0,
+        "contrailParticleDuration": 0.25
+      }
+    }
+  ],
+  "bounds": [
+    3, -26,
+    17, -8,
+    17, 8,
+    3, 26,
+    -4.5, 26,
+    -11.5, 20.5,
+    -15.5, 25,
+    -21, 24.5,
+    -28.5, 15.5,
+    -28, 13,
+    -21, 9.5,
+    -21, -9.5,
+    -28, -13,
+    -28.5, -15.5,
+    -21, -24.5,
+    -15.5, -25,
+    -11.5, -20.5,
+    -4.5, -26
+  ]
+}

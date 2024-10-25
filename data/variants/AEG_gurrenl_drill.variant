@@ -1,0 +1,29 @@
+{
+  "variantId": "AEG_gurrenl_drill",
+  "hullId": "AEG_gurrenl",
+  "displayName": "Gurren Lagann EX",
+  "goalVariant": false,
+  "fluxCapacitors": 0,
+  "fluxVents": 0,
+  "quality": 1,
+  "permaMods": [],
+  "hullMods": [],
+  "weaponGroups": [
+    {
+      "autofire": false,
+      "mode": "LINKED",
+      "weapons": {
+        "WS0001": "AEG_gurrenl_shoulder_l",
+        "WS0002": "AEG_gurrenl_shoulder_r",
+        "WS0003": "AEG_gurrenl_arm_l",
+        "WS0004": "AEG_gurrenl_arm_r",
+        "WS0005": "AEG_drillmirv",
+        "WS0007": "typhoon",
+        "WS0008": "AEG_spiralcannon",
+        "WS0010": "AEG_spiral_lance"
+      }
+    }
+  ],
+  "modules": [],
+  "wings": []
+}

@@ -1,12 +1,15 @@
 {
   "id": "AEG_gurrenl_shoulder_r",
   "specClass": "projectile",
-  "projectileSpecId": "type_1_srm",
+  "projectileSpecId": "AEG_drill_swarm",
   "type": "MISSILE",
   "size": "SMALL",
   "displayArcRadius": 500,
   "turretSprite": "graphics/ships/gurrenl/AEG_gurrenl_shoulder_r.png",
   "hardpointSprite": "graphics/ships/gurrenl/AEG_gurrenl_shoulder_r.png",
+  "renderHints": [
+      RENDER_LOADED_MISSILES
+    ],
   "turretOffsets": [
     10,
     -2.5,

@@ -1,0 +1,27 @@
+{
+  "id": "AEG_Giga_Drill",
+  "specClass": "projectile",
+  "projectileSpecId": "AEG_dummy_invisible",
+  "type": "DECORATIVE",
+  "size": "SMALL",
+  "turretSprite": "graphics/ships/gurrenl/drill/AEG_Drill00.png",
+  "hardpointSprite": "graphics/ships/gurrenl/drill/AEG_Drill00.png",
+  "numFrames": 4,
+  "frameRate": 8,
+  "turretOffsets": [
+    8,
+    0
+  ],
+  "turretAngleOffsets": [
+    0
+  ],
+  "hardpointOffsets": [
+    130,
+    0
+  ],
+  "hardpointAngleOffsets": [
+    0
+  ],
+  "barrelMode": "LINKED",
+  "animationType": "NONE"
+}

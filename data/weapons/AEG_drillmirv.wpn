@@ -5,7 +5,7 @@
   "type": "MISSILE",
   "size": "SMALL",
   "displayArcRadius": 300,
-  "turretSprite": "graphics/ships/gurrenl/AEG_gurrenl_body.png",
+  "turretSprite": "graphics/ships/gurrenl/AEG_gurrenl_bodymissile.png",
   "turretGlowSprite": "graphics/ships/gurrenl/AEG_gurrenl_bodymissile_glow.png",
   "hardpointSprite": "graphics/ships/gurrenl/AEG_gurrenl_bodymissile.png",
   "hardpointGlowSprite": "graphics/ships/gurrenl/AEG_gurrenl_bodymissile_glow.png",
