@@ -3,8 +3,8 @@
 	"specClass":"missile",	
 	"missileType":"MIRV",
 	"sprite":"graphics/missiles/AEG_drillmissile.png",
-	"size":[5,16],
-	"center":[2.5,8],
+	"size":[5,28],
+	"center":[2.5,14],
 	"collisionRadius":16,
 	"collisionClass":"MISSILE_NO_FF",
 	"explosionColor":[255,165,0,255],  # purely visual, will get a white additively blended core on top of this color

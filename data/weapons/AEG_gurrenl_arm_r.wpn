@@ -31,19 +31,19 @@
     0
   ],
   "fringeColor": [
-    0,
-    155,
-    0,
-    255
-  ],
-  "coreColor": [
     105,
     255,
     105,
     255
   ],
-  "width": 34,
-  "textureType": LASER,
+  "coreColor": [
+    255,
+    255,
+    255,
+    255
+  ],
+  "width": 24,
+  "textureType": SMOOTH,
   "textureScrollSpeed": 128,
   "pixelsPerTexel": 10,
   "pierceSet": [

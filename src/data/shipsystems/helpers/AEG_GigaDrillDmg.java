@@ -1,63 +1,98 @@
 package data.shipsystems.helpers;
 
 import com.fs.starfarer.api.combat.*;
-import org.lazywizard.lazylib.combat.CombatUtils;
+import com.fs.starfarer.api.util.IntervalUtil;
+import org.lazywizard.lazylib.combat.entities.SimpleEntity;
 import org.lwjgl.util.vector.Vector2f;
 
-import java.util.List;
+import java.awt.*;
 
 public class AEG_GigaDrillDmg {
 
-    private static final float DAMAGE_PER_SECOND = 500f; // Adjust this value as needed
+    private static final float CHECK_INTERVAL = 0.1f; // Updated to 0.1 seconds
+    private static final float ELLIPSE_WIDTH = 200f; // 100f on either side
+    private static final float ELLIPSE_LENGTH = 400f; // Adjust as needed
+    private static final float EXPLOSION_RADIUS = 100f; // Adjust as needed
+    private static final float KINETIC_DAMAGE = 1000f; // Adjust as needed
+    private static final float HIGH_EXPLOSIVE_DAMAGE = 1000f; // Adjust as needed
 
-    public static void applyDamage(CombatEngineAPI engine, ShipAPI ship, float amount) {
-        Vector2f shipLocation = ship.getLocation();
-        Vector2f[] trianglePoints = {
-                new Vector2f(0, 0),
-                new Vector2f(27, 70),
-                new Vector2f(220, 0),
-                new Vector2f(27, -70)
-        };
+    private final IntervalUtil interval = new IntervalUtil(CHECK_INTERVAL, CHECK_INTERVAL);
+    private final IntervalUtil empInterval = new IntervalUtil(1f, 2f); // EMP arcs every 1-2 seconds
 
-        List<CombatEntityAPI> entities = CombatUtils.getEntitiesWithinRange(shipLocation, 220f); // Max range of the triangle
+    public void applyDrillDamage(ShipAPI ship, WeaponAPI drillWeapon, CombatEngineAPI engine, float collisionDamage) {
+        interval.advance(engine.getElapsedInLastFrame());
+        empInterval.advance(engine.getElapsedInLastFrame());
 
-        if (entities != null) {
-            for (CombatEntityAPI entity : entities) {
-                if (entity instanceof ShipAPI && entity != ship) {
-                    Vector2f entityLocation = entity.getLocation();
-                    if (isPointInTriangle(entityLocation, shipLocation, trianglePoints)) {
-                        float damage = DAMAGE_PER_SECOND * amount;
-                        engine.applyDamage(entity, entity.getLocation(), damage, DamageType.ENERGY, 0f, false, false, ship);
-                    }
+        if (interval.intervalElapsed()) {
+            Vector2f shipLocation = ship.getLocation();
+            float shipFacing = ship.getFacing();
+
+            for (ShipAPI otherShip : engine.getShips()) {
+                if (otherShip == ship || otherShip.isHulk() || otherShip.isShuttlePod()) continue;
+
+                Vector2f otherLocation = otherShip.getLocation();
+                if (isWithinEllipse(shipLocation, otherLocation, shipFacing)) {
+                    spawnExplosion(engine, otherLocation);
+                    dealDamage(ship, otherShip, engine, collisionDamage);
                 }
             }
         }
+
+        if (empInterval.intervalElapsed()) {
+            spawnEMPArcs(ship, engine);
+        }
     }
 
-    private static boolean isPointInTriangle(Vector2f point, Vector2f origin, Vector2f[] trianglePoints) {
-        Vector2f p1 = new Vector2f(trianglePoints[0].x + origin.x, trianglePoints[0].y + origin.y);
-        Vector2f p2 = new Vector2f(trianglePoints[1].x + origin.x, trianglePoints[1].y + origin.y);
-        Vector2f p3 = new Vector2f(trianglePoints[2].x + origin.x, trianglePoints[2].y + origin.y);
-        Vector2f p4 = new Vector2f(trianglePoints[3].x + origin.x, trianglePoints[3].y + origin.y);
+    private boolean isWithinEllipse(Vector2f center, Vector2f point, float facing) {
+        float dx = point.x - center.x;
+        float dy = point.y - center.y;
 
-        return isPointInTriangle(point, p1, p2, p3) || isPointInTriangle(point, p1, p3, p4);
+        float cos = (float) Math.cos(Math.toRadians(facing));
+        float sin = (float) Math.sin(Math.toRadians(facing));
+
+        float rotatedX = cos * dx + sin * dy;
+        float rotatedY = -sin * dx + cos * dy;
+
+        float ellipseWidth = ELLIPSE_WIDTH / 2;
+        float ellipseLength = ELLIPSE_LENGTH / 2;
+
+        return (rotatedX * rotatedX) / (ellipseLength * ellipseLength) + (rotatedY * rotatedY) / (ellipseWidth * ellipseWidth) <= 1;
     }
 
-    private static boolean isPointInTriangle(Vector2f pt, Vector2f v1, Vector2f v2, Vector2f v3) {
-        float d1, d2, d3;
-        boolean hasNeg, hasPos;
-
-        d1 = sign(pt, v1, v2);
-        d2 = sign(pt, v2, v3);
-        d3 = sign(pt, v3, v1);
-
-        hasNeg = (d1 < 0) || (d2 < 0) || (d3 < 0);
-        hasPos = (d1 > 0) || (d2 > 0) || (d3 > 0);
-
-        return !(hasNeg && hasPos);
+    private void spawnExplosion(CombatEngineAPI engine, Vector2f location) {
+        engine.spawnExplosion(location, new Vector2f(), Color.ORANGE, EXPLOSION_RADIUS, 1f);
+        engine.addHitParticle(location, new Vector2f(), EXPLOSION_RADIUS, 1f, 0.1f, Color.WHITE); // Railgun impact visual effect
     }
 
-    private static float sign(Vector2f p1, Vector2f p2, Vector2f p3) {
-        return (p1.x - p3.x) * (p2.y - p3.y) - (p2.x - p3.x) * (p1.y - p3.y);
+    private void dealDamage(ShipAPI ship, CombatEntityAPI entity, CombatEngineAPI engine, float collisionDamage) {
+        DamageType damageType = entity instanceof ShipAPI && ((ShipAPI) entity).getShield() != null && ((ShipAPI) entity).getShield().isWithinArc(entity.getLocation())
+                ? DamageType.KINETIC : DamageType.HIGH_EXPLOSIVE;
+
+        engine.applyDamage(entity, entity.getLocation(), collisionDamage, damageType, 0f, false, false, ship);
+    }
+
+    private void spawnEMPArcs(ShipAPI ship, CombatEngineAPI engine) {
+        Vector2f shipLocation = ship.getLocation();
+        float shipFacing = ship.getFacing();
+
+        for (int i = 0; i < 10; i++) { // Adjust the number of EMP arcs as needed
+            float angleOffset = (i - 5) * 10; // Adjust the angle offset as needed
+            float distance = i * (ELLIPSE_LENGTH / 10); // Adjust the distance as needed
+
+            Vector2f arcStart = new Vector2f(shipLocation.x + distance * (float) Math.cos(Math.toRadians(shipFacing)),
+                    shipLocation.y + distance * (float) Math.sin(Math.toRadians(shipFacing)));
+
+            Vector2f arcEnd = new Vector2f(arcStart.x + ELLIPSE_WIDTH / 4 * (float) Math.cos(Math.toRadians(shipFacing + angleOffset)),
+                    arcStart.y + ELLIPSE_WIDTH / 4 * (float) Math.sin(Math.toRadians(shipFacing + angleOffset)));
+
+            engine.spawnEmpArc(ship, arcStart, null, new SimpleEntity(arcEnd), DamageType.ENERGY,
+                    KINETIC_DAMAGE, // Damage
+                    HIGH_EXPLOSIVE_DAMAGE, // Emp damage
+                    200f, // Max range
+                    "tachyon_lance_emp_impact",
+                    10f,
+                    new Color(105, 255, 105, 255),
+                    Color.WHITE);
+        }
     }
 }

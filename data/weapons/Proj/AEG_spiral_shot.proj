@@ -2,6 +2,7 @@
 	"id":"AEG_spiral_shot",
 	"specClass":"projectile",
 	"spawnType":"PLASMA",
+	"onHitEffect": "data.weapons.onhit.AEG_SpiralMunitions",
 	"collisionClass":"PROJECTILE_NO_FF",
     "collisionClassByFighter":"PROJECTILE_NO_FF",
 	#"width":45.0,
