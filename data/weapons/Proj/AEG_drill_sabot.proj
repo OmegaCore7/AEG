@@ -2,7 +2,7 @@
 	"id":"AEG_drill_sabot",
 	"specClass":"missile",	
 	"missileType":"MIRV",
-	"sprite":"graphics/missiles/AEG_drillmissilepayload.png",
+	"sprite":"graphics/missiles/AEG_drillmissile.png",
 	"size":[5,16],
 	"center":[2.5,8],
 	"collisionRadius":16,

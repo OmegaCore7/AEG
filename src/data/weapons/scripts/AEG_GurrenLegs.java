@@ -129,7 +129,7 @@ public class AEG_GurrenLegs implements EveryFrameWeaponEffectPlugin {
         if (frame >= 10) {
             frameStr = String.valueOf(frame);
         }
-        SpriteAPI spr = Global.getSettings().getSprite("graphics/ships/gurren/legs/gurrenlegs" + frameStr + ".png");
+        SpriteAPI spr = Global.getSettings().getSprite("graphics/ships/gurrenl/legs/gurrenl_legs" + frameStr + ".png");
 
         Color color = new Color(defColor.getRed() * 2, defColor.getGreen() * 2, defColor.getBlue() * 2, defColor.getAlpha());
         color = new Color(255, 255, 255);
