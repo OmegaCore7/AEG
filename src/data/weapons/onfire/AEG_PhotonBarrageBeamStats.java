@@ -15,7 +15,7 @@ public class AEG_PhotonBarrageBeamStats implements BeamEffectPlugin {
     private static final float INITIAL_DAMAGE = 2000f;
     private static final float SPLIT_BEAM_DAMAGE = 500f;
     private static final float RANGE = 1000f;
-    private static final float BEAM_THICKNESS = 30f;
+    private static final float BEAM_THICKNESS = 40f; // Updated standard width
     private static final Color BEAM_COLOR = new Color(255, 255, 0, 255); // Bright yellow color
     private static final Color PARTICLE_COLOR = new Color(220, 180, 100, 255); // Flame color
     private static final int PARTICLE_COUNT = 50;
@@ -127,6 +127,7 @@ public class AEG_PhotonBarrageBeamStats implements BeamEffectPlugin {
                             new Color(255, 255, 255, 255) // White core
                     );
                 }
+
                 // Create plasma projectiles in a wide cone
                 for (int i = 0; i < PLASMA_COUNT; i++) {
                     float angle = (random.nextFloat() * CONE_ANGLE) - (CONE_ANGLE / 2); // Random angle within the cone
@@ -155,7 +156,6 @@ public class AEG_PhotonBarrageBeamStats implements BeamEffectPlugin {
                             new Color(255, 255, 255, 255) // White core
                     );
                 }
-
                 // Split into smaller beams with random angles
                 Vector2f beamStart = beam.getWeapon().getLocation();
                 Vector2f beamEnd = new Vector2f(beamStart);
