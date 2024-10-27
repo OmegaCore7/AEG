@@ -1,23 +1,18 @@
 package data.weapons.scripts;
 
 import com.fs.starfarer.api.Global;
-import com.fs.starfarer.api.combat.BeamAPI;
-import com.fs.starfarer.api.combat.BeamEffectPlugin;
-import com.fs.starfarer.api.combat.CollisionClass;
-import com.fs.starfarer.api.combat.CombatEngineAPI;
-import com.fs.starfarer.api.combat.CombatEngineLayers;
-import com.fs.starfarer.api.combat.DamageType;
-import com.fs.starfarer.api.combat.ShipAPI;
-import com.fs.starfarer.api.combat.WeaponAPI;
+import com.fs.starfarer.api.combat.*;
+import com.fs.starfarer.api.input.InputEventAPI;
 import com.fs.starfarer.api.util.IntervalUtil;
-import org.magiclib.util.MagicRender;
-import java.awt.Color;
-import java.util.ArrayList;
-import java.util.List;
 import org.lazywizard.lazylib.FastTrig;
 import org.lazywizard.lazylib.MathUtils;
 import org.lazywizard.lazylib.VectorUtils;
 import org.lwjgl.util.vector.Vector2f;
+import org.magiclib.util.MagicRender;
+
+import java.awt.Color;
+import java.util.ArrayList;
+import java.util.List;
 
 public class AEG_SpiralRepeaterEffect implements BeamEffectPlugin {
 
@@ -35,7 +30,7 @@ public class AEG_SpiralRepeaterEffect implements BeamEffectPlugin {
     }
 
     @Override
-    public void advance(float amount, CombatEngineAPI engine, BeamAPI beam) {
+    public void advance(float amount, final CombatEngineAPI engine, BeamAPI beam) {
         // Don't bother with any checks if the game is paused
         if (engine.isPaused()) {
             return;
@@ -125,21 +120,21 @@ public class AEG_SpiralRepeaterEffect implements BeamEffectPlugin {
             hasFired = false;
         }
 
-        // Handle smoke effect based on ammo count
-        WeaponAPI weapon = beam.getWeapon();
+        // Handle smoke trail based on ammo count
+        final WeaponAPI weapon = beam.getWeapon();
         if (weapon.getAmmo() == 0) {
-            // Play in-game smoke effect at the beam's start point
-            Vector2f smokePos = beam.getFrom(); // Get the beam's start point
+            // Create a green smoke trail at the base of the beam
+            final Vector2f sparkPos = beam.getFrom(); // Base of the beam
 
-            for (int i = 0; i < 10; i++) {
-                Vector2f particlePos = MathUtils.getRandomPointInCircle(smokePos, 5); // Reduced radius to 5f
+            for (int i = 0; i < 5; i++) {
+                Vector2f smokePos = MathUtils.getRandomPointInCircle(sparkPos, 10);
                 engine.addSmokeParticle(
-                        particlePos,
+                        smokePos,
                         new Vector2f(),
-                        MathUtils.getRandomNumberInRange(2f, 5f), // Smaller size
-                        0.5f, // Opacity
-                        0.5f, // Duration set to half a second
-                        new Color(228, 228, 228, 128)
+                        MathUtils.getRandomNumberInRange(2, 5), // Size of the smoke
+                        1.0f, // Brightness
+                        1.5f, // Duration
+                        new Color(105, 105, 105, 155) // Gray color
                 );
             }
         }
