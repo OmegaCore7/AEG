@@ -96,7 +96,7 @@
       "size": "SMALL",
       "type": "BUILT_IN",
       "mount": "TURRET",
-      "arc": 75,
+      "arc": 76,
       "angle": -38,
       "locations": [-24, -27],
       "renderOrderMod": 8
@@ -123,7 +123,7 @@
   ],
   "engineSlots": [
     {
-      "location": [-21, 5],
+      "location": [-23, 5],
       "length": 45,
       "width": 10,
       "angle": 168,
@@ -164,7 +164,7 @@
       }
     },
     {
-      "location": [-21, -5],
+      "location": [-23, -5],
       "length": 45,
       "width": 10,
       "angle": -168,
@@ -205,7 +205,7 @@
       }
     },
     {
-      "location": [-20, -0],
+      "location": [-22, -0],
       "length": 70,
       "width": 20,
       "angle": 180,

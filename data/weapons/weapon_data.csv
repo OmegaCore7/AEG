@@ -69,7 +69,7 @@ Spiral Drill MIRV,AEG_drillmirv,,,4500,2500,,500,,50,10,25,10,1,10,HIGH_EXPLOSIV
 Spiral Cannon,AEG_spiralcannon,,,7500,2500,,500,,,20,30,,,,ENERGY,550,,0.33,1.01,3,0.33,,,,,,750,,,500,,,STRIKE,"energy20, rare_bp, hist1t, merc, ind, no_drop",,,,General,,,,,The targeting system is incapable of tracking fighters when on local/automatic control.,,,,,
 Spiral Repeater,AEG_gurrenl_arm_r,,,,1200,687,,343,,90,0,12,1,4,ENERGY,,600,,,"0.48
 ",0.02,,,,,1000000,,,,,,,DO_NOT_CONSERVE,"energy20,beam20, no_drop, no_sell, no_drop_salvage",,,,,,,,,%s: Deals %s damage to fighters and drones.,Superior Lenses|double,,,,
-Spiral Beam Cannon,AEG_spiral_lance,,,4500,2500,,2500,,300,45,20,1,1,1,HIGH_EXPLOSIVE,,1000,2,5,1,,,,,,9999,,,,,,,,"beam20, LR, hightech_bp, merc, ind, no_drop",,,,Anti Armor,,,,,,,,,,
+Spiral Beam Cannon,AEG_spiral_lance,,,4500,2500,,2500,,300,45,20,1,1,1,HIGH_EXPLOSIVE,,1000,0.5,1,1,,,,,,9999,,,,,,,,"beam20, LR, hightech_bp, merc, ind, no_drop",,,,Anti Armor,,,,,,,,,,
 ,AEG_gurrenl_legs,,,500000,600,1,,,,,,,,,,,,,,,,,,,,,,,,,,,,no_drop,,,,,,,,,,,,,,
 ,AEG_Giga_Drill,,,500000,600,1,,,,,,,,,,,,,,,,,,,,,,,,,,,,no_drop,,,,,,,,,,,,,,
 ,,,,,,,,,,,,,,,,,,,,,,,,,,,
