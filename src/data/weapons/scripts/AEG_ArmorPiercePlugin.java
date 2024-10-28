@@ -22,6 +22,7 @@ public class AEG_ArmorPiercePlugin extends BaseEveryFrameCombatPlugin {
     static {
         PROJ_IDS.put("lw_impaler_shot", false);
         PROJ_IDS.put("AEG_ironcutter_G_torp", true);
+        PROJ_IDS.put("Aeg_OmegaBlaster_Shot", true);
     }
     @Override
     public void advance(float amount, List events) {

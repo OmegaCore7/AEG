@@ -1,28 +1,50 @@
 {
 	"id":"AEG_testweapon",  # this id must match what's in the spreadsheet
-	"specClass":"projectile",
-	"type":"BALLISTIC",
-	"size":"MEDIUM",
-	"EveryFrameWeaponEffectPlugin": "data.weapons.scripts.AEG_IronCutterScript",
-	"turretSprite":"graphics/weapons/assault_chaingun_turret_base.png",
-	"turretGunSprite":"graphics/weapons/assault_chaingun_turret_recoil.png",
-	"hardpointSprite":"graphics/weapons/assault_chaingun_hardpoint_base.png",
-	"hardpointGunSprite":"graphics/weapons/assault_chaingun_hardpoint_recoil.png",	
-	"visualRecoil":7.0,  # the gun sprites are only used if this is non-0
-	#"renderHints":[RENDER_BARREL_BELOW],
-	"turretOffsets":[16, 0],
-	"turretAngleOffsets":[0],
-	"hardpointOffsets":[26, 0],
-	"hardpointAngleOffsets":[0],	
-	"barrelMode":"ALTERNATING", # or LINKED.  whether barrels fire at the same time or alternate.
-	"animationType":"MUZZLE_FLASH",  # NONE, GLOW, MUZZLE_FLASH, SMOKE
-	"muzzleFlashSpec":{"length":40.0,   # only used if animationType = MUZZLE_FLASH
-					   "spread":5.0,
-					   "particleSizeMin":12.0,
-					   "particleSizeRange":14.0,
-					   "particleDuration":0.5,
-					   "particleCount":12,
-					   "particleColor":[255,240,165,200]},	
-	"projectileSpecId":"AEG_test",  # projectile that will be fired
-	"fireSoundTwo":"heavy_mauler_fire",	
-}
+	  "specClass": "projectile",
+      "projectileSpecId": "AEG_test",
+      "type": "ENERGY",
+      "size": "SMALL",
+#"EveryFrameWeaponEffectPlugin": "data.weapons.scripts.GrowingPlasmaProjectileEffect",
+  "turretSprite": "graphics/ships/red_menace/rmrightarm.png",
+  "turretGlowSprite": "graphics/ships/red_menace/rmrightarm_glow.png",
+  "hardpointSprite": "graphics/ships/red_menace/rmrightarm.png",
+  "hardpointGlowSprite": "graphics/ships/red_menace/rmrightarm_glow.png",
+	"glowColor": [
+        255,
+        100,
+        50,
+        255
+      ],
+      "turretOffsets": [
+        55,
+        -8.5
+      ],
+      "turretAngleOffsets": [
+        0
+      ],
+      "hardpointOffsets": [
+        83,
+        -8.5
+      ],
+      "hardpointAngleOffsets": [
+        0
+      ],
+      "barrelMode": "ALTERNATING",
+      "animationType": "GLOW_AND_FLASH",
+      "autocharge": true,
+      "muzzleFlashSpec": {
+        "length": -34,
+        "spread": 15,
+        "particleSizeMin": 15,
+        "particleSizeRange": 15,
+        "particleDuration": 0.2,
+        "particleCount": 30,
+        "particleColor": [
+          255,
+          100,
+          50,
+          255
+        ]
+      },
+      "fireSoundTwo": "plasma_cannon_fire"
+    }

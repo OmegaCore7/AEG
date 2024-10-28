@@ -13,7 +13,7 @@ public class AEG_OmegaBlasterOnHit implements OnHitEffectPlugin {
 
     private static final Color EXPLOSION_COLOR = new Color(0, 255, 0); // Green color
     private static final Color CORE_COLOR = new Color(255, 255, 255); // White color
-    private static final float EXPLOSION_RADIUS = 500f;
+    private static final float EXPLOSION_RADIUS = 800f;
     private static final float EXPLOSION_DURATION = 2f;
     private static final float PUSH_FORCE = 500f;
     private static final int EMP_ARC_COUNT = 5;
