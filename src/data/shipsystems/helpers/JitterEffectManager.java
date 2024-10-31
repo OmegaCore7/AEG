@@ -30,11 +30,11 @@ public class JitterEffectManager {
                 ship.getFacing(),
                 jitterColor,
                 duration,
-                jitterRange
+                jitterRange,
+                ship
         );
 
         jitterCopies.put(jitterCopy.id, jitterCopy);
-        System.out.println("Added jitter copy: " + jitterCopy.id);
     }
 
     public static void advance(float amount) {
@@ -44,6 +44,12 @@ public class JitterEffectManager {
             jitterCopy.lifetime += amount;
             if (jitterCopy.lifetime > jitterCopy.duration) {
                 jitterCopiesToRemove.add(jitterCopy.id);
+            } else {
+                // Update the location to follow the ship with a delay
+                Vector2f shipLocation = jitterCopy.ship.getLocation();
+                Vector2f direction = Vector2f.sub(shipLocation, jitterCopy.location, null);
+                direction.scale(amount / jitterCopy.duration); // Adjust the delay factor as needed
+                Vector2f.add(jitterCopy.location, direction, jitterCopy.location);
             }
         }
         for (Long id : jitterCopiesToRemove) {
@@ -68,17 +74,7 @@ public class JitterEffectManager {
         sprite.setAlphaMult(1 - jitterCopy.lifetime / jitterCopy.duration);
         sprite.setAdditiveBlend();
 
-        Vector2f jitteredLocation = getRandomPointInCircle(jitterCopy.location, jitterCopy.jitterRange);
-        sprite.renderAtCenter(jitteredLocation.x, jitteredLocation.y);
-        System.out.println("Rendered jitter copy: " + jitterCopy.id);
-    }
-
-    private static Vector2f getRandomPointInCircle(Vector2f center, float radius) {
-        double angle = random.nextDouble() * Math.PI * 2;
-        double distance = random.nextDouble() * radius;
-        float x = (float) (center.x + Math.cos(angle) * distance);
-        float y = (float) (center.y + Math.sin(angle) * distance);
-        return new Vector2f(x, y);
+        sprite.renderAtCenter(jitterCopy.location.x, jitterCopy.location.y);
     }
 
     private static class JitterCopy {
@@ -90,8 +86,9 @@ public class JitterEffectManager {
         float duration;
         float jitterRange;
         float lifetime = 0f;
+        ShipAPI ship;
 
-        JitterCopy(long id, SpriteAPI sprite, Vector2f location, float facing, Color color, float duration, float jitterRange) {
+        JitterCopy(long id, SpriteAPI sprite, Vector2f location, float facing, Color color, float duration, float jitterRange, ShipAPI ship) {
             this.id = id;
             this.sprite = sprite;
             this.location = location;
@@ -99,6 +96,7 @@ public class JitterEffectManager {
             this.color = color;
             this.duration = duration;
             this.jitterRange = jitterRange;
+            this.ship = ship;
         }
     }
 }

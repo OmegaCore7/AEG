@@ -1,26 +1,24 @@
 package data.shipsystems.scripts;
 
-import com.fs.starfarer.api.combat.DamageType;
-import com.fs.starfarer.api.combat.MutableShipStatsAPI;
-import com.fs.starfarer.api.combat.ShipAPI;
+import com.fs.starfarer.api.combat.*;
 import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.impl.combat.BaseShipSystemScript;
-import com.fs.starfarer.api.combat.CombatEngineAPI;
 import com.fs.starfarer.api.util.Misc;
 import data.shipsystems.helpers.JitterEffectManager;
 import org.lwjgl.util.vector.Vector2f;
+
 import java.awt.Color;
 
 public class AEG_SteelBarrage extends BaseShipSystemScript {
 
     private static final float RAM_RADIUS = 1000f;
-    private static final float RAM_FORCE = 450f; // Adjusted value
-    private static final float RAM_DAMAGE = 2000f; // Damage to apply
-    private static final float COLLISION_THRESHOLD = 75f; // Threshold for collision detection
-    private static final int RAM_COUNT = 5; // Number of rams
-    private static final float PAUSE_DURATION = 0.4f; // Reduced pause duration in seconds
-    private static final Color LIGHT_GREEN_COLOR = new Color(144, 238, 144, 255); // RGBA for light green
-    private static final Color EXPLOSION_COLOR = new Color(175, 220, 120, 255); // Bright green explosion color
+    private static final float RAM_FORCE = 450f;
+    private static final float RAM_DAMAGE = 2000f;
+    private static final float COLLISION_THRESHOLD = 75f;
+    private static final int RAM_COUNT = 5;
+    private static final float PAUSE_DURATION = 0.4f;
+    private static final Color LIGHT_GREEN_COLOR = new Color(144, 238, 144, 255);
+    private static final Color EXPLOSION_COLOR = new Color(175, 220, 120, 255);
 
     private int ramCounter = 0;
     private float pauseTimer = 0f;
@@ -33,49 +31,51 @@ public class AEG_SteelBarrage extends BaseShipSystemScript {
         if (ship == null) return;
 
         if (state == State.ACTIVE) {
-            if (ramCounter == 0) {
-                // Find the nearest enemy ship within the ram radius
-                targetShip = findClosestTarget(ship);
-                if (targetShip != null) {
-                    ramCounter = RAM_COUNT;
-                }
-            }
+            handleActiveState(ship, id, effectLevel);
+        }
 
-            if (targetShip != null && ramCounter > 0) {
-                if (pauseTimer <= 0f) {
-                    if (maneuverStep == 0) {
-                        // Step 1: Create hitspark on the target ship
-                        createHitspark(ship, targetShip);
-                    }
+        addJitterCopies(ship);
+    }
 
-                    // Perform maneuvers before ramming
-                    performManeuvers(ship, targetShip);
-
-                    if (maneuverStep >= 5) { // Adjusted for additional maneuvers
-                        // Step 2: Ram the target
-                        applyRammingForceAndDamage(ship, targetShip, id, effectLevel);
-
-                        // Step 3: Create a big green explosion
-                        createExplosion(ship, targetShip);
-
-                        // Reset maneuver step and pause timer
-                        maneuverStep = 0;
-                        pauseTimer = PAUSE_DURATION;
-                        ramCounter--;
-                    } else {
-                        // Increment maneuver step and reset pause timer
-                        maneuverStep++;
-                        pauseTimer = PAUSE_DURATION / 2f; // Shorter pause between maneuvers
-                    }
-                } else {
-                    // Decrease pause timer
-                    pauseTimer -= Global.getCombatEngine().getElapsedInLastFrame();
-                }
+    private void handleActiveState(ShipAPI ship, String id, float effectLevel) {
+        if (ramCounter == 0) {
+            targetShip = findClosestTarget(ship);
+            if (targetShip != null) {
+                ramCounter = RAM_COUNT;
             }
         }
 
-        // Add jitter copies continuously
-        addJitterCopies(ship);
+        if (targetShip != null && ramCounter > 0) {
+            if (pauseTimer <= 0f) {
+                if (maneuverStep == 0) {
+                    createHitspark(ship, targetShip);
+                }
+
+                performManeuvers(ship, targetShip);
+
+                if (maneuverStep >= 5) {
+                    applyRammingForceAndDamage(ship, targetShip, id, effectLevel);
+                    createExplosion(ship, targetShip);
+
+                    resetManeuver();
+                } else {
+                    incrementManeuverStep();
+                }
+            } else {
+                pauseTimer -= Global.getCombatEngine().getElapsedInLastFrame();
+            }
+        }
+    }
+
+    private void resetManeuver() {
+        maneuverStep = 0;
+        pauseTimer = PAUSE_DURATION;
+        ramCounter--;
+    }
+
+    private void incrementManeuverStep() {
+        maneuverStep++;
+        pauseTimer = PAUSE_DURATION / 2f;
     }
 
     private ShipAPI findClosestTarget(ShipAPI ship) {
@@ -96,23 +96,67 @@ public class AEG_SteelBarrage extends BaseShipSystemScript {
     private void createHitspark(ShipAPI ship, ShipAPI target) {
         CombatEngineAPI engine = Global.getCombatEngine();
         Vector2f arcLocation = target.getLocation();
+
+        // Calculate dynamic size based on target ship size
+        float maxRange = target.getCollisionRadius();
+        float randomRange = (float) (Math.random() * maxRange);
+        float randomThickness = (float) (Math.random() * 10 + 5); // Random thickness between 5 and 15
+
         engine.spawnEmpArc(
                 ship, ship.getLocation(), ship, target,
-                DamageType.ENERGY, // Damage type
-                0f, // No damage
-                0f, // No EMP damage
-                100f, // Reduced range for small hitspark
-                "tachyon_lance_emp_impact", // Impact sound
-                5f, // Reduced thickness for small hitspark
-                LIGHT_GREEN_COLOR, // Fringe color
-                LIGHT_GREEN_COLOR // Core color
+                DamageType.ENERGY,
+                0f,
+                0f,
+                randomRange,
+                "tachyon_lance_emp_impact",
+                randomThickness,
+                LIGHT_GREEN_COLOR,
+                LIGHT_GREEN_COLOR
         );
     }
 
-    private void faceTarget(ShipAPI ship, ShipAPI target) {
+    private void performManeuvers(ShipAPI ship, ShipAPI target) {
         Vector2f direction = Vector2f.sub(target.getLocation(), ship.getLocation(), null);
-        float angle = Misc.getAngleInDegrees(direction);
-        ship.setFacing(angle);
+        direction.normalise();
+        Vector2f perpendicular = new Vector2f(-direction.y, direction.x);
+
+        // Calculate dynamic scale based on ship size
+        float shipSizeFactor = ship.getCollisionRadius() / 100f; // Adjust the divisor as needed for scaling
+
+        switch (maneuverStep) {
+            case 0:
+                perpendicular.scale(500f * shipSizeFactor);
+                Vector2f.add(ship.getVelocity(), perpendicular, ship.getVelocity());
+                break;
+            case 1:
+                Vector2f drift = new Vector2f(direction);
+                drift.scale(200f * shipSizeFactor);
+                Vector2f.add(ship.getVelocity(), drift, ship.getVelocity());
+                break;
+            case 2:
+                Vector2f curve = new Vector2f(direction);
+                curve.scale(300f * shipSizeFactor);
+                Vector2f.add(ship.getVelocity(), curve, ship.getVelocity());
+                break;
+            case 3:
+                perpendicular.scale(-500f * shipSizeFactor);
+                Vector2f.add(ship.getVelocity(), perpendicular, ship.getVelocity());
+                break;
+            case 4:
+                Vector2f reverseDrift = new Vector2f(direction);
+                reverseDrift.scale(-200f * shipSizeFactor);
+                Vector2f.add(ship.getVelocity(), reverseDrift, ship.getVelocity());
+                break;
+        }
+
+        float randomRotation = (float) (Math.random() * 180 - 90);
+        ship.setFacing(ship.getFacing() + randomRotation);
+
+        Vector2f currentVelocity = ship.getVelocity();
+        Vector2f targetDirection = Vector2f.sub(target.getLocation(), ship.getLocation(), null);
+        targetDirection.normalise();
+        targetDirection.scale(currentVelocity.length());
+        ship.getVelocity().set(targetDirection);
     }
 
     private void applyRammingForceAndDamage(ShipAPI ship, ShipAPI target, String id, float effectLevel) {
@@ -121,24 +165,22 @@ public class AEG_SteelBarrage extends BaseShipSystemScript {
         diff.scale(RAM_FORCE * effectLevel);
         ship.getVelocity().set(diff);
 
-        // Check for collision
         float distance = Vector2f.sub(target.getLocation(), ship.getLocation(), null).length();
         if (distance <= COLLISION_THRESHOLD) {
-            // Apply damage to the target's shield if it has one
             if (target.getShield() != null && target.getShield().isOn()) {
                 target.getFluxTracker().increaseFlux(RAM_DAMAGE * 2f * effectLevel, true);
             } else {
-                // Apply damage to armor if present
                 float armorValue = target.getArmorGrid().getArmorRating() * target.getArmorGrid().getMaxArmorInCell();
                 if (armorValue > 0) {
+                    // Apply a minimum damage to ensure armor is reduced
                     float effectiveDamage = RAM_DAMAGE * effectLevel * (1f - armorValue / (armorValue + RAM_DAMAGE));
-                    // Convert Vector2f to integer coordinates
+                    float minDamage = RAM_DAMAGE * 0.1f * effectLevel; // Minimum damage is 10% of RAM_DAMAGE
+                    effectiveDamage = Math.max(effectiveDamage, minDamage);
+
                     int x = (int) target.getLocation().x;
                     int y = (int) target.getLocation().y;
-                    // Manually reduce armor
                     target.getArmorGrid().setArmorValue(x, y, Math.max(0f, armorValue - effectiveDamage));
                 } else {
-                    // Apply full damage to hull if no armor
                     target.getMutableStats().getHullDamageTakenMult().modifyMult(id, 1f + (RAM_DAMAGE * effectLevel / target.getMaxHitpoints()));
                 }
             }
@@ -150,60 +192,12 @@ public class AEG_SteelBarrage extends BaseShipSystemScript {
         engine.spawnExplosion(target.getLocation(), target.getVelocity(), EXPLOSION_COLOR, 300f, 2f);
     }
 
-    private void performManeuvers(ShipAPI ship, ShipAPI target) {
-        Vector2f direction = Vector2f.sub(target.getLocation(), ship.getLocation(), null);
-        direction.normalise();
-        Vector2f perpendicular = new Vector2f(-direction.y, direction.x); // Perpendicular vector for strafing
-
-        switch (maneuverStep) {
-            case 0:
-                // Example maneuver: Strafe to the right
-                perpendicular.scale(500f); // Adjust the strafing speed as needed
-                Vector2f.add(ship.getVelocity(), perpendicular, ship.getVelocity());
-                break;
-            case 1:
-                // Example maneuver: Drift
-                Vector2f drift = new Vector2f(direction);
-                drift.scale(200f); // Adjust the drifting speed as needed
-                Vector2f.add(ship.getVelocity(), drift, ship.getVelocity());
-                break;
-            case 2:
-                // Example maneuver: Curve
-                Vector2f curve = new Vector2f(direction);
-                curve.scale(300f); // Adjust the curving speed as needed
-                Vector2f.add(ship.getVelocity(), curve, ship.getVelocity());
-                break;
-            case 3:
-                // Additional maneuver: Strafe to the left
-                perpendicular.scale(-500f); // Adjust the strafing speed as needed
-                Vector2f.add(ship.getVelocity(), perpendicular, ship.getVelocity());
-                break;
-            case 4:
-                // Additional maneuver: Reverse drift
-                Vector2f reverseDrift = new Vector2f(direction);
-                reverseDrift.scale(-200f); // Adjust the drifting speed as needed
-                Vector2f.add(ship.getVelocity(), reverseDrift, ship.getVelocity());
-                break;
-        }
-
-        // Add random half rotations to simulate swinging fists
-        float randomRotation = (float) (Math.random() * 180 - 90); // Random angle between -90 and 90 degrees
-        ship.setFacing(ship.getFacing() + randomRotation);
-
-        // Course correction logic to ensure the ship hits the target
-        Vector2f currentVelocity = ship.getVelocity();
-        Vector2f targetDirection = Vector2f.sub(target.getLocation(), ship.getLocation(), null);
-        targetDirection.normalise();
-        targetDirection.scale(currentVelocity.length());
-        ship.getVelocity().set(targetDirection);
-    }
-
     private void addJitterCopies(ShipAPI ship) {
-        Color jitterColor = new Color(144, 238, 144, 255); // Light green color
-        float jitterDuration = 5.0f; // Duration of the jitter copy
-        float jitterRange = 5.0f; // Range of the jitter effect
+        Color jitterColor = new Color(144, 238, 144, 255);
+        float jitterDuration = 5.0f;
+        float jitterRange = 5.0f;
 
-        for (int i = 0; i < 10; i++) { // Create 10 jitter copies
+        for (int i = 0; i < 10; i++) {
             JitterEffectManager.addJitterCopy(ship, jitterColor, jitterDuration, jitterRange);
         }
     }

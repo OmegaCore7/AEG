@@ -43,11 +43,11 @@ public class AEG_tenacity extends BaseHullMod {
 
             // Regenerate armor
             float armorRegen = ARMOR_REGEN_RATE * amount;
-            for (int i = 0; i < ship.getArmorGrid().getGrid().length; i++) {
-                for (int j = 0; j < ship.getArmorGrid().getGrid()[i].length; j++) {
-                    float currentArmor = ship.getArmorGrid().getGrid()[i][j];
-                    float maxArmor = ship.getArmorGrid().getMaxArmorInCell();
-                    ship.getArmorGrid().getGrid()[i][j] = Math.min(currentArmor + armorRegen, maxArmor);
+            float[][] armorGrid = ship.getArmorGrid().getGrid();
+            float maxArmor = ship.getArmorGrid().getMaxArmorInCell();
+            for (int i = 0; i < armorGrid.length; i++) {
+                for (int j = 0; j < armorGrid[i].length; j++) {
+                    armorGrid[i][j] = Math.min(armorGrid[i][j] + armorRegen, maxArmor);
                 }
             }
 
@@ -62,9 +62,11 @@ public class AEG_tenacity extends BaseHullMod {
     private boolean isArmorFullyRepaired(ShipAPI ship) {
         if (ship == null) return false;
 
-        for (float[] row : ship.getArmorGrid().getGrid()) {
+        float[][] armorGrid = ship.getArmorGrid().getGrid();
+        float maxArmor = ship.getArmorGrid().getMaxArmorInCell();
+        for (float[] row : armorGrid) {
             for (float armor : row) {
-                if (armor < ship.getArmorGrid().getMaxArmorInCell()) {
+                if (armor < maxArmor) {
                     return false;
                 }
             }
@@ -72,18 +74,16 @@ public class AEG_tenacity extends BaseHullMod {
         return true;
     }
 
-    public void unapply(MutableShipStatsAPI stats, String id) {
-        // No need to unapply anything specific for this hull mod
-    }
-
     @Override
     public String getDescriptionParam(int index, HullSize hullSize) {
-        if (index == 0) return "" + (int) HULL_BONUS + "%";
-        if (index == 1) return "" + HULL_REGEN_RATE + " HP/s";
-        if (index == 2) return "" + ARMOR_REGEN_RATE + " armor/s";
-        if (index == 3) return "45%";
-        if (index == 4) return "1 charge";
-        if (index == 5) return "2 charges if S-modded";
-        return null;
+        switch (index) {
+            case 0: return "" + (int) HULL_BONUS + "%";
+            case 1: return "" + HULL_REGEN_RATE + " HP/s";
+            case 2: return "" + ARMOR_REGEN_RATE + " armor/s";
+            case 3: return "45%";
+            case 4: return "1 charge";
+            case 5: return "2 charges if S-modded";
+            default: return null;
+        }
     }
 }
