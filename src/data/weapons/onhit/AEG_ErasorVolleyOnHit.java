@@ -1,5 +1,6 @@
 package data.weapons.onhit;
 
+import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.combat.*;
 import com.fs.starfarer.api.combat.listeners.ApplyDamageResultAPI;
 import com.fs.starfarer.api.util.Misc;
@@ -16,6 +17,7 @@ public class AEG_ErasorVolleyOnHit implements OnHitEffectPlugin {
     private static final float EXPLOSION_RADIUS = 300f;
     private static final float EMP_DAMAGE = 100f;
     private static final float EMP_ARC_RANGE = 300f;
+    private static final float KNOCKBACK_FORCE = 500f; // Adjust this value for desired knockback strength
 
     private AEG_TargetingQuadtreeHelper quadtree;
 
@@ -55,6 +57,26 @@ public class AEG_ErasorVolleyOnHit implements OnHitEffectPlugin {
                     break;
                 }
             }
+        }
+
+        // Apply knockback to the target
+        if (target instanceof ShipAPI) {
+            ShipAPI ship = (ShipAPI) target;
+            Vector2f knockbackDir = Vector2f.sub(ship.getLocation(), point, new Vector2f());
+            knockbackDir.normalise();
+            knockbackDir.scale(KNOCKBACK_FORCE);
+            ship.getVelocity().translate(knockbackDir.x, knockbackDir.y);
+
+            // Play sound and visual effects for knockback
+            Global.getSoundPlayer().playSound("shield_hit_heavy", 1.0f, 1.0f, ship.getLocation(), ship.getVelocity());
+            engine.addHitParticle(ship.getLocation(), ship.getVelocity(), 100, 1, 0.5f, Color.WHITE);
+        }
+
+        // Apply additional shield recoil effect if shield was hit
+        if (shieldHit && target instanceof ShipAPI) {
+            ShipAPI ship = (ShipAPI) target;
+            // Additional visual effect for shield recoil
+            engine.addHitParticle(ship.getLocation(), ship.getVelocity(), 150, 1, 0.5f, Color.CYAN);
         }
     }
 }

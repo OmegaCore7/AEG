@@ -55,7 +55,7 @@ public class AEG_SteelBarrage extends BaseShipSystemScript {
 
                 if (maneuverStep >= 5) {
                     applyRammingForceAndDamage(ship, targetShip, id, effectLevel);
-                    createExplosion(ship, targetShip);
+                    createExplosionOrShieldHit(ship, targetShip);
 
                     resetManeuver();
                 } else {
@@ -187,9 +187,20 @@ public class AEG_SteelBarrage extends BaseShipSystemScript {
         }
     }
 
-    private void createExplosion(ShipAPI ship, ShipAPI target) {
+
+    private void createExplosionOrShieldHit(ShipAPI ship, ShipAPI target) {
         CombatEngineAPI engine = Global.getCombatEngine();
-        engine.spawnExplosion(target.getLocation(), target.getVelocity(), EXPLOSION_COLOR, 300f, 2f);
+        if (target.getShield() != null && target.getShield().isOn()) {
+            // Render a massive shield hit recoil effect
+            Vector2f shieldHitLocation = target.getShield().getLocation();
+            float shieldHitRadius = target.getShield().getRadius();
+            engine.spawnExplosion(shieldHitLocation, target.getVelocity(), LIGHT_GREEN_COLOR, shieldHitRadius, 1f);
+            engine.addHitParticle(shieldHitLocation, target.getVelocity(), shieldHitRadius * 1.5f, 1f, 0.25f, LIGHT_GREEN_COLOR);
+            engine.addHitParticle(shieldHitLocation, target.getVelocity(), shieldHitRadius * 2f, 1f, 0.1f, Color.WHITE);
+        } else {
+            // Render a normal explosion effect
+            engine.spawnExplosion(target.getLocation(), target.getVelocity(), EXPLOSION_COLOR, 300f, 2f);
+        }
     }
 
     private void addJitterCopies(ShipAPI ship) {
