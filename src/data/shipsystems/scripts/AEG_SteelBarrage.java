@@ -7,6 +7,7 @@ import com.fs.starfarer.api.util.Misc;
 import data.shipsystems.helpers.JitterEffectManager;
 import data.shipsystems.helpers.AEG_SB_Animation;
 import data.shipsystems.helpers.AEG_SteelBarrageHelper;
+import data.shipsystems.helpers.AEG_SteelBarrageEffects;
 import org.lwjgl.util.vector.Vector2f;
 
 import java.awt.Color;
@@ -18,8 +19,6 @@ public class AEG_SteelBarrage extends BaseShipSystemScript {
     private static final float RAM_RADIUS = 1000f;
     private static final int RAM_COUNT = 5;
     private static final float PAUSE_DURATION = 0.4f;
-    private static final Color LIGHT_GREEN_COLOR = new Color(144, 238, 144, 255);
-    private static final Color EXPLOSION_COLOR = new Color(175, 220, 120, 255);
 
     private int ramCounter = 0;
     private float pauseTimer = 0f;
@@ -37,7 +36,7 @@ public class AEG_SteelBarrage extends BaseShipSystemScript {
             handleActiveState(ship, id, effectLevel);
         }
 
-        addJitterCopies(ship);
+        AEG_SteelBarrageEffects.addJitterCopies(ship);
     }
 
     private void handleActiveState(ShipAPI ship, String id, float effectLevel) {
@@ -51,14 +50,14 @@ public class AEG_SteelBarrage extends BaseShipSystemScript {
         if (targetShip != null && ramCounter > 0) {
             if (pauseTimer <= 0f) {
                 if (maneuverStep == 0) {
-                    createHitspark(ship, targetShip);
+                    AEG_SteelBarrageEffects.createHitspark(ship, targetShip);
                 }
 
                 AEG_SteelBarrageHelper.performManeuvers(ship, targetShip, maneuverStep);
 
                 if (maneuverStep >= AEG_SteelBarrageHelper.MANEUVER_STEPS.length) {
                     AEG_SteelBarrageHelper.applyRammingForceAndDamage(ship, targetShip, id, effectLevel);
-                    createExplosionOrShieldHit(ship, targetShip);
+                    AEG_SteelBarrageEffects.createExplosionOrShieldHit(ship, targetShip);
 
                     resetManeuver();
                 } else {
@@ -130,49 +129,6 @@ public class AEG_SteelBarrage extends BaseShipSystemScript {
             }
         }
         return closestTarget;
-    }
-
-    private void createHitspark(ShipAPI ship, ShipAPI target) {
-        CombatEngineAPI engine = Global.getCombatEngine();
-        Vector2f arcLocation = target.getLocation();
-
-        float maxRange = target.getCollisionRadius();
-        float randomRange = (float) (Math.random() * maxRange);
-        float randomThickness = (float) (Math.random() * 10 + 5);
-
-        engine.spawnEmpArc(
-                ship, ship.getLocation(), ship, target,
-                DamageType.ENERGY,
-                0f,
-                0f,
-                randomRange,
-                "tachyon_lance_emp_impact",
-                randomThickness,
-                LIGHT_GREEN_COLOR,
-                LIGHT_GREEN_COLOR
-        );
-    }
-
-    private void createExplosionOrShieldHit(ShipAPI ship, ShipAPI target) {
-        CombatEngineAPI engine = Global.getCombatEngine();
-        if (target.getShield() != null && target.getShield().isOn()) {
-            Vector2f shieldHitLocation = target.getShield().getLocation();
-            float shieldHitRadius = target.getShield().getRadius();
-            engine.spawnExplosion(shieldHitLocation, target.getVelocity(), LIGHT_GREEN_COLOR, shieldHitRadius, 1f);
-            engine.addHitParticle(shieldHitLocation, target.getVelocity(), shieldHitRadius * 1.5f, 1f, 0.25f, LIGHT_GREEN_COLOR);
-            engine.addHitParticle(shieldHitLocation, target.getVelocity(), shieldHitRadius * 2f, 1f, 0.1f, Color.WHITE);
-        } else {
-            engine.spawnExplosion(target.getLocation(), target.getVelocity(), EXPLOSION_COLOR, 300f, 2f);
-        }
-    }
-
-    private void addJitterCopies(ShipAPI ship) {
-        float jitterDuration = 5.0f;
-        float jitterRange = 5.0f;
-
-        for (int i = 0; i < 10; i++) {
-            JitterEffectManager.addJitterCopy(ship, LIGHT_GREEN_COLOR, jitterDuration, jitterRange);
-        }
     }
 
     @Override

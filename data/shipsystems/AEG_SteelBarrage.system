@@ -1,23 +1,37 @@
 {
-    "id": "AEG_SteelBarrage",
-    "type": "DISPLACER",
-    "aiType": "PHASE_DISPLACER",
-    "statsScript": "data.shipsystems.scripts.AEG_SteelBarrage",
-    "weaponGlowColor": [144, 238, 144, 255],
-    "weaponTypes": ["ENERGY"],
-    "engineGlowColor": [144, 238, 144, 255],
-    "jitterCopies":5,
-    "jitterRange":0,
-    "jitterRangeRadiusFraction":0.5,
-    "range": 300,
-    "randomRange": 250,
-    "renderCopyDuringTeleport": false,
-    "fadeActivationSoundOnChargedown": false,
-    "useSound": "system_phase_skimmer",
-    "outOfUsesSound": "gun_out_of_ammo",
-    "aiHints": {
-        "activeSpeedIncrease": 0,
-        "burstMovementPotential": 450,
-        "averageSpeedIncrease": 300
-    }
+  "id": "steel_barrage",
+  "type": "TELEPORTER",
+  "aiType": "PHASE_TELEPORTER_2",
+  "statsScript": "data.shipsystems.scripts.AEG_SteelBarrage",
+
+  "jitterColor": [144, 238, 144, 150],
+  "jitterCopies": 10,
+  "jitterRange": 5,
+  "jitterRangeRadiusFraction": 0,
+
+  "weaponGlowColor": [144, 238, 144, 0],
+  "weaponTypes": ["ENERGY"],
+
+  "engineGlowLengthMult": 0,
+  "engineGlowWidthMult": 0,
+  "engineGlowGlowMult": 0,
+
+  "range": 1500,
+  "randomRange": 0,
+
+  "vulnerableChargeup": false,
+  "vulnerableChargedown": false,
+  "renderCopyDuringTeleport": true,
+
+  "fadeActivationSoundOnChargedown": false,
+
+  "useSound": "system_phase_teleporter",
+  "outOfUsesSound": "gun_out_of_ammo",
+
+  "aiHints": {
+    "activeSpeedIncrease": 0,
+    "burstMovementPotential": 1000,
+    "averageSpeedIncrease": 350
+  },
+
 }
