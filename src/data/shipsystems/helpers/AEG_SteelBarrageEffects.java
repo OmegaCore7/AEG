@@ -24,8 +24,8 @@ public class AEG_SteelBarrageEffects {
         engine.spawnEmpArc(
                 ship, ship.getLocation(), ship, target,
                 DamageType.ENERGY,
-                0f,
-                0f,
+                25f,
+                100f,
                 randomRange,
                 "tachyon_lance_emp_impact",
                 randomThickness,
