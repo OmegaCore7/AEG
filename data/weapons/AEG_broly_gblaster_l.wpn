@@ -1,0 +1,49 @@
+{
+  "id": "AEG_broly_gblaster_l",
+  "specClass": "projectile",
+  "projectileSpecId": "AEG_broly_gpulse_shot",
+  "type": "ENERGY",
+  "size": "SMALL",
+  "turretSprite": "graphics/ships/broly/AEG_broly_gblaster_l.png",
+  "turretGlowSprite": "graphics/ships/broly/AEG_broly_gblaster_l_glow.png",
+  "hardpointSprite": "graphics/ships/broly/AEG_broly_gblaster_l.png",
+  "hardpointGlowSprite": "graphics/ships/broly/AEG_broly_gblaster_l_glow.png",
+  "glowColor": [
+    105,
+    255,
+    105,
+    255
+  ],
+  "turretOffsets": [
+    0,
+    0
+  ],
+  "turretAngleOffsets": [
+    0
+  ],
+  "hardpointOffsets": [
+    7.5,
+    0
+  ],
+  "hardpointAngleOffsets": [
+    0
+  ],
+  "barrelMode": "ALTERNATING",
+  "animationType": "GLOW_AND_FLASH",
+  "autocharge": true,
+  "muzzleFlashSpec": {
+    "length": 50,
+    "spread": 10,
+    "particleSizeMin": 15,
+    "particleSizeRange": 20,
+    "particleDuration": 0.2,
+    "particleCount": 15,
+    "particleColor": [
+      105,
+      255,
+      105,
+      255
+    ]
+  },
+  "fireSoundTwo": "thermal_pulse_cannon_fire"
+}
