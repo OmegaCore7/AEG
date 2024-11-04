@@ -11,15 +11,23 @@
   "shieldCenter": [0, -0],
   "shieldRadius": 231,
   "viewOffset": 0,
+  "builtInWeapons": {
+    "WS0001": "AEG_broly_shoulder_l",
+    "WS0002": "AEG_broly_shoulder_r",
+    "WS0003": "AEG_broly_arm_l",
+    "WS0004": "AEG_broly_arm_r",
+    "WS0008": "AEG_broly_gblaster_l",
+    "WS0010": "AEG_shell_deco"
+  },
   "weaponSlots": [
     {
       "id": "WS0001",
       "size": "SMALL",
       "type": "DECORATIVE",
       "mount": "TURRET",
-      "arc": 0,
+      "arc": 15,
       "angle": 0,
-      "locations": [-0.5, 98.5],
+      "locations": [-9, 80],
       "renderOrderMod": 2
     },
     {
@@ -27,9 +35,9 @@
       "size": "SMALL",
       "type": "DECORATIVE",
       "mount": "TURRET",
-      "arc": 0,
+      "arc": 15,
       "angle": -0,
-      "locations": [-0.5, -98.5],
+      "locations": [-9, -80],
       "renderOrderMod": 2
     },
     {
@@ -37,18 +45,20 @@
       "size": "SMALL",
       "type": "BUILT_IN",
       "mount": "TURRET",
-      "arc": 0,
-      "angle": 0,
-      "locations": [35, 109]
+      "arc": 75,
+      "angle": 0.5,
+      "locations": [10, 119],
+      "renderOrderMod": 1
     },
     {
       "id": "WS0004",
       "size": "SMALL",
       "type": "BUILT_IN",
       "mount": "TURRET",
-      "arc": 0,
-      "angle": -0,
-      "locations": [35, -109]
+      "arc": 75,
+      "angle": -0.5,
+      "locations": [10, -119],
+      "renderOrderMod": 1
     },
     {
       "id": "WS0005",
@@ -77,7 +87,8 @@
       "mount": "TURRET",
       "arc": 97,
       "angle": -35.5,
-      "locations": [62, -42.5]
+      "locations": [62, -42.5],
+      "renderOrderMod": 1
     },
     {
       "id": "WS0008",
@@ -86,7 +97,8 @@
       "mount": "TURRET",
       "arc": 97,
       "angle": 35.5,
-      "locations": [62, 42.5]
+      "locations": [62, 42.5],
+      "renderOrderMod": 1
     },
     {
       "id": "WS0009",
@@ -95,8 +107,7 @@
       "mount": "TURRET",
       "arc": 25,
       "angle": 0,
-      "locations": [66, -0],
-      "renderOrderMod": 1
+      "locations": [66, -0]
     },
     {
       "id": "WS0010",
@@ -117,6 +128,16 @@
       "angle": 0,
       "locations": [-23.5, -0],
       "renderOrderMod": 6
+    },
+    {
+      "id": "WS0012",
+      "size": "SMALL",
+      "type": "DECORATIVE",
+      "mount": "TURRET",
+      "arc": 0,
+      "angle": 0,
+      "locations": [-43, -1.5],
+      "renderOrderMod": 5
     }
   ],
   "engineSlots": [],

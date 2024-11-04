@@ -10,7 +10,7 @@ import org.lwjgl.util.vector.Vector2f;
 import java.awt.Color;
 import java.util.List;
 
-public class AEG_ErasorMGShot implements OnHitEffectPlugin {
+public class AEG_EraserMGShot implements OnHitEffectPlugin {
     private static final float ROTATION_RATE = 500f; // Rotation rate in degrees per second
     private static final float DOUBLE_DAMAGE_MULT = 2.0f; // Double damage multiplier
     private static final float EXPLOSION_RADIUS = 50f; // Radius of the small explosions
