@@ -1,0 +1,124 @@
+{
+  "hullName": "Aegis Vanguard",
+  "hullId": "AEG_broly",
+  "hullSize": "CAPITAL_SHIP",
+  "spriteName": "graphics/ships/broly/AEG_broly_body.png",
+  "style": "HIGH_TECH",
+  "height": 202,
+  "width": 162,
+  "center": [81, 101],
+  "collisionRadius": 231.5,
+  "shieldCenter": [0, -0],
+  "shieldRadius": 231,
+  "viewOffset": 0,
+  "weaponSlots": [
+    {
+      "id": "WS0001",
+      "size": "SMALL",
+      "type": "DECORATIVE",
+      "mount": "TURRET",
+      "arc": 0,
+      "angle": 0,
+      "locations": [-0.5, 98.5],
+      "renderOrderMod": 2
+    },
+    {
+      "id": "WS0002",
+      "size": "SMALL",
+      "type": "DECORATIVE",
+      "mount": "TURRET",
+      "arc": 0,
+      "angle": -0,
+      "locations": [-0.5, -98.5],
+      "renderOrderMod": 2
+    },
+    {
+      "id": "WS0003",
+      "size": "SMALL",
+      "type": "BUILT_IN",
+      "mount": "TURRET",
+      "arc": 0,
+      "angle": 0,
+      "locations": [35, 109]
+    },
+    {
+      "id": "WS0004",
+      "size": "SMALL",
+      "type": "BUILT_IN",
+      "mount": "TURRET",
+      "arc": 0,
+      "angle": -0,
+      "locations": [35, -109]
+    },
+    {
+      "id": "WS0005",
+      "size": "SMALL",
+      "type": "BUILT_IN",
+      "mount": "TURRET",
+      "arc": 360,
+      "angle": 0,
+      "locations": [9, 9.5],
+      "renderOrderMod": 3
+    },
+    {
+      "id": "WS0006",
+      "size": "SMALL",
+      "type": "BUILT_IN",
+      "mount": "TURRET",
+      "arc": 360,
+      "angle": -0,
+      "locations": [9, -9.5],
+      "renderOrderMod": 3
+    },
+    {
+      "id": "WS0007",
+      "size": "SMALL",
+      "type": "BUILT_IN",
+      "mount": "TURRET",
+      "arc": 97,
+      "angle": -35.5,
+      "locations": [62, -42.5]
+    },
+    {
+      "id": "WS0008",
+      "size": "SMALL",
+      "type": "BUILT_IN",
+      "mount": "TURRET",
+      "arc": 97,
+      "angle": 35.5,
+      "locations": [62, 42.5]
+    },
+    {
+      "id": "WS0009",
+      "size": "SMALL",
+      "type": "BUILT_IN",
+      "mount": "TURRET",
+      "arc": 25,
+      "angle": 0,
+      "locations": [66, -0],
+      "renderOrderMod": 1
+    },
+    {
+      "id": "WS0010",
+      "size": "SMALL",
+      "type": "DECORATIVE",
+      "mount": "TURRET",
+      "arc": 0,
+      "angle": 0,
+      "locations": [0, -0],
+      "renderOrderMod": 4
+    },
+    {
+      "id": "WS0011",
+      "size": "SMALL",
+      "type": "BUILT_IN",
+      "mount": "TURRET",
+      "arc": 0,
+      "angle": 0,
+      "locations": [-23.5, -0],
+      "renderOrderMod": 6
+    }
+  ],
+  "engineSlots": [],
+  "bounds": []
+}
