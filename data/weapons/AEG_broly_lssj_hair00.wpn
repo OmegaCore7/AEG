@@ -1,0 +1,27 @@
+{
+  "id": "AEG_broly_lssj_hair00",
+  "specClass": "projectile",
+  "projectileSpecId": "AEG_dummy_invisible",
+  "type": "DECORATIVE",
+  "size": "SMALL",
+  "turretSprite": "graphics/ships/broly/hair/AEG_broly_lssj_hair00.png",
+  "hardpointSprite": "graphics/ships/broly/hair/AEG_broly_lssj_hair00.png",
+  "numFrames": 13,
+  "frameRate": 13,
+  "turretOffsets": [
+    8,
+    0
+  ],
+  "turretAngleOffsets": [
+    0
+  ],
+  "hardpointOffsets": [
+    130,
+    0
+  ],
+  "hardpointAngleOffsets": [
+    0
+  ],
+  "barrelMode": "LINKED",
+  "animationType": "NONE"
+}

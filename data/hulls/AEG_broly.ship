@@ -7,17 +7,20 @@
   "height": 202,
   "width": 162,
   "center": [81, 101],
-  "collisionRadius": 231.5,
+  "collisionRadius": 246,
   "shieldCenter": [0, -0],
-  "shieldRadius": 231,
+  "shieldRadius": 245.5,
   "viewOffset": 0,
   "builtInWeapons": {
     "WS0001": "AEG_broly_shoulder_l",
     "WS0002": "AEG_broly_shoulder_r",
     "WS0003": "AEG_broly_arm_l",
     "WS0004": "AEG_broly_arm_r",
+    "WS0007": "AEG_broly_gblaster_r",
     "WS0008": "AEG_broly_gblaster_l",
-    "WS0010": "AEG_shell_deco"
+    "WS0010": "AEG_shell_deco",
+    "WS0011": "AEG_broly_head",
+    "WS0012": "AEG_broly_lssj_hair00"
   },
   "weaponSlots": [
     {
@@ -126,7 +129,7 @@
       "mount": "TURRET",
       "arc": 0,
       "angle": 0,
-      "locations": [-23.5, -0],
+      "locations": [-26, -0],
       "renderOrderMod": 6
     },
     {
@@ -136,10 +139,82 @@
       "mount": "TURRET",
       "arc": 0,
       "angle": 0,
-      "locations": [-43, -1.5],
+      "locations": [-26, 0],
       "renderOrderMod": 5
     }
   ],
-  "engineSlots": [],
-  "bounds": []
+  "engineSlots": [
+    {
+      "location": [-97, 37.5],
+      "length": 168.830002,
+      "width": 75.059998,
+      "angle": -180,
+      "contrailSize": 75.059998,
+      "style": "HIGH_TECH"
+    },
+    {
+      "location": [-97, -37.5],
+      "length": 168.830002,
+      "width": 75.059998,
+      "angle": 180,
+      "contrailSize": 75.059998,
+      "style": "HIGH_TECH"
+    },
+    {
+      "location": [-76.5, 58.5],
+      "length": 133.970001,
+      "width": 40.860001,
+      "angle": 168,
+      "contrailSize": 40.860001,
+      "style": "HIGH_TECH"
+    },
+    {
+      "location": [-76.5, -58.5],
+      "length": 133.970001,
+      "width": 40.860001,
+      "angle": -168,
+      "contrailSize": 40.860001,
+      "style": "HIGH_TECH"
+    },
+    {
+      "location": [-77, 14.5],
+      "length": 223.25,
+      "width": 38.330002,
+      "angle": -177.5,
+      "contrailSize": 38.330002,
+      "style": "HIGH_TECH"
+    },
+    {
+      "location": [-77, -14.5],
+      "length": 223.25,
+      "width": 38.330002,
+      "angle": 177.5,
+      "contrailSize": 38.330002,
+      "style": "HIGH_TECH"
+    }
+  ],
+  "bounds": [
+    -49, -8.5,
+    -76, -11,
+    -77.5, -18.5,
+    -97, -27,
+    -97, -47,
+    -78, -53,
+    -76, -64,
+    -42.5, -65,
+    -35, -77,
+    48.5, -76,
+    83.5, -44.5,
+    83.5, 44.5,
+    48.5, 76,
+    -35, 77,
+    -42.5, 65,
+    -76, 64,
+    -78, 53,
+    -97, 47,
+    -97, 27,
+    -77.5, 18.5,
+    -76, 11,
+    -49, 8.5
+  ]
 }
