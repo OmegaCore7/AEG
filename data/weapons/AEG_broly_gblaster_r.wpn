@@ -1,7 +1,7 @@
 {
   "id": "AEG_broly_gblaster_r",
   "specClass": "projectile",
-  "projectileSpecId": "AEG_broly_gpulse_shot",
+  "projectileSpecId": "AEG_broly_pulse_shot",
   "type": "ENERGY",
   "size": "SMALL",
   "everyFrameEffect": "data.weapons.scripts.AEG_GiganticPulseCharge",
