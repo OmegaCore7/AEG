@@ -1,0 +1,59 @@
+{
+  "id": "AEG_broly_cblaster",
+  "specClass": "beam",
+  "type": "ENERGY",
+  "size": "SMALL",
+  "beamEffect": "data.weapons.scripts.AEG_CalamityBlaster",
+  "collisionClass": "RAY",
+  "collisionClassByFighter": "RAY_FIGHTER",
+  "turretSprite": "graphics/ships/broly/AEG_broly_cblaster.png",
+  "turretGlowSprite": "graphics/ships/broly/AEG_broly_cblaster_glow.png",
+  "hardpointSprite": "graphics/ships/broly/AEG_broly_cblaster.png",
+  "hardpointGlowSprite": "graphics/ships/broly/AEG_broly_cblaster_glow.png",
+  "glowColor": [
+    105,
+    255,
+    105,
+    235
+  ],
+  "hitGlowRadius": 0,
+  "turretOffsets": [
+    1,
+    0
+  ],
+  "turretAngleOffsets": [
+    0
+  ],
+  "hardpointOffsets": [
+    13.5,
+    0
+  ],
+  "hardpointAngleOffsets": [
+    0
+  ],
+  "beamFireOnlyOnFullCharge": true,
+  "fringeColor": [
+    105,
+    255,
+    105,
+    255
+  ],
+  "coreColor": [
+    225,
+    255,
+    225,
+    255
+  ],
+  "width": 60,
+  "textureType": LASER,
+  "textureScrollSpeed": 292,
+  "pixelsPerTexel": 10,
+  "pierceSet": [
+    PROJECTILE_FF,
+    PROJECTILE_NO_FF,
+    PROJECTILE_FIGHTER,
+    MISSILE_FF,
+    MISSILE_NO_FF
+  ],
+  "fireSoundTwo": "high_intensity_laser_loop"
+}

@@ -12,7 +12,7 @@ import java.util.Random;
 
 public class AEG_CalamityBlaster implements BeamEffectPlugin {
     private static final float MAX_BEAM_WIDTH = 200f;
-    private static final float MIN_BEAM_WIDTH = 50f;
+    private static final float MIN_BEAM_WIDTH = 60f;
     private static final float DAMAGE_INCREMENT = 0.01f;
     private static final float FLUX_INCREMENT = 0.01f;
     private static final float EMP_ARC_INTERVAL = 1f;

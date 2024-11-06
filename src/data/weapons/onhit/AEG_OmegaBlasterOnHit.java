@@ -3,47 +3,33 @@ package data.weapons.onhit;
 import com.fs.starfarer.api.combat.*;
 import com.fs.starfarer.api.combat.listeners.ApplyDamageResultAPI;
 import com.fs.starfarer.api.util.Misc;
-import org.lazywizard.lazylib.MathUtils;
-import org.lazywizard.lazylib.combat.CombatUtils;
 import org.lwjgl.util.vector.Vector2f;
 
-import java.awt.*;
+import java.awt.Color;
 
 public class AEG_OmegaBlasterOnHit implements OnHitEffectPlugin {
 
-    private static final Color EXPLOSION_COLOR = new Color(0, 255, 0); // Green color
-    private static final Color CORE_COLOR = new Color(255, 255, 255); // White color
-    private static final float EXPLOSION_RADIUS = 800f;
-    private static final float EXPLOSION_DURATION = 2f;
-    private static final float PUSH_FORCE = 500f;
-    private static final int EMP_ARC_COUNT = 5;
-
     @Override
-    public void onHit(DamagingProjectileAPI projectile, CombatEntityAPI target, Vector2f point, boolean shieldHit, ApplyDamageResultAPI damageResult, CombatEngineAPI engine) {
-        // Create the explosion effect at the point of impact
-        engine.spawnExplosion(point, new Vector2f(0, 0), EXPLOSION_COLOR, EXPLOSION_RADIUS, EXPLOSION_DURATION);
-        engine.spawnExplosion(point, new Vector2f(0, 0), CORE_COLOR, EXPLOSION_RADIUS / 2, EXPLOSION_DURATION / 2);
+    public void onHit(DamagingProjectileAPI projectile, CombatEntityAPI target, Vector2f point,
+                      boolean shieldHit, ApplyDamageResultAPI damageResult, CombatEngineAPI engine) {
+        if (target == null || !(target instanceof ShipAPI)) return;
 
-        // Create EMP arcs radiating outward
-        for (int i = 0; i < EMP_ARC_COUNT; i++) {
-            Vector2f arcPoint = MathUtils.getRandomPointInCircle(point, EXPLOSION_RADIUS);
-            engine.spawnEmpArc(projectile.getSource(), point, null, target,
-                    DamageType.ENERGY,  // Damage type
-                    100,                  // Damage
-                    1000,               // EMP damage
-                    2000f,             // Max range
-                    "tachyon_lance_emp_impact",  // Impact sound
-                    15f,                // Thickness
-                    CORE_COLOR,         // Fringe color
-                    EXPLOSION_COLOR);   // Core color
-        }
+        ShipAPI ship = (ShipAPI) target;
+        float damage = projectile.getDamageAmount();
 
-        // Apply push force to all entities within the explosion radius
-        for (CombatEntityAPI entity : CombatUtils.getEntitiesWithinRange(point, EXPLOSION_RADIUS)) {
-            Vector2f pushVector = Vector2f.sub(entity.getLocation(), point, null);
-            pushVector.normalise();
-            pushVector.scale(PUSH_FORCE);
-            entity.getVelocity().set(Vector2f.add(entity.getVelocity(), pushVector, null));
+        // Create green explosion and deal damage
+        engine.spawnExplosion(point, new Vector2f(0, 0), Misc.setAlpha(new Color(0, 255, 0), 255),
+                100f, 1f);
+        engine.applyDamage(ship, point, damage, DamageType.ENERGY, 0, false, false, projectile.getSource());
+
+        // Create ring of electricity and deal EMP damage
+        for (int i = 0; i < 360; i += 30) {
+            float angle = (float) Math.toRadians(i);
+            Vector2f offset = new Vector2f((float) Math.cos(angle) * 50, (float) Math.sin(angle) * 50);
+            Vector2f spawnPoint = Vector2f.add(point, offset, null);
+            engine.spawnEmpArc(projectile.getSource(), point, ship, ship,
+                    DamageType.ENERGY, 0, damage, 1000f, null, 10f,
+                    new Color(0, 255, 0), new Color(0, 255, 255));
         }
     }
 }
