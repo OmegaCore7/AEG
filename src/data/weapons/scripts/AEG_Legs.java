@@ -8,11 +8,16 @@ import org.lwjgl.util.vector.Vector2f;
 import org.magiclib.util.MagicRender;
 
 import java.awt.*;
+import java.util.HashMap;
+import java.util.Map;
 
-public class AEG_BrolyLegs implements EveryFrameWeaponEffectPlugin {
+public class AEG_Legs implements EveryFrameWeaponEffectPlugin {
 
-    private boolean runOnce = false, lockNloaded = false;
-    private WeaponAPI shoulderL, shoulderR, armL, armR, bshellpd, bshellEc, gblasterR, gblasterL, cblaster, shellDeco, head, lssjHair, omegablaster;
+    private boolean runOnce = false;
+    private Map<String, WeaponAPI> weapons = new HashMap<>();
+    private WeaponAPI shoulderL, shoulderR, armL, armR, drillMirv, spiralCannon, legs, spiralLance;
+    private WeaponAPI torso, lArm, rArm, photonBarrage, module;
+    private WeaponAPI bshellpd, bshellEc, gblasterR, gblasterL, cblaster, shellDeco, head, lssjHair, omegablaster;
     public int frame = 7;
     private IntervalUtil interval = new IntervalUtil(0.08f, 0.08f);
     private IntervalUtil interval2;
@@ -20,70 +25,101 @@ public class AEG_BrolyLegs implements EveryFrameWeaponEffectPlugin {
 
     public void init(WeaponAPI weapon, float amount) {
         runOnce = true;
-        // Need to grab another weapon so some effects are properly rendered, like lighting from glib
+        // Initialize weapons based on slot IDs
         for (WeaponAPI w : weapon.getShip().getAllWeapons()) {
+            weapons.put(w.getSlot().getId(), w);
             switch (w.getSlot().getId()) {
-                case "WS0001": // AEG_broly_shoulder_l
+                case "WS0001":
                     if (shoulderL == null) {
                         shoulderL = w;
                     }
+                    if (module == null) {
+                        module = w;
+                    }
                     break;
-                case "WS0002": // AEG_broly_shoulder_r
+                case "WS0002":
                     if (shoulderR == null) {
                         shoulderR = w;
                     }
+                    if (torso == null) {
+                        torso = w;
+                    }
                     break;
-                case "WS0003": // AEG_broly_arm_l
+                case "WS0003":
+                    if (armL == null) {
+                        armL = w;
+                    }
                     if (armL == null) {
                         armL = w;
                     }
                     break;
-                case "WS0004": // AEG_broly_arm_r
+                case "WS0004":
                     if (armR == null) {
                         armR = w;
                     }
                     break;
-                case "WS0005": // AEG_broly_bshellpd
+                case "WS0005":
+                    if (drillMirv == null) {
+                        drillMirv = w;
+                    }
+                    if (lArm == null) {
+                        lArm = w;
+                    }
                     if (bshellpd == null) {
                         bshellpd = w;
                     }
                     break;
-                case "WS0006": // AEG_broly_bshell_ec
+                case "WS0006":
+                    if (rArm == null) {
+                        rArm = w;
+                    }
                     if (bshellEc == null) {
                         bshellEc = w;
                     }
                     break;
-                case "WS0007": // AEG_broly_gblaster_r
+                case "WS0007":
+                    if (photonBarrage == null) {
+                        photonBarrage = w;
+                    }
                     if (gblasterR == null) {
                         gblasterR = w;
                     }
                     break;
-                case "WS0008": // AEG_broly_gblaster_l
+                case "WS0008":
+                    if (spiralCannon == null) {
+                        spiralCannon = w;
+                    }
                     if (gblasterL == null) {
                         gblasterL = w;
                     }
                     break;
-                case "WS0009": // AEG_broly_cblaster
+                case "WS0009":
+                    if (legs == null) {
+                        legs = w;
+                    }
                     if (cblaster == null) {
                         cblaster = w;
                     }
                     break;
-                case "WS0010": // AEG_broly_shell_deco
+                case "WS0010":
+                    if (spiralLance == null) {
+                        spiralLance = w;
+                    }
                     if (shellDeco == null) {
                         shellDeco = w;
                     }
                     break;
-                case "WS0011": // AEG_broly_head
+                case "WS0011":
                     if (head == null) {
                         head = w;
                     }
                     break;
-                case "WS0012": // AEG_broly_lssj_hair00
+                case "WS0012":
                     if (lssjHair == null) {
                         lssjHair = w;
                     }
                     break;
-                case "WS0013": // AEG_broly_omegablaster
+                case "WS0013":
                     if (omegablaster == null) {
                         omegablaster = w;
                     }
@@ -149,7 +185,18 @@ public class AEG_BrolyLegs implements EveryFrameWeaponEffectPlugin {
         if (frame >= 10) {
             frameStr = String.valueOf(frame);
         }
-        SpriteAPI spr = Global.getSettings().getSprite("graphics/ships/broly/legs/AEG_broly_legs" + frameStr + ".png");
+
+        // Determine the sprite path based on the ship type
+        String spritePath = "graphics/ships/default/legs/default_legs" + frameStr + ".png";
+        if (ship.getHullSpec().getHullId().contains("broly")) {
+            spritePath = "graphics/ships/broly/legs/AEG_broly_legs" + frameStr + ".png";
+        } else if (ship.getHullSpec().getHullId().contains("zero")) {
+            spritePath = "graphics/ships/zero/legs/zerolegs" + frameStr + ".png";
+        } else if (ship.getHullSpec().getHullId().contains("gurren")) {
+            spritePath = "graphics/ships/gurrenl/legs/gurrenl_legs" + frameStr + ".png";
+        }
+
+        SpriteAPI spr = Global.getSettings().getSprite(spritePath);
 
         Color color = new Color(defColor.getRed() * 2, defColor.getGreen() * 2, defColor.getBlue() * 2, defColor.getAlpha());
         color = new Color(255, 255, 255);

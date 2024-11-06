@@ -17,13 +17,15 @@
     "WS0003": "AEG_broly_arm_l",
     "WS0004": "AEG_broly_arm_r",
     "WS0005": "AEG_broly_bshellpd",
+    "WS0006": "AEG_broly_bshell_ec",
     "WS0007": "AEG_broly_gblaster_r",
     "WS0008": "AEG_broly_gblaster_l",
     "WS0009": "AEG_broly_cblaster",
-    "WS0010": "AEG_shell_deco",
+    "WS0010": "AEG_broly_shell_deco",
     "WS0011": "AEG_broly_head",
     "WS0012": "AEG_broly_lssj_hair00",
-    "WS0013": "AEG_broly_omegablaster"
+    "WS0013": "AEG_broly_omegablaster",
+    "WS0014": "AEG_broly_legs"
   },
   "weaponSlots": [
     {
@@ -73,7 +75,7 @@
       "mount": "TURRET",
       "arc": 360,
       "angle": 0,
-      "locations": [0, -0],
+      "locations": [0, 0],
       "renderOrderMod": 3
     },
     {
@@ -83,7 +85,7 @@
       "mount": "TURRET",
       "arc": 360,
       "angle": -0,
-      "locations": [12, -12.5],
+      "locations": [0, -0],
       "renderOrderMod": 3
     },
     {
@@ -132,7 +134,7 @@
       "mount": "TURRET",
       "arc": 0,
       "angle": 0,
-      "locations": [-26, -0],
+      "locations": [-5, -0],
       "renderOrderMod": 6
     },
     {
@@ -142,7 +144,7 @@
       "mount": "TURRET",
       "arc": 0,
       "angle": 0,
-      "locations": [-26, 0],
+      "locations": [-5, 0],
       "renderOrderMod": 5
     },
     {
@@ -153,6 +155,15 @@
       "arc": 0,
       "angle": 0,
       "locations": [63, -0]
+    },
+    {
+      "id": "WS0014",
+      "size": "SMALL",
+      "type": "BUILT_IN",
+      "mount": "TURRET",
+      "arc": 0,
+      "angle": 0,
+      "locations": [0, -0]
     }
   ],
   "engineSlots": [

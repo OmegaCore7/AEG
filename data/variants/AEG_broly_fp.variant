@@ -1,0 +1,95 @@
+{
+  "variantId": "AEG_broly_fp",
+  "hullId": "AEG_broly",
+  "displayName": "New Variant",
+  "goalVariant": false,
+  "fluxCapacitors": 60,
+  "fluxVents": 60,
+  "quality": 1,
+  "permaMods": [],
+  "hullMods": [
+    "adaptiveshields",
+    "turretgyros",
+    "supercomputer",
+    "stabilizedshieldemitter",
+    "solar_shielding",
+    "shielded_holds",
+    "repair_gantry",
+    "nav_relay",
+    "insulatedengine",
+    "high_maintenance",
+    "fluxdistributor",
+    "fluxcoil",
+    "fluxbreakers",
+    "extendedshieldemitter",
+    "ecm",
+    "eccm",
+    "expanded_deck_crew",
+    "expanded_cargo_holds",
+    "blast_doors",
+    "auxiliarythrusters",
+    "auxiliary_fuel_tanks",
+    "augmentedengines",
+    "autorepair",
+    "advancedshieldemitter",
+    "armaa_himac",
+    "armaa_wingCommander",
+    "armaa_advancedoptics"
+  ],
+  "weaponGroups": [
+    {
+      "autofire": true,
+      "mode": "LINKED",
+      "weapons": {
+        "WS0003": "AEG_broly_arm_l",
+        "WS0014": "AEG_broly_legs"
+      }
+    },
+    {
+      "autofire": true,
+      "mode": "LINKED",
+      "weapons": {
+        "WS0004": "AEG_broly_arm_r"
+      }
+    },
+    {
+      "autofire": true,
+      "mode": "LINKED",
+      "weapons": {
+        "WS0005": "AEG_broly_bshellpd"
+      }
+    },
+    {
+      "autofire": true,
+      "mode": "LINKED",
+      "weapons": {
+        "WS0006": "AEG_broly_bshell_ec"
+      }
+    },
+    {
+      "autofire": true,
+      "mode": "LINKED",
+      "weapons": {
+        "WS0007": "AEG_broly_gblaster_r",
+        "WS0008": "AEG_broly_gblaster_l",
+        "WS0011": "AEG_broly_head"
+      }
+    },
+    {
+      "autofire": true,
+      "mode": "LINKED",
+      "weapons": {
+        "WS0009": "AEG_broly_cblaster"
+      }
+    },
+    {
+      "autofire": true,
+      "mode": "LINKED",
+      "weapons": {
+        "WS0013": "AEG_broly_omegablaster"
+      }
+    }
+  ],
+  "modules": [],
+  "wings": []
+}
