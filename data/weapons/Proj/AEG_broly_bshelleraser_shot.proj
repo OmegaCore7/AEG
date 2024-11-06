@@ -1,5 +1,5 @@
 {
-	"id":"AEG_broly_gpulse_shot",
+	"id":"AEG_broly_bshelleraser_shot",
 	"specClass":"projectile",
 	"spawnType":"BALLISTIC_AS_BEAM",
 	"onHitEffect": "data.weapons.onhit.AEG_BlasterShellOnHit",

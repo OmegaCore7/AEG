@@ -1,12 +1,7 @@
 <component name="libraryTable">
   <library name="ExerelinCore">
-    <CLASSES>
-      <root url="jar://$PROJECT_DIR$/../Nexerelin/jars/ExerelinCore.jar!/" />
-    </CLASSES>
+    <CLASSES />
     <JAVADOC />
-    <SOURCES>
-      <root url="jar://$PROJECT_DIR$/../Nexerelin/jars/ExerelinCore.jar!/" />
-      <root url="jar://$PROJECT_DIR$/../Nexerelin/jars/ExerelinCore.jar!/" />
-    </SOURCES>
+    <SOURCES />
   </library>
 </component>

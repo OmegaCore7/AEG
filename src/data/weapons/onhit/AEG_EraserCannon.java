@@ -10,7 +10,7 @@ import org.lwjgl.util.vector.Vector2f;
 import java.awt.Color;
 import java.util.List;
 
-public class AEG_ErasorCannon implements OnHitEffectPlugin {
+public class AEG_EraserCannon implements OnHitEffectPlugin {
     private static final float DAMAGE_MULT = 2.0f; // Double the damage
     private static final float EXPLOSION_RADIUS = 400f; // Radius of the explosion
     private static final float KNOCKBACK_FORCE = 600f; // Force of the knockback

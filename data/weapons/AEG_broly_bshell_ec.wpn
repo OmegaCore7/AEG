@@ -1,7 +1,7 @@
 {
   "id": "AEG_broly_bshell_ec",
   "specClass": "projectile",
-  "projectileSpecId": "AEG_broly_bshelleraser_shot",
+  "projectileSpecId": "AEG_broly_bshelleraser_shot",
   "type": "ENERGY",
   "size": "SMALL",
   "turretSprite": "graphics/ships/broly/AEG_broly_bshell.png",
