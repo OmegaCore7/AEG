@@ -1,5 +1,5 @@
 {
-  "id": "steel_barrage",
+  "id": "AEG_SteelBarrage",
   "type": "TELEPORTER",
   "aiType": "PHASE_TELEPORTER_2",
   "statsScript": "data.shipsystems.scripts.AEG_SteelBarrage",

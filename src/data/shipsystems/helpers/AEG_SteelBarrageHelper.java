@@ -1,7 +1,6 @@
 package data.shipsystems.helpers;
 
 import com.fs.starfarer.api.combat.*;
-import org.lwjgl.util.vector.Vector;
 import org.lwjgl.util.vector.Vector2f;
 
 public class AEG_SteelBarrageHelper {
@@ -18,17 +17,21 @@ public class AEG_SteelBarrageHelper {
 
         float shipSizeFactor = ship.getCollisionRadius() / 100f;
 
-        Vector[] maneuvers = {
-                new Vector2f(perpendicular).scale(MANEUVER_STEPS[0] * shipSizeFactor),
-                new Vector2f(direction).scale(MANEUVER_STEPS[1] * shipSizeFactor),
-                new Vector2f(direction).scale(MANEUVER_STEPS[2] * shipSizeFactor),
-                new Vector2f(perpendicular).scale(MANEUVER_STEPS[3] * shipSizeFactor),
-                new Vector2f(direction).scale(MANEUVER_STEPS[4] * shipSizeFactor)
+        Vector2f[] maneuvers = {
+                (Vector2f) new Vector2f(perpendicular).scale(MANEUVER_STEPS[0] * shipSizeFactor),
+                (Vector2f) new Vector2f(direction).scale(MANEUVER_STEPS[1] * shipSizeFactor),
+                (Vector2f) new Vector2f(direction).scale(MANEUVER_STEPS[2] * shipSizeFactor),
+                (Vector2f) new Vector2f(perpendicular).scale(MANEUVER_STEPS[3] * shipSizeFactor),
+                (Vector2f) new Vector2f(direction).scale(MANEUVER_STEPS[4] * shipSizeFactor)
         };
 
         if (maneuverStep < maneuvers.length) {
-            Vector2f.add(ship.getVelocity(), (Vector2f) maneuvers[maneuverStep], ship.getVelocity());
+            Vector2f.add(ship.getVelocity(), maneuvers[maneuverStep], ship.getVelocity());
         }
+
+        // Rotate the ship to face the target
+        float angleToTarget = (float) Math.toDegrees(Math.atan2(direction.y, direction.x));
+        ship.setFacing(angleToTarget);
     }
 
     public static void applyRammingForceAndDamage(ShipAPI ship, ShipAPI target, String id, float effectLevel) {
@@ -38,7 +41,8 @@ public class AEG_SteelBarrageHelper {
         ship.getVelocity().set(diff);
 
         float distance = Vector2f.sub(target.getLocation(), ship.getLocation(), null).length();
-        if (distance <= COLLISION_THRESHOLD) {
+        float proximityThreshold = target.getCollisionRadius() + 100f;
+        if (distance <= proximityThreshold) {
             if (target.getShield() != null && target.getShield().isOn()) {
                 target.getFluxTracker().increaseFlux(RAM_DAMAGE * 2f * effectLevel, true);
             } else {

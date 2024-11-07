@@ -79,22 +79,25 @@ public class AEG_BlasterShellOnHit implements OnHitEffectPlugin {
         // Apply push force to all entities within the explosion radius
         for (CombatEntityAPI entity : CombatUtils.getEntitiesWithinRange(point, EXPLOSION_RADIUS)) {
             Vector2f pushVector = Vector2f.sub(entity.getLocation(), point, null);
-            pushVector.normalise();
-            pushVector.scale(PUSH_FORCE);
-            entity.getVelocity().set(Vector2f.add(entity.getVelocity(), pushVector, null));
+            if (pushVector.length() > 0) { // Check for zero-length vector
+                pushVector.normalise();
+                pushVector.scale(PUSH_FORCE);
+                entity.getVelocity().set(Vector2f.add(entity.getVelocity(), pushVector, null));
+            }
         }
 
         // Apply knockback to the target
         if (target instanceof ShipAPI) {
             ShipAPI ship = (ShipAPI) target;
             Vector2f knockbackDir = Vector2f.sub(ship.getLocation(), point, new Vector2f());
-            knockbackDir.normalise();
-            knockbackDir.scale(KNOCKBACK_FORCE);
-            ship.getVelocity().translate(knockbackDir.x, knockbackDir.y);
+            if (knockbackDir.length() > 0) { // Check for zero-length vector
+                knockbackDir.normalise();
+                knockbackDir.scale(KNOCKBACK_FORCE);
+                ship.getVelocity().translate(knockbackDir.x, knockbackDir.y);
 
-            // Play sound and visual effects for knockback
-            Global.getSoundPlayer().playSound("shield_hit_heavy", 1.0f, 1.0f, ship.getLocation(), ship.getVelocity());
-            engine.addHitParticle(ship.getLocation(), ship.getVelocity(), 100, 1, 0.5f, Color.WHITE);
+                // Play sound and visual effects for knockback
+                engine.addHitParticle(ship.getLocation(), ship.getVelocity(), 100, 1, 0.5f, Color.WHITE);
+            }
         }
 
         // Apply additional shield recoil effect if shield was hit

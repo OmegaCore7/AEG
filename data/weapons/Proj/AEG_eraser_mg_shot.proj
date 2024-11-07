@@ -1,5 +1,5 @@
 {
-	"id":"Aeg_eraser_mg_shot",
+	"id":"AEG_eraser_mg_shot",
 	"specClass":"projectile",
 	"spawnType":"PLASMA",
 	"onHitEffect": "data.weapons.onhit.AEG_EraserMGShot",

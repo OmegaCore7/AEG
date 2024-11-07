@@ -75,15 +75,15 @@ Spiral Beam Cannon,AEG_spiral_lance,,,4500,2500,,2500,,300,45,20,1,1,1,HIGH_EXPL
 ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 #Broly,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-Eraser Machine Gun,AEG_broly_arm_l,,,7500,1000,,250,,5,20,30,,,,ENERGY,110,,0,0.25,1,,0,5,1,5,,800,,,100,,,"STRIKE, USE_VS_FRIGATES","energy20, rare_bp, hist1t, merc, ind, no_drop",,,,General,Extremely Fast,Excellent,,,The targeting system is incapable of tracking fighters when on local/automatic control.,,,,,23
-Eraser Cannon,AEG_broly_arm_r,,,7500,1000,,500,,10,20,30,,,,ENERGY,550,,0.33,1.01,3,0.33,,,,,,750,,,500,,,"STRIKE, USE_VS_FRIGATES","energy20, rare_bp, hist1t, merc, ind, no_drop",,,,General,Extremely Fast,Excellent,,,The targeting system is incapable of tracking fighters when on local/automatic control.,,,,,23
-Blaster Shell ,AEG_broly_bshell_ec,,,100000,1000,,250,,15,75,,24,1,,ENERGY,150,,0,0.2,1,,0,10,2,5,,1000,,,,,,"SYSTEM,SHOW_IN_CODEX",no_drop,TPC_only,,,General,Extremely Fast,Excellent,,,,,,,,40
-Powered Shell PD,AEG_broly_bshellpd,,,40000,1200,,1000,,15,75,7,24,0.05,,ENERGY,1000,,0,0.5,1,,0,0,0,0,,1000,200,3,250,,,"DO_NOT_AIM, DO_NOT_CONSERVE","utility8, missile9, strike7, omega, restricted, no_drop",,Unknown,,Anti Small Craft,Extremely Fast,Excellent,,,,,,,TRUE,10
-Calamity Blaster,AEG_broly_cblaster,,,4500,1000,400,,,0,5,20,,,,ENERGY,,250,0.1,0.1,,,,,,,2400,,,,,,,,"beam20, LR, hightech_bp, merc, ind, no_drop",,,,Anti Armor,Extremely Fast,Excellent,,,,,,,,24
-Gigantic Pulse,AEG_broly_gblaster_l,,,100000,1000,,250,,0,0,,20,1,,ENERGY,150,,0,0.2,1,,0,10,2,5,,1000,,,,,,"SYSTEM,SHOW_IN_CODEX",no_drop,TPC_only,,,General,Extremely Fast,Excellent,,,,,,,,40
-Gigantic Pulse,AEG_broly_gblaster_r,,,100000,1000,,250,,0,0,,20,1,,ENERGY,150,,0,0.2,1,,0,10,2,5,,1000,,,,,,"SYSTEM,SHOW_IN_CODEX",no_drop,TPC_only,,,General,Extremely Fast,Excellent,,,,,,,,40
-Rage Pulse Cannon,AEG_broly_head,,,100000,1000,,250,,0,0,,20,1,,ENERGY,150,,0,0.2,1,,0,10,2,5,,1000,,,,,,"SYSTEM,SHOW_IN_CODEX",no_drop,TPC_only,,,General,Extremely Fast,Excellent,,,,,,,,40
-Omega Blaster,AEG_broly_omegablaster,,,,2500,,1000,,100,10,25,1,1,,ENERGY,2500,,2,15,1,,0,0,0,0,,500,50,30,350,,,"DO_NOT_AIM, CONSERVE_5","missile18, strike15, rare_bp, hist1t, merc, ind, no_drop",,,,Finisher,Extremely Fast,Excellent,,,,,,,TRUE,16
+Eraser Machine Gun,AEG_broly_arm_l,,,7500,2000,,250,,5,20,30,,,,ENERGY,110,,0,0.25,1,,0,5,1,5,,800,,,100,,,"STRIKE, USE_VS_FRIGATES","energy20, rare_bp, hist1t, merc, ind, no_drop",,,,General,Extremely Fast,Excellent,,,The targeting system is incapable of tracking fighters when on local/automatic control.,,,,,23
+Eraser Cannon,AEG_broly_arm_r,,,7500,2000,,500,,10,20,30,,,,ENERGY,550,,0.33,1.01,3,0.33,,,,,,750,,,500,,,"STRIKE, USE_VS_FRIGATES","energy20, rare_bp, hist1t, merc, ind, no_drop",,,,General,Extremely Fast,Excellent,,,The targeting system is incapable of tracking fighters when on local/automatic control.,,,,,23
+Blaster Shell ,AEG_broly_bshell_ec,,,100000,2000,,250,,15,75,,24,1,,ENERGY,150,,0,0.2,1,,0,10,2,5,,1000,,,,,,"SYSTEM,SHOW_IN_CODEX",no_drop,TPC_only,,,General,Extremely Fast,Excellent,,,,,,,,40
+Powered Shell PD,AEG_broly_bshellpd,,,40000,2000,,1000,,15,75,7,24,0.05,,ENERGY,1000,,0,0.5,1,,0,0,0,0,,1000,200,3,250,,,"DO_NOT_AIM, DO_NOT_CONSERVE","utility8, missile9, strike7, omega, restricted, no_drop",,Unknown,,Anti Small Craft,Extremely Fast,Excellent,,,,,,,TRUE,10
+Calamity Blaster,AEG_broly_cblaster,,,4500,2000,400,,,0,5,20,,,,ENERGY,,25,2,0.1,2,,,,,,999999,,,,,,,,"beam20, LR, hightech_bp, merc, ind, no_drop",,,,Anti Armor,Extremely Fast,Excellent,,,,,,,,24
+Gigantic Pulse,AEG_broly_gblaster_l,,,100000,2000,,250,,0,0,,20,1,,ENERGY,150,,0,0.2,1,,0,10,2,5,,1000,,,,,,"SYSTEM,SHOW_IN_CODEX",no_drop,TPC_only,,,General,Extremely Fast,Excellent,,,,,,,,40
+Gigantic Pulse,AEG_broly_gblaster_r,,,100000,2000,,250,,0,0,,20,1,,ENERGY,150,,0,0.2,1,,0,10,2,5,,1000,,,,,,"SYSTEM,SHOW_IN_CODEX",no_drop,TPC_only,,,General,Extremely Fast,Excellent,,,,,,,,40
+Rage Pulse Cannon,AEG_broly_head,,,100000,2200,,500,,0,0,,20,1,,ENERGY,150,,2,20,20,,0,10,2,5,,1000,,,,,,"SYSTEM,SHOW_IN_CODEX",no_drop,TPC_only,,,General,Extremely Fast,Excellent,,,,,,,,40
+Omega Blaster,AEG_broly_omegablaster,,,,2500,,1000,,100,10,25,1,1,,ENERGY,2500,,2,15,1,,0,0,0,0,,500,50,30,99999,,,"DO_NOT_AIM, CONSERVE_5","missile18, strike15, rare_bp, hist1t, merc, ind, no_drop",,,,Finisher,Extremely Fast,Excellent,,,,,,,TRUE,16
 ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 ,AEG_broly_shell_deco,,,500000,600,1,,,,,,,,,,,,,,,,,,,,,,,,,,,,no_drop,,,,,,,,,,,,,,
 ,AEG_broly_legs,,,500000,600,1,,,,,,,,,,,,,,,,,,,,,,,,,,,,no_drop,,,,,,,,,,,,,,

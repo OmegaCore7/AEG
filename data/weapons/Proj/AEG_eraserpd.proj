@@ -2,7 +2,7 @@
 	"id":"AEG_eraserpd",
 	"specClass":"missile",
 	"missileType":"ROCKET",
-    "everyFrameEffect": "data.weapons.scripts.AEG_ErasorPDEveryFrame",
+    "everyFrameEffect": "data.weapons.scripts.AEG_EraserPDEveryFrame",
 	#"size":[16,28],
 	#"center":[8,14],
 	"sprite":"graphics/missiles/AEG_eraserpd.png",

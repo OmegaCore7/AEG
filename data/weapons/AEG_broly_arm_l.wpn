@@ -1,7 +1,7 @@
 {
   "id": "AEG_broly_arm_l",
   "specClass": "projectile",
-  "projectileSpecId": "AEG_erasor_mg_shot",
+  "projectileSpecId": "AEG_eraser_mg_shot",
   "type": "ENERGY",
   "size": "SMALL",
   "turretSprite": "graphics/ships/broly/AEG_broly_arm_l.png",
