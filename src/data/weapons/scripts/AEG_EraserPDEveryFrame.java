@@ -9,7 +9,7 @@ import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
 
-public class AEG_ErasorPDEveryFrame implements EveryFrameWeaponEffectPlugin {
+public class AEG_EraserPDEveryFrame implements EveryFrameWeaponEffectPlugin {
     private static final float ZAP_RANGE = 300f;
     private static final float ZAP_DAMAGE = 100f;
     private static final int MAX_CHARGES = 20;
