@@ -24,6 +24,7 @@ public class AEG_CalamityBlaster implements BeamEffectPlugin {
     private float damageMultiplier = 1f;
     private float fluxMultiplier = 1f;
     private float empArcTimer = 0f;
+    private float beamTime = 0f; // Track the time the beam has been active
     private final AEG_TargetingQuadtreeHelper quadtreeHelper;
     private final Random random;
 
@@ -36,13 +37,21 @@ public class AEG_CalamityBlaster implements BeamEffectPlugin {
     public void advance(float amount, CombatEngineAPI engine, BeamAPI beam) {
         if (engine.isPaused()) return;
 
-        // Increase beam width and damage/flux multipliers
-        currentBeamWidth = Math.min(MAX_BEAM_WIDTH, currentBeamWidth + amount * (MAX_BEAM_WIDTH - MIN_BEAM_WIDTH) / 150f);
-        damageMultiplier = Math.min(2f, damageMultiplier + DAMAGE_INCREMENT * amount);
-        fluxMultiplier = Math.min(2f, fluxMultiplier + FLUX_INCREMENT * amount);
+        beamTime += amount;
+
+        // Increase beam width over time
+        if (beamTime <= 1.0f) {
+            currentBeamWidth = MIN_BEAM_WIDTH + (MAX_BEAM_WIDTH - MIN_BEAM_WIDTH) * (beamTime / 1.0f);
+        } else {
+            currentBeamWidth = MAX_BEAM_WIDTH;
+        }
 
         // Set beam width
         beam.setWidth(currentBeamWidth);
+
+        // Increase damage and flux multipliers
+        damageMultiplier = Math.min(2f, damageMultiplier + DAMAGE_INCREMENT * amount);
+        fluxMultiplier = Math.min(2f, fluxMultiplier + FLUX_INCREMENT * amount);
 
         // Create the energy ball at the base of the beam
         Vector2f beamStart = beam.getFrom();
