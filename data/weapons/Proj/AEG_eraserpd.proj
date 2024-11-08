@@ -1,7 +1,7 @@
 {
 	"id":"AEG_eraserpd",
 	"specClass":"missile",
-	"missileType":"ROCKET",
+	"missileType":"MISSILE",
     "everyFrameEffect": "data.weapons.scripts.AEG_EraserPDEveryFrame",
 	#"size":[16,28],
 	#"center":[8,14],
@@ -45,9 +45,9 @@
 						"mode":"QUAD_STRIP", # PARTICLES or QUAD_STRIP, determines which params are used
 						"engineColor":[50,255,0,255],
 						"contrailDuration":5,
-						"contrailWidthMult":1.5,
+						"contrailWidthMult":14,
 						"contrailWidthAddedFractionAtEnd":1,  # can be negative. makes trail spread out/narrow at the end
-						"contrailMinSeg":10, # min segment length, in pixels
+						"contrailMinSeg":50, # min segment length, in pixels
 						"contrailMaxSpeedMult":0f,
 						"contrailAngularVelocityMult":0.5f,
 						"contrailSpawnDistMult":0f, # how far away from engine it starts

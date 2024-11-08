@@ -1,37 +1,27 @@
 {
   "id": "AEG_SteelBarrage",
-  "type": "TELEPORTER",
-  "aiType": "PHASE_TELEPORTER_2",
+  "type":"ENGINE_MOD",
+   "aiType":"MANEUVERING_JETS",
   "statsScript": "data.shipsystems.scripts.AEG_SteelBarrage",
 
-  "jitterColor": [144, 238, 144, 150],
-  "jitterCopies": 10,
-  "jitterRange": 5,
-  "jitterRangeRadiusFraction": 0,
+  "engineGlowColor":[105,255,105,255],
+  	"engineGlowContrailColor":[105,255,105,25],
+  	"engineGlowLengthMult":1,
+  	"engineGlowWidthMult":1,
+  	"engineGlowGlowMult":2,
 
-  "weaponGlowColor": [144, 238, 144, 0],
-  "weaponTypes": ["ENERGY"],
+  	"flameoutOnImpactChance":0,
 
-  "engineGlowLengthMult": 0,
-  "engineGlowWidthMult": 0,
-  "engineGlowGlowMult": 0,
+  	"clampTurnRateAfter":true,
+  	"clampMaxSpeedAfter":false,
 
-  "range": 1500,
-  "randomRange": 0,
+  	"useSound":"system_maneuvering_jets",
+  	"loopSound":"system_maneuvering_jets_loop",
+  	"outOfUsesSound":"engine_disabled",
 
-  "vulnerableChargeup": false,
-  "vulnerableChargedown": false,
-  "renderCopyDuringTeleport": true,
-
-  "fadeActivationSoundOnChargedown": false,
-
-  "useSound": "system_phase_teleporter",
-  "outOfUsesSound": "gun_out_of_ammo",
-
-  "aiHints": {
-    "activeSpeedIncrease": 0,
-    "burstMovementPotential": 1000,
-    "averageSpeedIncrease": 350
-  },
-
-}
+  	"aiHints":{
+  		"activeSpeedIncrease":50,
+  		"burstMovementPotential":0,
+  		"averageSpeedIncrease":25,
+  	}
+  }

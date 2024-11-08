@@ -168,7 +168,7 @@
   ],
   "engineSlots": [
     {
-      "location": [-97, 37.5],
+      "location": [-103.5, 37.5],
       "length": 168.830002,
       "width": 75.059998,
       "angle": -180,
@@ -176,7 +176,7 @@
       "style": "HIGH_TECH"
     },
     {
-      "location": [-97, -37.5],
+      "location": [-103.5, -37.5],
       "length": 168.830002,
       "width": 75.059998,
       "angle": 180,
@@ -184,35 +184,35 @@
       "style": "HIGH_TECH"
     },
     {
-      "location": [-76.5, 58.5],
-      "length": 133.970001,
-      "width": 40.860001,
+      "location": [-80.5, 59],
+      "length": 174.339264,
+      "width": 29.142496,
       "angle": 168,
-      "contrailSize": 40.860001,
+      "contrailSize": 29.142496,
       "style": "HIGH_TECH"
     },
     {
-      "location": [-76.5, -58.5],
-      "length": 133.970001,
-      "width": 40.860001,
+      "location": [-80.5, -59],
+      "length": 174.339264,
+      "width": 29.142496,
       "angle": -168,
-      "contrailSize": 40.860001,
+      "contrailSize": 29.142496,
       "style": "HIGH_TECH"
     },
     {
-      "location": [-77, 14.5],
-      "length": 223.25,
-      "width": 38.330002,
-      "angle": -177.5,
-      "contrailSize": 38.330002,
+      "location": [-80.5, 14.5],
+      "length": 164.14769,
+      "width": 23.476509,
+      "angle": -176.5,
+      "contrailSize": 23.476509,
       "style": "HIGH_TECH"
     },
     {
-      "location": [-77, -14.5],
-      "length": 223.25,
-      "width": 38.330002,
-      "angle": 177.5,
-      "contrailSize": 38.330002,
+      "location": [-80.5, -14.5],
+      "length": 164.14769,
+      "width": 23.476509,
+      "angle": 176.5,
+      "contrailSize": 23.476509,
       "style": "HIGH_TECH"
     }
   ],
