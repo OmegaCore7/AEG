@@ -11,9 +11,9 @@ import java.util.List;
 import java.util.Random;
 
 public class AEG_CalamityBlaster implements BeamEffectPlugin {
-    private static final float MAX_BEAM_WIDTH = 200f;
+    private static final float MAX_BEAM_WIDTH = 350f;
     private static final float MIN_BEAM_WIDTH = 60f;
-    private static final float DAMAGE_INCREMENT = 0.01f;
+    private static final float DAMAGE_INCREMENT = 0.10f;
     private static final float FLUX_INCREMENT = 0.01f;
     private static final float EMP_ARC_INTERVAL = 1f;
     private static final Color BALL_COLOR = new Color(105, 255, 105, 225); // Green color with some transparency
@@ -121,7 +121,7 @@ public class AEG_CalamityBlaster implements BeamEffectPlugin {
     }
 
     private void applyDamage(CombatEngineAPI engine, ShipAPI source, CombatEntityAPI target, float damage) {
-        engine.applyDamage(target, target.getLocation(), damage, DamageType.ENERGY, 0f, false, false, source);
+        engine.applyDamage(target, target.getLocation(), damage, DamageType.ENERGY, 100f, true, true, source);
     }
 
     private void emitEmpArc(CombatEngineAPI engine, Vector2f beamStart, BeamAPI beam) {
@@ -136,7 +136,7 @@ public class AEG_CalamityBlaster implements BeamEffectPlugin {
                 Color fringeColor = new Color(EMP_FRINGE_COLOR.getRed(), EMP_FRINGE_COLOR.getGreen(), EMP_FRINGE_COLOR.getBlue(), alpha);
 
                 engine.spawnEmpArc(beam.getSource(), beamStart, beam.getSource(), target,
-                        DamageType.ENERGY, 100f, 500f, 1000f, "tachyon_lance_emp_impact", width, coreColor, fringeColor);
+                        DamageType.ENERGY, 100f, 500f, 2000f, "tachyon_lance_emp_impact", width, coreColor, fringeColor);
             }
         }
     }

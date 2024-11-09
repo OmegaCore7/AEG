@@ -13,7 +13,7 @@ import java.util.List;
 public class AEG_EraserCannon implements OnHitEffectPlugin {
     private static final float DAMAGE_MULT = 2.0f; // Double the damage
     private static final float EXPLOSION_RADIUS = 400f; // Radius of the explosion
-    private static final float KNOCKBACK_FORCE = 300f; // Force of the knockback
+    private static final float KNOCKBACK_FORCE = 100f; // Force of the knockback
     private static final float DEBUFF_DURATION = 5f; // Duration of the debuff in seconds
     private static final Color[] EXPLOSION_COLORS = {
             new Color(0, 255, 0, 255), // Bright green

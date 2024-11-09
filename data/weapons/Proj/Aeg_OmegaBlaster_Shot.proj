@@ -2,6 +2,7 @@
 	"id":"Aeg_OmegaBlaster_Shot",
 	"specClass":"projectile",
 	"spawnType":"BALLISTIC",
+	"bulletSprite":"graphics/missiles/AEG_OmegaBlasterLarge.png",
 	"onHitEffect": "data.weapons.onhit.AEG_OmegaBlasterOnHit",
 	"collisionClass":"PROJECTILE_NO_FF",
     "collisionClassByFighter":"PROJECTILE_NO_FF",
@@ -15,5 +16,4 @@
     "pixelsPerTexel":10.0,
 	"passThroughMissiles":true,
 	"passThroughFighters":true,
-	"bulletSprite":"graphics/missiles/AEG_OmegaBlasterLarge.png",
 }
