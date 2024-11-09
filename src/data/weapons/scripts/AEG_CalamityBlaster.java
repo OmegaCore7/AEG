@@ -13,7 +13,6 @@ import java.util.Random;
 public class AEG_CalamityBlaster implements BeamEffectPlugin {
     private static final float MAX_BEAM_WIDTH = 350f;
     private static final float MIN_BEAM_WIDTH = 60f;
-    private static final float DAMAGE_INCREMENT = 0.10f;
     private static final float FLUX_INCREMENT = 0.01f;
     private static final float EMP_ARC_INTERVAL = 1f;
     private static final Color BALL_COLOR = new Color(105, 255, 105, 225); // Green color with some transparency
@@ -49,8 +48,8 @@ public class AEG_CalamityBlaster implements BeamEffectPlugin {
         // Set beam width
         beam.setWidth(currentBeamWidth);
 
-        // Increase damage and flux multipliers
-        damageMultiplier = Math.min(2f, damageMultiplier + DAMAGE_INCREMENT * amount);
+        // Increase damage multiplier exponentially
+        damageMultiplier = (float) Math.pow(2, beamTime);
         fluxMultiplier = Math.min(2f, fluxMultiplier + FLUX_INCREMENT * amount);
 
         // Create the energy ball at the base of the beam
@@ -70,58 +69,25 @@ public class AEG_CalamityBlaster implements BeamEffectPlugin {
         beam.getDamage().setMultiplier(damageMultiplier);
         beam.getSource().getFluxTracker().increaseFlux(beam.getWeapon().getFluxCostToFire() * fluxMultiplier, true);
 
-        // Handle beam collision and rendering
-        handleBeamCollision(engine, beam);
+        // Deal fatal damage to anything the beam passes over
+        dealFatalDamage(engine, beam);
     }
 
-    private void handleBeamCollision(CombatEngineAPI engine, BeamAPI beam) {
+    private void dealFatalDamage(CombatEngineAPI engine, BeamAPI beam) {
         Vector2f beamStart = beam.getFrom();
         Vector2f beamEnd = beam.getTo();
         List<CombatEntityAPI> targets = quadtreeHelper.retrieve(new ArrayList<CombatEntityAPI>(), beam.getSource());
 
-        float segmentLength = 10f; // Adjust as needed
-        Vector2f direction = Vector2f.sub(beamEnd, beamStart, null);
-        direction.normalise();
-        direction.scale(segmentLength);
-
-        Vector2f currentStart = new Vector2f(beamStart);
-        Vector2f currentEnd = new Vector2f(currentStart);
-        currentEnd.translate(direction.x, direction.y);
-
-        float currentWidth = MIN_BEAM_WIDTH;
-        float widthIncrement = (MAX_BEAM_WIDTH - MIN_BEAM_WIDTH) / (Vector2f.sub(beamEnd, beamStart, null).length() / segmentLength);
-
-        while (Vector2f.sub(currentEnd, beamStart, null).length() < Vector2f.sub(beamEnd, beamStart, null).length()) {
-            boolean hit = false;
-            for (CombatEntityAPI target : targets) {
-                Vector2f collisionPoint = CollisionUtils.getCollisionPoint(currentStart, currentEnd, target);
-                if (collisionPoint != null) {
-                    // Apply damage to the target
-                    applyDamage(engine, beam.getSource(), target, beam.getDamage().getDamage() * damageMultiplier);
-
-                    // Stop this segment
-                    beamEnd.set(collisionPoint);
-                    hit = true;
-                    break;
-                }
-            }
-
-            if (!hit) {
-                // Continue to the next segment
-                currentStart.set(currentEnd);
-                currentEnd.translate(direction.x, direction.y);
-                currentWidth = Math.min(MAX_BEAM_WIDTH, currentWidth + widthIncrement);
-            } else {
-                break;
+        for (CombatEntityAPI target : targets) {
+            Vector2f collisionPoint = CollisionUtils.getCollisionPoint(beamStart, beamEnd, target);
+            if (collisionPoint != null) {
+                applyFatalDamage(engine, beam.getSource(), target);
             }
         }
-
-        // Update the beam's end point manually
-        beam.getTo().set(beamEnd);
     }
 
-    private void applyDamage(CombatEngineAPI engine, ShipAPI source, CombatEntityAPI target, float damage) {
-        engine.applyDamage(target, target.getLocation(), damage, DamageType.ENERGY, 100f, true, true, source);
+    private void applyFatalDamage(CombatEngineAPI engine, ShipAPI source, CombatEntityAPI target) {
+        engine.applyDamage(target, target.getLocation(), target.getHitpoints(), DamageType.ENERGY, 100f, true, true, source);
     }
 
     private void emitEmpArc(CombatEngineAPI engine, Vector2f beamStart, BeamAPI beam) {

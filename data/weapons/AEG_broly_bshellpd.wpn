@@ -4,8 +4,10 @@
   "projectileSpecId": "AEG_eraserpd",
   "type": "MISSILE",
   "size": "SMALL",
+  "everyFrameEffect": "data.weapons.scripts.AEG_EraserPDEveryFrame",
   "turretSprite": "graphics/ships/broly/AEG_broly_bshell.png",
   "hardpointSprite": "graphics/ships/broly/AEG_broly_bshell.png",
+  "fadeTime": 0.3,
   "glowColor": [
     50,
     255,

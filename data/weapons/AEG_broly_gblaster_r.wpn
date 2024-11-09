@@ -4,6 +4,7 @@
   "projectileSpecId": "AEG_broly_pulse_shot",
   "type": "ENERGY",
   "size": "SMALL",
+  "everyFrameEffect": "data.weapons.scripts.AEG_GiganticPulseCharge",
   "turretSprite": "graphics/ships/broly/AEG_broly_gblaster_r.png",
   "hardpointSprite": "graphics/ships/broly/AEG_broly_gblaster_r.png",
   "glowColor": [
