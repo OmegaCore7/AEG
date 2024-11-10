@@ -6,6 +6,7 @@
 	"onHitEffect": "data.weapons.onhit.AEG_OmegaBlasterOnHit",
 	"collisionClass":"PROJECTILE_NO_FF",
     "collisionClassByFighter":"PROJECTILE_NO_FF",
+    "fadeTime":0.3,
 	"glowColor":[175,200,255,90],
 	"glowRadius":600,
 	"length":600.0,

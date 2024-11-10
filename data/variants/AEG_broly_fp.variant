@@ -41,8 +41,7 @@
       "autofire": true,
       "mode": "LINKED",
       "weapons": {
-        "WS0003": "AEG_broly_arm_l",
-        "WS0014": "AEG_broly_legs"
+        "WS0003": "AEG_broly_arm_l"
       }
     },
     {

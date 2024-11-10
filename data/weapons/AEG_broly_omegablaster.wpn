@@ -1,11 +1,11 @@
 {
   "id": "AEG_broly_omegablaster",
-  "specClass": "projectile",
-  "projectileSpecId": "AEG_OmegaBlaster_Missile",
+"specClass":"projectile",
+	"type":"BALLISTIC",
+	"size":"SMALL",
+	"displayArcRadius":450,
+  "projectileSpecId": "Aeg_OmegaBlaster_Shot",
   "everyFrameEffect": "data.weapons.scripts.AEG_OmegaBlasterCharge",
-  "type": "MISSILE",
-  "size": "SMALL",
-  "displayArcRadius": 300,
   "turretSprite": "graphics/ships/broly/AEG_broly_cblaster.png",
   "turretGlowSprite": "graphics/ships/broly/AEG_broly_cblaster_glow.png",
   "hardpointSprite": "graphics/ships/broly/AEG_broly_cblaster.png",
@@ -46,5 +46,5 @@
       255
     ]
   },
-  "fireSoundTwo": "hurricane_mirv_fire"
+  "fireSoundTwo":"mjolnir_fire",
 }

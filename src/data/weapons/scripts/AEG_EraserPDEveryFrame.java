@@ -11,8 +11,8 @@ import java.util.List;
 import java.util.Random;
 
 public class AEG_EraserPDEveryFrame implements EveryFrameWeaponEffectPlugin {
-    private static final float ZAP_RANGE = 500f;
-    private static final float ZAP_DAMAGE = 100f;
+    private static final float ZAP_RANGE = 800f;
+    private static final float ZAP_DAMAGE = 200f;
     private static final int MAX_CHARGES = 20;
 
     private int charges = MAX_CHARGES;
