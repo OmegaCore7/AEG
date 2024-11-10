@@ -34,10 +34,10 @@
     						"engineColor":[150,255,100,0],
     						"glowSizeMult":1.5,
     						"glowAlternateColor":[150,255,0,255],
-    						"contrailDuration":10,
-    						"contrailWidthMult":5,
+    						"contrailDuration":1,
+    						"contrailWidthMult":2,
     						"contrailWidthAddedFractionAtEnd":2,  # can be negative. makes trail spread out/narrow at the end
-    						"contrailMinSeg":20, # min segment length, in pixels
+    						"contrailMinSeg":10, # min segment length, in pixels
     						"contrailMaxSpeedMult":0.0f,
     						"contrailAngularVelocityMult":0.5f,
     						"contrailSpawnDistMult":0.5, # how far away from engine it starts
