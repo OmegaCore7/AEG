@@ -15,7 +15,7 @@
     	"useHitGlowWhenDestroyed":true,
     	"fizzleOnReachingWeaponRange":true,
     	"dudProbabilityOnFlameout":0,
-    	"armingTime":0,
+    	"armingTime":0.0,
     	"flameoutTime":0.5,
     	"noEngineGlowTime":0.5,
     	"fadeTime":0.5,
@@ -27,7 +27,7 @@
     				  "dec":2000},
     	"engineSlots":[{"id":"ES1",
     					#"loc":[-7, 0],
-    					"loc":[0, -20],
+    					"loc":[0,-20],
     				    "style":"CUSTOM",
     					"styleSpec":{
     						"mode":"QUAD_STRIP", # PARTICLES or QUAD_STRIP, determines which params are used
@@ -38,9 +38,9 @@
     						"contrailWidthMult":5,
     						"contrailWidthAddedFractionAtEnd":2,  # can be negative. makes trail spread out/narrow at the end
     						"contrailMinSeg":20, # min segment length, in pixels
-    						"contrailMaxSpeedMult":.0f,
+    						"contrailMaxSpeedMult":0.0f,
     						"contrailAngularVelocityMult":0.5f,
-    						"contrailSpawnDistMult":.5, # how far away from engine it starts
+    						"contrailSpawnDistMult":0.5, # how far away from engine it starts
     						"contrailColor":[100,155,70,75],
     						"type":"GLOW" # GLOW or SMOKE; additive or regular blend mode
     					},
