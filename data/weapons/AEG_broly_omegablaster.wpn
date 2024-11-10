@@ -3,7 +3,7 @@
 "specClass":"projectile",
 	"type":"BALLISTIC",
 	"size":"SMALL",
-	"displayArcRadius":450,
+	"displayArcRadius":600,
   "projectileSpecId": "Aeg_OmegaBlaster_Shot",
   "everyFrameEffect": "data.weapons.scripts.AEG_OmegaBlasterCharge",
   "turretSprite": "graphics/ships/broly/AEG_broly_cblaster.png",

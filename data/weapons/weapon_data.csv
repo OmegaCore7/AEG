@@ -83,7 +83,7 @@ Calamity Blaster,AEG_broly_cblaster,,,4500,2000,2000,3000,1000,15,5,20,,,,ENERGY
 Gigantic Pulse,AEG_broly_gblaster_l,,,100000,2000,,250,,15,45,,20,1,,ENERGY,150,,0,0.2,1,,0,10,2,5,,1000,1500,30,,,,"SYSTEM,SHOW_IN_CODEX",no_drop,,,,General,Extremely Fast,Excellent,,,,,,,,40
 Gigantic Pulse,AEG_broly_gblaster_r,,,100000,2000,,250,,15,45,,20,1,,ENERGY,150,,0,0.2,1,,0,10,2,5,,1000,1500,30,,,,"SYSTEM,SHOW_IN_CODEX",no_drop,,,,General,Extremely Fast,Excellent,,,,,,,,40
 Rage Pulse Cannon,AEG_broly_head,,,100000,2200,,500,,15,45,,30,1,,ENERGY,150,,2,30,30,0.05,0,2,0.5,1,,1000,1500,30,,,,"SYSTEM,SHOW_IN_CODEX",no_drop,,,,General,Extremely Fast,Excellent,,,,,,,,40
-Omega Blaster,AEG_broly_omegablaster,,,,2500,,5000,,100,5,25,1,1,,ENERGY,2500,,2,15,1,,0,0,0,0,,500,50,30,99999,,,"DO_NOT_AIM, CONSERVE_5",no_drop,,,,Finisher,Extremely Fast,Excellent,,,,,,,TRUE,16
+Omega Blaster,AEG_broly_omegablaster,,,,5000,,5000,,100,5,25,1,1,,ENERGY,2500,,2,15,1,,0,0,0,0,,500,1000,10,99999,,,"DO_NOT_AIM, CONSERVE_5",no_drop,,,,Finisher,Extremely Fast,Excellent,,,,,,,TRUE,16
 ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 ,AEG_broly_shell_deco,,,500000,600,1,,,,,,,,,,,,,,,,,,,,,,,,,,,,no_drop,,,,,,,,,,,,,,
 ,AEG_broly_legs,,,500000,600,1,,,,,,,,,,,,,,,,,,,,,,,,,,,,no_drop,,,,,,,,,,,,,,
