@@ -35,7 +35,7 @@
     						"glowSizeMult":1.5,
     						"glowAlternateColor":[150,255,0,255],
     						"contrailDuration":5,
-    						"contrailWidthMult":5,
+    						"contrailWidthMult":2.5,
     						"contrailWidthAddedFractionAtEnd":2,  # can be negative. makes trail spread out/narrow at the end
     						"contrailMinSeg":20, # min segment length, in pixels
     						"contrailMaxSpeedMult":.0f,
