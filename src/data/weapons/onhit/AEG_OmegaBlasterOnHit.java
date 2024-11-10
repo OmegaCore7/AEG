@@ -39,12 +39,12 @@ public class AEG_OmegaBlasterOnHit implements OnHitEffectPlugin, EveryFrameWeapo
             return true;
         }
 
-        // Check if the projectile is within 50su of the target's collision radius
+        // Check if the projectile is within 100su of the target's collision radius
         for (CombatEntityAPI entity : engine.getShips()) {
             if (entity instanceof ShipAPI && entity.getOwner() != projectile.getSource().getOwner()) {
                 ShipAPI ship = (ShipAPI) entity;
                 float distanceToShip = MathUtils.getDistance(projectile, ship);
-                if (distanceToShip <= ship.getCollisionRadius() + 50f) {
+                if (distanceToShip <= ship.getCollisionRadius() + 100f) {
                     // Slow down the projectile
                     projectile.getVelocity().scale(0.1f); // Reduce speed to 10% of original
                     return true;
