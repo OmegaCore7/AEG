@@ -17,10 +17,10 @@ public class AEG_CalamityBlaster implements BeamEffectPlugin {
     private static final float BASE_BEAM_WIDTH = 60f;
     private static final float MAX_BEAM_WIDTH = 450f;
     private static final float FLUX_INCREMENT = 0.01f;
-    private static final float EMP_ARC_INTERVAL = 0.08f;
+    private static final float EMP_ARC_INTERVAL = 1.5f;
     private static final Color BALL_COLOR = new Color(105, 255, 105, 225);
-    private static final Color EMP_CORE_COLOR = new Color(255, 0, 0, 255);
-    private static final Color EMP_FRINGE_COLOR = new Color(255, 165, 0, 255);
+    private static final Color EMP_CORE_COLOR = new Color(255, 47, 0, 255);
+    private static final Color EMP_FRINGE_COLOR = new Color(229, 138, 0, 255);
 
     private float currentBeamWidth = BASE_BEAM_WIDTH;
     private float damageMultiplier = 1f;
