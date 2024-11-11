@@ -15,13 +15,13 @@ public class AEG_CalamityBlaster implements BeamEffectPlugin {
     private static final float MAX_BEAM_WIDTH = 350f;
     private static final float MIN_BEAM_WIDTH = 60f;
     private static final float FLUX_INCREMENT = 0.01f;
-    private static final float EMP_ARC_INTERVAL = 1f;
+    private static final float EMP_ARC_INTERVAL = 0.8f;
     private static final float PULSE_INTERVAL = 2f;
     private static final float PULSE_DURATION = 0.4f;
     private static final float PULSE_EXTRA_WIDTH = 100f; // Increased pulse width
     private static final Color BALL_COLOR = new Color(105, 255, 105, 225); // Green color with some transparency
-    private static final Color EMP_CORE_COLOR = new Color(255, 255, 255, 255); // White core
-    private static final Color EMP_FRINGE_COLOR = new Color(105, 255, 105, 225); // Green fringe
+    private static final Color EMP_CORE_COLOR = new Color(255, 0, 0, 255); // Bright red core
+    private static final Color EMP_FRINGE_COLOR = new Color(255, 165, 0, 255); // Sunset orange fringe
 
     private float currentBeamWidth = MIN_BEAM_WIDTH;
     private float damageMultiplier = 1f;
@@ -58,7 +58,11 @@ public class AEG_CalamityBlaster implements BeamEffectPlugin {
             }
             float pulseProgress = (pulseTimer % PULSE_INTERVAL) / PULSE_DURATION;
             if (pulseProgress <= 1.0f) {
-                currentBeamWidth = MAX_BEAM_WIDTH + PULSE_EXTRA_WIDTH * (1.0f - Math.abs(pulseProgress - 0.5f) * 2);
+                if (pulseProgress <= 0.5f) {
+                    currentBeamWidth = 250f + 400f * pulseProgress;
+                } else {
+                    currentBeamWidth = 450f - 200f * (pulseProgress - 0.5f);
+                }
             } else {
                 currentBeamWidth = MAX_BEAM_WIDTH;
             }
@@ -112,7 +116,7 @@ public class AEG_CalamityBlaster implements BeamEffectPlugin {
         float distance = MathUtils.getDistance(beamStart, beamEnd);
         for (float i = 0; i < distance; i += 450 + random.nextFloat() * 100) { // Random segments between 450 and 550
             Vector2f point = new Vector2f(beamStart.x + (beamEnd.x - beamStart.x) * (i / distance), beamStart.y + (beamEnd.y - beamStart.y) * (i / distance));
-            engine.spawnEmpArcVisual(point, null, new Vector2f(point.x + (float) (Math.random() * 10 - 5), point.y + (float) (Math.random() * 10 - 5)), null, 10f, new Color(105, 255, 255, 255), new Color(105, 255, 105, 255));
+            engine.spawnEmpArcVisual(point, null, new Vector2f(point.x + (float) (Math.random() * 10 - 5), point.y + (float) (Math.random() * 10 - 5)), null, 20f, EMP_CORE_COLOR, EMP_FRINGE_COLOR);
         }
     }
 }
