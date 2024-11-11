@@ -13,7 +13,6 @@ import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-
 public class AEG_CalamityBlaster implements BeamEffectPlugin {
     private static final float BASE_BEAM_WIDTH = 60f;
     private static final float MAX_BEAM_WIDTH = 450f;
@@ -87,6 +86,11 @@ public class AEG_CalamityBlaster implements BeamEffectPlugin {
             currentBeamWidth = 450f;
             beam.setWidth(currentBeamWidth);
         }
+
+        // Trigger explosions regardless of hitting shields or ships
+        if (beamTime > 20f) {
+            triggerExplosions(engine, beam);
+        }
     }
 
     private void emitEmpArc(CombatEngineAPI engine, Vector2f beamStart, BeamAPI beam) {
@@ -138,40 +142,28 @@ public class AEG_CalamityBlaster implements BeamEffectPlugin {
         engine.applyDamage(target, target.getLocation(), target.getHitpoints(), DamageType.ENERGY, 0, false, false, source);
     }
 
-    private void shrinkAndGrowEffect(final CombatEngineAPI engine, final BeamAPI beam, CombatEntityAPI target) {
+    private void triggerExplosions(final CombatEngineAPI engine, final BeamAPI beam) {
         Vector2f beamBase = beam.getFrom();
-        Vector2f targetLocation = target.getLocation();
+        Vector2f targetLocation = beam.getTo();
         Vector2f endPoint = MathUtils.getPointOnCircumference(targetLocation, 100f, VectorUtils.getAngle(beamBase, targetLocation));
 
         for (int i = 0; i < 50; i++) {
             Vector2f explosionPoint = MathUtils.getRandomPointOnLine(beamBase, endPoint);
             float size = 10f + random.nextFloat() * 290f;
             engine.spawnExplosion(explosionPoint, new Vector2f(), new Color(105, 255, 105, 255), size, 1f);
+
+            // Retrieve entities within the explosion range
+            List<CombatEntityAPI> entities = CombatUtils.getEntitiesWithinRange(explosionPoint, size);
+            for (CombatEntityAPI entity : entities) {
+                engine.applyDamage(entity, explosionPoint, size, DamageType.HIGH_EXPLOSIVE, 0, false, false, beam.getSource());
+                engine.applyDamage(entity, explosionPoint, size, DamageType.KINETIC, 0, false, false, beam.getSource());
+                engine.applyDamage(entity, explosionPoint, size, DamageType.FRAGMENTATION, 0, false, false, beam.getSource());
+            }
         }
 
-        engine.applyDamage(target, target.getLocation(), target.getHitpoints(), DamageType.ENERGY, 0, false, false, beam.getSource());
-
-        // Shrink and grow animation
-        beam.setWidth(100f);
-        engine.addPlugin(new BaseEveryFrameCombatPlugin() {
-            private float timer = 0f;
-
-            @Override
-            public void advance(float amount, List<InputEventAPI> events) {
-                if (engine.isPaused()) return;
-
-                timer += amount;
-                if (timer < 0.6f) {
-                    beam.setWidth(100f + (1000f - 100f) * (timer / 0.6f));
-                } else if (timer < 2.6f) {
-                    beam.setWidth(450f - (450f - 60f) * ((timer - 0.6f) / 2f));
-                } else {
-                    beam.setWidth(60f);
-                    engine.removePlugin(this);
-                }
-            }
-        });
+        disableWeapon(engine, beam);
     }
+
     private void disableWeapon(final CombatEngineAPI engine, final BeamAPI beam) {
         beam.getWeapon().disable(true);
         engine.addPlugin(new BaseEveryFrameCombatPlugin() {
