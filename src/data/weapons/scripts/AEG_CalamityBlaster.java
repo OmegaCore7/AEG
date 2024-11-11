@@ -15,7 +15,7 @@ public class AEG_CalamityBlaster implements BeamEffectPlugin {
     private static final float MAX_BEAM_WIDTH = 350f;
     private static final float MIN_BEAM_WIDTH = 60f;
     private static final float FLUX_INCREMENT = 0.01f;
-    private static final float EMP_ARC_INTERVAL = 0.8f;
+    private static final float EMP_ARC_INTERVAL = 1f;
     private static final float PULSE_INTERVAL = 2f;
     private static final float PULSE_DURATION = 0.4f;
     private static final float PULSE_EXTRA_WIDTH = 100f; // Increased pulse width
@@ -110,7 +110,7 @@ public class AEG_CalamityBlaster implements BeamEffectPlugin {
     private void emitEmpArc(CombatEngineAPI engine, Vector2f beamStart, BeamAPI beam) {
         Vector2f beamEnd = beam.getTo();
         float distance = MathUtils.getDistance(beamStart, beamEnd);
-        for (float i = 0; i < distance; i += 350 + random.nextFloat() * 100) { // Random segments between 350 and 450
+        for (float i = 0; i < distance; i += 450 + random.nextFloat() * 100) { // Random segments between 450 and 550
             Vector2f point = new Vector2f(beamStart.x + (beamEnd.x - beamStart.x) * (i / distance), beamStart.y + (beamEnd.y - beamStart.y) * (i / distance));
             engine.spawnEmpArcVisual(point, null, new Vector2f(point.x + (float) (Math.random() * 10 - 5), point.y + (float) (Math.random() * 10 - 5)), null, 10f, new Color(105, 255, 255, 255), new Color(105, 255, 105, 255));
         }
