@@ -1,5 +1,6 @@
 package data.shipsystems.scripts;
 
+import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.combat.*;
 import com.fs.starfarer.api.impl.combat.BaseShipSystemScript;
 import org.lwjgl.util.vector.Vector2f;
@@ -9,20 +10,38 @@ import java.util.Map;
 
 public class AEG_SteelBarrage extends BaseShipSystemScript {
 
-    private static final float SHOULDER_ROTATION_ANGLE = 15f;
-    private static final float ARM_MOVEMENT_DISTANCE = 5f;
-    private static final float ANIMATION_SPEED = 0.1f; // Adjust as needed
+    private static final float ARM_MOVEMENT_DISTANCE = 6f;
+    private static final float SHOULDER_MOVEMENT_DISTANCE = 3f;
+    private static final float ANIMATION_SPEED = 0.5f; // 2 seconds per loop
+    private static final float RETURN_SPEED = 0.05f; // Speed for returning to base position
+    private static final float RESET_TIME = 1f; // Time to reset before system ends
+    private static final float TOTAL_ANIMATION_TIME = 6f; // Total time for the animation
 
     private float animationProgress = 0f;
     private boolean isPunchingRight = true;
-    private final Map<String, WeaponAPI> weaponMap = new HashMap<>();
+    private boolean isResetting = false;
+    private float resetTimer = 0f;
+    private Map<String, WeaponAPI> weaponMap = new HashMap<>();
+    private Map<String, Vector2f> initialPositions = new HashMap<>();
 
     @Override
     public void apply(MutableShipStatsAPI stats, String id, State state, float effectLevel) {
         ShipAPI ship = (ShipAPI) stats.getEntity();
         if (ship == null) return;
 
-        handleWeaponAnimation(ship, effectLevel);
+        if (state == State.ACTIVE) {
+            handleWeaponAnimation(ship, effectLevel);
+        } else if (state == State.OUT) {
+            if (!isResetting) {
+                isResetting = true;
+                resetTimer = RESET_TIME;
+            }
+            resetTimer -= Global.getCombatEngine().getElapsedInLastFrame();
+            if (resetTimer <= 0f) {
+                returnToBasePosition(ship);
+                isResetting = false;
+            }
+        }
     }
 
     @Override
@@ -30,7 +49,7 @@ public class AEG_SteelBarrage extends BaseShipSystemScript {
         ShipAPI ship = (ShipAPI) stats.getEntity();
         if (ship == null) return;
 
-        resetWeaponAnimation(ship);
+        returnToBasePosition(ship);
     }
 
     private void handleWeaponAnimation(ShipAPI ship, float effectLevel) {
@@ -49,27 +68,33 @@ public class AEG_SteelBarrage extends BaseShipSystemScript {
     private void advance(WeaponAPI shoulderLeft, WeaponAPI armLeft, WeaponAPI shoulderRight, WeaponAPI armRight, float amount) {
         animationProgress += amount * ANIMATION_SPEED;
 
-        if (animationProgress >= 1f) {
+        if (animationProgress >= TOTAL_ANIMATION_TIME) {
             animationProgress = 0f;
             isPunchingRight = !isPunchingRight;
         }
 
+        float shoulderProgress = animationProgress + (ANIMATION_SPEED / TOTAL_ANIMATION_TIME); // Shoulders move slightly ahead
+        if (shoulderProgress > 1f) shoulderProgress = 1f;
+
+        float armMovement = (float) Math.sin(animationProgress * Math.PI * 2) * ARM_MOVEMENT_DISTANCE;
+        float shoulderMovement = (float) Math.sin(shoulderProgress * Math.PI * 2) * SHOULDER_MOVEMENT_DISTANCE;
+
         if (isPunchingRight) {
             // Right punch
-            shoulderRight.setCurrAngle((float) Math.toRadians(-SHOULDER_ROTATION_ANGLE * animationProgress));
-            armRight.getSlot().getLocation().set(new Vector2f(armRight.getSlot().getLocation().x + ARM_MOVEMENT_DISTANCE * animationProgress, armRight.getSlot().getLocation().y));
-            shoulderLeft.setCurrAngle((float) Math.toRadians(SHOULDER_ROTATION_ANGLE * animationProgress));
-            armLeft.getSlot().getLocation().set(new Vector2f(armLeft.getSlot().getLocation().x - ARM_MOVEMENT_DISTANCE * animationProgress, armLeft.getSlot().getLocation().y));
+            shoulderRight.getSlot().getLocation().set(new Vector2f(initialPositions.get("WS0002").x + shoulderMovement, initialPositions.get("WS0002").y));
+            armRight.getSlot().getLocation().set(new Vector2f(initialPositions.get("WS0004").x + armMovement, initialPositions.get("WS0004").y));
+            shoulderLeft.getSlot().getLocation().set(new Vector2f(initialPositions.get("WS0001").x - shoulderMovement, initialPositions.get("WS0001").y));
+            armLeft.getSlot().getLocation().set(new Vector2f(initialPositions.get("WS0003").x - armMovement, initialPositions.get("WS0003").y));
         } else {
             // Left punch
-            shoulderRight.setCurrAngle((float) Math.toRadians(SHOULDER_ROTATION_ANGLE * animationProgress));
-            armRight.getSlot().getLocation().set(new Vector2f(armRight.getSlot().getLocation().x - ARM_MOVEMENT_DISTANCE * animationProgress, armRight.getSlot().getLocation().y));
-            shoulderLeft.setCurrAngle((float) Math.toRadians(-SHOULDER_ROTATION_ANGLE * animationProgress));
-            armLeft.getSlot().getLocation().set(new Vector2f(armLeft.getSlot().getLocation().x + ARM_MOVEMENT_DISTANCE * animationProgress, armLeft.getSlot().getLocation().y));
+            shoulderRight.getSlot().getLocation().set(new Vector2f(initialPositions.get("WS0002").x - shoulderMovement, initialPositions.get("WS0002").y));
+            armRight.getSlot().getLocation().set(new Vector2f(initialPositions.get("WS0004").x - armMovement, initialPositions.get("WS0004").y));
+            shoulderLeft.getSlot().getLocation().set(new Vector2f(initialPositions.get("WS0001").x + shoulderMovement, initialPositions.get("WS0001").y));
+            armLeft.getSlot().getLocation().set(new Vector2f(initialPositions.get("WS0003").x + armMovement, initialPositions.get("WS0003").y));
         }
     }
 
-    private void resetWeaponAnimation(ShipAPI ship) {
+    private void returnToBasePosition(ShipAPI ship) {
         initializeWeaponMap(ship);
 
         WeaponAPI shoulderLeft = findWeapon("WS0001");
@@ -78,17 +103,20 @@ public class AEG_SteelBarrage extends BaseShipSystemScript {
         WeaponAPI armRight = findWeapon("WS0004");
 
         if (shoulderLeft != null && armLeft != null && shoulderRight != null && armRight != null) {
-            shoulderLeft.setCurrAngle(0);
-            armLeft.getSlot().getLocation().set(new Vector2f(0, 0));
-            shoulderRight.setCurrAngle(0);
-            armRight.getSlot().getLocation().set(new Vector2f(0, 0));
+            // Gradually return to base position
+            armLeft.getSlot().getLocation().set(Vector2f.add(initialPositions.get("WS0003"), new Vector2f((armLeft.getSlot().getLocation().x - initialPositions.get("WS0003").x) * (1 - RETURN_SPEED), (armLeft.getSlot().getLocation().y - initialPositions.get("WS0003").y) * (1 - RETURN_SPEED)), null));
+            armRight.getSlot().getLocation().set(Vector2f.add(initialPositions.get("WS0004"), new Vector2f((armRight.getSlot().getLocation().x - initialPositions.get("WS0004").x) * (1 - RETURN_SPEED), (armRight.getSlot().getLocation().y - initialPositions.get("WS0004").y) * (1 - RETURN_SPEED)), null));
+            shoulderLeft.getSlot().getLocation().set(Vector2f.add(initialPositions.get("WS0001"), new Vector2f((shoulderLeft.getSlot().getLocation().x - initialPositions.get("WS0001").x) * (1 - RETURN_SPEED), (shoulderLeft.getSlot().getLocation().y - initialPositions.get("WS0001").y) * (1 - RETURN_SPEED)), null));
+            shoulderRight.getSlot().getLocation().set(Vector2f.add(initialPositions.get("WS0002"), new Vector2f((shoulderRight.getSlot().getLocation().x - initialPositions.get("WS0002").x) * (1 - RETURN_SPEED), (shoulderRight.getSlot().getLocation().y - initialPositions.get("WS0002").y) * (1 - RETURN_SPEED)), null));
         }
     }
 
     private void initializeWeaponMap(ShipAPI ship) {
         weaponMap.clear();
+        initialPositions.clear();
         for (WeaponAPI weapon : ship.getAllWeapons()) {
             weaponMap.put(weapon.getSlot().getId(), weapon);
+            initialPositions.put(weapon.getSlot().getId(), new Vector2f(weapon.getSlot().getLocation()));
         }
     }
 

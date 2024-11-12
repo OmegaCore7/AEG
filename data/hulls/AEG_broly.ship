@@ -54,8 +54,8 @@
       "type": "BUILT_IN",
       "mount": "TURRET",
       "arc": 75,
-      "angle": 0.5,
-      "locations": [10, 119],
+      "angle": 0,
+      "locations": [10, 118],
       "renderOrderMod": 1
     },
     {
@@ -64,8 +64,8 @@
       "type": "BUILT_IN",
       "mount": "TURRET",
       "arc": 75,
-      "angle": -0.5,
-      "locations": [10, -119],
+      "angle": -0,
+      "locations": [10, -118],
       "renderOrderMod": 1
     },
     {
