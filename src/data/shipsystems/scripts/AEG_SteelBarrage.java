@@ -11,7 +11,7 @@ import java.util.Map;
 public class AEG_SteelBarrage extends BaseShipSystemScript {
 
     private static final float ARM_MOVEMENT_DISTANCE = 6f;
-    private static final float SHOULDER_MOVEMENT_DISTANCE = 6f;
+    private static final float SHOULDER_MOVEMENT_DISTANCE = 5f;
     private static final float ANIMATION_SPEED = 0.2f; // Adjusted for 5-second animation
     private static final float RETURN_SPEED = 0.05f; // Speed for returning to base position
     private static final float RESET_TIME = 1f; // Time to reset before system ends
@@ -38,7 +38,7 @@ public class AEG_SteelBarrage extends BaseShipSystemScript {
             }
             resetTimer -= Global.getCombatEngine().getElapsedInLastFrame();
             if (resetTimer <= 0f) {
-                resetToInitialPositions(ship);
+                returnToBasePosition(ship);
                 isResetting = false;
             }
         }
@@ -49,7 +49,7 @@ public class AEG_SteelBarrage extends BaseShipSystemScript {
         ShipAPI ship = (ShipAPI) stats.getEntity();
         if (ship == null) return;
 
-        resetToInitialPositions(ship);
+        returnToBasePosition(ship);
     }
 
     private void handleWeaponAnimation(ShipAPI ship, float effectLevel) {
@@ -82,11 +82,11 @@ public class AEG_SteelBarrage extends BaseShipSystemScript {
         // Move arms and shoulders independently based on their initial positions
         shoulderRight.getSlot().getLocation().set(new Vector2f(initialPositions.get("WS0002").x + shoulderMovement, initialPositions.get("WS0002").y));
         armRight.getSlot().getLocation().set(new Vector2f(initialPositions.get("WS0004").x + armMovement, initialPositions.get("WS0004").y));
-        shoulderLeft.getSlot().getLocation().set(new Vector2f(initialPositions.get("WS0001").x - shoulderMovement, initialPositions.get("WS0001").y));
-        armLeft.getSlot().getLocation().set(new Vector2f(initialPositions.get("WS0003").x - armMovement, initialPositions.get("WS0003").y));
+        shoulderLeft.getSlot().getLocation().set(new Vector2f(initialPositions.get("WS0001").x + shoulderMovement, initialPositions.get("WS0001").y));
+        armLeft.getSlot().getLocation().set(new Vector2f(initialPositions.get("WS0003").x + armMovement, initialPositions.get("WS0003").y));
     }
 
-    private void resetToInitialPositions(ShipAPI ship) {
+    private void returnToBasePosition(ShipAPI ship) {
         initializeWeaponMap(ship);
 
         WeaponAPI shoulderLeft = findWeapon("WS0001");
@@ -95,11 +95,11 @@ public class AEG_SteelBarrage extends BaseShipSystemScript {
         WeaponAPI armRight = findWeapon("WS0004");
 
         if (shoulderLeft != null && armLeft != null && shoulderRight != null && armRight != null) {
-            // Reset to initial positions
-            shoulderLeft.getSlot().getLocation().set(initialPositions.get("WS0001"));
-            armLeft.getSlot().getLocation().set(initialPositions.get("WS0003"));
-            shoulderRight.getSlot().getLocation().set(initialPositions.get("WS0002"));
-            armRight.getSlot().getLocation().set(initialPositions.get("WS0004"));
+            // Gradually return to base position
+            armLeft.getSlot().getLocation().set(Vector2f.add(initialPositions.get("WS0003"), new Vector2f((armLeft.getSlot().getLocation().x - initialPositions.get("WS0003").x) * (1 - RETURN_SPEED), (armLeft.getSlot().getLocation().y - initialPositions.get("WS0003").y) * (1 - RETURN_SPEED)), null));
+            armRight.getSlot().getLocation().set(Vector2f.add(initialPositions.get("WS0004"), new Vector2f((armRight.getSlot().getLocation().x - initialPositions.get("WS0004").x) * (1 - RETURN_SPEED), (armRight.getSlot().getLocation().y - initialPositions.get("WS0004").y) * (1 - RETURN_SPEED)), null));
+            shoulderLeft.getSlot().getLocation().set(Vector2f.add(initialPositions.get("WS0001"), new Vector2f((shoulderLeft.getSlot().getLocation().x - initialPositions.get("WS0001").x) * (1 - RETURN_SPEED), (shoulderLeft.getSlot().getLocation().y - initialPositions.get("WS0001").y) * (1 - RETURN_SPEED)), null));
+            shoulderRight.getSlot().getLocation().set(Vector2f.add(initialPositions.get("WS0002"), new Vector2f((shoulderRight.getSlot().getLocation().x - initialPositions.get("WS0002").x) * (1 - RETURN_SPEED), (shoulderRight.getSlot().getLocation().y - initialPositions.get("WS0002").y) * (1 - RETURN_SPEED)), null));
         }
     }
 
