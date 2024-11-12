@@ -11,8 +11,8 @@ import java.util.Map;
 public class AEG_SteelBarrage extends BaseShipSystemScript {
 
     private static final float ARM_MOVEMENT_DISTANCE = 6f;
-    private static final float SHOULDER_MOVEMENT_DISTANCE = 3f;
-    private static final float ANIMATION_SPEED = 0.5f; // 2 seconds per loop
+    private static final float SHOULDER_MOVEMENT_DISTANCE = 6f;
+    private static final float ANIMATION_SPEED = 0.2f; // Adjusted for 5-second animation
     private static final float RETURN_SPEED = 0.05f; // Speed for returning to base position
     private static final float RESET_TIME = 1f; // Time to reset before system ends
     private static final float TOTAL_ANIMATION_TIME = 6f; // Total time for the animation
@@ -21,8 +21,8 @@ public class AEG_SteelBarrage extends BaseShipSystemScript {
     private boolean isPunchingRight = true;
     private boolean isResetting = false;
     private float resetTimer = 0f;
-    private Map<String, WeaponAPI> weaponMap = new HashMap<>();
-    private Map<String, Vector2f> initialPositions = new HashMap<>();
+    private final Map<String, WeaponAPI> weaponMap = new HashMap<>();
+    private final Map<String, Vector2f> initialPositions = new HashMap<>();
 
     @Override
     public void apply(MutableShipStatsAPI stats, String id, State state, float effectLevel) {
@@ -66,9 +66,9 @@ public class AEG_SteelBarrage extends BaseShipSystemScript {
     }
 
     private void advance(WeaponAPI shoulderLeft, WeaponAPI armLeft, WeaponAPI shoulderRight, WeaponAPI armRight, float amount) {
-        animationProgress += amount * ANIMATION_SPEED;
+        animationProgress += amount * (ANIMATION_SPEED / TOTAL_ANIMATION_TIME);
 
-        if (animationProgress >= TOTAL_ANIMATION_TIME) {
+        if (animationProgress >= 1f) {
             animationProgress = 0f;
             isPunchingRight = !isPunchingRight;
         }
@@ -79,19 +79,11 @@ public class AEG_SteelBarrage extends BaseShipSystemScript {
         float armMovement = (float) Math.sin(animationProgress * Math.PI * 2) * ARM_MOVEMENT_DISTANCE;
         float shoulderMovement = (float) Math.sin(shoulderProgress * Math.PI * 2) * SHOULDER_MOVEMENT_DISTANCE;
 
-        if (isPunchingRight) {
-            // Right punch
-            shoulderRight.getSlot().getLocation().set(new Vector2f(initialPositions.get("WS0002").x + shoulderMovement, initialPositions.get("WS0002").y));
-            armRight.getSlot().getLocation().set(new Vector2f(initialPositions.get("WS0004").x + armMovement, initialPositions.get("WS0004").y));
-            shoulderLeft.getSlot().getLocation().set(new Vector2f(initialPositions.get("WS0001").x - shoulderMovement, initialPositions.get("WS0001").y));
-            armLeft.getSlot().getLocation().set(new Vector2f(initialPositions.get("WS0003").x - armMovement, initialPositions.get("WS0003").y));
-        } else {
-            // Left punch
-            shoulderRight.getSlot().getLocation().set(new Vector2f(initialPositions.get("WS0002").x - shoulderMovement, initialPositions.get("WS0002").y));
-            armRight.getSlot().getLocation().set(new Vector2f(initialPositions.get("WS0004").x - armMovement, initialPositions.get("WS0004").y));
-            shoulderLeft.getSlot().getLocation().set(new Vector2f(initialPositions.get("WS0001").x + shoulderMovement, initialPositions.get("WS0001").y));
-            armLeft.getSlot().getLocation().set(new Vector2f(initialPositions.get("WS0003").x + armMovement, initialPositions.get("WS0003").y));
-        }
+        // Move arms and shoulders independently based on their initial positions
+        shoulderRight.getSlot().getLocation().set(new Vector2f(initialPositions.get("WS0002").x + shoulderMovement, initialPositions.get("WS0002").y));
+        armRight.getSlot().getLocation().set(new Vector2f(initialPositions.get("WS0004").x + armMovement, initialPositions.get("WS0004").y));
+        shoulderLeft.getSlot().getLocation().set(new Vector2f(initialPositions.get("WS0001").x - shoulderMovement, initialPositions.get("WS0001").y));
+        armLeft.getSlot().getLocation().set(new Vector2f(initialPositions.get("WS0003").x - armMovement, initialPositions.get("WS0003").y));
     }
 
     private void returnToBasePosition(ShipAPI ship) {
