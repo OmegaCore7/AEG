@@ -1,5 +1,6 @@
 package data.shipsystems.scripts;
 
+import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.combat.*;
 import com.fs.starfarer.api.impl.combat.BaseShipSystemScript;
 import org.lwjgl.util.vector.Vector2f;
@@ -9,12 +10,17 @@ import java.util.Map;
 
 public class AEG_SteelBarrage extends BaseShipSystemScript {
 
-    private static final float ARM_MOVEMENT_DISTANCE = 10f;
-    private static final float SHOULDER_MOVEMENT_DISTANCE = 10f;
+    private static final float ARM_MOVEMENT_DISTANCE = 6f;
+    private static final float SHOULDER_MOVEMENT_DISTANCE = 6f;
     private static final float ANIMATION_SPEED = 0.2f; // Adjusted for 5-second animation
+    private static final float RETURN_SPEED = 0.05f; // Speed for returning to base position
+    private static final float RESET_TIME = 1f; // Time to reset before system ends
     private static final float TOTAL_ANIMATION_TIME = 6f; // Total time for the animation
 
     private float animationProgress = 0f;
+    private boolean isPunchingRight = true;
+    private boolean isResetting = false;
+    private float resetTimer = 0f;
     private final Map<String, WeaponAPI> weaponMap = new HashMap<>();
     private final Map<String, Vector2f> initialPositions = new HashMap<>();
 
@@ -25,8 +31,16 @@ public class AEG_SteelBarrage extends BaseShipSystemScript {
 
         if (state == State.ACTIVE) {
             handleWeaponAnimation(ship, effectLevel);
-        } else {
-            resetToInitialPositions(ship);
+        } else if (state == State.OUT) {
+            if (!isResetting) {
+                isResetting = true;
+                resetTimer = RESET_TIME;
+            }
+            resetTimer -= Global.getCombatEngine().getElapsedInLastFrame();
+            if (resetTimer <= 0f) {
+                resetToInitialPositions(ship);
+                isResetting = false;
+            }
         }
     }
 
@@ -56,12 +70,16 @@ public class AEG_SteelBarrage extends BaseShipSystemScript {
 
         if (animationProgress >= 1f) {
             animationProgress = 0f;
+            isPunchingRight = !isPunchingRight;
         }
 
-        float armMovement = (float) Math.sin(animationProgress * Math.PI * 2) * ARM_MOVEMENT_DISTANCE;
-        float shoulderMovement = (float) Math.sin(animationProgress * Math.PI * 2) * SHOULDER_MOVEMENT_DISTANCE;
+        float shoulderProgress = animationProgress + (ANIMATION_SPEED / TOTAL_ANIMATION_TIME); // Shoulders move slightly ahead
+        if (shoulderProgress > 1f) shoulderProgress = 1f;
 
-        // Move arms and shoulders equally on both sides
+        float armMovement = (float) Math.sin(animationProgress * Math.PI * 2) * ARM_MOVEMENT_DISTANCE;
+        float shoulderMovement = (float) Math.sin(shoulderProgress * Math.PI * 2) * SHOULDER_MOVEMENT_DISTANCE;
+
+        // Move arms and shoulders independently based on their initial positions
         shoulderRight.getSlot().getLocation().set(new Vector2f(initialPositions.get("WS0002").x + shoulderMovement, initialPositions.get("WS0002").y));
         armRight.getSlot().getLocation().set(new Vector2f(initialPositions.get("WS0004").x + armMovement, initialPositions.get("WS0004").y));
         shoulderLeft.getSlot().getLocation().set(new Vector2f(initialPositions.get("WS0001").x - shoulderMovement, initialPositions.get("WS0001").y));
