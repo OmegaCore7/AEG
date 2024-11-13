@@ -50,11 +50,6 @@ public class AEG_SB_Effect {
                 }
             }
         }
-
-        // Knock the target ship away
-        Vector2f pushVector = VectorUtils.getDirectionalVector(ship.getLocation(), target.getLocation());
-        pushVector.scale(1000f);
-        Vector2f.add(target.getVelocity(), pushVector, target.getVelocity());
     }
 
     private static void createLightningArc(ShipAPI source, CombatEntityAPI target, CombatEngineAPI engine, Color color, float kineticDamage, float empDamage, float width, float length) {
