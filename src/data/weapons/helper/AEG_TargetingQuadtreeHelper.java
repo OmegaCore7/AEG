@@ -1,6 +1,7 @@
 package data.weapons.helper;
 
 import com.fs.starfarer.api.combat.CombatEntityAPI;
+import com.fs.starfarer.api.combat.CombatEngineAPI;
 import org.lwjgl.util.vector.Vector2f;
 
 import java.util.ArrayList;
@@ -17,7 +18,7 @@ public class AEG_TargetingQuadtreeHelper {
 
     public AEG_TargetingQuadtreeHelper(int level, Vector2f bounds) {
         this.level = level;
-        this.objects = new ArrayList<CombatEntityAPI>();
+        this.objects = new ArrayList<>();
         this.bounds = bounds;
         this.nodes = new AEG_TargetingQuadtreeHelper[4];
     }
@@ -107,5 +108,15 @@ public class AEG_TargetingQuadtreeHelper {
         returnObjects.addAll(objects);
 
         return returnObjects;
+    }
+
+    public static List<CombatEntityAPI> retrieveEntitiesWithinRadius(CombatEngineAPI engine, Vector2f center, float radius) {
+        List<CombatEntityAPI> entities = new ArrayList<>();
+        for (CombatEntityAPI entity : engine.getShips()) {
+            if (Vector2f.sub(entity.getLocation(), center, null).lengthSquared() <= radius * radius) {
+                entities.add(entity);
+            }
+        }
+        return entities;
     }
 }
