@@ -1,10 +1,10 @@
 package data.shipsystems.scripts;
 
 import com.fs.starfarer.api.Global;
-import com.fs.starfarer.api.combat.MutableShipStatsAPI;
-import com.fs.starfarer.api.combat.ShipAPI;
-import com.fs.starfarer.api.combat.WeaponAPI;
+import com.fs.starfarer.api.combat.*;
 import com.fs.starfarer.api.impl.combat.BaseShipSystemScript;
+import data.shipsystems.helpers.AEG_SB_Effect;
+import data.shipsystems.helpers.AEG_SBRegen;
 import data.shipsystems.helpers.AEG_TimeDilationHelper;
 import org.lazywizard.lazylib.VectorUtils;
 import org.lwjgl.util.vector.Vector2f;
@@ -14,11 +14,25 @@ public class AEG_SteelBarrage extends BaseShipSystemScript {
     private static final float SPEED_BOOST = 2.0f;
     private static final float MANEUVERABILITY_BOOST = 2.0f;
     private static final float PUSH_FORCE = 500f;
-    private static final float TIME_DILATION_DURATION = 1.0f;
+    private static final float TIME_DILATION_DURATION = 0.5f; // Shortened duration
     private static final float TIME_MULT = 0.1f;
 
     private Vector2f initialLeftArmPos;
     private Vector2f initialRightArmPos;
+    private Vector2f initialLeftShoulderPos;
+    private Vector2f initialRightShoulderPos;
+
+    private float initialLeftArmAngle;
+    private float initialRightArmAngle;
+    private float initialLeftShoulderAngle;
+    private float initialRightShoulderAngle;
+
+    private static final float TARGET_LEFT_ARM_ANGLE = -40f;
+    private static final float TARGET_RIGHT_ARM_ANGLE = 40f;
+    private static final float TARGET_LEFT_SHOULDER_ANGLE = -7f;
+    private static final float TARGET_RIGHT_SHOULDER_ANGLE = 7f;
+
+    private AEG_SBRegen regenHelper;
 
     @Override
     public void apply(MutableShipStatsAPI stats, String id, State state, float effectLevel) {
@@ -33,28 +47,42 @@ public class AEG_SteelBarrage extends BaseShipSystemScript {
             return;
         }
 
+        if (regenHelper == null) {
+            regenHelper = new AEG_SBRegen(ship);
+        }
+
         if (state == State.IN) {
-            if (initialLeftArmPos == null || initialRightArmPos == null) {
+            if (initialLeftArmPos == null || initialRightArmPos == null || initialLeftShoulderPos == null || initialRightShoulderPos == null) {
                 for (WeaponAPI w : ship.getAllWeapons()) {
                     switch (w.getSlot().getId()) {
                         case "WS0003":
                             initialLeftArmPos = new Vector2f(w.getSlot().getLocation());
+                            initialLeftArmAngle = w.getCurrAngle();
                             break;
                         case "WS0004":
                             initialRightArmPos = new Vector2f(w.getSlot().getLocation());
+                            initialRightArmAngle = w.getCurrAngle();
+                            break;
+                        case "WS0001":
+                            initialLeftShoulderPos = new Vector2f(w.getSlot().getLocation());
+                            initialLeftShoulderAngle = w.getCurrAngle();
+                            break;
+                        case "WS0002":
+                            initialRightShoulderPos = new Vector2f(w.getSlot().getLocation());
+                            initialRightShoulderAngle = w.getCurrAngle();
                             break;
                     }
                 }
             }
-
-            // Apply time dilation for 1 second
+        } else if (state == State.ACTIVE) {
+            // Apply time dilation for the transition
             AEG_TimeDilationHelper.applyTimeDilation(ship, TIME_DILATION_DURATION, TIME_MULT);
 
-            // Move arms back diagonally
-            moveArms(ship, -5f, -2f, -3f);
-        } else if (state == State.ACTIVE) {
-            // Move arms forward diagonally
-            moveArms(ship, 15f, 2f, 2f);
+            // Lock weapons into place at specified angles
+            setWeaponAngles(ship, TARGET_LEFT_ARM_ANGLE, TARGET_RIGHT_ARM_ANGLE, TARGET_LEFT_SHOULDER_ANGLE, TARGET_RIGHT_SHOULDER_ANGLE);
+
+            // Apply visual effects for ramming maneuver
+            AEG_SB_Effect.applyRammingEffects(ship, Global.getCombatEngine());
 
             // Apply speed and maneuverability boost
             ship.getMutableStats().getMaxSpeed().modifyMult(id, SPEED_BOOST);
@@ -75,43 +103,59 @@ public class AEG_SteelBarrage extends BaseShipSystemScript {
                 ship.setFacing(targetAngle);
             }
         } else if (state == State.OUT) {
-            // Reset arm positions
-            resetArms(ship);
+            // Reset arm and shoulder positions
+            resetArmsAndShoulders(ship);
         }
+
+        // Advance regeneration when the system isn't active
+        regenHelper.advance(Global.getCombatEngine().getElapsedInLastFrame());
     }
 
-    private void moveArms(ShipAPI ship, float distance, float leftOffset, float rightOffset) {
+    private void setWeaponAngles(ShipAPI ship, float leftArmAngle, float rightArmAngle, float leftShoulderAngle, float rightShoulderAngle) {
+        float shipFacing = ship.getFacing();
         for (WeaponAPI w : ship.getAllWeapons()) {
             switch (w.getSlot().getId()) {
                 case "WS0003":
-                    if (initialLeftArmPos != null) {
-                        Vector2f newPos = new Vector2f(initialLeftArmPos);
-                        newPos.translate(leftOffset, distance);
-                        w.getSlot().getLocation().set(newPos);
-                    }
+                    w.setCurrAngle(shipFacing + leftArmAngle);
                     break;
                 case "WS0004":
-                    if (initialRightArmPos != null) {
-                        Vector2f newPos = new Vector2f(initialRightArmPos);
-                        newPos.translate(rightOffset, distance);
-                        w.getSlot().getLocation().set(newPos);
-                    }
+                    w.setCurrAngle(shipFacing + rightArmAngle);
+                    break;
+                case "WS0001":
+                    w.setCurrAngle(shipFacing + leftShoulderAngle);
+                    break;
+                case "WS0002":
+                    w.setCurrAngle(shipFacing + rightShoulderAngle);
                     break;
             }
         }
     }
 
-    private void resetArms(ShipAPI ship) {
+    private void resetArmsAndShoulders(ShipAPI ship) {
         for (WeaponAPI w : ship.getAllWeapons()) {
             switch (w.getSlot().getId()) {
                 case "WS0003":
                     if (initialLeftArmPos != null) {
                         w.getSlot().getLocation().set(initialLeftArmPos);
+                        w.setCurrAngle(initialLeftArmAngle);
                     }
                     break;
                 case "WS0004":
                     if (initialRightArmPos != null) {
                         w.getSlot().getLocation().set(initialRightArmPos);
+                        w.setCurrAngle(initialRightArmAngle);
+                    }
+                    break;
+                case "WS0001":
+                    if (initialLeftShoulderPos != null) {
+                        w.getSlot().getLocation().set(initialLeftShoulderPos);
+                        w.setCurrAngle(initialLeftShoulderAngle);
+                    }
+                    break;
+                case "WS0002":
+                    if (initialRightShoulderPos != null) {
+                        w.getSlot().getLocation().set(initialRightShoulderPos);
+                        w.setCurrAngle(initialRightShoulderAngle);
                     }
                     break;
             }
@@ -135,7 +179,7 @@ public class AEG_SteelBarrage extends BaseShipSystemScript {
         // Reset engine flame size
         ship.getEngineController().extendFlame(id, 1.0f, 1.0f, 1.0f);
 
-        // Reset arm positions
-        resetArms(ship);
+        // Reset arm and shoulder positions
+        resetArmsAndShoulders(ship);
     }
 }
