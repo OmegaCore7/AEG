@@ -5,6 +5,7 @@ import com.fs.starfarer.api.combat.CombatEngineAPI;
 import com.fs.starfarer.api.combat.CombatEntityAPI;
 import com.fs.starfarer.api.combat.ShipAPI;
 import com.fs.starfarer.api.combat.WeaponAPI;
+import org.lazywizard.lazylib.MathUtils;
 import org.lwjgl.util.vector.Vector2f;
 import org.lazywizard.lazylib.VectorUtils;
 public class AEG_MeteorSmash {
@@ -14,6 +15,7 @@ public class AEG_MeteorSmash {
     private static final float PUSH_FORCE = 500f;
     private static final float TIME_DILATION_DURATION = 0.5f; // Shortened duration
     private static final float TIME_MULT = 0.1f;
+    private static final float ROTATION_SPEED = 180f; // Degrees per second
 
     private static Vector2f initialLeftArmPos;
     private static Vector2f initialRightArmPos;
@@ -55,10 +57,10 @@ public class AEG_MeteorSmash {
         pushVector.scale(PUSH_FORCE);
         Vector2f.add(ship.getVelocity(), pushVector, ship.getVelocity());
 
-        // Rotate ship to face target
+        // Rotate ship to face target smoothly
         if (ship.getMouseTarget() != null) {
             float targetAngle = VectorUtils.getAngle(ship.getLocation(), ship.getMouseTarget());
-            ship.setFacing(targetAngle);
+            smoothRotateToAngle(ship, targetAngle, engine.getElapsedInLastFrame());
         }
     }
 
@@ -114,6 +116,7 @@ public class AEG_MeteorSmash {
             }
         }
     }
+
     public static void resetPositions(ShipAPI ship) {
         for (WeaponAPI w : ship.getAllWeapons()) {
             switch (w.getSlot().getId()) {
@@ -142,6 +145,18 @@ public class AEG_MeteorSmash {
                     }
                     break;
             }
+        }
+    }
+
+    private static void smoothRotateToAngle(ShipAPI ship, float targetAngle, float deltaTime) {
+        float currentAngle = ship.getFacing();
+        float shortestAngle = MathUtils.getShortestRotation(currentAngle, targetAngle);
+        float rotationAmount = ROTATION_SPEED * deltaTime;
+
+        if (Math.abs(shortestAngle) < rotationAmount) {
+            ship.setFacing(targetAngle);
+        } else {
+            ship.setFacing(currentAngle + Math.signum(shortestAngle) * rotationAmount);
         }
     }
 }
