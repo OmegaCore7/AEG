@@ -3,14 +3,13 @@ package data.shipsystems.helpers;
 import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.combat.CombatEngineAPI;
 import com.fs.starfarer.api.combat.CombatEntityAPI;
-import com.fs.starfarer.api.combat.MutableShipStatsAPI;
 import com.fs.starfarer.api.combat.ShipAPI;
 import org.lazywizard.lazylib.VectorUtils;
 import org.lwjgl.util.vector.Vector2f;
 
 import java.awt.Color;
 
-public class AEG_GiganticCatastrophe {
+public class AEG_VanishingManeuver {
 
     private static final float SPEED_BOOST = 1.5f;
     private static final float MANEUVERABILITY_BOOST = 1.5f;
@@ -30,9 +29,6 @@ public class AEG_GiganticCatastrophe {
 
     public static void execute(ShipAPI ship, String id) {
         CombatEngineAPI engine = Global.getCombatEngine();
-
-        // Apply time dilation for the transition
-        AEG_TimeDilationHelper.applyTimeDilation(ship, TIME_DILATION_DURATION, TIME_MULT);
 
         // Apply visual effects for the maneuver
         applyVisualEffects(ship, engine);

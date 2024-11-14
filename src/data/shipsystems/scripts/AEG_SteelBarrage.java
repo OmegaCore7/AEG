@@ -4,11 +4,11 @@ import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.combat.MutableShipStatsAPI;
 import com.fs.starfarer.api.combat.ShipAPI;
 import com.fs.starfarer.api.impl.combat.BaseShipSystemScript;
-import data.shipsystems.helpers.AEG_MeteorSmash;
-import data.shipsystems.helpers.AEG_GiganticCatastrophe;
-import data.shipsystems.helpers.AEG_OmegaBlasterFinisher;
-import data.shipsystems.helpers.AEG_SBRegen;
-import org.lwjgl.input.Keyboard;
+import data.shipsystems.helpers.AEG_MeteorSmash; //CHARGE AND RAM THINGS
+import data.shipsystems.helpers.AEG_VanishingManeuver; //Dodging and High Maneuverability
+import data.shipsystems.helpers.AEG_EMPPulse; //DISABLE THINGS
+import data.shipsystems.helpers.AEG_SBRegen; //PASSIVE REGEN WHEN SYSTEM NOT BEING USED
+import org.lwjgl.input.Keyboard; //HOW WE ATTACH EACH MANEUVER TO SHIFT+BUTTON
 
 public class AEG_SteelBarrage extends BaseShipSystemScript {
 
@@ -39,16 +39,16 @@ public class AEG_SteelBarrage extends BaseShipSystemScript {
         if (state == State.IN) {
             // Initialize positions for maneuvers
             AEG_MeteorSmash.initializePositions(ship);
-            AEG_GiganticCatastrophe.resetCharges();
+            AEG_VanishingManeuver.resetCharges();
         } else if (state == State.ACTIVE) {
             // Check for key combinations and execute corresponding maneuver
             if (Keyboard.isKeyDown(Keyboard.KEY_LSHIFT)) {
                 if (Keyboard.isKeyDown(Keyboard.KEY_W)) {
                     AEG_MeteorSmash.execute(ship, id);
-                } else if (Keyboard.isKeyDown(Keyboard.KEY_D) || Keyboard.isKeyDown(Keyboard.KEY_A)) {
-                    AEG_GiganticCatastrophe.execute(ship, id);
+                } else if (Keyboard.isKeyDown(Keyboard.KEY_D)) {
+                    AEG_VanishingManeuver.execute(ship, id);
                 } else if (Keyboard.isKeyDown(Keyboard.KEY_S)) {
-                    AEG_OmegaBlasterFinisher.execute(ship, id);
+                    AEG_EMPPulse.execute(ship, id);
                 }
             }
         } else if (state == State.OUT) {
