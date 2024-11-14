@@ -6,6 +6,7 @@ import com.fs.starfarer.api.combat.ShipAPI;
 import com.fs.starfarer.api.impl.combat.BaseShipSystemScript;
 import data.shipsystems.helpers.AEG_MeteorSmash;
 import data.shipsystems.helpers.AEG_GiganticCatastrophe;
+import data.shipsystems.helpers.AEG_OmegaBlasterFinisher;
 import data.shipsystems.helpers.AEG_SBRegen;
 import org.lwjgl.input.Keyboard;
 
@@ -47,8 +48,7 @@ public class AEG_SteelBarrage extends BaseShipSystemScript {
                 } else if (Keyboard.isKeyDown(Keyboard.KEY_D) || Keyboard.isKeyDown(Keyboard.KEY_A)) {
                     AEG_GiganticCatastrophe.execute(ship, id);
                 } else if (Keyboard.isKeyDown(Keyboard.KEY_S)) {
-                    // Placeholder for Omega Blaster maneuver
-                    // AEG_OmegaBlaster.execute(ship, id);
+                    AEG_OmegaBlasterFinisher.execute(ship, id);
                 }
             }
         } else if (state == State.OUT) {
