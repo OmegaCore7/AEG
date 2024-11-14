@@ -1,14 +1,13 @@
 package data.shipsystems.scripts;
 
 import com.fs.starfarer.api.Global;
-import com.fs.starfarer.api.combat.CollisionClass;
-import com.fs.starfarer.api.combat.CombatEntityAPI;
 import com.fs.starfarer.api.combat.MutableShipStatsAPI;
 import com.fs.starfarer.api.combat.ShipAPI;
 import com.fs.starfarer.api.impl.combat.BaseShipSystemScript;
 import data.shipsystems.helpers.AEG_MeteorSmash;
+import data.shipsystems.helpers.AEG_GiganticCatastrophe;
 import data.shipsystems.helpers.AEG_SBRegen;
-import org.lazywizard.lazylib.MathUtils;
+import org.lwjgl.input.Keyboard;
 
 public class AEG_SteelBarrage extends BaseShipSystemScript {
 
@@ -37,29 +36,28 @@ public class AEG_SteelBarrage extends BaseShipSystemScript {
         }
 
         if (state == State.IN) {
+            // Initialize positions for maneuvers
             AEG_MeteorSmash.initializePositions(ship);
+            AEG_GiganticCatastrophe.resetCharges();
         } else if (state == State.ACTIVE) {
-            // Execute the Meteor Smash maneuver
-            AEG_MeteorSmash.execute(ship, id);
+            // Check for key combinations and execute corresponding maneuver
+            if (Keyboard.isKeyDown(Keyboard.KEY_LSHIFT)) {
+                if (Keyboard.isKeyDown(Keyboard.KEY_W)) {
+                    AEG_MeteorSmash.execute(ship, id);
+                } else if (Keyboard.isKeyDown(Keyboard.KEY_D) || Keyboard.isKeyDown(Keyboard.KEY_A)) {
+                    AEG_GiganticCatastrophe.execute(ship, id);
+                } else if (Keyboard.isKeyDown(Keyboard.KEY_S)) {
+                    // Placeholder for Omega Blaster maneuver
+                    // AEG_OmegaBlaster.execute(ship, id);
+                }
+            }
         } else if (state == State.OUT) {
-            // Reset arm and shoulder positions
+            // Reset positions after maneuvers
             AEG_MeteorSmash.resetPositions(ship);
         }
 
         // Advance regeneration when the system isn't active
         regenHelper.advance(Global.getCombatEngine().getElapsedInLastFrame());
-
-        // Check for collision and handle it
-        for (CombatEntityAPI entity : Global.getCombatEngine().getShips()) {
-            if (entity instanceof ShipAPI && entity != ship && ship.getCollisionClass() != CollisionClass.NONE) {
-                if (ship.getCollisionRadius() + entity.getCollisionRadius() > MathUtils.getDistance(ship, entity)) {
-                    AEG_MeteorSmash.handleCollision(ship, entity);
-                    // Trigger the next maneuver (Gigantic Catastrophe)
-                    // Placeholder for Gigantic Catastrophe maneuver
-                    break;
-                }
-            }
-        }
     }
 
     @Override
