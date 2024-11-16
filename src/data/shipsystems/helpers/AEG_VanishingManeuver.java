@@ -1,33 +1,31 @@
 package data.shipsystems.helpers;
 
 import com.fs.starfarer.api.Global;
-import com.fs.starfarer.api.combat.*;
+import com.fs.starfarer.api.combat.BaseEveryFrameCombatPlugin;
+import com.fs.starfarer.api.combat.CombatEngineAPI;
+import com.fs.starfarer.api.combat.ShipAPI;
 import org.lazywizard.lazylib.VectorUtils;
 import org.lwjgl.util.vector.Vector2f;
 
-import java.awt.Color;
+import java.awt.*;
 import java.util.List;
 
 public class AEG_VanishingManeuver {
-
-    private static final float SPEED_BOOST = 1.5f;
-    private static final float MANEUVERABILITY_BOOST = 1.5f;
     private static final float PUSH_FORCE = 700f;
     private static final float TIME_DILATION_DURATION = 0.5f;
     private static final float TIME_MULT = 0.1f;
+    private static final float DAMAGE_TAKEN_REDUCTION = 0.9f; // 10% damage taken
 
     private static final int TURN_ACC_BUFF = 1000;
     private static final int TURN_RATE_BUFF = 500;
     private static final int ACCEL_BUFF = 500;
     private static final int DECCEL_BUFF = 300;
     private static final int SPEED_BUFF = 200;
-    private static final float DAMAGE_REDUCTION = 0.1f; // 90% damage reduction
 
     public static void execute(ShipAPI ship, String id) {
-        CombatEngineAPI engine = Global.getCombatEngine();
 
         // Apply visual effects for the maneuver
-        applyVisualEffects(ship, engine);
+        applyVisualEffects(ship);
 
         // Apply speed and maneuverability boost
         ship.getMutableStats().getMaxSpeed().modifyPercent(id, SPEED_BUFF);
@@ -52,13 +50,13 @@ public class AEG_VanishingManeuver {
         // Apply time dilation
         applyTimeDilation(ship, id);
 
-        // Apply damage reduction
-        ship.getMutableStats().getHullDamageTakenMult().modifyMult(id, DAMAGE_REDUCTION);
-        ship.getMutableStats().getArmorDamageTakenMult().modifyMult(id, DAMAGE_REDUCTION);
-        ship.getMutableStats().getShieldDamageTakenMult().modifyMult(id, DAMAGE_REDUCTION);
+        // Apply damage taken reduction
+        ship.getMutableStats().getHullDamageTakenMult().modifyMult(id, DAMAGE_TAKEN_REDUCTION);
+        ship.getMutableStats().getArmorDamageTakenMult().modifyMult(id, DAMAGE_TAKEN_REDUCTION);
+        ship.getMutableStats().getShieldDamageTakenMult().modifyMult(id, DAMAGE_TAKEN_REDUCTION);
     }
 
-    private static void applyVisualEffects(ShipAPI ship, CombatEngineAPI engine) {
+    private static void applyVisualEffects(ShipAPI ship) {
         float effect = 1.0f; // Full effect level for visual effects
         ship.setJitterUnder(
                 ship,

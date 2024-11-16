@@ -1,13 +1,12 @@
 package data.shipsystems.helpers;
 
 import com.fs.starfarer.api.Global;
-import com.fs.starfarer.api.combat.CombatEngineAPI;
-import com.fs.starfarer.api.combat.CombatEntityAPI;
-import com.fs.starfarer.api.combat.ShipAPI;
+import com.fs.starfarer.api.combat.*;
 import com.fs.starfarer.api.combat.WeaponAPI;
 import org.lazywizard.lazylib.MathUtils;
 import org.lwjgl.util.vector.Vector2f;
 import org.lazywizard.lazylib.VectorUtils;
+
 public class AEG_MeteorSmash {
 
     private static final float SPEED_BOOST = 2.0f;
@@ -16,6 +15,11 @@ public class AEG_MeteorSmash {
     private static final float TIME_DILATION_DURATION = 0.5f; // Shortened duration
     private static final float TIME_MULT = 0.1f;
     private static final float ROTATION_SPEED = 180f; // Degrees per second
+
+    public static final float TARGET_LEFT_ARM_ANGLE = -40f;
+    public static final float TARGET_RIGHT_ARM_ANGLE = 40f;
+    public static final float TARGET_LEFT_SHOULDER_ANGLE = -7f;
+    public static final float TARGET_RIGHT_SHOULDER_ANGLE = 7f;
 
     private static Vector2f initialLeftArmPos;
     private static Vector2f initialRightArmPos;
@@ -26,11 +30,6 @@ public class AEG_MeteorSmash {
     private static float initialRightArmAngle;
     private static float initialLeftShoulderAngle;
     private static float initialRightShoulderAngle;
-
-    private static final float TARGET_LEFT_ARM_ANGLE = -40f;
-    private static final float TARGET_RIGHT_ARM_ANGLE = 40f;
-    private static final float TARGET_LEFT_SHOULDER_ANGLE = -7f;
-    private static final float TARGET_RIGHT_SHOULDER_ANGLE = 7f;
 
     public static void execute(ShipAPI ship, String id) {
         CombatEngineAPI engine = Global.getCombatEngine();
@@ -62,16 +61,6 @@ public class AEG_MeteorSmash {
             float targetAngle = VectorUtils.getAngle(ship.getLocation(), ship.getMouseTarget());
             smoothRotateToAngle(ship, targetAngle, engine.getElapsedInLastFrame());
         }
-    }
-
-    public static void handleCollision(ShipAPI ship, CombatEntityAPI target) {
-        CombatEngineAPI engine = Global.getCombatEngine();
-
-        // Create collision effects
-        AEG_SB_Effect.createCollisionEffects(ship, target, engine);
-
-        // End the Meteor Smash maneuver
-        resetPositions(ship);
     }
 
     private static void setWeaponAngles(ShipAPI ship) {
