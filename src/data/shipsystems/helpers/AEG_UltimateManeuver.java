@@ -7,8 +7,9 @@ import org.lazywizard.lazylib.MathUtils;
 import org.lazywizard.lazylib.VectorUtils;
 import org.lwjgl.util.vector.Vector2f;
 
-import java.awt.*;
+import java.awt.Color;
 import java.util.List;
+import java.util.Random;
 
 public class AEG_UltimateManeuver {
 
@@ -123,7 +124,16 @@ public class AEG_UltimateManeuver {
     private static void applyWeaponGlow(WeaponAPI weapon) {
         // Apply glow effect to the weapon
         CombatEngineAPI engine = Global.getCombatEngine();
-        engine.addHitParticle(weapon.getLocation(), new Vector2f(), 20f, 1f, 0.5f, BLACK_HOLE_COLOR);
+        Vector2f weaponLocation = weapon.getLocation();
+        float weaponFacing = weapon.getCurrAngle();
+        Color glowColor = new Color(255, 255, 255, 128); // White glow with some transparency
+
+        // Create a pulsing effect by varying the size and opacity
+        for (int i = 0; i < 5; i++) {
+            float size = 20f + (float) Math.random() * 10f;
+            float opacity = 0.5f + (float) Math.random() * 0.5f;
+            engine.addHitParticle(weaponLocation, new Vector2f(), size, opacity, 0.5f, glowColor);
+        }
     }
 
     private static void endEffect(ShipAPI ship, String id) {
@@ -141,10 +151,12 @@ public class AEG_UltimateManeuver {
             }
         }
 
-        // Disable all weapons, systems, and engines
-        ship.getMutableStats().getWeaponMalfunctionChance().modifyFlat(id, 1f);
-        ship.getMutableStats().getEngineMalfunctionChance().modifyFlat(id, 1f);
-        ship.getMutableStats().getCriticalMalfunctionChance().modifyFlat(id, 1f);
+        // Put all weapons and systems into a 10-second cooldown
+        for (WeaponAPI weapon : ship.getAllWeapons()) {
+            weapon.disable(true);
+            weapon.setRemainingCooldownTo(10f);
+        }
+        ship.getSystem().setCooldownRemaining(10f);
 
         // Reset damage reduction
         ship.getMutableStats().getHullDamageTakenMult().unmodify(id);
