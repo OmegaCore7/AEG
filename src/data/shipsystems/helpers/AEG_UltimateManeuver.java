@@ -18,8 +18,8 @@ public class AEG_UltimateManeuver {
     private static final float BLACK_HOLE_RADIUS = 2000f;
     private static final float PULL_STRENGTH = 300f;
     private static final Color BLACK_HOLE_COLOR = new Color(93, 36, 145);
-    private static final Color EXPLOSION_COLOR = new Color(255, 255, 255); // White with green fringe
-    private static final Color EXPLOSION_FRINGE_COLOR = new Color(105, 255, 105);
+    private static final Color EXPLOSION_COLOR = new Color(200, 255, 161); // White with green fringe
+    private static final Color EXPLOSION_FRINGE_COLOR = new Color(25, 153, 25);
 
     private static Vector2f blackHolePosition;
     private static boolean isActive = false;
@@ -126,7 +126,7 @@ public class AEG_UltimateManeuver {
         CombatEngineAPI engine = Global.getCombatEngine();
         Vector2f weaponLocation = weapon.getLocation();
         float weaponFacing = weapon.getCurrAngle();
-        Color glowColor = new Color(255, 255, 255, 128); // White glow with some transparency
+        Color glowColor = new Color(105, 255, 105, 255); // White glow with some transparency
 
         // Create a pulsing effect by varying the size and opacity
         for (int i = 0; i < 5; i++) {
@@ -142,21 +142,21 @@ public class AEG_UltimateManeuver {
         // Create final explosion
         CombatEngineAPI engine = Global.getCombatEngine();
         engine.spawnExplosion(blackHolePosition, new Vector2f(), EXPLOSION_COLOR, 1000f, 1f);
-        engine.addHitParticle(blackHolePosition, new Vector2f(), 1000f, 1f, 1f, EXPLOSION_FRINGE_COLOR);
+        engine.addHitParticle(blackHolePosition, new Vector2f(), 1500f, 1f, 1f, EXPLOSION_FRINGE_COLOR);
 
         // Deal 10,000 high explosive damage to all entities except the player ship
         for (CombatEntityAPI entity : engine.getShips()) {
             if (entity != ship) {
-                engine.applyDamage(entity, blackHolePosition, 10000f, DamageType.HIGH_EXPLOSIVE, 0f, false, false, ship);
+                engine.applyDamage(entity, blackHolePosition, 10000f, DamageType.HIGH_EXPLOSIVE, 0f, true, false, ship);
             }
         }
 
         // Put all weapons and systems into a 10-second cooldown
         for (WeaponAPI weapon : ship.getAllWeapons()) {
             weapon.disable(true);
-            weapon.setRemainingCooldownTo(10f);
+            weapon.setRemainingCooldownTo(5f);
         }
-        ship.getSystem().setCooldownRemaining(10f);
+        ship.getSystem().setCooldownRemaining(5f);
 
         // Reset damage reduction
         ship.getMutableStats().getHullDamageTakenMult().unmodify(id);
