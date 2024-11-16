@@ -11,32 +11,35 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-public class AEG_EMPPulse {
+public class AEG_NaniteSwarm {
 
     private static final float EMP_RADIUS = 1000f;
-    private static final float ARC_INTERVAL = 3f; // Interval for EMP arcs
-    private static final Color EMP_CORE_COLOR = new Color(105, 255, 105, 255);
-    private static final Color EMP_FRINGE_COLOR = new Color(0, 100, 0, 255);
+    private static final float ORB_INTERVAL = 1f; // Interval for orb updates
+    private static final Color ORB_COLOR = new Color(105, 255, 105, 255);
     private static final float DISSIPATION_TIME = 1f; // 1 second dissipation time
+    private static final float DEBUFF_DURATION = 20f; // Duration of debuffs on ships
 
     private static boolean isActive = false;
     private static float activeTime = 0f;
+    private static List<ShipAPI> affectedShips = new ArrayList<>();
 
     public static void execute(ShipAPI ship, String id) {
         isActive = true;
         activeTime = 0f;
+        affectedShips.clear();
 
         CombatEngineAPI engine = Global.getCombatEngine();
 
-        // Emit EMP pulse
-        emitEMPPulse(ship, engine, id);
+        // Emit nanite swarm
+        emitNaniteSwarm(ship, engine, id);
     }
 
-    private static void emitEMPPulse(ShipAPI ship, CombatEngineAPI engine, String id) {
+    private static void emitNaniteSwarm(ShipAPI ship, CombatEngineAPI engine, String id) {
         List<CombatEntityAPI> targets = getTargetsInRange(engine, ship.getLocation(), EMP_RADIUS);
 
+        // Apply debuffs to enemy ships only
         for (CombatEntityAPI target : targets) {
-            if (target instanceof ShipAPI && target != ship) { // Ensure player ship is unaffected
+            if (target instanceof ShipAPI && target != ship) {
                 applySpecialEffects((ShipAPI) target, id);
             }
         }
@@ -56,8 +59,11 @@ public class AEG_EMPPulse {
     }
 
     private static void applySpecialEffects(final ShipAPI target, final String id) {
-        // Flux Overload
-        target.getFluxTracker().increaseFlux(target.getFluxTracker().getMaxFlux() * 0.25f, true);
+        if (affectedShips.contains(target)) {
+            return; // Do not apply effects if already affected
+        }
+
+        affectedShips.add(target);
 
         // Shield Disruption
         if (target.getShield() != null) {
@@ -69,11 +75,30 @@ public class AEG_EMPPulse {
 
         // Energy Drain
         target.getMutableStats().getEnergyWeaponDamageMult().modifyMult(id, 0.5f);
+
+        // Schedule removal of debuffs after DEBUFF_DURATION
+        Global.getCombatEngine().addPlugin(new BaseEveryFrameCombatPlugin() {
+            private float elapsed = 0f;
+
+            @Override
+            public void advance(float amount, List<InputEventAPI> events) {
+                if (Global.getCombatEngine().isPaused()) {
+                    return;
+                }
+
+                elapsed += amount;
+                if (elapsed >= DEBUFF_DURATION) {
+                    removeSpecialEffects(target, id);
+                    Global.getCombatEngine().removePlugin(this);
+                }
+            }
+        });
     }
 
     private static void removeSpecialEffects(final ShipAPI target, final String id) {
         target.getMutableStats().getSensorProfile().unmodify(id);
         target.getMutableStats().getEnergyWeaponDamageMult().unmodify(id);
+        affectedShips.remove(target);
     }
 
     private static void createVisualEffects(final ShipAPI ship, final List<CombatEntityAPI> targets) {
@@ -90,33 +115,30 @@ public class AEG_EMPPulse {
                 }
 
                 elapsed += amount;
-                if (elapsed >= ARC_INTERVAL) {
+                if (elapsed >= ORB_INTERVAL) {
                     elapsed = 0f;
-                    int alpha = random.nextInt(156) + 100; // Random transparency between 100 and 255
-                    Color coreColor = new Color(EMP_CORE_COLOR.getRed(), EMP_CORE_COLOR.getGreen(), EMP_CORE_COLOR.getBlue(), alpha);
-                    Color fringeColor = new Color(EMP_FRINGE_COLOR.getRed(), EMP_FRINGE_COLOR.getGreen(), EMP_FRINGE_COLOR.getBlue(), alpha);
-                    float thickness = 2f + random.nextFloat() * 18f; // Random thickness between 2 and 20
 
-                    // Visual effects on the target ships
+                    // Check for ships in the radius and target them
+                    boolean targetFound = false;
                     for (CombatEntityAPI target : targets) {
-                        if (target instanceof ShipAPI) {
-                            Vector2f point = MathUtils.getRandomPointInCircle(target.getLocation(), target.getCollisionRadius());
-                            engine.spawnEmpArcVisual(target.getLocation(), target, point, target, thickness, coreColor, fringeColor);
+                        if (target instanceof ShipAPI && !affectedShips.contains(target)) {
+                            // Create particle effects on impact
+                            for (int i = 0; i < 10; i++) {
+                                Vector2f particlePos = MathUtils.getRandomPointInCircle(target.getLocation(), target.getCollisionRadius());
+                                engine.addHitParticle(particlePos, new Vector2f(), 5f + random.nextFloat() * 10f, 1f, 0.5f, ORB_COLOR);
+                            }
+                            applySpecialEffects((ShipAPI) target, "AEG_NaniteSwarm");
+                            targetFound = true;
+                            break; // Only strike one ship per interval
                         }
                     }
 
-                    // Visual effects on the player ship
-                    Vector2f point = MathUtils.getRandomPointInCircle(ship.getLocation(), ship.getCollisionRadius());
-                    engine.spawnEmpArcVisual(ship.getLocation(), ship, point, ship, thickness, coreColor, fringeColor);
-
-                    // Create green lightning arcs from the ship to the outer ring at cardinal directions
-                    for (int i = 0; i < 4; i++) {
-                        float angle = (float) (Math.PI / 2 * i);
-                        Vector2f ringPoint = new Vector2f(
-                                (float) (ship.getLocation().x + EMP_RADIUS * Math.cos(angle)),
-                                (float) (ship.getLocation().y + EMP_RADIUS * Math.sin(angle))
-                        );
-                        engine.spawnEmpArcVisual(ship.getLocation(), ship, ringPoint, ship, thickness, Color.GREEN, Color.GREEN);
+                    // If no targets found, dissipate particles
+                    if (!targetFound) {
+                        for (int i = 0; i < 10; i++) {
+                            Vector2f particlePos = MathUtils.getRandomPointInCircle(ship.getLocation(), 200);
+                            engine.addHitParticle(particlePos, new Vector2f(), 5f + random.nextFloat() * 10f, 1f, 0.5f, ORB_COLOR);
+                        }
                     }
                 }
             }
@@ -136,7 +158,7 @@ public class AEG_EMPPulse {
             List<CombatEntityAPI> targets = getTargetsInRange(Global.getCombatEngine(), Global.getCombatEngine().getPlayerShip().getLocation(), EMP_RADIUS);
             for (CombatEntityAPI target : targets) {
                 if (target instanceof ShipAPI) {
-                    removeSpecialEffects((ShipAPI) target, "AEG_EMPPulse");
+                    removeSpecialEffects((ShipAPI) target, "AEG_NaniteSwarm");
                 }
             }
         }

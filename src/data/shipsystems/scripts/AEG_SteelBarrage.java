@@ -5,8 +5,8 @@ import com.fs.starfarer.api.combat.MutableShipStatsAPI;
 import com.fs.starfarer.api.combat.ShipAPI;
 import com.fs.starfarer.api.impl.combat.BaseShipSystemScript;
 import data.shipsystems.helpers.AEG_MeteorSmash; // CHARGE AND RAM THINGS
+import data.shipsystems.helpers.AEG_NaniteSwarm; // DISABLE THINGS
 import data.shipsystems.helpers.AEG_VanishingManeuver; // Dodging and High Maneuverability
-import data.shipsystems.helpers.AEG_EMPPulse; // DISABLE THINGS
 import data.shipsystems.helpers.AEG_SBRegen; // PASSIVE REGEN WHEN SYSTEM NOT BEING USED
 import org.lwjgl.input.Keyboard; // HOW WE ATTACH EACH MANEUVER TO SHIFT+BUTTON
 
@@ -44,11 +44,11 @@ public class AEG_SteelBarrage extends BaseShipSystemScript {
             if (Keyboard.isKeyDown(Keyboard.KEY_LSHIFT)) {
                 if (Keyboard.isKeyDown(Keyboard.KEY_W)) {
                     AEG_MeteorSmash.execute(ship, id);
-                } else if (Keyboard.isKeyDown(Keyboard.KEY_S)) {
+                } else if (Keyboard.isKeyDown(Keyboard.KEY_A)) {
                     AEG_VanishingManeuver.execute(ship, id);
                 } else if (Keyboard.isKeyDown(Keyboard.KEY_D)) {
-                    AEG_EMPPulse.execute(ship, id);
-                } else if (Keyboard.isKeyDown(Keyboard.KEY_A)) {
+                    AEG_NaniteSwarm.execute(ship, id);
+                } else if (Keyboard.isKeyDown(Keyboard.KEY_S)) {
                     // Do nothing for now
                 }
             }
