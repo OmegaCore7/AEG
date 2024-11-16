@@ -1,13 +1,12 @@
 package data.shipsystems.helpers;
 
 import com.fs.starfarer.api.Global;
-import com.fs.starfarer.api.combat.CombatEngineAPI;
-import com.fs.starfarer.api.combat.CombatEntityAPI;
-import com.fs.starfarer.api.combat.ShipAPI;
+import com.fs.starfarer.api.combat.*;
 import org.lazywizard.lazylib.VectorUtils;
 import org.lwjgl.util.vector.Vector2f;
 
 import java.awt.Color;
+import java.util.List;
 
 public class AEG_VanishingManeuver {
 
@@ -22,10 +21,7 @@ public class AEG_VanishingManeuver {
     private static final int ACCEL_BUFF = 500;
     private static final int DECCEL_BUFF = 300;
     private static final int SPEED_BUFF = 200;
-    private static final int TIME_BUFF = 1000;
-
-    private static final int MAX_CHARGES = 6;
-    private static int currentCharges = MAX_CHARGES;
+    private static final float DAMAGE_REDUCTION = 0.1f; // 90% damage reduction
 
     public static void execute(ShipAPI ship, String id) {
         CombatEngineAPI engine = Global.getCombatEngine();
@@ -52,18 +48,14 @@ public class AEG_VanishingManeuver {
 
         // Disable shields for balance
         ship.getShield().toggleOff();
-    }
 
-    public static void handleCollision(ShipAPI ship, CombatEntityAPI target) {
-        CombatEngineAPI engine = Global.getCombatEngine();
+        // Apply time dilation
+        applyTimeDilation(ship, id);
 
-        // Create collision effects
-        AEG_SB_Effect.createCollisionEffects(ship, target, engine);
-
-        // Use a charge when taking hits
-        if (currentCharges > 0) {
-            currentCharges--;
-        }
+        // Apply damage reduction
+        ship.getMutableStats().getHullDamageTakenMult().modifyMult(id, DAMAGE_REDUCTION);
+        ship.getMutableStats().getArmorDamageTakenMult().modifyMult(id, DAMAGE_REDUCTION);
+        ship.getMutableStats().getShieldDamageTakenMult().modifyMult(id, DAMAGE_REDUCTION);
     }
 
     private static void applyVisualEffects(ShipAPI ship, CombatEngineAPI engine) {
@@ -81,7 +73,30 @@ public class AEG_VanishingManeuver {
         }
     }
 
-    public static void resetCharges() {
-        currentCharges = MAX_CHARGES;
+    private static void applyTimeDilation(final ShipAPI ship, final String id) {
+        final CombatEngineAPI engine = Global.getCombatEngine();
+        engine.getTimeMult().modifyMult(id, TIME_MULT);
+        ship.getMutableStats().getTimeMult().modifyMult(id, 1 / TIME_MULT);
+
+        Global.getCombatEngine().addPlugin(new BaseEveryFrameCombatPlugin() {
+            private float elapsed = 0f;
+
+            @Override
+            public void advance(float amount, List events) {
+                if (Global.getCombatEngine().isPaused()) {
+                    return;
+                }
+
+                elapsed += amount;
+                if (elapsed >= TIME_DILATION_DURATION) {
+                    engine.getTimeMult().unmodify(id);
+                    ship.getMutableStats().getTimeMult().unmodify(id);
+                    ship.getMutableStats().getHullDamageTakenMult().unmodify(id);
+                    ship.getMutableStats().getArmorDamageTakenMult().unmodify(id);
+                    ship.getMutableStats().getShieldDamageTakenMult().unmodify(id);
+                    Global.getCombatEngine().removePlugin(this);
+                }
+            }
+        });
     }
 }
