@@ -7,15 +7,17 @@ import com.fs.starfarer.api.impl.combat.BaseShipSystemScript;
 import data.shipsystems.helpers.AEG_MeteorSmash;
 import data.shipsystems.helpers.AEG_NaniteSwarm;
 import data.shipsystems.helpers.AEG_VanishingManeuver;
-import data.shipsystems.helpers.AEG_SBRegen;
 import data.shipsystems.helpers.AEG_UltimateManeuver;
 import org.lwjgl.input.Keyboard;
 
 public class AEG_SteelBarrage extends BaseShipSystemScript {
 
     private static final float SHIELD_UNFOLD_RATE_MULT = 10.0f;
+    private static final float ARMOR_REPAIR_RATE = 0.1f; // Armor repair rate per second
+    private static final float HULL_REPAIR_RATE = 0.02f; // Hull repair rate per second
 
-    private AEG_SBRegen regenHelper;
+    private AEG_ArmorRegen armorRegenHelper;
+    private AEG_HullRegen hullRegenHelper;
 
     private enum ManeuverState { IDLE, METEOR_SMASH, VANISHING_MANEUVER, NANITE_SWARM, ULTIMATE }
     private ManeuverState currentState = ManeuverState.IDLE;
@@ -75,8 +77,11 @@ public class AEG_SteelBarrage extends BaseShipSystemScript {
 
         ship.getMutableStats().getShieldUnfoldRateMult().modifyMult(id, SHIELD_UNFOLD_RATE_MULT);
 
-        if (regenHelper == null) {
-            regenHelper = new AEG_SBRegen(ship);
+        if (armorRegenHelper == null) {
+            armorRegenHelper = new AEG_ArmorRegen(ship);
+        }
+        if (hullRegenHelper == null) {
+            hullRegenHelper = new AEG_HullRegen(ship);
         }
 
         if (state == State.IN) {
@@ -93,11 +98,11 @@ public class AEG_SteelBarrage extends BaseShipSystemScript {
                     transitionToState(ManeuverState.ULTIMATE, ship, id);
                 }
             }
+            armorRegenHelper.advance(Global.getCombatEngine().getElapsedInLastFrame());
         } else if (state == State.OUT) {
             AEG_MeteorSmash.resetPositions(ship);
+            hullRegenHelper.advance(Global.getCombatEngine().getElapsedInLastFrame());
         }
-
-        regenHelper.advance(Global.getCombatEngine().getElapsedInLastFrame());
     }
 
     @Override
@@ -118,5 +123,50 @@ public class AEG_SteelBarrage extends BaseShipSystemScript {
         AEG_MeteorSmash.resetPositions(ship);
 
         ship.getMutableStats().getShieldUnfoldRateMult().unmodify(id);
+    }
+
+    private static class AEG_ArmorRegen {
+        private final ShipAPI ship;
+
+        public AEG_ArmorRegen(ShipAPI ship) {
+            this.ship = ship;
+        }
+
+        public void advance(float amount) {
+            if (ship == null || ship.isHulk()) {
+                return;
+            }
+
+            float armorRepair = ARMOR_REPAIR_RATE * amount;
+            float[][] armorGrid = ship.getArmorGrid().getGrid();
+            for (int i = 0; i < armorGrid.length; i++) {
+                for (int j = 0; j < armorGrid[i].length; j++) {
+                    armorGrid[i][j] += armorRepair;
+                    if (armorGrid[i][j] > ship.getArmorGrid().getMaxArmorInCell()) {
+                        armorGrid[i][j] = ship.getArmorGrid().getMaxArmorInCell();
+                    }
+                }
+            }
+        }
+    }
+
+    private static class AEG_HullRegen {
+        private final ShipAPI ship;
+
+        public AEG_HullRegen(ShipAPI ship) {
+            this.ship = ship;
+        }
+
+        public void advance(float amount) {
+            if (ship == null || ship.isHulk()) {
+                return;
+            }
+
+            float hullRepair = HULL_REPAIR_RATE * amount * ship.getMaxHitpoints();
+            ship.setHitpoints(ship.getHitpoints() + hullRepair);
+            if (ship.getHitpoints() > ship.getMaxHitpoints()) {
+                ship.setHitpoints(ship.getMaxHitpoints());
+            }
+        }
     }
 }

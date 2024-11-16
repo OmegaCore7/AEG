@@ -12,7 +12,7 @@ public class AEG_MeteorSmash {
     private static final float SPEED_BOOST = 2.0f;
     private static final float MANEUVERABILITY_BOOST = 2.0f;
     private static final float PUSH_FORCE = 500f;
-    private static final float TIME_DILATION_DURATION = 0.5f; // Shortened duration
+    private static final float TIME_DILATION_DURATION = 0.25f; // Shortened duration
     private static final float TIME_MULT = 0.1f;
     private static final float ROTATION_SPEED = 180f; // Degrees per second
 

@@ -2,14 +2,12 @@ package data.shipsystems.helpers;
 
 import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.combat.*;
-import com.fs.starfarer.api.input.InputEventAPI;
 import org.lazywizard.lazylib.MathUtils;
 import org.lazywizard.lazylib.VectorUtils;
 import org.lwjgl.util.vector.Vector2f;
 
-import java.awt.Color;
+import java.awt.*;
 import java.util.List;
-import java.util.Random;
 
 public class AEG_UltimateManeuver {
 
@@ -23,11 +21,18 @@ public class AEG_UltimateManeuver {
 
     private static Vector2f blackHolePosition;
     private static boolean isActive = false;
+    private static boolean explosionOccurred = false;
     private static float elapsedTime = 0f;
+    private static WeaponRepairHelper repairHelper;
 
     public static void execute(final ShipAPI ship, final String id) {
+        if (isActive) {
+            return; // Prevent reactivation while already active
+        }
+
         isActive = true;
         elapsedTime = 0f;
+        explosionOccurred = false;
 
         // Lock arms and shoulders
         AEG_MeteorSmash.initializePositions(ship);
@@ -52,22 +57,36 @@ public class AEG_UltimateManeuver {
         // Add plugin to handle the effect over time
         Global.getCombatEngine().addPlugin(new BaseEveryFrameCombatPlugin() {
             @Override
-            public void advance(float amount, List<InputEventAPI> events) {
+            public void advance(float amount, List events) {
                 if (Global.getCombatEngine().isPaused() || !isActive) {
                     return;
                 }
 
                 elapsedTime += amount;
-                if (elapsedTime >= DURATION) {
-                    endEffect(ship, id);
+                if (elapsedTime >= DURATION + 1f) { // Reset timer at the 11th second
+                    if (!explosionOccurred) {
+                        endEffect(ship, id);
+                        explosionOccurred = true;
+                    }
                     Global.getCombatEngine().removePlugin(this);
                     return;
                 }
 
                 // Apply black hole pull effect
                 applyBlackHolePull();
+
+                // Create particles moving towards the black hole
+                createBlackHoleParticles();
+
+                // Display countdown timer
+                displayCountdownTimer(DURATION + 1f - elapsedTime);
             }
         });
+
+        // Remove the repair helper if it exists
+        if (repairHelper != null) {
+            Global.getCombatEngine().removePlugin(repairHelper);
+        }
     }
 
     private static void setWeaponAngles(ShipAPI ship) {
@@ -85,10 +104,6 @@ public class AEG_UltimateManeuver {
                     break;
                 case "WS0002":
                     w.setCurrAngle(shipFacing + AEG_MeteorSmash.TARGET_RIGHT_SHOULDER_ANGLE);
-                    break;
-                case "WS0013":
-                    // Ensure OmegaBlaster weapons glow
-                    applyWeaponGlow(w);
                     break;
             }
         }
@@ -121,19 +136,28 @@ public class AEG_UltimateManeuver {
         }
     }
 
-    private static void applyWeaponGlow(WeaponAPI weapon) {
-        // Apply glow effect to the weapon
+    private static void createBlackHoleParticles() {
         CombatEngineAPI engine = Global.getCombatEngine();
-        Vector2f weaponLocation = weapon.getLocation();
-        float weaponFacing = weapon.getCurrAngle();
-        Color glowColor = new Color(105, 255, 105, 255); // White glow with some transparency
+        for (int i = 0; i < 10; i++) { // Increase particle frequency
+            Vector2f particlePos = MathUtils.getRandomPointInCircle(blackHolePosition, BLACK_HOLE_RADIUS);
+            Vector2f particleVel = Vector2f.sub(blackHolePosition, particlePos, null);
+            particleVel.scale(0.05f); // Slow down the particles
+            float size = 20f + (float) Math.random() * 10f; // Increase particle size
+            float transparency = 0.5f + (float) Math.random() * 0.5f; // Random transparency
+            engine.addHitParticle(particlePos, particleVel, size, transparency, 1f, BLACK_HOLE_COLOR);
 
-        // Create a pulsing effect by varying the size and opacity
-        for (int i = 0; i < 5; i++) {
-            float size = 20f + (float) Math.random() * 10f;
-            float opacity = 0.5f + (float) Math.random() * 0.5f;
-            engine.addHitParticle(weaponLocation, new Vector2f(), size, opacity, 0.5f, glowColor);
+            // Add smoke effect
+            if (Math.random() < 0.5) {
+                Color smokeColor = new Color(50, 50, 50, (int) (transparency * 255));
+                engine.addSmokeParticle(particlePos, particleVel, size * 1.5f, transparency, 1f, smokeColor);
+            }
         }
+    }
+
+    private static void displayCountdownTimer(float timeRemaining) {
+        CombatEngineAPI engine = Global.getCombatEngine();
+        String text = String.format("Ultimate Maneuver: %.1f", timeRemaining);
+        engine.getCombatUI().addMessage(0, text, Color.WHITE);
     }
 
     private static void endEffect(ShipAPI ship, String id) {
@@ -151,12 +175,11 @@ public class AEG_UltimateManeuver {
             }
         }
 
-        // Put all weapons and systems into a 10-second cooldown
+        // Apply fatal damage to all weapons
         for (WeaponAPI weapon : ship.getAllWeapons()) {
             weapon.disable(true);
-            weapon.setRemainingCooldownTo(5f);
+            engine.applyDamage(ship, weapon.getLocation(), weapon.getCurrHealth() + 1, DamageType.FRAGMENTATION, 0f, false, false, ship);
         }
-        ship.getSystem().setCooldownRemaining(5f);
 
         // Reset damage reduction
         ship.getMutableStats().getHullDamageTakenMult().unmodify(id);
@@ -170,5 +193,46 @@ public class AEG_UltimateManeuver {
 
         // Reset arm and shoulder positions
         AEG_MeteorSmash.resetPositions(ship);
+
+        // Add the repair helper to repair weapons over time
+        repairHelper = new WeaponRepairHelper(ship);
+        Global.getCombatEngine().addPlugin(repairHelper);
+
+        // Reset the 11-second timer
+        elapsedTime = 0f;
+
+        // Deactivate the system
+        ship.getSystem().deactivate();
+    }
+    private static class WeaponRepairHelper extends BaseEveryFrameCombatPlugin {
+
+        private final ShipAPI ship;
+        private static final float REPAIR_INTERVAL = 1f; // Repair interval in seconds
+        private float elapsed = 0f;
+
+        public WeaponRepairHelper(ShipAPI ship) {
+            this.ship = ship;
+        }
+
+        @Override
+        public void advance(float amount, List events) {
+            if (Global.getCombatEngine().isPaused()) {
+                return;
+            }
+
+            elapsed += amount;
+            if (elapsed >= REPAIR_INTERVAL) {
+                repairWeapons();
+                elapsed = 0f;
+            }
+        }
+
+        private void repairWeapons() {
+            for (WeaponAPI weapon : ship.getAllWeapons()) {
+                if (weapon.isDisabled()) {
+                    weapon.repair();
+                }
+            }
+        }
     }
 }
