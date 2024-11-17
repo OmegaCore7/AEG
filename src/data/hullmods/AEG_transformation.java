@@ -4,10 +4,13 @@ import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.combat.BaseEveryFrameCombatPlugin;
 import com.fs.starfarer.api.combat.BaseHullMod;
 import com.fs.starfarer.api.combat.ShipAPI;
+import com.fs.starfarer.api.combat.WeaponAPI;
 import com.fs.starfarer.api.input.InputEventAPI;
 import com.fs.starfarer.api.loading.HullModSpecAPI;
-import org.lwjgl.opengl.GL11;
+import com.fs.starfarer.api.util.Misc;
+import data.hullmods.AEG_transformationFX;
 import org.lwjgl.util.vector.Vector2f;
+import org.magiclib.util.MagicUI;
 
 import java.awt.Color;
 import java.util.List;
@@ -16,14 +19,15 @@ public class AEG_transformation extends BaseHullMod {
 
     private static final float GAUGE_MAX = 1.0f; // Max gauge (100%)
     private static final float[] BOOST_THRESHOLDS = {0.5f, 0.75f, 1.0f};
-    private static final float TRANSFORMATION_DURATION = 30f; // Duration of the transformation in seconds
-    private static final Color AURA_COLOR = new Color(255, 223, 0, 150); // Golden yellow color with some transparency
+    private static final float TRANSFORMATION_DURATION = 60f; // Duration of the transformation in seconds
 
     private float powerGauge = 0f; // Current gauge value
+    private AEG_transformationFX particleEffect;
 
-    public void applyEffectsBeforeShipCreation(HullModSpecAPI spec, ShipAPI ship, List<ShipAPI> ships) {
+    public void applyEffectsBeforeShipCreation(HullModSpecAPI spec, ShipAPI ship, List ships) {
         if (ship == null) return;
         powerGauge = 0f; // Initialize gauge when applied
+        particleEffect = new AEG_transformationFX();
     }
 
     @Override
@@ -34,40 +38,17 @@ public class AEG_transformation extends BaseHullMod {
         powerGauge = Math.min(powerGauge + (0.01f * amount), GAUGE_MAX);
         applyBuffs(ship);
 
+        // Update particles based on charge level
+        particleEffect.updateParticles(ship, powerGauge);
+
         // Check if the power gauge is at maximum
         if (powerGauge >= GAUGE_MAX) {
             // Trigger the transformation
             triggerTransformation(ship);
         }
-    }
 
-    public void render(ShipAPI ship, float alpha) {
-        if (ship == null) return;
-
-        // Get the position to draw the gauge
-        float x = ship.getLocation().x + 20; // Offset from the ship's position
-        float y = ship.getLocation().y + 40; // Offset from the ship's position
-        float width = 100; // Width of the gauge
-        float height = 10; // Height of the gauge
-
-        // Draw the background
-        GL11.glColor4f(0, 0, 0, 0.5f); // Semi-transparent black
-        GL11.glBegin(GL11.GL_QUADS);
-        GL11.glVertex2f(x, y);
-        GL11.glVertex2f(x + width, y);
-        GL11.glVertex2f(x + width, y + height);
-        GL11.glVertex2f(x, y + height);
-        GL11.glEnd();
-
-        // Draw the filled gauge
-        float filledWidth = (powerGauge / GAUGE_MAX) * width;
-        GL11.glColor4f(0, 1, 0, 1); // Green for the filled gauge
-        GL11.glBegin(GL11.GL_QUADS);
-        GL11.glVertex2f(x, y);
-        GL11.glVertex2f(x + filledWidth, y);
-        GL11.glVertex2f(x + filledWidth, y + height);
-        GL11.glVertex2f(x, y + height);
-        GL11.glEnd();
+        // Update the HUD with the transformation bar
+        updateHUD(ship);
     }
 
     private void applyBuffs(ShipAPI ship) {
@@ -117,18 +98,17 @@ public class AEG_transformation extends BaseHullMod {
         ship.getMutableStats().getMissileWeaponDamageMult().modifyMult("super_saiyan", 2f);
         ship.getMutableStats().getShieldUpkeepMult().modifyMult("super_saiyan", 0.5f); // Reduce shield upkeep by 50%
 
-        // Add visual and audio effects
-        Global.getCombatEngine().addFloatingText(ship.getLocation(), "Transformation Activated!", 30, Color.GREEN, ship, 1f, 2f);
-        Global.getSoundPlayer().playSound("super_saiyan_transformation", 1f, 1f, ship.getLocation(), ship.getVelocity());
+        // Create transformation particle effect
+        particleEffect.createTransformationEffect(ship);
 
-        // Add golden yellow aura effect
-        addAuraEffect(ship);
+        // Sync hair deco weapon rotation and animation
+        syncHairDecoWeapon(ship);
 
         // Set a timer to revert the transformation after the duration
         Global.getCombatEngine().addPlugin(new BaseEveryFrameCombatPlugin() {
             private float timer = TRANSFORMATION_DURATION;
 
-            public void advance(float amount, List<InputEventAPI> events) {
+            public void advance(float amount, List events) {
                 timer -= amount;
                 if (timer <= 0) {
                     revertTransformation(ship);
@@ -138,14 +118,41 @@ public class AEG_transformation extends BaseHullMod {
         });
     }
 
-    private void addAuraEffect(ShipAPI ship) {
+    private void syncHairDecoWeapon(ShipAPI ship) {
         if (ship == null) return;
 
-        for (int i = 0; i < 360; i += 10) {
-            float angle = (float) Math.toRadians(i);
-            Vector2f offset = new Vector2f((float) Math.cos(angle) * ship.getCollisionRadius(), (float) Math.sin(angle) * ship.getCollisionRadius());
-            Vector2f location = Vector2f.add(ship.getLocation(), offset, new Vector2f());
-            Global.getCombatEngine().addNebulaParticle(location, ship.getVelocity(), 50f, 1.5f, 0.1f, 0.3f, TRANSFORMATION_DURATION, AURA_COLOR);
+        WeaponAPI headWeapon = null;
+        WeaponAPI hairWeapon = null;
+
+        for (WeaponAPI weapon : ship.getAllWeapons()) {
+            if ("WS0011".equals(weapon.getSlot().getId())) {
+                headWeapon = weapon;
+            } else if ("WS0012".equals(weapon.getSlot().getId())) {
+                hairWeapon = weapon;
+            }
+        }
+
+        if (headWeapon != null && hairWeapon != null) {
+            hairWeapon.setCurrAngle(headWeapon.getCurrAngle());
+            hairWeapon.getAnimation().play();
+            hairWeapon.getAnimation().setFrame(0);
+            hairWeapon.getAnimation().setFrameRate(12f); // Play frames 00-12
+
+            final WeaponAPI finalHeadWeapon = headWeapon;
+            final WeaponAPI finalHairWeapon = hairWeapon;
+            Global.getCombatEngine().addPlugin(new BaseEveryFrameCombatPlugin() {
+                private boolean loopStarted = false;
+
+                @Override
+                public void advance(float amount, List<InputEventAPI> events) {
+                    finalHairWeapon.setCurrAngle(finalHeadWeapon.getCurrAngle());
+                    if (finalHairWeapon.getAnimation().getFrame() >= 12 && !loopStarted) {
+                        finalHairWeapon.getAnimation().setFrame(6);
+                        finalHairWeapon.getAnimation().setFrameRate(12f / (12 - 6)); // Loop frames 6-12
+                        loopStarted = true;
+                    }
+                }
+            });
         }
     }
 
@@ -161,6 +168,64 @@ public class AEG_transformation extends BaseHullMod {
 
         // Reset the power gauge
         powerGauge = 0f;
+
+        // Fade out transformation particle effect
+        particleEffect.fadeOutParticles(ship);
+
+        // Revert hair deco weapon animation
+        revertHairDecoWeapon(ship);
+    }
+
+    private void revertHairDecoWeapon(ShipAPI ship) {
+        if (ship == null) return;
+
+        for (final WeaponAPI weapon : ship.getAllWeapons()) {
+            if ("WS0012".equals(weapon.getSlot().getId())) {
+                weapon.getAnimation().setFrameRate(12f); // Play frames 12-00
+                weapon.getAnimation().play();
+                Global.getCombatEngine().addPlugin(new BaseEveryFrameCombatPlugin() {
+                    @Override
+                    public void advance(float amount, List<InputEventAPI> events) {
+                        if (weapon.getAnimation().getFrame() <= 0) {
+                            weapon.getAnimation().pause();
+                            Global.getCombatEngine().removePlugin(this);
+                        }
+                    }
+                });
+            }
+        }
+    }
+
+    private void updateHUD(ShipAPI ship) {
+        if (Global.getCombatEngine().getPlayerShip() == ship) {
+            float progress = powerGauge / GAUGE_MAX;
+            Color barColor = progress >= 1.0f ? Misc.getPositiveHighlightColor() : Misc.getNegativeHighlightColor();
+            MagicUI.drawHUDStatusBar(
+                    ship,
+                    progress,
+                    barColor,
+                    barColor,
+                    0,
+                    "Transformation",
+                    "",
+                    false
+            );
+
+            // Draw ticks at 20%, 40%, 60%, 80%, and 100%
+            for (int i = 1; i <= 5; i++) {
+                float tickPosition = i * 0.2f;
+                MagicUI.drawHUDStatusBar(
+                        ship,
+                        tickPosition,
+                        Misc.getHighlightColor(),
+                        Misc.getHighlightColor(),
+                        0,
+                        "",
+                        "",
+                        true
+                );
+            }
+        }
     }
 
     @Override

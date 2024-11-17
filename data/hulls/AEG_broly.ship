@@ -11,6 +11,27 @@
   "shieldCenter": [0, -0],
   "shieldRadius": 245.5,
   "viewOffset": 0,
+  "builtInMods": [
+    "AEG_transformation",
+    "advancedshieldemitter",
+    "advancedoptics",
+    "armaa_himac",
+    "armoredweapons",
+    "hardenedshieldemitter",
+    "hardened_subsystems",
+    "fluxbreakers",
+    "fluxcoil",
+    "fluxdistributor",
+    "shielded_holds",
+    "solar_shielding",
+    "stabilizedshieldemitter",
+    "surveying_equipment",
+    "supercomputer",
+    "repair_gantry",
+    "reinforcedhull",
+    "nav_relay",
+    "always_detaches"
+  ],
   "builtInWeapons": {
     "WS0001": "AEG_broly_shoulder_l",
     "WS0002": "AEG_broly_shoulder_r",
@@ -35,7 +56,7 @@
       "mount": "TURRET",
       "arc": 15,
       "angle": 0,
-      "locations": [-9, 80],
+      "locations": [2, 80],
       "renderOrderMod": 2
     },
     {
@@ -45,7 +66,7 @@
       "mount": "TURRET",
       "arc": 15,
       "angle": -0,
-      "locations": [-9, -80],
+      "locations": [2, -80],
       "renderOrderMod": 2
     },
     {

@@ -14,9 +14,10 @@ public class AEG_UltimateManeuver {
     private static final float DURATION = 10f;
     private static final float DAMAGE_REDUCTION = 0.01f; // 99% damage reduction
     private static final float BLACK_HOLE_RADIUS = 2000f;
+    private static final float RING_RADIUS = 300f;
     private static final float PULL_STRENGTH = 300f;
-    private static final Color BLACK_HOLE_COLOR = new Color(93, 36, 145);
-    private static final Color EXPLOSION_COLOR = new Color(200, 255, 161); // White with green fringe
+    private static final Color RING_COLOR = new Color(255, 0, 255); // Bright magenta
+    private static final Color EXPLOSION_COLOR = new Color(105, 255, 105); // White with green fringe
     private static final Color EXPLOSION_FRINGE_COLOR = new Color(25, 153, 25);
 
     private static Vector2f blackHolePosition;
@@ -38,6 +39,9 @@ public class AEG_UltimateManeuver {
         AEG_MeteorSmash.initializePositions(ship);
         setWeaponAngles(ship);
 
+        // Determine black hole position
+        blackHolePosition = MathUtils.getPointOnCircumference(ship.getLocation(), 1500f, ship.getFacing());
+
         // Apply visual effects
         applyVisualEffects(ship);
 
@@ -50,9 +54,6 @@ public class AEG_UltimateManeuver {
         ship.getMutableStats().getMaxSpeed().modifyMult(id, 0f);
         ship.getMutableStats().getAcceleration().modifyMult(id, 0f);
         ship.getMutableStats().getDeceleration().modifyMult(id, 0f);
-
-        // Determine black hole position
-        blackHolePosition = MathUtils.getPointOnCircumference(ship.getLocation(), 1500f, ship.getFacing());
 
         // Add plugin to handle the effect over time
         Global.getCombatEngine().addPlugin(new BaseEveryFrameCombatPlugin() {
@@ -79,7 +80,7 @@ public class AEG_UltimateManeuver {
                 createBlackHoleParticles();
 
                 // Display countdown timer
-                displayCountdownTimer(DURATION + 1f - elapsedTime);
+                displayCountdownTimer(ship, DURATION + 1f - elapsedTime);
             }
         });
 
@@ -110,19 +111,23 @@ public class AEG_UltimateManeuver {
     }
 
     private static void applyVisualEffects(ShipAPI ship) {
-        ship.setJitterUnder(
-                ship,
-                BLACK_HOLE_COLOR,
-                1.0f,
-                10,
-                20f,
-                40f
-        );
-        ship.addAfterimage(BLACK_HOLE_COLOR, 0, 0, -ship.getVelocity().x, -ship.getVelocity().y, 50f, 0, 0, 2f, false, false, false);
+        if (blackHolePosition == null) {
+            return; // Ensure blackHolePosition is not null
+        }
+
+        // Add central ring effect
+        CombatEngineAPI engine = Global.getCombatEngine();
+        if (engine != null) {
+            engine.addHitParticle(blackHolePosition, new Vector2f(), RING_RADIUS, 1f, DURATION, RING_COLOR);
+        }
     }
 
     private static void applyBlackHolePull() {
         CombatEngineAPI engine = Global.getCombatEngine();
+        if (engine == null || blackHolePosition == null) {
+            return; // Ensure engine and blackHolePosition are not null
+        }
+
         for (CombatEntityAPI entity : engine.getShips()) {
             if (entity instanceof ShipAPI && entity != engine.getPlayerShip()) {
                 float distance = MathUtils.getDistance(entity, blackHolePosition);
@@ -138,24 +143,37 @@ public class AEG_UltimateManeuver {
 
     private static void createBlackHoleParticles() {
         CombatEngineAPI engine = Global.getCombatEngine();
+        if (engine == null || blackHolePosition == null) {
+            return; // Ensure engine and blackHolePosition are not null
+        }
+
         for (int i = 0; i < 10; i++) { // Increase particle frequency
             Vector2f particlePos = MathUtils.getRandomPointInCircle(blackHolePosition, BLACK_HOLE_RADIUS);
             Vector2f particleVel = Vector2f.sub(blackHolePosition, particlePos, null);
             particleVel.scale(0.05f); // Slow down the particles
             float size = 20f + (float) Math.random() * 10f; // Increase particle size
             float transparency = 0.5f + (float) Math.random() * 0.5f; // Random transparency
-            engine.addHitParticle(particlePos, particleVel, size, transparency, 1f, BLACK_HOLE_COLOR);
+            engine.addHitParticle(particlePos, particleVel, size, transparency, 1f, RING_COLOR);
 
             // Add smoke effect
             if (Math.random() < 0.5) {
                 Color smokeColor = new Color(50, 50, 50, (int) (transparency * 255));
                 engine.addSmokeParticle(particlePos, particleVel, size * 1.5f, transparency, 1f, smokeColor);
             }
+
+            // Ensure particles stop at the ring
+            if (MathUtils.getDistance(particlePos, blackHolePosition) <= RING_RADIUS) {
+                particleVel.set(0, 0);
+            }
         }
     }
 
-    private static void displayCountdownTimer(float timeRemaining) {
+    private static void displayCountdownTimer(ShipAPI ship, float timeRemaining) {
         CombatEngineAPI engine = Global.getCombatEngine();
+        if (engine == null) {
+            return; // Ensure engine is not null
+        }
+
         String text = String.format("Ultimate Maneuver: %.1f", timeRemaining);
         engine.getCombatUI().addMessage(0, text, Color.WHITE);
     }
@@ -165,22 +183,26 @@ public class AEG_UltimateManeuver {
 
         // Create final explosion
         CombatEngineAPI engine = Global.getCombatEngine();
-        engine.spawnExplosion(blackHolePosition, new Vector2f(), EXPLOSION_COLOR, 1000f, 1f);
-        engine.addHitParticle(blackHolePosition, new Vector2f(), 1500f, 1f, 1f, EXPLOSION_FRINGE_COLOR);
+        if (engine != null && blackHolePosition != null) {
+            engine.spawnExplosion(blackHolePosition, new Vector2f(), EXPLOSION_COLOR, 1000f, 1f);
+            engine.addHitParticle(blackHolePosition, new Vector2f(), 1500f, 1f, 1f, EXPLOSION_FRINGE_COLOR);
 
-        // Deal 10,000 high explosive damage to all entities except the player ship
-        for (CombatEntityAPI entity : engine.getShips()) {
-            if (entity != ship) {
-                engine.applyDamage(entity, blackHolePosition, 10000f, DamageType.HIGH_EXPLOSIVE, 0f, true, false, ship);
+            // Add shockwave effect
+            engine.addNebulaParticle(blackHolePosition, new Vector2f(), 200f, 1.5f, 0.1f, 0.3f, 1f, EXPLOSION_COLOR);
+
+            // Deal 10,000 high explosive damage to all entities except the player ship
+            for (CombatEntityAPI entity : engine.getShips()) {
+                if (entity != ship) {
+                    engine.applyDamage(entity, blackHolePosition, 10000f, DamageType.HIGH_EXPLOSIVE, 0f, true, false, ship);
+                }
+            }
+
+            // Apply fatal damage to all weapons
+            for (WeaponAPI weapon : ship.getAllWeapons()) {
+                weapon.disable(true);
+                engine.applyDamage(ship, weapon.getLocation(), weapon.getCurrHealth() + 1, DamageType.FRAGMENTATION, 0f, false, false, ship);
             }
         }
-
-        // Apply fatal damage to all weapons
-        for (WeaponAPI weapon : ship.getAllWeapons()) {
-            weapon.disable(true);
-            engine.applyDamage(ship, weapon.getLocation(), weapon.getCurrHealth() + 1, DamageType.FRAGMENTATION, 0f, false, false, ship);
-        }
-
         // Reset damage reduction
         ship.getMutableStats().getHullDamageTakenMult().unmodify(id);
         ship.getMutableStats().getArmorDamageTakenMult().unmodify(id);
@@ -204,6 +226,7 @@ public class AEG_UltimateManeuver {
         // Deactivate the system
         ship.getSystem().deactivate();
     }
+
     private static class WeaponRepairHelper extends BaseEveryFrameCombatPlugin {
 
         private final ShipAPI ship;

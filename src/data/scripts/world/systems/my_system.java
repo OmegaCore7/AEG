@@ -28,7 +28,7 @@ public class my_system {
         // create the star and generate the hyperspace anchor for this system
         PlanetAPI my_system_star = system.initStar("my_system_star ", // unique id for this star
                 "black_hole", // id in planets.json
-                999f, // radius (in pixels at default zoom)
+                300f, // radius (in pixels at default zoom)
                 300); // corona radius, from star edge
         system.setLightColor(new Color(147,255,140)); // light color in entire system, affects all entities
 

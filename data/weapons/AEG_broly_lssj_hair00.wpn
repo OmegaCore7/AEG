@@ -7,7 +7,7 @@
   "turretSprite": "graphics/ships/broly/hair/AEG_broly_lssj_hair00.png",
   "hardpointSprite": "graphics/ships/broly/hair/AEG_broly_lssj_hair00.png",
   "numFrames": 13,
-  "frameRate": 13,
+  "frameRate": 26,
   "turretOffsets": [
     8,
     0
