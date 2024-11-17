@@ -1,10 +1,10 @@
 package data.hullmods;
 
 import com.fs.starfarer.api.Global;
+import com.fs.starfarer.api.combat.BaseEveryFrameCombatPlugin;
 import com.fs.starfarer.api.combat.BaseHullMod;
 import com.fs.starfarer.api.combat.ShipAPI;
-import com.fs.starfarer.api.loading.HullModSpecAPI;
-import com.fs.starfarer.api.util.Misc;
+import com.fs.starfarer.api.combat.WeaponAPI;
 import org.magiclib.util.MagicUI;
 
 import java.awt.Color;
@@ -13,41 +13,34 @@ import java.util.List;
 public class AEG_transformation extends BaseHullMod {
 
     private static final float GAUGE_MAX = 1.0f; // Max gauge (100%)
+    private static final float TRANSFORMATION_DURATION = 60f; // Duration of the transformation in seconds
 
     private float powerGauge = 0f; // Current gauge value
-    private AEG_transformationFX particleEffect;
-
-    public void applyEffectsBeforeShipCreation(HullModSpecAPI spec, ShipAPI ship, List<ShipAPI> ships) {
-        if (ship == null) return;
-        powerGauge = 0f; // Initialize gauge when applied
-        particleEffect = new AEG_transformationFX();
-    }
+    private float transformationTime = 0f; // Time spent in the transformed state
 
     @Override
     public void advanceInCombat(ShipAPI ship, float amount) {
         if (ship == null) return;
 
-        // Ensure particleEffect is initialized
-        if (particleEffect == null) {
-            particleEffect = new AEG_transformationFX();
+        // Increase the power gauge by 1% per second if not fully transformed
+        if (powerGauge < GAUGE_MAX) {
+            powerGauge = Math.min(powerGauge + (0.01f * amount), GAUGE_MAX);
+        } else {
+            // Track the time spent in the transformed state
+            transformationTime += amount;
+            if (transformationTime >= TRANSFORMATION_DURATION) {
+                // Reset the transformation state after the duration
+                powerGauge = 0f;
+                transformationTime = 0f;
+            }
         }
 
-        // Increase the power gauge by 1% per second
-        powerGauge = Math.min(powerGauge + (0.01f * amount), GAUGE_MAX);
-        AEG_transformationBuffs.applyBuffs(ship, powerGauge);
+        // Apply buffs based on charge level
+        applyBuffs(ship, powerGauge);
 
-        // Update particles based on charge level
-        particleEffect.updateParticles(ship, powerGauge);
-
-        // Check if the power gauge is at maximum
-        if (powerGauge >= GAUGE_MAX) {
-            // Trigger the transformation
-            triggerTransformation(ship);
-        }
-
-        // Apply damage reduction if hull is above 50%
-        if (ship.getHullLevel() > 0.5f) {
-            applyDamageReduction(ship);
+        // Trigger the hair transformation effect at 99%
+        if (powerGauge >= 0.99f) {
+            createTransformationEffect(ship);
         }
 
         // Update the HUD with the transformation bar
@@ -56,30 +49,76 @@ public class AEG_transformation extends BaseHullMod {
 
     @Override
     public void applyEffectsAfterShipCreation(ShipAPI ship, String id) {
-        // Reset power gauge and buffs when the battle ends
+        // Reset power gauge when the battle ends
         powerGauge = 0f;
-        if (particleEffect != null) {
-            particleEffect.reset();
+        transformationTime = 0f;
+    }
+
+    private void applyBuffs(ShipAPI ship, float powerGauge) {
+        if (ship == null) return;
+
+        if (powerGauge >= 0.1f) {
+            ship.getMutableStats().getShieldUnfoldRateMult().modifyMult("super_saiyan", 1.2f);
+        }
+        if (powerGauge >= 0.2f) {
+            ship.getMutableStats().getAcceleration().modifyMult("super_saiyan", 1.2f);
+            ship.getMutableStats().getDeceleration().modifyMult("super_saiyan", 1.2f);
+            ship.getMutableStats().getTurnAcceleration().modifyMult("super_saiyan", 1.2f);
+            ship.getMutableStats().getMaxTurnRate().modifyMult("super_saiyan", 1.2f);
+        }
+        if (powerGauge >= 0.4f) {
+            ship.getMutableStats().getFluxDissipation().modifyMult("super_saiyan", 1.2f);
+        }
+        if (powerGauge >= 0.6f) {
+            ship.getMutableStats().getArmorDamageTakenMult().modifyMult("super_saiyan", 0.8f); // Reduces armor damage taken by 20%
+        }
+        if (powerGauge >= 0.8f) {
+            ship.getMutableStats().getBallisticRoFMult().modifyMult("super_saiyan", 1.2f);
+            ship.getMutableStats().getEnergyRoFMult().modifyMult("super_saiyan", 1.2f);
+            ship.getMutableStats().getMissileRoFMult().modifyMult("super_saiyan", 1.2f);
+        }
+        if (powerGauge >= 1.0f) {
+            ship.getMutableStats().getEnergyWeaponDamageMult().modifyMult("super_saiyan", 1.5f);
+            ship.getMutableStats().getEmpDamageTakenMult().modifyMult("super_saiyan", 0.5f); // Reduces EMP damage taken by 50%
         }
     }
 
-    private void triggerTransformation(final ShipAPI ship) {
+    private void createTransformationEffect(ShipAPI ship) {
         if (ship == null) return;
 
-        // Ensure hair animation plays before any boosts
-        particleEffect.createTransformationEffect(ship);
+        WeaponAPI headWeapon = null;
+        WeaponAPI hairWeapon = null;
 
-        // Apply transformation effects
-        ship.getMutableStats().getMaxSpeed().modifyFlat("super_saiyan", 100f);
-        ship.getMutableStats().getBallisticWeaponDamageMult().modifyMult("super_saiyan", 2f);
-        ship.getMutableStats().getEnergyWeaponDamageMult().modifyMult("super_saiyan", 2f);
-        ship.getMutableStats().getMissileWeaponDamageMult().modifyMult("super_saiyan", 2f);
-        ship.getMutableStats().getShieldUpkeepMult().modifyMult("super_saiyan", 0.5f); // Reduce shield upkeep by 50%
-    }
+        for (WeaponAPI weapon : ship.getAllWeapons()) {
+            if ("WS0011".equals(weapon.getSlot().getId())) {
+                headWeapon = weapon;
+            } else if ("WS0012".equals(weapon.getSlot().getId())) {
+                hairWeapon = weapon;
+            }
+        }
 
-    private void applyDamageReduction(ShipAPI ship) {
-        ship.getMutableStats().getHullDamageTakenMult().modifyFlat("super_saiyan", 0.5f);
-        ship.getMutableStats().getArmorDamageTakenMult().modifyFlat("super_saiyan", 0.5f);
+        if (headWeapon != null && hairWeapon != null) {
+            hairWeapon.setCurrAngle(headWeapon.getCurrAngle());
+            hairWeapon.getAnimation().play();
+            hairWeapon.getAnimation().setFrame(0);
+            hairWeapon.getAnimation().setFrameRate(24f); // Speed up the animation by 2x
+
+            final WeaponAPI finalHairWeapon = hairWeapon;
+            final WeaponAPI finalHeadWeapon = headWeapon;
+            Global.getCombatEngine().addPlugin(new BaseEveryFrameCombatPlugin() {
+                private boolean loopStarted = false;
+
+                @Override
+                public void advance(float amount, List events) {
+                    finalHairWeapon.setCurrAngle(finalHeadWeapon.getCurrAngle());
+                    if (finalHairWeapon.getAnimation().getFrame() >= 12 && !loopStarted) {
+                        finalHairWeapon.getAnimation().setFrame(6);
+                        finalHairWeapon.getAnimation().setFrameRate(24f / (12 - 6)); // Loop frames 6-12 at 2x speed
+                        loopStarted = true;
+                    }
+                }
+            });
+        }
     }
 
     private void updateHUD(ShipAPI ship) {
@@ -88,10 +127,6 @@ public class AEG_transformation extends BaseHullMod {
             Color barColor = new Color(217, 255, 161); // Greenish-yellow fill color
             Color backgroundColor = Color.BLACK; // Black background
 
-            // Example coordinates for positioning the HUD
-            float xPosition = 100f; // Adjust this value to move left/right
-            float yPosition = 60f;  // Adjust this value to move up/down (10f below the current position)
-
             // Draw the gauge with the label "Transformation" above it
             MagicUI.drawHUDStatusBar(
                     ship,
@@ -99,22 +134,10 @@ public class AEG_transformation extends BaseHullMod {
                     barColor,
                     backgroundColor,
                     0,
+                    "SSJ",
                     "",
-                    "LSSJ",
                     true
             );
         }
-    }
-
-    @Override
-    public String getDescriptionParam(int index, ShipAPI.HullSize hullSize) {
-        if (index == 0) return "20% less flux cost for weapons";
-        if (index == 1) return "30% shorter system cooldown";
-        if (index == 2) return "temporary boost in speed, damage, and shield efficiency in critical situations";
-        if (index == 3) return "Transformation when power gauge is full";
-        if (index == 4) return "Doubles weapon damage and speed, halves shield upkeep";
-        if (index == 5) return "Transformation lasts indefinitely once triggered";
-        if (index == 6) return "Damage under 500 reduced to 1, damage above 500 reduced by 50% if hull is above 50%";
-        return null;
     }
 }

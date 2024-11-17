@@ -78,9 +78,6 @@ public class AEG_UltimateManeuver {
 
                 // Create particles moving towards the black hole
                 createBlackHoleParticles();
-
-                // Display countdown timer
-                displayCountdownTimer(ship, DURATION + 1f - elapsedTime);
             }
         });
 
@@ -168,24 +165,14 @@ public class AEG_UltimateManeuver {
         }
     }
 
-    private static void displayCountdownTimer(ShipAPI ship, float timeRemaining) {
-        CombatEngineAPI engine = Global.getCombatEngine();
-        if (engine == null) {
-            return; // Ensure engine is not null
-        }
-
-        String text = String.format("Ultimate Maneuver: %.1f", timeRemaining);
-        engine.getCombatUI().addMessage(0, text, Color.WHITE);
-    }
-
     private static void endEffect(ShipAPI ship, String id) {
         isActive = false;
 
         // Create final explosion
         CombatEngineAPI engine = Global.getCombatEngine();
         if (engine != null && blackHolePosition != null) {
-            engine.spawnExplosion(blackHolePosition, new Vector2f(), EXPLOSION_COLOR, 1000f, 1f);
-            engine.addHitParticle(blackHolePosition, new Vector2f(), 1500f, 1f, 1f, EXPLOSION_FRINGE_COLOR);
+            engine.spawnExplosion(blackHolePosition, new Vector2f(), EXPLOSION_COLOR, 1500f, 1f);
+            engine.addHitParticle(blackHolePosition, new Vector2f(), 2000, 1f, 1f, EXPLOSION_FRINGE_COLOR);
 
             // Add shockwave effect
             engine.addNebulaParticle(blackHolePosition, new Vector2f(), 200f, 1.5f, 0.1f, 0.3f, 1f, EXPLOSION_COLOR);
