@@ -5,6 +5,7 @@
   "type": "DECORATIVE",
   "size": "SMALL",
   "turretSprite": "graphics/ships/red_menace/rmrightshoulder.png",
+  "showDamageWhenDecorative": "TRUE",
   "hardpointSprite": "",
   "turretOffsets": [
     0,

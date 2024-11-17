@@ -1,10 +1,8 @@
 package data.hullmods;
 
 import com.fs.starfarer.api.Global;
-import com.fs.starfarer.api.combat.BaseEveryFrameCombatPlugin;
-import com.fs.starfarer.api.combat.BaseHullMod;
-import com.fs.starfarer.api.combat.ShipAPI;
-import com.fs.starfarer.api.combat.WeaponAPI;
+import com.fs.starfarer.api.combat.*;
+import com.fs.starfarer.api.input.InputEventAPI;
 import org.magiclib.util.MagicUI;
 
 import java.awt.Color;
@@ -12,36 +10,41 @@ import java.util.List;
 
 public class AEG_transformation extends BaseHullMod {
 
-    private static final float GAUGE_MAX = 1.0f; // Max gauge (100%)
-    private static final float TRANSFORMATION_DURATION = 60f; // Duration of the transformation in seconds
+    private static final float GAUGE_MAX = 2.0f; // Max gauge (200%)
 
     private float powerGauge = 0f; // Current gauge value
-    private float transformationTime = 0f; // Time spent in the transformed state
+    private AEG_LSSJCriticalHitHelper critHelper = new AEG_LSSJCriticalHitHelper();
+    private AEG_SpecialEffectsHelper effectsHelper;
 
     @Override
     public void advanceInCombat(ShipAPI ship, float amount) {
         if (ship == null) return;
 
+        if (effectsHelper == null) {
+            effectsHelper = new AEG_SpecialEffectsHelper(Global.getCombatEngine());
+        }
+
         // Increase the power gauge by 1% per second if not fully transformed
         if (powerGauge < GAUGE_MAX) {
             powerGauge = Math.min(powerGauge + (0.01f * amount), GAUGE_MAX);
         } else {
-            // Track the time spent in the transformed state
-            transformationTime += amount;
-            if (transformationTime >= TRANSFORMATION_DURATION) {
-                // Reset the transformation state after the duration
-                powerGauge = 0f;
-                transformationTime = 0f;
-            }
+            // Reset the transformation state after reaching 200%
+            powerGauge = 0f;
         }
+
+        // Store the power gauge value in the ship's custom data
+        ship.setCustomData("powerGauge", powerGauge);
 
         // Apply buffs based on charge level
         applyBuffs(ship, powerGauge);
 
-        // Trigger the hair transformation effect at 99%
-        if (powerGauge >= 0.99f) {
+        // Trigger the hair transformation effect at 100%
+        if (powerGauge >= 1.0f) {
             createTransformationEffect(ship);
         }
+
+        // Apply special effects based on power gauge thresholds
+        effectsHelper.applyEffects(ship, powerGauge);
 
         // Update the HUD with the transformation bar
         updateHUD(ship);
@@ -51,7 +54,6 @@ public class AEG_transformation extends BaseHullMod {
     public void applyEffectsAfterShipCreation(ShipAPI ship, String id) {
         // Reset power gauge when the battle ends
         powerGauge = 0f;
-        transformationTime = 0f;
     }
 
     private void applyBuffs(ShipAPI ship, float powerGauge) {
@@ -81,8 +83,19 @@ public class AEG_transformation extends BaseHullMod {
             ship.getMutableStats().getEnergyWeaponDamageMult().modifyMult("super_saiyan", 1.5f);
             ship.getMutableStats().getEmpDamageTakenMult().modifyMult("super_saiyan", 0.5f); // Reduces EMP damage taken by 50%
         }
+        if (powerGauge >= 1.2f) {
+            critHelper.setCritChance(0.05f); // Increase critical hit chance at 120%
+        }
+        if (powerGauge >= 1.4f) {
+            critHelper.setCritChance(0.1f); // Increase critical hit chance at 140%
+        }
+        if (powerGauge >= 1.6f) {
+            critHelper.setCritChance(0.15f); // Increase critical hit chance at 160%
+        }
+        if (powerGauge >= 1.8f) {
+            critHelper.setCritChance(0.2f); // Increase critical hit chance at 180%
+        }
     }
-
     private void createTransformationEffect(ShipAPI ship) {
         if (ship == null) return;
 
@@ -117,6 +130,21 @@ public class AEG_transformation extends BaseHullMod {
                         loopStarted = true;
                     }
                 }
+
+                @Override
+                public void processInputPreCoreControls(float amount, List<InputEventAPI> events) {
+                    // No implementation needed for this method
+                }
+
+                @Override
+                public void renderInWorldCoords(ViewportAPI viewport) {
+                    // No implementation needed for this method
+                }
+
+                @Override
+                public void renderInUICoords(ViewportAPI viewport) {
+                    // No implementation needed for this method
+                }
             });
         }
     }
@@ -124,7 +152,7 @@ public class AEG_transformation extends BaseHullMod {
     private void updateHUD(ShipAPI ship) {
         if (Global.getCombatEngine().getPlayerShip() == ship) {
             float progress = powerGauge / GAUGE_MAX;
-            Color barColor = new Color(217, 255, 161); // Greenish-yellow fill color
+            Color barColor = progress < 0.5f ? Color.YELLOW : new Color(217, 255, 161); // Yellow from 0 to 100, greenish-yellow from 100 to 200
             Color backgroundColor = Color.BLACK; // Black background
 
             // Draw the gauge with the label "Transformation" above it
@@ -134,7 +162,7 @@ public class AEG_transformation extends BaseHullMod {
                     barColor,
                     backgroundColor,
                     0,
-                    "SSJ",
+                    "Transformation",
                     "",
                     true
             );

@@ -4,6 +4,7 @@
   "type": "ENERGY",
   "size": "SMALL",
   "beamEffect": "com.fs.starfarer.api.impl.combat.PaladinEffect",
+  "showDamageWhenDecorative": "TRUE",
   "collisionClass": "RAY_FIGHTER",
   "collisionClassByFighter": "RAY_FIGHTER",
   "turretSprite": "graphics/ships/red_menace/rmhead.png",

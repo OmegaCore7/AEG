@@ -8,6 +8,7 @@
   "turretGlowSprite": "graphics/ships/broly/AEG_broly_shoulder_l_glow.png",
   "hardpointSprite": "graphics/ships/broly/AEG_broly_shoulder_l.png",
   "hardpointGlowSprite": "graphics/ships/broly/AEG_broly_shoulder_l_glow.png",
+  "showDamageWhenDecorative": "TRUE",
   "glowColor": [
     105,
     255,

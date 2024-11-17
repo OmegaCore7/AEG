@@ -6,6 +6,7 @@
   "size": "SMALL",
   "turretSprite": "graphics/ships/gurrenl/drill/AEG_Drill00.png",
   "hardpointSprite": "graphics/ships/gurrenl/drill/AEG_Drill00.png",
+  "showDamageWhenDecorative": "TRUE",
   "numFrames": 5,
   "frameRate": 20,
   "turretOffsets": [
