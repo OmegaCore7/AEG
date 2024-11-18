@@ -13,7 +13,7 @@ import org.lwjgl.input.Keyboard;
 public class AEG_SteelBarrage extends BaseShipSystemScript {
 
     private static final float SHIELD_UNFOLD_RATE_MULT = 10.0f;
-    private static final float ARMOR_REPAIR_RATE = 0.1f; // Armor repair rate per second
+    private static final float ARMOR_REPAIR_RATE = 1.5f; // Armor repair rate per second
     private static final float HULL_REPAIR_RATE = 0.02f; // Hull repair rate per second
 
     private AEG_ArmorRegen armorRegenHelper;
@@ -98,10 +98,12 @@ public class AEG_SteelBarrage extends BaseShipSystemScript {
                     transitionToState(ManeuverState.ULTIMATE, ship, id);
                 }
             }
+        }
+
+        // Always regenerate hull and armor
+        hullRegenHelper.advance(Global.getCombatEngine().getElapsedInLastFrame());
+        if (ship.getHitpoints() >= ship.getMaxHitpoints()) {
             armorRegenHelper.advance(Global.getCombatEngine().getElapsedInLastFrame());
-        } else if (state == State.OUT) {
-            AEG_MeteorSmash.resetPositions(ship);
-            hullRegenHelper.advance(Global.getCombatEngine().getElapsedInLastFrame());
         }
     }
 
