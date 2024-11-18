@@ -75,11 +75,11 @@ Spiral Beam Cannon,AEG_spiral_lance,,,4500,2500,,2500,,300,45,20,1,1,1,HIGH_EXPL
 ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 #Broly,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-Eraser Machine Gun,AEG_broly_arm_l,,,7500,2500,,250,,5,45,30,,,,ENERGY,75,,0,0.10,1,,0,5,1,5,,1000,1500,30,100,,,STRIKE,"energy20, rare_bp, hist1t, merc, ind, no_drop",,,,General,Extremely Fast,Excellent,,,The targeting system is incapable of tracking fighters when on local/automatic control.,,,,,23
+Eraser Machine Gun,AEG_broly_arm_l,,,7500,2500,,250,,5,45,30,,,,ENERGY,75,,0,0.10,1,,0,5,1,5,,1000,1500,30,100,,,DO_NOT_CONSERVE,"energy20, rare_bp, hist1t, merc, ind, no_drop",,,,General,Extremely Fast,Excellent,,,The targeting system is incapable of tracking fighters when on local/automatic control.,,,,,23
 Eraser Cannon,AEG_broly_arm_r,,,7500,2500,,500,,10,45,30,,,,ENERGY,250,,0.33,0.85,2,,,,,,,900,1500,30,500,,,STRIKE,"energy20, rare_bp, hist1t, merc, ind, no_drop",,,,General,Extremely Fast,Excellent,,,The targeting system is incapable of tracking fighters when on local/automatic control.,,,,,23
-Blaster Shell ,AEG_broly_bshell_ec,,,100000,2500,,2000,,100,75,,48,1,6,ENERGY,50,,0,0.2,6,,0,10,2,5,,1000,2000,30,,,,"SYSTEM,SHOW_IN_CODEX",no_drop,,,,General,Extremely Fast,Excellent,,,,,,,,40
+Blaster Shell ,AEG_broly_bshell_ec,,,100000,2500,,2000,,100,75,,48,1,6,ENERGY,50,,0,5,12,.05,0,10,2,5,,1000,2000,30,,,,"STRIKE,DO_NOT_CONSERVE",no_drop,,,,General,Extremely Fast,Excellent,,,,,,,,40
 Powered Shell PD,AEG_broly_bshellpd,,,40000,2500,,250,,15,75,7,96,0.05,,ENERGY,25,,0,2,24,.05,0,0,0,0,,1000,50,30,400,,,"DO_NOT_AIM, DO_NOT_CONSERVE","utility8, missile9, strike7, omega, restricted, no_drop",,Unknown,,General,Extremely Fast,Excellent,,,,,,,TRUE,10
-Calamity Blaster,AEG_broly_cblaster,,,4500,5000,2000,3000,1000,15,5,20,,,,ENERGY,,25,0,0.1,0,,,,,,999999,,,30,,,,,"beam20, LR, hightech_bp, merc, ind, no_drop",,,,Gemeral,,,,,,,,,,24
+Calamity Blaster,AEG_broly_cblaster,,,4500,5000,1000,250,500,15,5,20,,,,ENERGY,,50,0,0.1,0,,,,,,999999,,,30,,,,,"beam20, LR, hightech_bp, merc, ind, no_drop",,,,Gemeral,,,,,,,,,,24
 Gigantic Pulse,AEG_broly_gblaster_l,,,100000,2500,,250,,15,45,,20,1,,ENERGY,150,,0,0.2,1,,0,10,2,5,,1000,,30,,,,"SYSTEM,SHOW_IN_CODEX",no_drop,,,,General,Extremely Fast,Excellent,,,,,,,,40
 Gigantic Pulse,AEG_broly_gblaster_r,,,100000,2500,,250,,15,45,,20,1,,ENERGY,150,,0,0.2,1,,0,10,2,5,,1000,,30,,,,"SYSTEM,SHOW_IN_CODEX",no_drop,,,,General,Extremely Fast,Excellent,,,,,,,,40
 Rage Pulse Cannon,AEG_broly_head,,,100000,3000,,500,,15,45,,30,1,,ENERGY,150,,2,30,30,0.05,0,2,0.5,1,,1000,,30,,,,"SYSTEM,SHOW_IN_CODEX",no_drop,,,,General,Extremely Fast,Excellent,,,,,,,,40

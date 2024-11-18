@@ -2,7 +2,8 @@ package data.hullmods;
 
 import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.combat.*;
-import com.fs.starfarer.api.input.InputEventAPI;
+import org.lazywizard.lazylib.MathUtils;
+import org.lwjgl.util.vector.Vector2f;
 import org.magiclib.util.MagicUI;
 
 import java.awt.Color;
@@ -14,14 +15,16 @@ public class AEG_transformation extends BaseHullMod {
 
     private float powerGauge = 0f; // Current gauge value
     private AEG_LSSJCriticalHitHelper critHelper = new AEG_LSSJCriticalHitHelper();
-    private AEG_SpecialEffectsHelper effectsHelper;
+    private boolean hairAnimationStarted = false;
 
     @Override
     public void advanceInCombat(ShipAPI ship, float amount) {
         if (ship == null) return;
 
-        if (effectsHelper == null) {
-            effectsHelper = new AEG_SpecialEffectsHelper(Global.getCombatEngine());
+        // Start hair animation at the beginning of combat
+        if (!hairAnimationStarted) {
+            startHairAnimation(ship);
+            hairAnimationStarted = true;
         }
 
         // Increase the power gauge by 1% per second if not fully transformed
@@ -38,13 +41,8 @@ public class AEG_transformation extends BaseHullMod {
         // Apply buffs based on charge level
         applyBuffs(ship, powerGauge);
 
-        // Trigger the hair transformation effect at 100%
-        if (powerGauge >= 1.0f) {
-            createTransformationEffect(ship);
-        }
-
         // Apply special effects based on power gauge thresholds
-        effectsHelper.applyEffects(ship, powerGauge);
+        applyEffects(ship, powerGauge);
 
         // Update the HUD with the transformation bar
         updateHUD(ship);
@@ -54,6 +52,7 @@ public class AEG_transformation extends BaseHullMod {
     public void applyEffectsAfterShipCreation(ShipAPI ship, String id) {
         // Reset power gauge when the battle ends
         powerGauge = 0f;
+        hairAnimationStarted = false;
     }
 
     private void applyBuffs(ShipAPI ship, float powerGauge) {
@@ -96,9 +95,8 @@ public class AEG_transformation extends BaseHullMod {
             critHelper.setCritChance(0.2f); // Increase critical hit chance at 180%
         }
     }
-    private void createTransformationEffect(ShipAPI ship) {
-        if (ship == null) return;
 
+    private void startHairAnimation(ShipAPI ship) {
         WeaponAPI headWeapon = null;
         WeaponAPI hairWeapon = null;
 
@@ -129,10 +127,15 @@ public class AEG_transformation extends BaseHullMod {
                         finalHairWeapon.getAnimation().setFrameRate(24f / (12 - 6)); // Loop frames 6-12 at 2x speed
                         loopStarted = true;
                     }
+                    if (powerGauge == 0f) {
+                        finalHairWeapon.getAnimation().setFrame(0);
+                        finalHairWeapon.getAnimation().setFrameRate(24f); // Reset animation
+                        loopStarted = false;
+                    }
                 }
 
                 @Override
-                public void processInputPreCoreControls(float amount, List<InputEventAPI> events) {
+                public void processInputPreCoreControls(float amount, List events) {
                     // No implementation needed for this method
                 }
 
@@ -149,10 +152,146 @@ public class AEG_transformation extends BaseHullMod {
         }
     }
 
+    private void applyEffects(ShipAPI ship, float powerGauge) {
+        if (ship == null || !ship.isAlive()) return;
+
+        WeaponAPI shoulderL = getWeaponBySlot(ship, "WS0001");
+        WeaponAPI shoulderR = getWeaponBySlot(ship, "WS0002");
+
+        if (powerGauge <= 0.99f) {
+            playChargingEffects(ship, shoulderL, shoulderR, powerGauge);
+        } else if (powerGauge <= 1.4f) {
+            playEnhancedEffects(ship, shoulderL, shoulderR, powerGauge);
+        } else if (powerGauge <= 2.0f) {
+            playUltimateEffects(ship, shoulderL, shoulderR, powerGauge);
+        }
+    }
+    private void playChargingEffects(ShipAPI ship, WeaponAPI shoulderL, WeaponAPI shoulderR, float powerGauge) {
+        float charge = powerGauge / 0.99f;
+        Color particleColor = new Color(1f, 0.5f * charge, 0.5f * charge, MathUtils.getRandomNumberInRange(0.5f, 1f));
+
+        for (ShipEngineControllerAPI.ShipEngineAPI eng : ship.getEngineController().getShipEngines()) {
+            Vector2f location = eng.getLocation();
+            Vector2f velocity = ship.getVelocity();
+            if (location == null || velocity == null) continue;
+            float size = MathUtils.getRandomNumberInRange(10f, 20f) * charge;
+            Global.getCombatEngine().addHitParticle(location, velocity, size, 1f, 1f, particleColor);
+        }
+
+        if (shoulderL != null) {
+            Vector2f location = shoulderL.getLocation();
+            Vector2f velocity = ship.getVelocity();
+            if (location == null || velocity == null) return;
+            float size = MathUtils.getRandomNumberInRange(10f, 20f) * charge;
+            Global.getCombatEngine().addHitParticle(location, velocity, size, 1f, 1f, particleColor);
+        }
+
+        if (shoulderR != null) {
+            Vector2f location = shoulderR.getLocation();
+            Vector2f velocity = ship.getVelocity();
+            if (location == null || velocity == null) return;
+            float size = MathUtils.getRandomNumberInRange(10f, 20f) * charge;
+            Global.getCombatEngine().addHitParticle(location, velocity, size, 1f, 1f, particleColor);
+        }
+    }
+
+    private void playEnhancedEffects(ShipAPI ship, WeaponAPI shoulderL, WeaponAPI shoulderR, float powerGauge) {
+        float charge = (powerGauge - 0.99f) / (1.4f - 0.99f);
+        Color particleColor = new Color(0.5f * charge, 0.5f, 1f * charge, MathUtils.getRandomNumberInRange(0.5f, 1f));
+
+        for (ShipEngineControllerAPI.ShipEngineAPI eng : ship.getEngineController().getShipEngines()) {
+            Vector2f location = eng.getLocation();
+            Vector2f velocity = ship.getVelocity();
+            if (location == null || velocity == null) continue;
+            float size = MathUtils.getRandomNumberInRange(20f, 40f) * charge;
+            Global.getCombatEngine().addNebulaParticle(location, velocity, size, 1f, 0.5f, 1f, 1f, particleColor);
+        }
+
+        if (shoulderL != null) {
+            Vector2f location = shoulderL.getLocation();
+            Vector2f velocity = ship.getVelocity();
+            if (location == null || velocity == null) return;
+            float size = MathUtils.getRandomNumberInRange(20f, 40f) * charge;
+            Global.getCombatEngine().addNebulaParticle(location, velocity, size, 1f, 0.5f, 1f, 1f, particleColor);
+        }
+
+        if (shoulderR != null) {
+            Vector2f location = shoulderR.getLocation();
+            Vector2f velocity = ship.getVelocity();
+            if (location == null || velocity == null) return;
+            float size = MathUtils.getRandomNumberInRange(20f, 40f) * charge;
+            Global.getCombatEngine().addNebulaParticle(location, velocity, size, 1f, 0.5f, 1f, 1f, particleColor);
+        }
+    }
+
+    private void playUltimateEffects(ShipAPI ship, WeaponAPI shoulderL, WeaponAPI shoulderR, float powerGauge) {
+        float charge = (powerGauge - 1.4f) / (2.0f - 1.4f);
+        Color particleColor = new Color(1f, 0.5f * charge, 0.5f * charge, MathUtils.getRandomNumberInRange(0.5f, 1f));
+
+        for (ShipEngineControllerAPI.ShipEngineAPI eng : ship.getEngineController().getShipEngines()) {
+            Vector2f location = eng.getLocation();
+            Vector2f velocity = ship.getVelocity();
+            if (location == null || velocity == null) continue;
+            float size = MathUtils.getRandomNumberInRange(40f, 80f) * charge;
+            Global.getCombatEngine().addNebulaParticle(location, velocity, size, 1f, 0.5f, 1f, 1f, particleColor);
+        }
+
+        if (shoulderL != null) {
+            Vector2f location = shoulderL.getLocation();
+            Vector2f velocity = ship.getVelocity();
+            if (location == null || velocity == null) return;
+            float size = MathUtils.getRandomNumberInRange(40f, 80f) * charge;
+            Global.getCombatEngine().addNebulaParticle(location, velocity, size, 1f, 0.5f, 1f, 1f, particleColor);
+        }
+
+        if (shoulderR != null) {
+            Vector2f location = shoulderR.getLocation();
+            Vector2f velocity = ship.getVelocity();
+            if (location == null || velocity == null) return;
+            float size = MathUtils.getRandomNumberInRange(40f, 80f) * charge;
+            Global.getCombatEngine().addNebulaParticle(location, velocity, size, 1f, 0.5f, 1f, 1f, particleColor);
+        }
+
+        // Big explosion at 100
+        if (powerGauge >= 100f) {
+            Vector2f location = ship.getLocation();
+            Vector2f velocity = ship.getVelocity();
+            if (location == null || velocity == null) return;
+            Global.getCombatEngine().spawnExplosion(location, velocity, Color.RED, 300f, 2f);
+            Global.getCombatEngine().spawnExplosion(location, velocity, Color.MAGENTA, 400f, 2.5f);
+        }
+
+        // Smoke/burnout effect at 200
+        if (powerGauge >= 200f) {
+            for (ShipEngineControllerAPI.ShipEngineAPI eng : ship.getEngineController().getShipEngines()) {
+                Vector2f location = eng.getLocation();
+                Vector2f velocity = ship.getVelocity();
+                if (location == null || velocity == null) continue;
+                float size = MathUtils.getRandomNumberInRange(20f, 40f);
+                Global.getCombatEngine().addNebulaParticle(location, velocity, size, 1f, 0.5f, 1f, 1f, Color.GRAY);
+            }
+        }
+    }
+
+    private WeaponAPI getWeaponBySlot(ShipAPI ship, String slotId) {
+        if (ship == null) return null;
+        for (WeaponAPI weapon : ship.getAllWeapons()) {
+            if (weapon.getSlot().getId().equals(slotId)) {
+                return weapon;
+            }
+        }
+        return null;
+    }
+
     private void updateHUD(ShipAPI ship) {
         if (Global.getCombatEngine().getPlayerShip() == ship) {
             float progress = powerGauge / GAUGE_MAX;
-            Color barColor = progress < 0.5f ? Color.YELLOW : new Color(217, 255, 161); // Yellow from 0 to 100, greenish-yellow from 100 to 200
+            Color barColor;
+            if (progress < 0.5f) {
+                barColor = Color.YELLOW; // First half of the gauge
+            } else {
+                barColor = new Color(217, 255, 161); // Second half of the gauge
+            }
             Color backgroundColor = Color.BLACK; // Black background
 
             // Draw the gauge with the label "Transformation" above it
