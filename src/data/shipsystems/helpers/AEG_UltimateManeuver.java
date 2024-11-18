@@ -16,7 +16,7 @@ public class AEG_UltimateManeuver {
     private static final float BLACK_HOLE_RADIUS = 2000f;
     private static final float RING_RADIUS = 300f;
     private static final float PULL_STRENGTH = 300f;
-    private static final Color RING_COLOR = new Color(255, 0, 255); // Bright magenta
+    private static final Color RING_COLOR = new Color(185, 0, 255); // Bright magenta
     private static final Color EXPLOSION_COLOR = new Color(105, 255, 105); // White with green fringe
     private static final Color EXPLOSION_FRINGE_COLOR = new Color(25, 153, 25);
 
