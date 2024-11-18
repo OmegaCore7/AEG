@@ -15,17 +15,10 @@ public class AEG_transformation extends BaseHullMod {
 
     private float powerGauge = 0f; // Current gauge value
     private AEG_LSSJCriticalHitHelper critHelper = new AEG_LSSJCriticalHitHelper();
-    private boolean hairAnimationStarted = false;
 
     @Override
     public void advanceInCombat(ShipAPI ship, float amount) {
         if (ship == null) return;
-
-        // Start hair animation at the beginning of combat
-        if (!hairAnimationStarted) {
-            startHairAnimation(ship);
-            hairAnimationStarted = true;
-        }
 
         // Increase the power gauge by 1% per second if not fully transformed
         if (powerGauge < GAUGE_MAX) {
@@ -52,7 +45,6 @@ public class AEG_transformation extends BaseHullMod {
     public void applyEffectsAfterShipCreation(ShipAPI ship, String id) {
         // Reset power gauge when the battle ends
         powerGauge = 0f;
-        hairAnimationStarted = false;
     }
 
     private void applyBuffs(ShipAPI ship, float powerGauge) {
@@ -96,62 +88,6 @@ public class AEG_transformation extends BaseHullMod {
         }
     }
 
-    private void startHairAnimation(ShipAPI ship) {
-        WeaponAPI headWeapon = null;
-        WeaponAPI hairWeapon = null;
-
-        for (WeaponAPI weapon : ship.getAllWeapons()) {
-            if ("WS0011".equals(weapon.getSlot().getId())) {
-                headWeapon = weapon;
-            } else if ("WS0012".equals(weapon.getSlot().getId())) {
-                hairWeapon = weapon;
-            }
-        }
-
-        if (headWeapon != null && hairWeapon != null) {
-            hairWeapon.setCurrAngle(headWeapon.getCurrAngle());
-            hairWeapon.getAnimation().play();
-            hairWeapon.getAnimation().setFrame(0);
-            hairWeapon.getAnimation().setFrameRate(24f); // Speed up the animation by 2x
-
-            final WeaponAPI finalHairWeapon = hairWeapon;
-            final WeaponAPI finalHeadWeapon = headWeapon;
-            Global.getCombatEngine().addPlugin(new BaseEveryFrameCombatPlugin() {
-                private boolean loopStarted = false;
-
-                @Override
-                public void advance(float amount, List events) {
-                    finalHairWeapon.setCurrAngle(finalHeadWeapon.getCurrAngle());
-                    if (finalHairWeapon.getAnimation().getFrame() >= 12 && !loopStarted) {
-                        finalHairWeapon.getAnimation().setFrame(6);
-                        finalHairWeapon.getAnimation().setFrameRate(24f / (12 - 6)); // Loop frames 6-12 at 2x speed
-                        loopStarted = true;
-                    }
-                    if (powerGauge == 0f) {
-                        finalHairWeapon.getAnimation().setFrame(0);
-                        finalHairWeapon.getAnimation().setFrameRate(24f); // Reset animation
-                        loopStarted = false;
-                    }
-                }
-
-                @Override
-                public void processInputPreCoreControls(float amount, List events) {
-                    // No implementation needed for this method
-                }
-
-                @Override
-                public void renderInWorldCoords(ViewportAPI viewport) {
-                    // No implementation needed for this method
-                }
-
-                @Override
-                public void renderInUICoords(ViewportAPI viewport) {
-                    // No implementation needed for this method
-                }
-            });
-        }
-    }
-
     private void applyEffects(ShipAPI ship, float powerGauge) {
         if (ship == null || !ship.isAlive()) return;
 
@@ -166,13 +102,14 @@ public class AEG_transformation extends BaseHullMod {
             playUltimateEffects(ship, shoulderL, shoulderR, powerGauge);
         }
     }
+
     private void playChargingEffects(ShipAPI ship, WeaponAPI shoulderL, WeaponAPI shoulderR, float powerGauge) {
         float charge = powerGauge / 0.99f;
         Color particleColor = new Color(1f, 0.5f * charge, 0.5f * charge, MathUtils.getRandomNumberInRange(0.5f, 1f));
 
         for (ShipEngineControllerAPI.ShipEngineAPI eng : ship.getEngineController().getShipEngines()) {
             Vector2f location = eng.getLocation();
-            Vector2f velocity = ship.getVelocity();
+            Vector2f velocity = MathUtils.getPointOnCircumference(ship.getVelocity(), MathUtils.getRandomNumberInRange(50f, 100f), ship.getFacing() + 180f);
             if (location == null || velocity == null) continue;
             float size = MathUtils.getRandomNumberInRange(10f, 20f) * charge;
             Global.getCombatEngine().addHitParticle(location, velocity, size, 1f, 1f, particleColor);
@@ -180,7 +117,7 @@ public class AEG_transformation extends BaseHullMod {
 
         if (shoulderL != null) {
             Vector2f location = shoulderL.getLocation();
-            Vector2f velocity = ship.getVelocity();
+            Vector2f velocity = MathUtils.getPointOnCircumference(ship.getVelocity(), MathUtils.getRandomNumberInRange(50f, 100f), ship.getFacing() + 180f);
             if (location == null || velocity == null) return;
             float size = MathUtils.getRandomNumberInRange(10f, 20f) * charge;
             Global.getCombatEngine().addHitParticle(location, velocity, size, 1f, 1f, particleColor);
@@ -188,20 +125,19 @@ public class AEG_transformation extends BaseHullMod {
 
         if (shoulderR != null) {
             Vector2f location = shoulderR.getLocation();
-            Vector2f velocity = ship.getVelocity();
+            Vector2f velocity = MathUtils.getPointOnCircumference(ship.getVelocity(), MathUtils.getRandomNumberInRange(50f, 100f), ship.getFacing() + 180f);
             if (location == null || velocity == null) return;
             float size = MathUtils.getRandomNumberInRange(10f, 20f) * charge;
             Global.getCombatEngine().addHitParticle(location, velocity, size, 1f, 1f, particleColor);
         }
     }
-
     private void playEnhancedEffects(ShipAPI ship, WeaponAPI shoulderL, WeaponAPI shoulderR, float powerGauge) {
         float charge = (powerGauge - 0.99f) / (1.4f - 0.99f);
         Color particleColor = new Color(0.5f * charge, 0.5f, 1f * charge, MathUtils.getRandomNumberInRange(0.5f, 1f));
 
         for (ShipEngineControllerAPI.ShipEngineAPI eng : ship.getEngineController().getShipEngines()) {
             Vector2f location = eng.getLocation();
-            Vector2f velocity = ship.getVelocity();
+            Vector2f velocity = MathUtils.getPointOnCircumference(ship.getVelocity(), MathUtils.getRandomNumberInRange(100f, 200f), ship.getFacing() + 180f);
             if (location == null || velocity == null) continue;
             float size = MathUtils.getRandomNumberInRange(20f, 40f) * charge;
             Global.getCombatEngine().addNebulaParticle(location, velocity, size, 1f, 0.5f, 1f, 1f, particleColor);
@@ -209,7 +145,7 @@ public class AEG_transformation extends BaseHullMod {
 
         if (shoulderL != null) {
             Vector2f location = shoulderL.getLocation();
-            Vector2f velocity = ship.getVelocity();
+            Vector2f velocity = MathUtils.getPointOnCircumference(ship.getVelocity(), MathUtils.getRandomNumberInRange(100f, 200f), ship.getFacing() + 180f);
             if (location == null || velocity == null) return;
             float size = MathUtils.getRandomNumberInRange(20f, 40f) * charge;
             Global.getCombatEngine().addNebulaParticle(location, velocity, size, 1f, 0.5f, 1f, 1f, particleColor);
@@ -217,7 +153,7 @@ public class AEG_transformation extends BaseHullMod {
 
         if (shoulderR != null) {
             Vector2f location = shoulderR.getLocation();
-            Vector2f velocity = ship.getVelocity();
+            Vector2f velocity = MathUtils.getPointOnCircumference(ship.getVelocity(), MathUtils.getRandomNumberInRange(100f, 200f), ship.getFacing() + 180f);
             if (location == null || velocity == null) return;
             float size = MathUtils.getRandomNumberInRange(20f, 40f) * charge;
             Global.getCombatEngine().addNebulaParticle(location, velocity, size, 1f, 0.5f, 1f, 1f, particleColor);
@@ -230,7 +166,7 @@ public class AEG_transformation extends BaseHullMod {
 
         for (ShipEngineControllerAPI.ShipEngineAPI eng : ship.getEngineController().getShipEngines()) {
             Vector2f location = eng.getLocation();
-            Vector2f velocity = ship.getVelocity();
+            Vector2f velocity = MathUtils.getPointOnCircumference(ship.getVelocity(), MathUtils.getRandomNumberInRange(200f, 400f), ship.getFacing() + 180f);
             if (location == null || velocity == null) continue;
             float size = MathUtils.getRandomNumberInRange(40f, 80f) * charge;
             Global.getCombatEngine().addNebulaParticle(location, velocity, size, 1f, 0.5f, 1f, 1f, particleColor);
@@ -238,7 +174,7 @@ public class AEG_transformation extends BaseHullMod {
 
         if (shoulderL != null) {
             Vector2f location = shoulderL.getLocation();
-            Vector2f velocity = ship.getVelocity();
+            Vector2f velocity = MathUtils.getPointOnCircumference(ship.getVelocity(), MathUtils.getRandomNumberInRange(200f, 400f), ship.getFacing() + 180f);
             if (location == null || velocity == null) return;
             float size = MathUtils.getRandomNumberInRange(40f, 80f) * charge;
             Global.getCombatEngine().addNebulaParticle(location, velocity, size, 1f, 0.5f, 1f, 1f, particleColor);
@@ -246,7 +182,7 @@ public class AEG_transformation extends BaseHullMod {
 
         if (shoulderR != null) {
             Vector2f location = shoulderR.getLocation();
-            Vector2f velocity = ship.getVelocity();
+            Vector2f velocity = MathUtils.getPointOnCircumference(ship.getVelocity(), MathUtils.getRandomNumberInRange(200f, 400f), ship.getFacing() + 180f);
             if (location == null || velocity == null) return;
             float size = MathUtils.getRandomNumberInRange(40f, 80f) * charge;
             Global.getCombatEngine().addNebulaParticle(location, velocity, size, 1f, 0.5f, 1f, 1f, particleColor);
@@ -255,7 +191,7 @@ public class AEG_transformation extends BaseHullMod {
         // Big explosion at 100
         if (powerGauge >= 100f) {
             Vector2f location = ship.getLocation();
-            Vector2f velocity = ship.getVelocity();
+            Vector2f velocity = MathUtils.getPointOnCircumference(ship.getVelocity(), MathUtils.getRandomNumberInRange(300f, 600f), ship.getFacing() + 180f);
             if (location == null || velocity == null) return;
             Global.getCombatEngine().spawnExplosion(location, velocity, Color.RED, 300f, 2f);
             Global.getCombatEngine().spawnExplosion(location, velocity, Color.MAGENTA, 400f, 2.5f);
@@ -265,7 +201,7 @@ public class AEG_transformation extends BaseHullMod {
         if (powerGauge >= 200f) {
             for (ShipEngineControllerAPI.ShipEngineAPI eng : ship.getEngineController().getShipEngines()) {
                 Vector2f location = eng.getLocation();
-                Vector2f velocity = ship.getVelocity();
+                Vector2f velocity = MathUtils.getPointOnCircumference(ship.getVelocity(), MathUtils.getRandomNumberInRange(100f, 200f), ship.getFacing() + 180f);
                 if (location == null || velocity == null) continue;
                 float size = MathUtils.getRandomNumberInRange(20f, 40f);
                 Global.getCombatEngine().addNebulaParticle(location, velocity, size, 1f, 0.5f, 1f, 1f, Color.GRAY);
