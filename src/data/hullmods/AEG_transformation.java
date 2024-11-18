@@ -288,7 +288,7 @@ public class AEG_transformation extends BaseHullMod {
             float progress = powerGauge / GAUGE_MAX;
             Color barColor;
             if (progress < 0.5f) {
-                barColor = Color.YELLOW; // First half of the gauge
+                barColor = Color.GREEN; // First half of the gauge
             } else {
                 barColor = new Color(217, 255, 161); // Second half of the gauge
             }
@@ -301,7 +301,7 @@ public class AEG_transformation extends BaseHullMod {
                     barColor,
                     backgroundColor,
                     0,
-                    "Transformation",
+                    "LSSJ",
                     "",
                     true
             );
