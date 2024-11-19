@@ -11,6 +11,10 @@
   "shieldCenter": [0, 0],
   "shieldRadius": 45.5,
   "viewOffset": 0,
+  "builtInMods": [
+    "AEG_GurrenLCRHull",
+    "AEG_SpiralEnergyShield"
+  ],
   "builtInWeapons": {
     "WS0001": "AEG_gurrenl_shoulder_l",
     "WS0002": "AEG_gurrenl_shoulder_r",
@@ -50,7 +54,7 @@
       "mount": "TURRET",
       "arc": 75,
       "angle": 0,
-      "locations": [8, 31]
+      "locations": [5, 29]
     },
     {
       "id": "WS0004",
@@ -59,7 +63,7 @@
       "mount": "TURRET",
       "arc": 75,
       "angle": -0,
-      "locations": [8, -31]
+      "locations": [5, -29]
     },
     {
       "id": "WS0005",
@@ -96,7 +100,7 @@
       "size": "SMALL",
       "type": "BUILT_IN",
       "mount": "TURRET",
-      "arc": 76,
+      "arc": 100,
       "angle": -38,
       "locations": [-24, -27],
       "renderOrderMod": 8

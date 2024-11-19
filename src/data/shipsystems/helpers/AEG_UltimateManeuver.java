@@ -8,17 +8,21 @@ import org.lwjgl.util.vector.Vector2f;
 
 import java.awt.*;
 import java.util.List;
+import java.util.Random;
 
 public class AEG_UltimateManeuver {
 
     private static final float DURATION = 10f;
     private static final float DAMAGE_REDUCTION = 0.01f; // 99% damage reduction
-    private static final float BLACK_HOLE_RADIUS = 2000f;
-    private static final float RING_RADIUS = 300f;
+    private static final float BLACK_HOLE_RADIUS = 2500f;
+    private static final float RING_RADIUS = 205f;
+    private static final float INNER_RING_RADIUS = 200f;
     private static final float PULL_STRENGTH = 300f;
     private static final Color RING_COLOR = new Color(185, 0, 255); // Bright magenta
+    private static final Color INNER_RING_COLOR = new Color(255, 140, 0); // Gradient orange
     private static final Color EXPLOSION_COLOR = new Color(105, 255, 105); // White with green fringe
     private static final Color EXPLOSION_FRINGE_COLOR = new Color(25, 153, 25);
+    private static final Random RANDOM = new Random();
 
     private static Vector2f blackHolePosition;
     private static boolean isActive = false;
@@ -40,7 +44,7 @@ public class AEG_UltimateManeuver {
         setWeaponAngles(ship);
 
         // Determine black hole position
-        blackHolePosition = MathUtils.getPointOnCircumference(ship.getLocation(), 1500f, ship.getFacing());
+        blackHolePosition = MathUtils.getPointOnCircumference(ship.getLocation(), 2000f, ship.getFacing());
 
         // Apply visual effects
         applyVisualEffects(ship);
@@ -112,11 +116,47 @@ public class AEG_UltimateManeuver {
             return; // Ensure blackHolePosition is not null
         }
 
-        // Add central ring effect
         CombatEngineAPI engine = Global.getCombatEngine();
         if (engine != null) {
+            // Add central ring effect
             engine.addHitParticle(blackHolePosition, new Vector2f(), RING_RADIUS, 1f, DURATION, RING_COLOR);
+            // Add inner ring effect
+            engine.addHitParticle(blackHolePosition, new Vector2f(), INNER_RING_RADIUS, 1f, DURATION, INNER_RING_COLOR);
+
+            // Create the wavy magenta ring
+            createWavyParticleRing(engine, blackHolePosition, RING_RADIUS, 258, RING_COLOR);
+
+            // Create the thicker gradient orange ring
+            createGradientParticleRing(engine, blackHolePosition, INNER_RING_RADIUS, 251);
         }
+    }
+
+    private static void createWavyParticleRing(CombatEngineAPI engine, Vector2f center, float radius, int particleCount, Color color) {
+        for (int i = 0; i < particleCount; i++) {
+            float angle = (float) (i * 2 * Math.PI / particleCount);
+            float noise = (RANDOM.nextFloat() - 0.5f) * 10f; // Add some noise for wavy effect
+            float x = center.x + (radius + noise) * (float) Math.cos(angle);
+            float y = center.y + (radius + noise) * (float) Math.sin(angle);
+            engine.addHitParticle(new Vector2f(x, y), new Vector2f(0, 0), 5f, 1f, DURATION, color);
+        }
+    }
+
+    private static void createGradientParticleRing(CombatEngineAPI engine, Vector2f center, float radius, int particleCount) {
+        for (int i = 0; i < particleCount; i++) {
+            float angle = (float) (i * 2 * Math.PI / particleCount);
+            float x = center.x + radius * (float) Math.cos(angle);
+            float y = center.y + radius * (float) Math.sin(angle);
+            Color color = getGradientColor(i, particleCount);
+            engine.addHitParticle(new Vector2f(x, y), new Vector2f(0, 0), 10f, 1f, DURATION, color); // Increased size to 10f
+        }
+    }
+
+    private static Color getGradientColor(int index, int total) {
+        float ratio = (float) index / total;
+        int red = (int) (255 * ratio + 255 * (1 - ratio));
+        int green = (int) (165 * ratio + 69 * (1 - ratio));
+        int blue = (int) (0 * ratio + 0 * (1 - ratio));
+        return new Color(red, green, blue);
     }
 
     private static void applyBlackHolePull() {
@@ -137,7 +177,6 @@ public class AEG_UltimateManeuver {
             }
         }
     }
-
     private static void createBlackHoleParticles() {
         CombatEngineAPI engine = Global.getCombatEngine();
         if (engine == null || blackHolePosition == null) {
@@ -152,10 +191,11 @@ public class AEG_UltimateManeuver {
             float transparency = 0.5f + (float) Math.random() * 0.5f; // Random transparency
             engine.addHitParticle(particlePos, particleVel, size, transparency, 1f, RING_COLOR);
 
-            // Add smoke effect
+            // Add smoke effect with variance
             if (Math.random() < 0.5) {
+                Vector2f smokePos = MathUtils.getRandomPointInCircle(particlePos, 10f); // Add variance to smoke position
                 Color smokeColor = new Color(50, 50, 50, (int) (transparency * 255));
-                engine.addSmokeParticle(particlePos, particleVel, size * 1.5f, transparency, 1f, smokeColor);
+                engine.addSmokeParticle(smokePos, particleVel, size * 1.5f, transparency, 1f, smokeColor);
             }
 
             // Ensure particles stop at the ring
@@ -171,8 +211,8 @@ public class AEG_UltimateManeuver {
         // Create final explosion
         CombatEngineAPI engine = Global.getCombatEngine();
         if (engine != null && blackHolePosition != null) {
-            engine.spawnExplosion(blackHolePosition, new Vector2f(), EXPLOSION_COLOR, 1500f, 1f);
-            engine.addHitParticle(blackHolePosition, new Vector2f(), 2000, 1f, 1f, EXPLOSION_FRINGE_COLOR);
+            engine.spawnExplosion(blackHolePosition, new Vector2f(), EXPLOSION_COLOR, 2500f, 1f);
+            engine.addHitParticle(blackHolePosition, new Vector2f(), 3000, 1f, 1f, EXPLOSION_FRINGE_COLOR);
 
             // Add shockwave effect
             engine.addNebulaParticle(blackHolePosition, new Vector2f(), 200f, 1.5f, 0.1f, 0.3f, 1f, EXPLOSION_COLOR);
@@ -180,7 +220,7 @@ public class AEG_UltimateManeuver {
             // Deal 10,000 high explosive damage to all entities except the player ship
             for (CombatEntityAPI entity : engine.getShips()) {
                 if (entity != ship) {
-                    engine.applyDamage(entity, blackHolePosition, 10000f, DamageType.HIGH_EXPLOSIVE, 0f, true, false, ship);
+                    engine.applyDamage(entity, blackHolePosition, 10000f, DamageType.HIGH_EXPLOSIVE, 5000f, true, false, ship);
                 }
             }
 
