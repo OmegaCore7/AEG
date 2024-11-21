@@ -30,7 +30,8 @@
     "repair_gantry",
     "reinforcedhull",
     "nav_relay",
-    "always_detaches"
+    "always_detaches",
+    "AEG_PowerRegulationMatrix"
   ],
   "builtInWeapons": {
     "WS0001": "AEG_broly_shoulder_l",
