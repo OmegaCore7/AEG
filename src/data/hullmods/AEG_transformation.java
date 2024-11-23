@@ -21,7 +21,7 @@ public class AEG_transformation extends BaseHullMod {
 
     @Override
     public void advanceInCombat(ShipAPI ship, float amount) {
-        if (ship == null) return;
+        if (ship == null || !ship.isAlive()) return;
 
         // Adjust gauge rate based on current power level
         float gaugeRate = 0.01f;
@@ -64,7 +64,6 @@ public class AEG_transformation extends BaseHullMod {
         // Reset power gauge when the battle ends
         powerGauge = 0f;
     }
-
     private void applyBuffs(ShipAPI ship, float powerGauge) {
         if (ship == null) return;
 
@@ -114,7 +113,6 @@ public class AEG_transformation extends BaseHullMod {
 
         playUltimateEffects(ship, shoulderL, shoulderR, powerGauge);
     }
-
     private void playUltimateEffects(ShipAPI ship, WeaponAPI shoulderL, WeaponAPI shoulderR, float powerGauge) {
         float charge = powerGauge / GAUGE_MAX;
         Color particleColor = new Color(0.5f * charge, 1f, 0.5f * charge, MathUtils.getRandomNumberInRange(0.5f, 1f));
@@ -143,14 +141,21 @@ public class AEG_transformation extends BaseHullMod {
     }
 
     private void triggerExplosion(ShipAPI ship, Color color) {
+        if (ship == null || !ship.isAlive()) return;
+
         Vector2f location = ship.getLocation();
         Vector2f velocity = MathUtils.getPointOnCircumference(ship.getVelocity(), MathUtils.getRandomNumberInRange(300f, 600f), ship.getFacing() + 180f);
         if (location == null || velocity == null) return;
         Global.getCombatEngine().spawnExplosion(location, velocity, color, 300f, 2f);
     }
     private void triggerEMP(ShipAPI ship) {
+        if (ship == null || !ship.isAlive()) return;
+
         WeaponAPI shoulderL = getWeaponBySlot(ship, "WS0001");
         WeaponAPI shoulderR = getWeaponBySlot(ship, "WS0002");
+
+        if (shoulderL == null || shoulderR == null) return;
+
         Vector2f newPoint1 = new Vector2f(shoulderL.getLocation().x - 22f, shoulderL.getLocation().y);
         Vector2f newPoint2 = new Vector2f(shoulderR.getLocation().x - 22f, shoulderR.getLocation().y);
 
