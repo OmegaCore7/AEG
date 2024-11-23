@@ -5,3 +5,4 @@ Legendary Transformation,AEG_transformation,4,,,,,,,FALSE	,FALSE,3,6,9,15,data.h
 Quantum Flux Matrix,AEG_PowerRegulationMatrix,4,,,,,,,FALSE,FALSE,2,4,9,15,data.hullmods.AEG_PowerRegulationMatrix,,,,graphics/hullmods/AEG_vdp.png
 Spiral Flux Harmonizer,AEG_SpiralEnergyShield,4,,,,,,,FALSE	,FALSE	,3,6,9,15,data.hullmods.AEG_SpiralEnergyShield,,,,graphics/hullmods/AEG_vdp.png
 Will of the Spiral,AEG_GurrenLCRHull,4,,,,,,,FALSE,FALSE,3,6,9,15,data.hullmods.AEG_GurrenLCRHull,,,,graphics/hullmods/AEG_vdp.png
+Spiral Conversion		,AEG_SpiralConversion,4,,,,,,,FALSE	,FALSE,3,6,9,15,data.hullmods.AEG_SpiralConversion,,,,graphics/hullmods/AEG_vdp.png
