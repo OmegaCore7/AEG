@@ -13,6 +13,7 @@ import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+
 public class AEG_CalamityBlaster implements BeamEffectPlugin {
     private static final float BASE_BEAM_WIDTH = 60f;
     private static final float MAX_BEAM_WIDTH = 450f;
@@ -41,12 +42,10 @@ public class AEG_CalamityBlaster implements BeamEffectPlugin {
 
         beamTime += amount;
 
-        // Gradually increase beam width and double damage every 2 seconds
-        if (beamTime <= 10.0f) {
-            currentBeamWidth = BASE_BEAM_WIDTH + (MAX_BEAM_WIDTH - BASE_BEAM_WIDTH) * (beamTime / 10f);
-            if ((int) beamTime % 2 == 0) {
-                beam.getDamage().setDamage(beam.getDamage().getDamage() * 2);
-            }
+        // Gradually increase beam width and triple damage every 1 second
+        if (beamTime <= 5.0f) {
+            currentBeamWidth = BASE_BEAM_WIDTH + (MAX_BEAM_WIDTH - BASE_BEAM_WIDTH) * (beamTime / 5f);
+            beam.getDamage().setDamage(beam.getDamage().getDamage() * 3);
         }
 
         // Set beam width
@@ -56,9 +55,9 @@ public class AEG_CalamityBlaster implements BeamEffectPlugin {
         Vector2f beamStart = beam.getFrom();
         engine.addHitParticle(beamStart, new Vector2f(), currentBeamWidth + 4f, 1f, 0.1f, BALL_COLOR);
 
-        // Generate EMP arcs traveling from the base to the end of the beam every 0.08 seconds
+        // Generate EMP arcs traveling from the base to the end of the beam every 0.04 seconds
         empArcTimer += amount;
-        if (empArcTimer >= EMP_ARC_INTERVAL) {
+        if (empArcTimer >= EMP_ARC_INTERVAL / 2) {
             empArcTimer = 0f;
             emitEmpArc(engine, beamStart, beam);
         }
@@ -73,22 +72,22 @@ public class AEG_CalamityBlaster implements BeamEffectPlugin {
             applyDamage(engine, beam, target);
         }
 
-        // Spawn particles after 5 seconds at max width
-        if (beamTime >= 15f) {
+        // Spawn particles after 2.5 seconds at max width
+        if (beamTime >= 7.5f) {
             spawnParticles(engine, beam);
         }
 
-        // Handle beam effects after 5 seconds at max width
-        if (beamTime >= 15f && beamTime <= 20f) {
-            currentBeamWidth = MAX_BEAM_WIDTH + (450f - MAX_BEAM_WIDTH) * ((beamTime - 15f) / 5f);
+        // Handle beam effects after 2.5 seconds at max width
+        if (beamTime >= 7.5f && beamTime <= 10f) {
+            currentBeamWidth = MAX_BEAM_WIDTH + (450f - MAX_BEAM_WIDTH) * ((beamTime - 7.5f) / 2.5f);
             beam.setWidth(currentBeamWidth);
-        } else if (beamTime > 20f) {
+        } else if (beamTime > 10f) {
             currentBeamWidth = 450f;
             beam.setWidth(currentBeamWidth);
         }
 
-        // Trigger explosions regardless of hitting shields or ships
-        if (beamTime > 20f) {
+        // Trigger explosions after 10 seconds
+        if (beamTime > 10f) {
             triggerExplosions(engine, beam);
         }
     }
@@ -145,19 +144,28 @@ public class AEG_CalamityBlaster implements BeamEffectPlugin {
     private void triggerExplosions(final CombatEngineAPI engine, final BeamAPI beam) {
         Vector2f beamBase = beam.getFrom();
         Vector2f targetLocation = beam.getTo();
-        Vector2f endPoint = MathUtils.getPointOnCircumference(targetLocation, 100f, VectorUtils.getAngle(beamBase, targetLocation));
 
+        // Calculate the direction of the beam
+        Vector2f direction = Vector2f.sub(targetLocation, beamBase, null);
+        direction.normalise();
+
+        // Extend the endpoint beyond the beam's end
+        float extensionLength = 500f; // Adjust this value as needed
+        Vector2f extendedEndPoint = new Vector2f(targetLocation);
+        extendedEndPoint.translate(direction.x * extensionLength, direction.y * extensionLength);
+
+        // Spawn explosions along the extended line
         for (int i = 0; i < 50; i++) {
-            Vector2f explosionPoint = MathUtils.getRandomPointOnLine(beamBase, endPoint);
+            Vector2f explosionPoint = MathUtils.getRandomPointOnLine(beamBase, extendedEndPoint);
             float size = 10f + random.nextFloat() * 290f;
             engine.spawnExplosion(explosionPoint, new Vector2f(), new Color(105, 255, 105, 255), size, 1f);
 
             // Retrieve entities within the explosion range
             List<CombatEntityAPI> entities = CombatUtils.getEntitiesWithinRange(explosionPoint, size);
             for (CombatEntityAPI entity : entities) {
-                engine.applyDamage(entity, explosionPoint, size, DamageType.HIGH_EXPLOSIVE, 0, false, false, beam.getSource());
+                engine.applyDamage(entity, explosionPoint, size, DamageType.HIGH_EXPLOSIVE, 0, true, false, beam.getSource());
                 engine.applyDamage(entity, explosionPoint, size, DamageType.KINETIC, 0, false, false, beam.getSource());
-                engine.applyDamage(entity, explosionPoint, size, DamageType.FRAGMENTATION, 0, false, false, beam.getSource());
+                engine.applyDamage(entity, explosionPoint, size, DamageType.FRAGMENTATION, 0, true, false, beam.getSource());
             }
         }
 
