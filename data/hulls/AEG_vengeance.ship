@@ -33,7 +33,9 @@
     "turretgyros",
     "autorepair",
     "auxiliarythrusters",
-    "advancedshieldemitter"
+    "advancedshieldemitter",
+    "supercomputer",
+    "AEG_PowerRegulationMatrix"
   ],
   "builtInWeapons": {
     "WS0001": "AEG_Mark7pb_array",

@@ -30,7 +30,6 @@
     "reinforcedhull",
     "nav_relay",
     "always_detaches",
-    "AEG_PowerRegulationMatrix",
     "AEG_BlasterShell"
   ],
   "builtInWeapons": {
