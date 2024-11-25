@@ -30,7 +30,8 @@
     "reinforcedhull",
     "nav_relay",
     "always_detaches",
-    "AEG_PowerRegulationMatrix"
+    "AEG_PowerRegulationMatrix",
+    "AEG_BlasterShell"
   ],
   "builtInWeapons": {
     "WS0001": "AEG_broly_shoulder_l",

@@ -2,6 +2,7 @@ name,id,tier,rarity,tech/manufacturer,tags,uiTags,base value,unlocked,hidden,hid
 # Accelerated Shields,advancedshieldemitter,0,,,"defensive, shields, merc, standard",Shields,3000,,FALSE,FALSE,3,6,9,15,data.hullmods.AcceleratedShieldEmitter,Increases the turn rate of the ship's shields by %s and the rate at which the shields are raised by %s.,Increases shield turn rate and extension speed.,Increases the shield's turn rate and raise rate by an additional %s.,graphics/hullmods/accelerated_shields.png
  7 BlackBox System,AEG_7BlackBoxes,4,,,,,,,FALSE,FALSE,3,6,9,15,data.hullmods.AEG_7BlackBoxes,6,6,,graphics/hullmods/AEG_vdp.png
 Legendary Transformation,AEG_transformation,4,,,,,,,FALSE	,FALSE,3,6,9,15,data.hullmods.AEG_transformation,,,,graphics/hullmods/AEG_vdp.png
+Blaster Shell ,AEG_BlasterShell,4,,,,,,,FALSE	,FALSE	,3,6,9,15,data.hullmods.AEG_BlasterShell,,,,graphics/hullmods/AEG_vdp.png
 Quantum Flux Matrix,AEG_PowerRegulationMatrix,4,,,,,,,FALSE,FALSE,2,4,9,15,data.hullmods.AEG_PowerRegulationMatrix,,,,graphics/hullmods/AEG_vdp.png
 Spiral Flux Harmonizer,AEG_SpiralEnergyShield,4,,,,,,,FALSE	,FALSE	,3,6,9,15,data.hullmods.AEG_SpiralEnergyShield,,,,graphics/hullmods/AEG_vdp.png
 Will of the Spiral,AEG_GurrenLCRHull,4,,,,,,,FALSE,FALSE,3,6,9,15,data.hullmods.AEG_GurrenLCRHull,,,,graphics/hullmods/AEG_vdp.png

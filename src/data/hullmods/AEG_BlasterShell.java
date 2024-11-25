@@ -2,7 +2,6 @@ package data.hullmods;
 
 import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.combat.*;
-import com.fs.starfarer.api.input.InputEventAPI;
 import org.lwjgl.util.vector.Vector2f;
 
 import java.awt.Color;
@@ -11,9 +10,7 @@ import java.util.Random;
 
 public class AEG_BlasterShell extends BaseHullMod {
     private static final float DAMAGE_MULT = 1.2f;
-    private static final float RANGE_BONUS = 20f;
-    private static final Color SHIELD_COLOR = new Color(105, 255, 105, 255);
-    private static final Color DEFAULT_SHIELD_COLOR = Color.WHITE;
+    private static final Color SHIELD_COLOR = new Color(105, 255, 105, 255); // Default shield color set to green
     private static final Color[] PARTICLE_COLORS = {
             new Color(0, 255, 0, 225), // Green
             new Color(144, 238, 144, 225), // Light Green
@@ -25,8 +22,20 @@ public class AEG_BlasterShell extends BaseHullMod {
     private final Random random = new Random();
 
     @Override
+    public void applyEffectsBeforeShipCreation(ShipAPI.HullSize hullSize, MutableShipStatsAPI stats, String id) {
+        stats.getShieldUnfoldRateMult().modifyMult(id, 10f); // Fast unfold rate
+    }
+
+    @Override
     public void advanceInCombat(ShipAPI ship, float amount) {
         if (ship == null || !ship.isAlive()) return;
+
+        // Ensure shield is always green and has a fast unfold rate
+        if (ship.getShield() != null) {
+            ship.getShield().setRingColor(SHIELD_COLOR);
+            ship.getShield().setInnerColor(SHIELD_COLOR);
+            ship.getMutableStats().getShieldUnfoldRateMult().modifyMult("AEG_BlasterShell", 2f);
+        }
 
         boolean anyWeaponFiring = false;
         for (WeaponAPI weapon : ship.getAllWeapons()) {
@@ -53,24 +62,15 @@ public class AEG_BlasterShell extends BaseHullMod {
     }
 
     private boolean isSpecificWeaponSlot(WeaponAPI weapon) {
-        // Add your logic to check if the weapon is in a specific slot
-        return true;
+        // Check if the weapon ID matches the specified weapon slots
+        return weapon.getSlot().getId().equals("WS0005") || weapon.getSlot().getId().equals("WS0006");
     }
 
     private void activateHullMod(final ShipAPI ship) {
-        if (ship.getShield() == null || !ship.getShield().isOn()) {
-            ship.getMutableStats().getShieldDamageTakenMult().modifyMult("AEG_BlasterShell_shield", 0.1f);
-            ship.getMutableStats().getShieldUpkeepMult().modifyMult("AEG_BlasterShell_shield", 0f);
-            ship.setJitterUnder(this, SHIELD_COLOR, 1f, 10, 5f, 10f);
-        } else {
-            ship.getShield().toggleOn();
-            ship.getShield().setRingColor(SHIELD_COLOR);
-            ship.getShield().setInnerColor(SHIELD_COLOR);
-        }
+        ship.getMutableStats().getShieldDamageTakenMult().modifyMult("AEG_BlasterShell_shield", 0.1f);
+        ship.getMutableStats().getShieldUpkeepMult().modifyMult("AEG_BlasterShell_shield", 0f);
+        ship.setJitterUnder(this, SHIELD_COLOR, 1f, 10, 5f, 10f);
 
-        ship.getMutableStats().getBallisticWeaponRangeBonus().modifyPercent("AEG_BlasterShell_range", RANGE_BONUS);
-        ship.getMutableStats().getEnergyWeaponRangeBonus().modifyPercent("AEG_BlasterShell_range", RANGE_BONUS);
-        ship.getMutableStats().getMissileWeaponRangeBonus().modifyPercent("AEG_BlasterShell_range", RANGE_BONUS);
         ship.getMutableStats().getBallisticWeaponDamageMult().modifyMult("AEG_BlasterShell_damage", DAMAGE_MULT);
         ship.getMutableStats().getEnergyWeaponDamageMult().modifyMult("AEG_BlasterShell_damage", DAMAGE_MULT);
         ship.getMutableStats().getMissileWeaponDamageMult().modifyMult("AEG_BlasterShell_damage", DAMAGE_MULT);
@@ -79,17 +79,9 @@ public class AEG_BlasterShell extends BaseHullMod {
     private void deactivateHullMod(final ShipAPI ship) {
         ship.getMutableStats().getShieldDamageTakenMult().unmodify("AEG_BlasterShell_shield");
         ship.getMutableStats().getShieldUpkeepMult().unmodify("AEG_BlasterShell_shield");
-        ship.getMutableStats().getBallisticWeaponRangeBonus().unmodify("AEG_BlasterShell_range");
-        ship.getMutableStats().getEnergyWeaponRangeBonus().unmodify("AEG_BlasterShell_range");
-        ship.getMutableStats().getMissileWeaponRangeBonus().unmodify("AEG_BlasterShell_range");
         ship.getMutableStats().getBallisticWeaponDamageMult().unmodify("AEG_BlasterShell_damage");
         ship.getMutableStats().getEnergyWeaponDamageMult().unmodify("AEG_BlasterShell_damage");
         ship.getMutableStats().getMissileWeaponDamageMult().unmodify("AEG_BlasterShell_damage");
-
-        if (ship.getShield() != null) {
-            ship.getShield().setRingColor(DEFAULT_SHIELD_COLOR);
-            ship.getShield().setInnerColor(DEFAULT_SHIELD_COLOR);
-        }
     }
 
     private void createShieldParticles(ShipAPI ship) {
