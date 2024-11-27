@@ -1,6 +1,7 @@
 name,id,flux/second,f/s (base rate),f/s (base cap),flux/use,f/u (base rate),f/u (base cap),cr/u,max uses,regen,charge up,active,down,cooldown,toggle,noDissipation,noHardDissipation,hardFlux,noFiring,noTurning,noStrafing,noAccel,noShield,isPhaseCloak,noVent,tags,icon
 ,,,,,,,,,,,,,,,,,,,,,,,,,,,
-Combat Warp,AEG_warp,,,,,,,,,,1,3,0.05,5,TRUE,,,TRUE,,,,,,,,,graphics/icons/hullsys/displacer.png
+Combat Warp,AEG_warp,,,,,,,,,,1,3,0.05,5,True,,,,,,,,,,,,graphics/icons/hullsys/displacer.png
 True Destruction Steel Fist Barrage,AEG_SteelBarrage,,,,,,,,5		,1,,,,15,True,,,,,,,,,,,,graphics/icons/hullsys/displacer.png
 Giga Drill Breaker,AEG_GDBreaker,,,,,,,,,,,15		,0.05,5,True,,,,,,,,,,,,graphics/icons/hullsys/displacer.png
-Majin Change,AEG_MajinChange,,,,,,,,,,,20	,2,10,True,,,,,,,,,,,,graphics/icons/hullsys/displacer.png
+Majin Change,AEG_MajinChange,,,,,,,,,,,20	,0.05,10,True,,,,,,,,,,,,graphics/icons/hullsys/displacer.png
+Quantum System Override	,AEG_QuantumComputation,,,,,,,,4		,0.09	,3,0,0,0.5,,,,,,,,,,,,,graphics/icons/hullsys/displacer.png
