@@ -13,8 +13,8 @@ import org.lwjgl.input.Keyboard;
 public class AEG_SteelBarrage extends BaseShipSystemScript {
 
     private static final float SHIELD_UNFOLD_RATE_MULT = 10.0f;
-    private static final float ARMOR_REPAIR_RATE = 5.0f; // Armor repair rate per second
-    private static final float HULL_REPAIR_RATE = 0.10f; // Hull repair rate per second
+    private static final float ARMOR_REPAIR_RATE = 2.5f; // Armor repair rate per second
+    private static final float HULL_REPAIR_RATE = 0.05f; // Hull repair rate per second
 
     private AEG_ArmorRegen armorRegenHelper;
     private AEG_HullRegen hullRegenHelper;
