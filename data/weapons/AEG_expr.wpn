@@ -1,7 +1,7 @@
 {
   "id": "AEG_expr",
   "specClass": "projectile",
-  "projectileSpecId": "vpdriver_shot",
+  "projectileSpecId": "AEG_expr_shot",
   "type": "ENERGY",
   "mountTypeOverride": "HYBRID",
   "size": "LARGE",

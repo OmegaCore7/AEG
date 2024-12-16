@@ -36,3 +36,5 @@ Anomaly 000: Zero,AEG_zero,Super Robot,Unknown,AEG_MajinChange,35,20000,1800,250
 Spiral Warrior,AEG_gurrenl,Experimental Strike Mecha,Astral Guardians,AEG_GDBreaker,15,8000,1250,10000,18000,900,145,,75,160,99,85,65,1200,PHASE,phasecloak,,,,0.05,0.05,1,100,120,150,3,50,8,250000,25,20,1000,0.01,35,10,,,,,,,,rare_bp,,0.5,2,3,,406,
 #LSSJ Broly,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 Aegis Vanguard,AEG_broly,Experimental Flagship Mecha,Astral Guardians,AEG_SteelBarrage,45,30000,1850,30000,40250,1250,370,0,130,50,50,50,50,3000,OMNI,,360,0.25,0.35,,,1,2000,3000,300,1,60,12,5000000,25,20,2000,0.2,60,20,,,,,,,,rare_bp,,0.6,2,4,,504,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+Experimental Paragon,AEG_paragon_ex,Battleship,High Tech,plasmajets,30,18000,1500,25000,31250,1250,370,,30,15,10,5,5,3500,OMNI,,360,0.6,0.6,,,400,1000,300,300,10,30,7,500000,4,20,720,0.25,60,60,,,,,,,,"rare_bp, hist3t, merc",,0.6,2,4,,504
