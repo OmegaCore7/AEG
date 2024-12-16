@@ -3,7 +3,6 @@
   "specClass": "projectile",
   "projectileSpecId": "AEG_expr_shot",
   "type": "ENERGY",
-  "mountTypeOverride": "HYBRID",
   "size": "LARGE",
   "turretSprite": "graphics/ships/paragon_ex/notatachlance.png",
   "turretGlowSprite": "graphics/ships/paragon_ex/notatachlance_glow.png",
