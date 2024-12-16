@@ -4,7 +4,6 @@
 	"spawnType":"BALLISTIC_AS_BEAM",
 	"collisionClass":"RAY",
 	"collisionClassByFighter":"RAY_FIGHTER",
-	
 	"length":75.0,
 	"width":9,
 	"coreWidthMult":0.5,
