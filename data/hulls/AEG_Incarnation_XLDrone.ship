@@ -1,0 +1,154 @@
+{
+  "hullName": "Xtremely Heavy Drone",
+  "hullId": "AEG_Incarnation_XLDrone",
+  "hullSize": "CRUISER",
+  "spriteName": "graphics/ships/paragon_ex/incarnation/incarnation_ultrabomber.png",
+  "style": "HIGH_TECH",
+  "height": 178,
+  "width": 242,
+  "center": [121, 75],
+  "collisionRadius": 128,
+  "shieldCenter": [0, -0],
+  "shieldRadius": 127.5,
+  "viewOffset": 0,
+  "builtInWeapons": {
+    "WS0011": "AEG_expr"
+  },
+  "weaponSlots": [
+    {
+      "id": "WS0001",
+      "size": "MEDIUM",
+      "type": "ENERGY",
+      "mount": "TURRET",
+      "arc": 145,
+      "angle": 33.5,
+      "locations": [57, 40]
+    },
+    {
+      "id": "WS0002",
+      "size": "MEDIUM",
+      "type": "ENERGY",
+      "mount": "TURRET",
+      "arc": 145,
+      "angle": -33.5,
+      "locations": [57, -40]
+    },
+    {
+      "id": "WS0003",
+      "size": "LARGE",
+      "type": "UNIVERSAL",
+      "mount": "TURRET",
+      "arc": 145,
+      "angle": 0,
+      "locations": [87, 16]
+    },
+    {
+      "id": "WS0004",
+      "size": "LARGE",
+      "type": "UNIVERSAL",
+      "mount": "TURRET",
+      "arc": 145,
+      "angle": -0,
+      "locations": [87, -16]
+    },
+    {
+      "id": "WS0005",
+      "size": "SMALL",
+      "type": "ENERGY",
+      "mount": "TURRET",
+      "arc": 181,
+      "angle": -56.5,
+      "locations": [37, -69]
+    },
+    {
+      "id": "WS0006",
+      "size": "MEDIUM",
+      "type": "ENERGY",
+      "mount": "TURRET",
+      "arc": 181,
+      "angle": 56.5,
+      "locations": [37, 69]
+    },
+    {
+      "id": "WS0007",
+      "size": "SMALL",
+      "type": "UNIVERSAL",
+      "mount": "TURRET",
+      "arc": 360,
+      "angle": -56.5,
+      "locations": [9, -55]
+    },
+    {
+      "id": "WS0008",
+      "size": "SMALL",
+      "type": "UNIVERSAL",
+      "mount": "TURRET",
+      "arc": 360,
+      "angle": 56.5,
+      "locations": [9, 55]
+    },
+    {
+      "id": "WS0009",
+      "size": "MEDIUM",
+      "type": "UNIVERSAL",
+      "mount": "TURRET",
+      "arc": 360,
+      "angle": -56.5,
+      "locations": [-18, -90]
+    },
+    {
+      "id": "WS0010",
+      "size": "MEDIUM",
+      "type": "UNIVERSAL",
+      "mount": "TURRET",
+      "arc": 360,
+      "angle": 56.5,
+      "locations": [-18, 90]
+    },
+    {
+      "id": "WS0011",
+      "size": "LARGE",
+      "type": "BUILT_IN",
+      "mount": "TURRET",
+      "arc": 100,
+      "angle": 180,
+      "locations": [-72, -0]
+    }
+  ],
+  "engineSlots": [
+    {
+      "location": [-72.5, 65],
+      "length": 58.5,
+      "width": 16,
+      "angle": 180,
+      "contrailSize": 16,
+      "style": "HIGH_TECH"
+    },
+    {
+      "location": [-72.5, -65],
+      "length": 58.5,
+      "width": 16,
+      "angle": -180,
+      "contrailSize": 16,
+      "style": "HIGH_TECH"
+    }
+  ],
+  "bounds": [
+    -14, -119,
+    100.5, -36.5,
+    100.5, 36.5,
+    -14, 119,
+    -34, 116,
+    -73, 72,
+    -73, 56,
+    -52, 55,
+    -32.5, 42.5,
+    -17, 15.5,
+    -17, -15.5,
+    -32.5, -42.5,
+    -52, -55,
+    -73, -56,
+    -73, -72,
+    -34, -116
+  ]
+}

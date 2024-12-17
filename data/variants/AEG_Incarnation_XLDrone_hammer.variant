@@ -1,0 +1,31 @@
+{
+  "variantId": "AEG_Incarnation_XLDrone_hammer",
+  "hullId": "AEG_Incarnation_XLDrone",
+  "displayName": "Incarnation Drone",
+  "goalVariant": false,
+  "fluxCapacitors": 0,
+  "fluxVents": 0,
+  "quality": 1,
+  "permaMods": [],
+  "hullMods": [],
+  "weaponGroups": [
+    {
+      "autofire": false,
+      "mode": "LINKED",
+      "weapons": {
+        "WS0001": "ionbeam",
+        "WS0002": "ionpulser",
+        "WS0003": "tachyonlance",
+        "WS0004": "hil",
+        "WS0005": "minipulser",
+        "WS0006": "minipulser",
+        "WS0007": "swarmer",
+        "WS0008": "swarmer",
+        "WS0009": "heavyburst",
+        "WS0010": "heavyburst"
+      }
+    }
+  ],
+  "modules": [],
+  "wings": []
+}

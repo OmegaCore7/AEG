@@ -1,0 +1,145 @@
+{
+  "hullName": "Incarnation Left Shoulder",
+  "hullId": "AEG_module_incarnaton_left",
+  "hullSize": "DESTROYER",
+  "spriteName": "graphics/ships/paragon_ex/incarnation/incarnation_leftwing.png",
+  "style": "HIGH_TECH",
+  "height": 378,
+  "width": 138,
+  "center": [74.5, 112],
+  "collisionRadius": 123.5,
+  "shieldCenter": [0, -0],
+  "shieldRadius": 123,
+  "viewOffset": 0,
+  "weaponSlots": [
+    {
+      "id": "WS0001",
+      "size": "LARGE",
+      "type": "UNIVERSAL",
+      "mount": "TURRET",
+      "arc": 360,
+      "angle": 45,
+      "locations": [77, 5.5]
+    },
+    {
+      "id": "WS0002",
+      "size": "MEDIUM",
+      "type": "UNIVERSAL",
+      "mount": "TURRET",
+      "arc": 360,
+      "angle": 45,
+      "locations": [-69, -31.5]
+    },
+    {
+      "id": "WS0003",
+      "size": "SMALL",
+      "type": "UNIVERSAL",
+      "mount": "TURRET",
+      "arc": 360,
+      "angle": 45,
+      "locations": [22, -13.5]
+    },
+    {
+      "id": "WS0004",
+      "size": "SMALL",
+      "type": "ENERGY",
+      "mount": "TURRET",
+      "arc": 360,
+      "angle": 45,
+      "locations": [34, 18]
+    },
+    {
+      "id": "WS0005",
+      "size": "SMALL",
+      "type": "ENERGY",
+      "mount": "TURRET",
+      "arc": 360,
+      "angle": 45,
+      "locations": [-18, 10.5]
+    },
+    {
+      "id": "WS0006",
+      "size": "SMALL",
+      "type": "ENERGY",
+      "mount": "TURRET",
+      "arc": 360,
+      "angle": 45,
+      "locations": [-71, 27.5]
+    }
+  ],
+  "engineSlots": [
+    {
+      "location": [-104, 45.5],
+      "length": 30,
+      "width": 10,
+      "angle": 180,
+      "contrailSize": 30,
+      "style": "HIGH_TECH"
+    },
+    {
+      "location": [-111.5, 11],
+      "length": 30,
+      "width": 10,
+      "angle": 180,
+      "contrailSize": 30,
+      "style": "HIGH_TECH"
+    },
+    {
+      "location": [-111, -21.5],
+      "length": 30,
+      "width": 10,
+      "angle": 180,
+      "contrailSize": 30,
+      "style": "HIGH_TECH"
+    },
+    {
+      "location": [-111, -29.5],
+      "length": 30,
+      "width": 10,
+      "angle": 180,
+      "contrailSize": 30,
+      "style": "HIGH_TECH"
+    },
+    {
+      "location": [-111, -37.5],
+      "length": 30,
+      "width": 10,
+      "angle": 180,
+      "contrailSize": 30,
+      "style": "HIGH_TECH"
+    }
+  ],
+  "bounds": [
+    -109, -10,
+    -111, -39.5,
+    -105, -51.5,
+    -98.5, -58.5,
+    -80.5, -59.5,
+    -69, -53,
+    -17.5, -50.5,
+    -3.5, -61,
+    13.5, -61,
+    43, -29.5,
+    88, -25,
+    109.5, -0,
+    113, 28.5,
+    73, 43,
+    44.5, 39,
+    40, 44,
+    28.5, 40,
+    27.5, 35,
+    13.5, 24,
+    6, 24,
+    -17, 36.5,
+    -28, 31,
+    -31.5, 41,
+    -47, 46.5,
+    -47.5, 57.5,
+    -72.5, 65.5,
+    -79.5, 59.5,
+    -86.5, 59.5,
+    -90.5, 53.5,
+    -103, 50,
+    -111, 15
+  ]
+}

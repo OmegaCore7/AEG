@@ -1,0 +1,14 @@
+{
+  "variantId": "AEG_Incarnation_Equiped",
+  "hullId": "AEG_Incarnation",
+  "displayName": "Incarnation Mech",
+  "goalVariant": false,
+  "fluxCapacitors": 1,
+  "fluxVents": 0,
+  "quality": 1,
+  "permaMods": [],
+  "hullMods": [],
+  "weaponGroups": [],
+  "modules": [],
+  "wings": []
+}

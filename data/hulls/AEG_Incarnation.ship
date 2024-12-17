@@ -1,0 +1,182 @@
+{
+  "hullName": "Incarnation",
+  "hullId": "AEG_Incarnation",
+  "hullSize": "DESTROYER",
+  "spriteName": "graphics/ships/paragon_ex/incarnation/incarnation_body.png",
+  "style": "HIGH_TECH",
+  "height": 112,
+  "width": 182,
+  "center": [91, 56],
+  "collisionRadius": 128,
+  "shieldCenter": [0, 0],
+  "shieldRadius": 125.5,
+  "viewOffset": 0,
+  "weaponSlots": [
+    {
+      "id": "WS0001",
+      "size": "LARGE",
+      "type": "STATION_MODULE",
+      "mount": "TURRET",
+      "arc": 360,
+      "angle": 0,
+      "locations": [-29, -0],
+      "renderOrderMod": 4
+    },
+    {
+      "id": "WS0002",
+      "size": "LARGE",
+      "type": "STATION_MODULE",
+      "mount": "TURRET",
+      "arc": 360,
+      "angle": 0,
+      "locations": [10, 84.5],
+      "renderOrderMod": 2
+    },
+    {
+      "id": "WS0003",
+      "size": "LARGE",
+      "type": "STATION_MODULE",
+      "mount": "TURRET",
+      "arc": 360,
+      "angle": -0,
+      "locations": [10, -84.5],
+      "renderOrderMod": 2
+    },
+    {
+      "id": "WS0004",
+      "size": "MEDIUM",
+      "type": "UNIVERSAL",
+      "mount": "TURRET",
+      "arc": 75,
+      "angle": -14,
+      "locations": [26.5, 48.5],
+      "renderOrderMod": 1
+    },
+    {
+      "id": "WS0005",
+      "size": "MEDIUM",
+      "type": "UNIVERSAL",
+      "mount": "TURRET",
+      "arc": 75,
+      "angle": 14,
+      "locations": [26.5, -48.5],
+      "renderOrderMod": 1
+    },
+    {
+      "id": "WS0006",
+      "size": "LARGE",
+      "type": "STATION_MODULE",
+      "mount": "TURRET",
+      "arc": 360,
+      "angle": 0,
+      "locations": [41.5, -0]
+    },
+    {
+      "id": "LB 1",
+      "size": "LARGE",
+      "type": "LAUNCH_BAY",
+      "mount": "HIDDEN",
+      "arc": 360,
+      "angle": 0,
+      "locations": [-24, -0]
+    },
+    {
+      "id": "WS0008",
+      "size": "SMALL",
+      "type": "BUILT_IN",
+      "mount": "TURRET",
+      "arc": 84,
+      "angle": 17.5,
+      "locations": [31, 77]
+    },
+    {
+      "id": "WS0009",
+      "size": "SMALL",
+      "type": "BUILT_IN",
+      "mount": "TURRET",
+      "arc": 84,
+      "angle": -17.5,
+      "locations": [31, -77]
+    }
+  ],
+  "engineSlots": [
+    {
+      "location": [-51, 53.5],
+      "length": 1.5,
+      "width": 7,
+      "angle": 180,
+      "contrailSize": 7,
+      "style": "HIGH_TECH"
+    },
+    {
+      "location": [-51, -53.5],
+      "length": 1.5,
+      "width": 7,
+      "angle": -180,
+      "contrailSize": 7,
+      "style": "HIGH_TECH"
+    },
+    {
+      "location": [-51, -46.5],
+      "length": 1.5,
+      "width": 7,
+      "angle": -180,
+      "contrailSize": 7,
+      "style": "HIGH_TECH"
+    },
+    {
+      "location": [-51, 46.5],
+      "length": 1.5,
+      "width": 7,
+      "angle": 180,
+      "contrailSize": 7,
+      "style": "HIGH_TECH"
+    }
+  ],
+  "bounds": [
+    -35, -14,
+    -25, -25.5,
+    -31, -25.5,
+    -32, -28,
+    -26.5, -35,
+    -45, -35.5,
+    -51, -40.5,
+    -51, -61,
+    -55, -64,
+    -55.5, -69,
+    -46, -76,
+    -21, -80,
+    -3, -90,
+    18.5, -80,
+    24.5, -80.5,
+    49.5, -66.5,
+    48, -62.5,
+    42, -62,
+    42, -41,
+    34.5, -31.5,
+    33.5, -19.5,
+    52, -3,
+    52, 3,
+    33.5, 19.5,
+    34.5, 31.5,
+    42, 41,
+    42, 62,
+    48, 62.5,
+    49.5, 66.5,
+    24.5, 80.5,
+    18.5, 80,
+    -3, 90,
+    -21, 80,
+    -46, 76,
+    -55.5, 69,
+    -55, 64,
+    -51, 61,
+    -51, 40.5,
+    -45, 35.5,
+    -26.5, 35,
+    -32, 28,
+    -31, 25.5,
+    -25, 25.5,
+    -35, 14
+  ]
+}

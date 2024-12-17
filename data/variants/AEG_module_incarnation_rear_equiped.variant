@@ -1,0 +1,14 @@
+{
+  "variantId": "AEG_module_incarnation_rear_equiped",
+  "hullId": "AEG_module_incarnation_rear",
+  "displayName": "Incarnation Rear",
+  "goalVariant": false,
+  "fluxCapacitors": 0,
+  "fluxVents": 0,
+  "quality": 1,
+  "permaMods": [],
+  "hullMods": [],
+  "weaponGroups": [],
+  "modules": [],
+  "wings": []
+}
