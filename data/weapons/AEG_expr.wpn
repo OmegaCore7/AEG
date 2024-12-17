@@ -4,17 +4,15 @@
   "projectileSpecId": "AEG_expr_shot",
   "type": "ENERGY",
   "size": "LARGE",
+  "everyFrameEffect": "data.weapons.scripts.AEG_SparkEffect",
   "turretSprite": "graphics/ships/paragon_ex/notatachlance00.png",
   "turretGlowSprite": "graphics/ships/paragon_ex/notatachlance_glow.png",
   "hardpointSprite": "graphics/ships/paragon_ex/notatachlance00.png",
   "hardpointGlowSprite": "graphics/ships/paragon_ex/notatachlance_glow.png",
-  "everyFrameEffect": "data.weapons.scripts.AEG_SparkEffect",
-  "numFrames": 13,
-  "frameRate": 13,
   "glowColor": [
-    150,
-    225,
-    250,
+    105,
+    50,
+    255,
     225
   ],
   "turretOffsets": [
@@ -33,20 +31,22 @@
   ],
   "barrelMode": "ALTERNATING",
   "animationType": "GLOW_AND_FLASH",
+  "numFrames": 13,
+  "frameRate": 13,
   "autocharge": true,
   "muzzleFlashSpec": {
-    "length": 35,
+    "length": 60,
     "spread": 0,
     "particleSizeMin": 12,
     "particleSizeRange": 12,
     "particleDuration": 0.12,
-    "particleCount": 12,
+    "particleCount": 25,
     "particleColor": [
       150,
-      225,
+      80,
       250,
       255
     ]
   },
-  "fireSoundTwo": "vpdriver_fire"
+  "fireSoundTwo": "gauss_cannon_fire"
 }
