@@ -11,6 +11,10 @@
   "shieldCenter": [0, 0],
   "shieldRadius": 125.5,
   "viewOffset": 0,
+  "builtInWeapons": {
+    "WS0008": "AEG_Incarnation_armleft",
+    "WS0009": "AEG_Incarnation_armright"
+  },
   "weaponSlots": [
     {
       "id": "WS0001",
@@ -54,7 +58,7 @@
     },
     {
       "id": "WS0005",
-      "size": "MEDIUM",
+      "size": "LARGE",
       "type": "UNIVERSAL",
       "mount": "TURRET",
       "arc": 75,
@@ -82,16 +86,16 @@
     },
     {
       "id": "WS0008",
-      "size": "SMALL",
+      "size": "LARGE",
       "type": "BUILT_IN",
       "mount": "TURRET",
-      "arc": 84,
-      "angle": 17.5,
-      "locations": [31, 77]
+      "arc": 138,
+      "angle": 25,
+      "locations": [27, 89]
     },
     {
       "id": "WS0009",
-      "size": "SMALL",
+      "size": "LARGE",
       "type": "BUILT_IN",
       "mount": "TURRET",
       "arc": 84,

@@ -15,14 +15,15 @@
       "weapons": {
         "WS0001": "ionbeam",
         "WS0002": "ionpulser",
-        "WS0003": "tachyonlance",
-        "WS0004": "hil",
+        "WS0003": "cyclone",
+        "WS0004": "locust",
         "WS0005": "minipulser",
         "WS0006": "minipulser",
         "WS0007": "swarmer",
         "WS0008": "swarmer",
         "WS0009": "heavyburst",
-        "WS0010": "heavyburst"
+        "WS0010": "heavyburst",
+        "WS0011": "AEG_expr"
       }
     }
   ],

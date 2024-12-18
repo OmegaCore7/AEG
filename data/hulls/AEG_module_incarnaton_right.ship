@@ -18,7 +18,7 @@
       "type": "UNIVERSAL",
       "mount": "TURRET",
       "arc": 360,
-      "angle": -135,
+      "angle": -45,
       "locations": [77, -5]
     },
     {
@@ -27,7 +27,7 @@
       "type": "UNIVERSAL",
       "mount": "TURRET",
       "arc": 360,
-      "angle": -135,
+      "angle": -45,
       "locations": [-69, 32]
     },
     {
@@ -36,7 +36,7 @@
       "type": "UNIVERSAL",
       "mount": "TURRET",
       "arc": 360,
-      "angle": -135,
+      "angle": -45,
       "locations": [34, -18]
     },
     {
@@ -45,7 +45,7 @@
       "type": "ENERGY",
       "mount": "TURRET",
       "arc": 360,
-      "angle": -135,
+      "angle": -45,
       "locations": [22, 13]
     },
     {
@@ -54,7 +54,7 @@
       "type": "ENERGY",
       "mount": "TURRET",
       "arc": 360,
-      "angle": -135,
+      "angle": -45,
       "locations": [-18, -10]
     },
     {
@@ -63,7 +63,7 @@
       "type": "ENERGY",
       "mount": "TURRET",
       "arc": 360,
-      "angle": -133,
+      "angle": -45,
       "locations": [-71, -27]
     }
   ],
