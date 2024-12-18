@@ -1,0 +1,52 @@
+{
+  "id": "AEG_Incarnation_armright",
+  "specClass": "projectile",
+  "projectileSpecId": "autopulse_shot",
+  "type": "ENERGY",
+  "size": "LARGE",
+  "turretSprite": "graphics/ships/paragon_ex/incarnation/incarnation_arm_right.png",
+  "turretGlowSprite": "graphics/ships/paragon_ex/incarnation/incarnation_arm_right_glow.png",
+  "hardpointSprite": "graphics/weapons/autopulse_laser_hardpoint_base.png",
+  "hardpointGlowSprite": "graphics/weapons/autopulse_laser_hardpoint_glow.png",
+  "glowColor": [
+    100,
+    100,
+    255,
+    225
+  ],
+  "turretOffsets": [
+    75,
+    -35,
+    75,
+    -26
+  ],
+  "turretAngleOffsets": [
+    0,
+    0
+  ],
+  "hardpointOffsets": [
+    48,
+    0
+  ],
+  "hardpointAngleOffsets": [
+    0
+  ],
+  "barrelMode": "ALTERNATING",
+  "animationType": "GLOW_AND_FLASH",
+  "autocharge": true,
+  "muzzleFlashSpec": {
+    "length": 35,
+    "spread": 0,
+    "particleSizeMin": 12,
+    "particleSizeRange": 12,
+    "particleDuration": 0.12,
+    "particleCount": 12,
+    "particleColor": [
+      100,
+      100,
+      255,
+      255
+    ]
+  },
+  "fireSoundTwo": "autopulse_laser_fire"
+}
