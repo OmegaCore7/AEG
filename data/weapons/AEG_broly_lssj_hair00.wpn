@@ -7,6 +7,7 @@
   "turretSprite": "graphics/ships/broly/hair/AEG_broly_lssj_hair00.png",
   "hardpointSprite": "graphics/ships/broly/hair/AEG_broly_lssj_hair00.png",
   "everyFrameEffect": "data.weapons.scripts.AEG_BrolyHairDeco",
+  "showDamageWhenDecorative": true,
   "numFrames": 13,
   "frameRate": 1,
   "turretOffsets": [

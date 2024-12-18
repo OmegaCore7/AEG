@@ -1,0 +1,46 @@
+{
+  "id": "AEG_core_decogun",
+  "specClass": "projectile",
+  "projectileSpecId": "AEG_dummy_invisible",
+  "type": "DECORATIVE",
+  "size": "LARGE",
+  "turretSprite": "graphics/ships/paragon_ex/core/core_rightgun.png",
+  "turretGlowSprite": "graphics/ships/paragon_ex/core/core_rightgun_glow.png",
+  "hardpointSprite": "graphics/ships/paragon_ex/core/core_rightgun.png",
+  "hardpointGlowSprite": "graphics/ships/paragon_ex/core/core_rightgun_glow.png",
+  "showDamageWhenDecorative": true,
+  "glowColor": [
+    105,
+    105,
+    255,
+    255
+  ],
+  "turretOffsets": [
+    105.5,
+    0,
+    104,
+    -4.5,
+    102,
+    -7,
+    102,
+    7,
+    104,
+    4.5
+  ],
+  "turretAngleOffsets": [
+    0,
+    0,
+    0,
+    0,
+    0
+  ],
+  "hardpointOffsets": [
+    157.5,
+    0
+  ],
+  "hardpointAngleOffsets": [
+    0
+  ],
+  "barrelMode": "ALTERNATING",
+  "animationType": "GLOW"
+}

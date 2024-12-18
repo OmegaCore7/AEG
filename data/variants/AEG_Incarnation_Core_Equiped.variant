@@ -1,0 +1,24 @@
+{
+  "variantId": "AEG_Incarnation_Core_Equiped",
+  "hullId": "AEG_Incarnation_Core",
+  "displayName": "EX Core",
+  "goalVariant": false,
+  "fluxCapacitors": 0,
+  "fluxVents": 0,
+  "quality": 1,
+  "permaMods": [],
+  "hullMods": [],
+  "weaponGroups": [
+    {
+      "autofire": false,
+      "mode": "LINKED",
+      "weapons": {
+        "WS0001": "gorgonpod",
+        "WS0002": "breachpod",
+        "WS0009": "AEG_core_legs"
+      }
+    }
+  ],
+  "modules": [],
+  "wings": []
+}

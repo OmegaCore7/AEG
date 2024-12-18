@@ -93,3 +93,7 @@ Omega Blaster,AEG_broly_omegablaster,,,,5000,,5000,100,0,5,25,1,1,,ENERGY,4000,,
 Experimental Particle Rail-Cannon,AEG_expr,3,,200000,2000,,1250,,50,15,30,3,0.05,1,KINETIC,100,,2,0.05,3,1,0,5,0.5,5,,3000,,,,,,,"kinetic20, omega, restricted",,Unknown,,Anti Shield,,,,,Shots may lose cohesion and dissolve. %s of the shots reach half the maximum range and %s of the shots reach full range.,100% | 50%,,,,25
 Incarnation Left Double Autopulser,AEG_Incarnation_armleft,1,,4500,700,,150,,0,20,20,30,2,,ENERGY,125,,0.05,0.05,1,,0,10,1,5,,1000,,,,,,,"energy18, hightech_bp, merc, ind",,,,General,,,,,,,,,,25
 Incarnation Right Double Autopulser,AEG_Incarnation_armright,1,,4500,700,,150,,0,20,20,30,2,,ENERGY,125,,0.05,0.05,1,,0,10,1,5,,1000,,,,,,,"energy18, hightech_bp, merc, ind",,,,General,,,,,,,,,,25
+Core Main Cannon,AEG_core_decogun,,,500000,600,1,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,AEG_core_left_shoulder,,,500000,600,1,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,AEG_core_left_arm,,,500000,600,1,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,AEG_core_legs,,,500000,600,1,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,

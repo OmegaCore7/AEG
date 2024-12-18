@@ -15,13 +15,16 @@
                 "WS0008": "AEG_Incarnation_armleft",
                 "WS0009": "AEG_Incarnation_armright",
                 "WS0004": "ionpulser",
-                "WS0005": "typhoon"
+                "WS0005": "typhoon",
+                "WS0007": "guardian",
+                "WS0010": "guardian"
             }
         }
     ],
     "modules": {
         "WS0001": "AEG_module_incarnation_rear_equiped",
         "WS0003": "AEG_module_incarnaton_right_equiped",
-        "WS0002": "AEG_module_incarnaton_left_equiped"
+        "WS0002": "AEG_module_incarnaton_left_equiped",
+        "WS0006": "AEG_Incarnation_Core_Equiped"
     }
 }
