@@ -2,7 +2,6 @@ package data.shipsystems.scripts;
 
 import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.combat.BaseEveryFrameCombatPlugin;
-
 import com.fs.starfarer.api.combat.CombatEngineAPI;
 import com.fs.starfarer.api.combat.MutableShipStatsAPI;
 import com.fs.starfarer.api.combat.ShipAPI;
@@ -13,15 +12,14 @@ import org.lwjgl.util.vector.Vector2f;
 import java.awt.*;
 
 public class AEG_QuantumComputation extends BaseShipSystemScript {
-    private static final float PUSH_FORCE = 700f;
-    private static final float TIME_MULT = 0.1f;
+    private static final float PUSH_FORCE = 10f;
     private static final float DAMAGE_TAKEN_REDUCTION = 0.9f; // 10% damage taken
 
     private static final int TURN_ACC_BUFF = 1000;
     private static final int TURN_RATE_BUFF = 500;
     private static final int ACCEL_BUFF = 500;
     private static final int DECCEL_BUFF = 300;
-    private static final int SPEED_BUFF = 200;
+    private static final int SPEED_BUFF = 50;
 
     @Override
     public void apply(MutableShipStatsAPI stats, String id, State state, float effectLevel) {
@@ -52,9 +50,6 @@ public class AEG_QuantumComputation extends BaseShipSystemScript {
             // Disable shields for balance
             ship.getShield().toggleOff();
 
-            // Apply time dilation
-            applyTimeDilation(ship, id, effectLevel);
-
             // Apply damage taken reduction
             stats.getHullDamageTakenMult().modifyMult(id, DAMAGE_TAKEN_REDUCTION);
             stats.getArmorDamageTakenMult().modifyMult(id, DAMAGE_TAKEN_REDUCTION);
@@ -84,15 +79,5 @@ public class AEG_QuantumComputation extends BaseShipSystemScript {
         if (Math.random() > 0.9f) {
             ship.addAfterimage(new Color(0, 200, 255, 64), 0, 0, -ship.getVelocity().x, -ship.getVelocity().y, 5 + 50 * effectLevel, 0, 0, 2 * effectLevel, false, false, false);
         }
-    }
-
-    private void applyTimeDilation(final ShipAPI ship, final String id, float effectLevel) {
-        final CombatEngineAPI engine = Global.getCombatEngine();
-        engine.getTimeMult().modifyMult(id, TIME_MULT * effectLevel);
-        ship.getMutableStats().getTimeMult().modifyMult(id, 1 / (TIME_MULT * effectLevel));
-
-        Global.getCombatEngine().addPlugin(new BaseEveryFrameCombatPlugin() {
-
-        });
     }
 }

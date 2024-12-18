@@ -1,23 +1,27 @@
 {
-  "variantId": "AEG_Incarnation_Equiped",
-  "hullId": "AEG_Incarnation",
-  "displayName": "Incarnation Mech",
-  "goalVariant": false,
-  "fluxCapacitors": 1,
-  "fluxVents": 0,
-  "quality": 1,
-  "permaMods": [],
-  "hullMods": [],
-  "weaponGroups": [
-    {
-      "autofire": false,
-      "mode": "LINKED",
-      "weapons": {
-        "WS0008": "AEG_Incarnation_armleft",
-        "WS0009": "AEG_Incarnation_armright"
-      }
+    "displayName": "Incarnation Mech",
+    "fluxCapacitors": 20,
+    "fluxVents": 20,
+    "goalVariant": false,
+    "hullId": "AEG_Incarnation",
+    "hullMods": [],
+    "quality": 1.0,
+    "variantId": "AEG_Incarnation_Equiped",
+    "weaponGroups": [
+        {
+            "autofire": false,
+            "mode": "LINKED",
+            "weapons": {
+                "WS0008": "AEG_Incarnation_armleft",
+                "WS0009": "AEG_Incarnation_armright",
+                "WS0004": "ionpulser",
+                "WS0005": "typhoon"
+            }
+        }
+    ],
+    "modules": {
+        "WS0001": "AEG_module_incarnation_rear_equiped",
+        "WS0003": "AEG_module_incarnaton_right_equiped",
+        "WS0002": "AEG_module_incarnaton_left_equiped"
     }
-  ],
-  "modules": [],
-  "wings": []
 }

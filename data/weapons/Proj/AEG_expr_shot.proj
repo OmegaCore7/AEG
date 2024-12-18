@@ -7,7 +7,7 @@
 	"onHitEffect": "data.weapons.onhit.AEG_expr_pierce",
 	"length":300.0,
 	"width":30,
-	"coreWidthMult":0.5,
+	"coreWidthMult":5,
 	"fadeTime":0.5,
 	"fringeColor":[150,50,250,255],
 	"coreColor":[255,255,255,255],

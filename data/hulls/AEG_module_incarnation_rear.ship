@@ -11,6 +11,10 @@
   "shieldCenter": [0, -0],
   "shieldRadius": 94,
   "viewOffset": 0,
+  "builtInMods": [
+    "always_detaches",
+    "reduced_explosion"
+  ],
   "weaponSlots": [
     {
       "id": "WS0001",

@@ -75,10 +75,10 @@ Spiral Beam Cannon,AEG_spiral_lance,,,4500,2500,,2500,,300,45,20,5,0.0333,1,HIGH
 ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 #Broly,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-Eraser Machine Gun,AEG_broly_arm_l,,,7500,2500,,250,,5,45,30,,,,ENERGY,75,,0,0.10,1,,0,5,1,5,,1000,1500,30,100,,,DO_NOT_CONSERVE,"energy20, rare_bp, hist1t, merc, ind, no_drop",,,,General,Extremely Fast,Excellent,,,The targeting system is incapable of tracking fighters when on local/automatic control.,,,,,23
+Eraser Machine Gun,AEG_broly_arm_l,,,7500,2500,,250,,5,45,30,,,,ENERGY,75,,0,0.1,1,,0,5,1,5,,1000,1500,30,100,,,DO_NOT_CONSERVE,"energy20, rare_bp, hist1t, merc, ind, no_drop",,,,General,Extremely Fast,Excellent,,,The targeting system is incapable of tracking fighters when on local/automatic control.,,,,,23
 Eraser Cannon,AEG_broly_arm_r,,,7500,2500,,500,,10,45,30,,,,ENERGY,250,,0.33,0.85,2,,,,,,,900,1500,30,500,,,STRIKE,"energy20, rare_bp, hist1t, merc, ind, no_drop",,,,General,Extremely Fast,Excellent,,,The targeting system is incapable of tracking fighters when on local/automatic control.,,,,,23
-Blaster Shell ,AEG_broly_bshell_ec,,,100000,2500,,2000,,100,75,,48,1,6,ENERGY,50,,0,5,12,.05,0,10,2,5,,1000,2000,30,,,,"STRIKE,DO_NOT_CONSERVE",no_drop,,,,General,Extremely Fast,Excellent,,,,,,,,40
-Powered Shell PD,AEG_broly_bshellpd,,,40000,2500,,250,,15,75,7,96,0.05,,ENERGY,25,,0,2,24,.05,0,0,0,0,,1000,50,30,400,,,"DO_NOT_AIM, DO_NOT_CONSERVE","utility8, missile9, strike7, omega, restricted, no_drop",,Unknown,,General,Extremely Fast,Excellent,,,,,,,TRUE,10
+Blaster Shell ,AEG_broly_bshell_ec,,,100000,2500,,2000,,100,75,,48,1,6,ENERGY,50,,0,5,12,0.05,0,10,2,5,,1000,2000,30,,,,"STRIKE,DO_NOT_CONSERVE",no_drop,,,,General,Extremely Fast,Excellent,,,,,,,,40
+Powered Shell PD,AEG_broly_bshellpd,,,40000,2500,,250,,15,75,7,96,0.05,,ENERGY,25,,0,2,24,0.05,0,0,0,0,,1000,50,30,400,,,"DO_NOT_AIM, DO_NOT_CONSERVE","utility8, missile9, strike7, omega, restricted, no_drop",,Unknown,,General,Extremely Fast,Excellent,,,,,,,TRUE,10
 Calamity Blaster,AEG_broly_cblaster,,,4500,5000,600,,,50,5,20,,,,KINETIC,,25,0,0.1,0,,,,,,999999,,,,,,,,"beam20, LR, hightech_bp, merc, ind, no_drop",,,,Gemeral,,,,,,,,,,24
 Gigantic Pulse,AEG_broly_gblaster_l,,,100000,2500,,250,,15,45,,20,1,5,ENERGY,150,,0,0.2,1,,0,10,2,5,,1000,,30,,,,"SYSTEM,SHOW_IN_CODEX",no_drop,,,,General,Extremely Fast,Excellent,,,,,,,,40
 Gigantic Pulse,AEG_broly_gblaster_r,,,100000,2500,,250,,15,45,,20,1,5,ENERGY,150,,0,0.2,1,,0,10,2,5,,1000,,30,,,,"SYSTEM,SHOW_IN_CODEX",no_drop,,,,General,Extremely Fast,Excellent,,,,,,,,40
@@ -91,4 +91,5 @@ Omega Blaster,AEG_broly_omegablaster,,,,5000,,5000,100,0,5,25,1,1,,ENERGY,4000,,
 ,AEG_broly_shoulder_l,,,500000,600,1,,,,,,,,,,,,,,,,,,,,,,,,,,,,no_drop,,,,,,,,,,,,,,
 ,AEG_broly_shoulder_r,,,500000,600,1,,,,,,,,,,,,,,,,,,,,,,,,,,,,no_drop,,,,,,,,,,,,,,
 Experimental Particle Rail-Cannon,AEG_expr,3,,200000,2000,,1250,,50,15,30,3,0.05,1,KINETIC,100,,2,0.05,3,1,0,5,0.5,5,,3000,,,,,,,"kinetic20, omega, restricted",,Unknown,,Anti Shield,,,,,Shots may lose cohesion and dissolve. %s of the shots reach half the maximum range and %s of the shots reach full range.,100% | 50%,,,,25
-,,,,,,,,,,,,,,,,,,,,
+Incarnation Left Double Autopulser,AEG_Incarnation_armleft,1,,4500,700,,150,,0,20,20,30,2,,ENERGY,125,,0.05,0.05,1,,0,10,1,5,,1000,,,,,,,"energy18, hightech_bp, merc, ind",,,,General,,,,,,,,,,25
+Incarnation Right Double Autopulser,AEG_Incarnation_armright,1,,4500,700,,150,,0,20,20,30,2,,ENERGY,125,,0.05,0.05,1,,0,10,1,5,,1000,,,,,,,"energy18, hightech_bp, merc, ind",,,,General,,,,,,,,,,25
