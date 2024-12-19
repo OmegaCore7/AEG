@@ -5,9 +5,11 @@
   "type": "DECORATIVE",
   "size": "SMALL",
   "everyFrameEffect": "data.weapons.scripts.AEG_CoreLegs",
-  "turretSprite": "graphics/ships/paragon_ex/core/legs/core_legs00.png",
-  "hardpointSprite": "graphics/ships/paragon_ex/core/core_leftgun.png",
+  "turretSprite": "graphics/ships/paragon_ex/core/legs/core_legs_00.png",
+  "hardpointSprite": "graphics/ships/paragon_ex/core/legs/core_legs_00.png",
   "showDamageWhenDecorative": true,
+  "numFrames": 12,
+  "frameRate": 1,
   "glowColor": [
     255,
     255,

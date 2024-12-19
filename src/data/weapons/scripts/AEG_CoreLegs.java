@@ -74,11 +74,12 @@ public class AEG_CoreLegs implements EveryFrameWeaponEffectPlugin {
                 }
             }
         }
+
         String frameStr = "0" + frame;
         if (frame >= 10) {
             frameStr = String.valueOf(frame);
         }
-        SpriteAPI spr = Global.getSettings().getSprite("graphics/ships/paragon_ex/core/legs/core_legs" + frameStr + ".png");
+        SpriteAPI spr = Global.getSettings().getSprite("graphics/ships/paragon_ex/core/legs/core_legs_" + frameStr + ".png");
 
         Color color = new Color(defColor.getRed() * 2, defColor.getGreen() * 2, defColor.getBlue() * 2, defColor.getAlpha());
         color = new Color(255, 255, 255);
