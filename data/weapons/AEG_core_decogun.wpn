@@ -9,6 +9,7 @@
   "hardpointSprite": "graphics/ships/paragon_ex/core/core_rightgun.png",
   "hardpointGlowSprite": "graphics/ships/paragon_ex/core/core_rightgun_glow.png",
   "showDamageWhenDecorative": true,
+  "everyFrameEffect": "data.weapons.scripts.AEG_CoreDecoWeaponEffect",
   "glowColor": [
     105,
     105,

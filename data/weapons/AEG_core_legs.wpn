@@ -4,6 +4,7 @@
   "projectileSpecId": "AEG_dummy_invisible",
   "type": "DECORATIVE",
   "size": "SMALL",
+  "everyFrameEffect": "data.weapons.scripts.AEG_CoreLegs",
   "turretSprite": "graphics/ships/paragon_ex/core/legs/core_legs00.png",
   "hardpointSprite": "graphics/ships/paragon_ex/core/core_leftgun.png",
   "showDamageWhenDecorative": true,

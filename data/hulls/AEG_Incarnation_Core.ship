@@ -7,9 +7,9 @@
   "height": 68,
   "width": 66,
   "center": [33, 34],
-  "collisionRadius": 58,
+  "collisionRadius": 80.5,
   "shieldCenter": [0, 0],
-  "shieldRadius": 57.5,
+  "shieldRadius": 79,
   "viewOffset": 0,
   "builtInWeapons": {
     "WS0003": "AEG_core_left_arm",
@@ -44,36 +44,36 @@
       "type": "DECORATIVE",
       "mount": "TURRET",
       "arc": 5,
-      "angle": 11.5,
-      "locations": [33.5, 16.5],
+      "angle": 0,
+      "locations": [37, 16],
       "renderOrderMod": 1
     },
     {
       "id": "WS0004",
       "size": "LARGE",
       "type": "UNIVERSAL",
-      "mount": "HIDDEN",
-      "arc": 75,
-      "angle": 16.5,
-      "locations": [10.5, -25.5]
+      "mount": "TURRET",
+      "arc": 85,
+      "angle": 15,
+      "locations": [10, -27]
     },
     {
       "id": "WS0005",
       "size": "SMALL",
       "type": "DECORATIVE",
       "mount": "TURRET",
-      "arc": 131,
-      "angle": -25.5,
-      "locations": [9.5, 27]
+      "arc": 85,
+      "angle": 0,
+      "locations": [9, 26]
     },
     {
       "id": "WS0006",
       "size": "LARGE",
       "type": "DECORATIVE",
       "mount": "TURRET",
-      "arc": 75,
-      "angle": 16.5,
-      "locations": [10.5, -25.5],
+      "arc": 85,
+      "angle": 15,
+      "locations": [10, -27],
       "renderOrderMod": 2
     },
     {
