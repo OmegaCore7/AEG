@@ -12,13 +12,13 @@ import org.lwjgl.util.vector.Vector2f;
 import java.awt.*;
 
 public class AEG_QuantumComputation extends BaseShipSystemScript {
-    private static final float PUSH_FORCE = 50f;
-    private static final float DAMAGE_TAKEN_REDUCTION = 0.9f; // 10% damage taken
+    private static final float PUSH_FORCE = 25f;
+    private static final float DAMAGE_TAKEN_REDUCTION = 0.99f; // 1% damage taken
 
-    private static final int TURN_ACC_BUFF = 1000;
-    private static final int TURN_RATE_BUFF = 700;
-    private static final int ACCEL_BUFF = 700;
-    private static final int DECCEL_BUFF = 700;
+    private static final int TURN_ACC_BUFF = 500;
+    private static final int TURN_RATE_BUFF = 500;
+    private static final int ACCEL_BUFF = 500;
+    private static final int DECCEL_BUFF = 500;
     private static final int SPEED_BUFF = 100;
 
     @Override

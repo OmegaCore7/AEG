@@ -30,8 +30,8 @@
       "id": "WS0001",
       "size": "LARGE",
       "type": "STATION_MODULE",
-      "mount": "HARDPOINT",
-      "arc": 360,
+      "mount": "TURRET",
+      "arc": 14,
       "angle": 0,
       "locations": [-90, -0],
       "renderOrderMod": 4
@@ -40,8 +40,8 @@
       "id": "WS0002",
       "size": "LARGE",
       "type": "STATION_MODULE",
-      "mount": "HARDPOINT",
-      "arc": 360,
+      "mount": "TURRET",
+      "arc": 14,
       "angle": -35,
       "locations": [-102, 133],
       "renderOrderMod": 2
@@ -50,8 +50,8 @@
       "id": "WS0003",
       "size": "LARGE",
       "type": "STATION_MODULE",
-      "mount": "HARDPOINT",
-      "arc": 360,
+      "mount": "TURRET",
+      "arc": 14,
       "angle": 35,
       "locations": [-102, -133],
       "renderOrderMod": 2
