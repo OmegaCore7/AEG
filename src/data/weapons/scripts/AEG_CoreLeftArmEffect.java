@@ -1,14 +1,14 @@
 package data.weapons.scripts;
 
 import com.fs.starfarer.api.combat.*;
-import com.fs.starfarer.api.util.IntervalUtil;
 import org.lwjgl.util.vector.Vector2f;
-import org.lazywizard.lazylib.VectorUtils;
 
 public class AEG_CoreLeftArmEffect implements EveryFrameWeaponEffectPlugin, OnFireEffectPlugin {
 
-    private boolean firstRun = true;
-    private IntervalUtil interval = new IntervalUtil(0f, 0.1f);
+    private Vector2f initialOffset = new Vector2f(37f, 8f); // Initial offset relative to the ship's facing
+    private float maxDistancePositive = 2f; // Maximum positive distance the arm weapon can move
+    private float maxDistanceNegative = -2f; // Maximum negative distance the arm weapon can move
+    private float movementSpeed = 50f; // Speed at which the arm weapon moves
 
     @Override
     public void advance(float amount, CombatEngineAPI engine, WeaponAPI weapon) {
@@ -17,19 +17,40 @@ public class AEG_CoreLeftArmEffect implements EveryFrameWeaponEffectPlugin, OnFi
         }
 
         ShipAPI ship = weapon.getShip();
-        WeaponAPI mainWeapon = null;
+        WeaponAPI decoGun = null;
 
         for (WeaponAPI w : ship.getAllWeapons()) {
-            if (w.getSlot().getId().equals("WS0006")) { // Main weapon
-                mainWeapon = w;
+            if (w.getSlot().getId().equals("WS0006")) { // Deco gun
+                decoGun = w;
                 break;
             }
         }
 
-        if (mainWeapon != null) {
-            float offset = 0f;
-            weapon.getSlot().getLocation().set(VectorUtils.rotateAroundPivot(new Vector2f(weapon.getSlot().getLocation().getX() + 21f, weapon.getSlot().getLocation().getY() + 7f), weapon.getSlot().getLocation(), weapon.getCurrAngle() - ship.getFacing()));
-            weapon.setCurrAngle(ship.getFacing() + offset);
+        if (decoGun != null) {
+            // Get the current angle of the deco gun and ship
+            float decoGunAngle = decoGun.getCurrAngle();
+            float shipFacing = ship.getFacing();
+
+            // Calculate the direction of movement based on the difference between the deco gun's angle and the ship's facing
+            float angleDifference = decoGunAngle - shipFacing;
+
+            // Get the current position of the arm (relative to the ship's position)
+            Vector2f currentArmPosition = weapon.getSlot().getLocation();
+
+            // Move the arm based on the angle difference
+            if (angleDifference > 0 && currentArmPosition.y < initialOffset.y + maxDistancePositive) {
+                // Move the arm upwards
+                currentArmPosition.y += movementSpeed * amount;
+            } else if (angleDifference < 0 && currentArmPosition.y > initialOffset.y + maxDistanceNegative) {
+                // Move the arm downwards
+                currentArmPosition.y -= movementSpeed * amount;
+            }
+
+            // Ensure the arm position stays within bounds
+            currentArmPosition.y = Math.min(Math.max(currentArmPosition.y, initialOffset.y + maxDistanceNegative), initialOffset.y + maxDistancePositive);
+
+            // Update the arm weapon's position
+            weapon.getSlot().getLocation().set(currentArmPosition);
         }
     }
 
