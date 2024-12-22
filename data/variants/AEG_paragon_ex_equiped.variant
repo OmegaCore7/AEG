@@ -1,0 +1,48 @@
+{
+  "variantId": "AEG_paragon_ex_equiped",
+  "hullId": "AEG_paragon_ex",
+  "displayName": "New Variant",
+  "goalVariant": false,
+  "fluxCapacitors": 0,
+  "fluxVents": 0,
+  "quality": 1,
+  "permaMods": [],
+  "hullMods": [
+    "always_detaches",
+    "advancedshieldemitter"
+  ],
+  "weaponGroups": [
+    {
+      "autofire": false,
+      "mode": "LINKED",
+      "weapons": {
+        "WS 001": "gigacannon",
+        "WS 002": "gigacannon",
+        "WS 003": "tachyonlance",
+        "WS 004": "tachyonlance",
+        "WS 005": "gravitonbeam",
+        "WS 006": "gravitonbeam",
+        "WS 007": "typhoon",
+        "WS 008": "typhoon",
+        "WS 009": "heavyburst",
+        "WS 010": "heavyburst",
+        "WS 011": "taclaser",
+        "WS 012": "amsrm",
+        "WS 013": "riftlance",
+        "WS 014": "annihilator",
+        "WS 015": "lrpdlaser",
+        "WS 016": "pdburst",
+        "WS 017": "taclaser",
+        "WS 018": "amsrm",
+        "WS 019": "riftlance",
+        "WS 020": "annihilator",
+        "WS 021": "lrpdlaser",
+        "WS 022": "pdburst",
+        "WS 023": "pdburst",
+        "WS0001": "AEG_expr"
+      }
+    }
+  ],
+  "modules": [],
+  "wings": []
+}
