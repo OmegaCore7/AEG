@@ -3,7 +3,8 @@
 		"AEG_RMModuleMovementPlugin": "data.weapons.scripts.AEG_RMModuleMovementPlugin",
 		"AEG_ArmorPiercePlugin": "data.weapons.scripts.AEG_ArmorPiercePlugin",
 		"AEG_BlackHoleGeneratorPlugin": "data.weapons.scripts.AEG_BlackHoleGeneratorPlugin",
-		"AEG_IncarnationModulePlugin": "data.weapons.scripts.AEG_IncarnationModulePlugin"
+		"AEG_IncarnationModulePlugin": "data.weapons.scripts.AEG_IncarnationModulePlugin",
+		"AEG_PurgePlugin": "data.weapons.scripts.AEG_PurgePlugin"
 	},
 
 	 "fx": {
