@@ -4,12 +4,12 @@
   "projectileSpecId": "AEG_dummy_invisible",
   "type": "DECORATIVE",
   "size": "LARGE",
+  "everyFrameEffect": "data.weapons.scripts.AEG_CoreDecoWeaponEffect",
   "turretSprite": "graphics/ships/paragon_ex/core/core_rightgun.png",
   "turretGlowSprite": "graphics/ships/paragon_ex/core/core_rightgun_glow.png",
   "hardpointSprite": "graphics/ships/paragon_ex/core/core_rightgun.png",
   "hardpointGlowSprite": "graphics/ships/paragon_ex/core/core_rightgun_glow.png",
   "showDamageWhenDecorative": true,
-  "everyFrameEffect": "data.weapons.scripts.AEG_CoreDecoWeaponEffect",
   "glowColor": [
     105,
     105,
@@ -21,16 +21,10 @@
     0,
     104,
     -4.5,
-    102,
-    -7,
-    102,
-    7,
     104,
     4.5
   ],
   "turretAngleOffsets": [
-    0,
-    0,
     0,
     0,
     0
