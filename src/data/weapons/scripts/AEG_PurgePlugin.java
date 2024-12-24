@@ -15,6 +15,7 @@ public class AEG_PurgePlugin extends BaseEveryFrameCombatPlugin {
 
     private static final String TARGET_SHIP_ID = "AEG_Incarnation";
     private static final String CORE_MODULE_VARIANT = "AEG_Incarnation_Core_Equiped";
+    private static final String SPAWN_VARIANT_ID = "AEG_Incarnation_Core_Equiped";
     private static final float PURGE_THRESHOLD = 0.50f;
 
     private final Map<ShipAPI, Long> lastPressTime = new HashMap<>();
@@ -75,8 +76,9 @@ public class AEG_PurgePlugin extends BaseEveryFrameCombatPlugin {
 
     private void transitionToCoreModule(ShipAPI mainShip, ShipAPI coreModule) {
         // Define the variant ID of the new ship
+        String spawnVariantId = SPAWN_VARIANT_ID;
 
-        // Calculate spawn location 50f in front of the main ship
+        // Calculate spawn location 175f in front of the main ship
         float spawnDistance = 175f;
         float facingRadians = (float) Math.toRadians(mainShip.getFacing());
         float offsetX = (float) Math.cos(facingRadians) * spawnDistance;
@@ -87,7 +89,7 @@ public class AEG_PurgePlugin extends BaseEveryFrameCombatPlugin {
         );
 
         // Create the new fleet member directly from the variant ID
-        FleetMemberAPI coreFleetMember = Global.getFactory().createFleetMember(FleetMemberType.SHIP, CORE_MODULE_VARIANT);
+        FleetMemberAPI coreFleetMember = Global.getFactory().createFleetMember(FleetMemberType.SHIP, spawnVariantId);
         coreFleetMember.setOwner(mainShip.getOwner());
         coreFleetMember.setCaptain(mainShip.getCaptain());
 
@@ -103,15 +105,18 @@ public class AEG_PurgePlugin extends BaseEveryFrameCombatPlugin {
         );
 
         // Ensure the new ship is fully operational
-        newCore.setCurrentCR(1f);
+        newCore.setCRAtDeployment(1f);
+        newCore.setControlsLocked(false);
+
+
 
         // Transfer control to the new ship if applicable
         if (engine.getPlayerShip() == mainShip) {
             engine.setPlayerShipExternal(newCore);
+
         }
 
-
-        // No ships are locked
+        // Adjust the alpha and collision class of the core module
         mainShip.setAlphaMult(1f);
         coreModule.setAlphaMult(0f);
         coreModule.setCollisionClass(CollisionClass.NONE);

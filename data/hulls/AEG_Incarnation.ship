@@ -12,8 +12,8 @@
   "shieldRadius": 113.5,
   "viewOffset": 0,
   "builtInMods": [
-    "vastbulk",
-    "always_detaches"
+    "always_detaches",
+    "vastbulk"
   ],
   "builtInWings": [
     "terminator_wing",
