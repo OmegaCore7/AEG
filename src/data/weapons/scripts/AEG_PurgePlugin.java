@@ -2,15 +2,13 @@ package data.weapons.scripts;
 
 import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.combat.*;
-import com.fs.starfarer.api.characters.PersonAPI;
 import com.fs.starfarer.api.fleet.FleetMemberAPI;
 import com.fs.starfarer.api.fleet.FleetMemberType;
 import com.fs.starfarer.api.input.InputEventAPI;
 import org.lwjgl.input.Keyboard;
+import org.lwjgl.util.vector.Vector2f;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class AEG_PurgePlugin extends BaseEveryFrameCombatPlugin {
     private CombatEngineAPI engine;
@@ -27,6 +25,7 @@ public class AEG_PurgePlugin extends BaseEveryFrameCombatPlugin {
         if (engine == null || engine.isPaused()) return;
 
         for (ShipAPI ship : engine.getShips()) {
+            if (ship == null || ship.getHullSpec() == null) continue;
             if (!TARGET_SHIP_ID.equals(ship.getHullSpec().getHullId())) continue;
 
             boolean doubleTapped = isKeyDoubleTapped(ship, Keyboard.getKeyIndex("X"));
@@ -73,35 +72,49 @@ public class AEG_PurgePlugin extends BaseEveryFrameCombatPlugin {
             }
         }
     }
+
     private void transitionToCoreModule(ShipAPI mainShip, ShipAPI coreModule) {
-        // Set up the new fleet member for the core module
-        FleetMemberAPI coreFleetMember = Global.getFactory().createFleetMember(FleetMemberType.SHIP, coreModule.getVariant().clone());
+        // Define the variant ID of the new ship
+
+        // Calculate spawn location 50f in front of the main ship
+        float spawnDistance = 175f;
+        float facingRadians = (float) Math.toRadians(mainShip.getFacing());
+        float offsetX = (float) Math.cos(facingRadians) * spawnDistance;
+        float offsetY = (float) Math.sin(facingRadians) * spawnDistance;
+        Vector2f spawnLocation = new Vector2f(
+                mainShip.getLocation().x + offsetX,
+                mainShip.getLocation().y + offsetY
+        );
+
+        // Create the new fleet member directly from the variant ID
+        FleetMemberAPI coreFleetMember = Global.getFactory().createFleetMember(FleetMemberType.SHIP, CORE_MODULE_VARIANT);
         coreFleetMember.setOwner(mainShip.getOwner());
         coreFleetMember.setCaptain(mainShip.getCaptain());
-        coreFleetMember.getRepairTracker().setCR(mainShip.getCurrentCR()); // Set CR from the parent ship
-        coreFleetMember.getStatus().setHullFraction(coreModule.getHullLevel());
 
-        // Spawn the core module as a new ship
+        // Ensure the fleet member is not mothballed
+        coreFleetMember.getRepairTracker().setMothballed(false);
+
+        // Spawn the new core ship in combat
         ShipAPI newCore = engine.getFleetManager(mainShip.getOwner()).spawnFleetMember(
                 coreFleetMember,
-                coreModule.getLocation(),
-                coreModule.getFacing(),
+                spawnLocation,
+                mainShip.getFacing(),
                 0f
         );
 
-        // Restore the new ship's CR and ensure it is combat-ready
-        newCore.setCRAtDeployment(mainShip.getCurrentCR()); // Ensure the new ship starts with the correct CR
-        newCore.getMutableStats().getCRLossPerSecondPercent().modifyFlat("AEG_PurgePlugin", 0); // Prevent immediate CR loss
+        // Ensure the new ship is fully operational
+        newCore.setCurrentCR(1f);
 
-        // Make only the specified module transparent and disable it
-        coreModule.setControlsLocked(true);
-        coreModule.setAlphaMult(0f); // Make the module invisible
-        coreModule.setCollisionClass(CollisionClass.NONE); // Prevent interactions
-
-        // Transfer player control if applicable
+        // Transfer control to the new ship if applicable
         if (engine.getPlayerShip() == mainShip) {
             engine.setPlayerShipExternal(newCore);
         }
+
+
+        // No ships are locked
+        mainShip.setAlphaMult(1f);
+        coreModule.setAlphaMult(0f);
+        coreModule.setCollisionClass(CollisionClass.NONE);
     }
 
     @Override
