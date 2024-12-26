@@ -11,6 +11,9 @@
   "shieldCenter": [0, 0],
   "shieldRadius": 114.5,
   "viewOffset": 0,
+  "builtInMods": [
+    "autorepair"
+  ],
   "builtInWeapons": {
     "WS0003": "AEG_core_left_arm",
     "WS0005": "AEG_core_left_shoulder",

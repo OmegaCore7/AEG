@@ -15,11 +15,12 @@ public class AEG_PurgePlugin extends BaseEveryFrameCombatPlugin {
 
     private static final String TARGET_SHIP_ID = "AEG_Incarnation";
     private static final String CORE_MODULE_VARIANT = "AEG_Incarnation_Core_Equiped";
-    private static final String SPAWN_VARIANT_ID = "AEG_Incarnation_Core_Equiped";
     private static final float PURGE_THRESHOLD = 0.50f;
 
     private final Map<ShipAPI, Long> lastPressTime = new HashMap<>();
     private static final long DOUBLE_TAP_THRESHOLD_MS = 300;
+
+    private boolean shipSpawned = false; // Flag to track if the ship has been spawned
 
     @Override
     public void advance(float amount, List<InputEventAPI> events) {
@@ -32,8 +33,9 @@ public class AEG_PurgePlugin extends BaseEveryFrameCombatPlugin {
             boolean doubleTapped = isKeyDoubleTapped(ship, Keyboard.getKeyIndex("X"));
             boolean lowHealth = ship.getHullLevel() < PURGE_THRESHOLD;
 
-            if ((lowHealth || doubleTapped) && !ship.isHulk()) {
+            if ((lowHealth || doubleTapped) && !ship.isHulk() && !shipSpawned) {
                 handlePurge(ship);
+                shipSpawned = true; // Set the flag to true after spawning the ship
             }
         }
     }
@@ -76,9 +78,8 @@ public class AEG_PurgePlugin extends BaseEveryFrameCombatPlugin {
 
     private void transitionToCoreModule(ShipAPI mainShip, ShipAPI coreModule) {
         // Define the variant ID of the new ship
-        String spawnVariantId = SPAWN_VARIANT_ID;
 
-        // Calculate spawn location 175f in front of the main ship
+        // Calculate spawn location 50f in front of the main ship
         float spawnDistance = 175f;
         float facingRadians = (float) Math.toRadians(mainShip.getFacing());
         float offsetX = (float) Math.cos(facingRadians) * spawnDistance;
@@ -89,12 +90,11 @@ public class AEG_PurgePlugin extends BaseEveryFrameCombatPlugin {
         );
 
         // Create the new fleet member directly from the variant ID
-        FleetMemberAPI coreFleetMember = Global.getFactory().createFleetMember(FleetMemberType.SHIP, spawnVariantId);
+        FleetMemberAPI coreFleetMember = Global.getFactory().createFleetMember(FleetMemberType.SHIP, CORE_MODULE_VARIANT);
         coreFleetMember.setOwner(mainShip.getOwner());
         coreFleetMember.setCaptain(mainShip.getCaptain());
 
         // Ensure the fleet member is not mothballed
-        coreFleetMember.getRepairTracker().setMothballed(false);
 
         // Spawn the new core ship in combat
         ShipAPI newCore = engine.getFleetManager(mainShip.getOwner()).spawnFleetMember(
@@ -106,18 +106,15 @@ public class AEG_PurgePlugin extends BaseEveryFrameCombatPlugin {
 
         // Ensure the new ship is fully operational
         newCore.setCRAtDeployment(1f);
+        newCore.setShipSystemDisabled(false);
         newCore.setControlsLocked(false);
+        newCore.getFleetMember().getRepairTracker().setMothballed(false);
+        newCore.getFleetMember().canBeDeployedForCombat();
+        newCore.getMutableStats().getCriticalMalfunctionChance().modifyFlat("no_malfunction_mod", 0f);
+        newCore.getMutableStats().getCombatEngineRepairTimeMult().modifyMult("no_malfunction_mod", 0.001f);
+        newCore.getMutableStats().getCombatWeaponRepairTimeMult().modifyMult("no_malfunction_mod", 0.001f);
 
-
-
-        // Transfer control to the new ship if applicable
-        if (engine.getPlayerShip() == mainShip) {
-            engine.setPlayerShipExternal(newCore);
-
-        }
-
-        // Adjust the alpha and collision class of the core module
-        mainShip.setAlphaMult(1f);
+        // Core Module on Purged ship Set Transparent and collision class adjusted
         coreModule.setAlphaMult(0f);
         coreModule.setCollisionClass(CollisionClass.NONE);
     }
