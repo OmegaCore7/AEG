@@ -23,6 +23,7 @@ public class AEG_SmoothTransition implements EveryFrameCombatPlugin {
         }
 
         // Implement gradual alpha transition logic here
+        updateWeaponStates();
     }
 
     private void initialize(CombatEngineAPI engine) {
@@ -74,6 +75,19 @@ public class AEG_SmoothTransition implements EveryFrameCombatPlugin {
 
         currentWeapon.getSprite().setAlphaMult(0.0f);
         newWeapon.getSprite().setAlphaMult(1.0f);
+    }
+
+    private void updateWeaponStates() {
+        for (WeaponAPI weapon : leftArmWeapons) {
+            if (weapon.getSprite().getAlphaMult() == 0.0f) {
+                weapon.disable(false);
+            }
+        }
+        for (WeaponAPI weapon : rightArmWeapons) {
+            if (weapon.getSprite().getAlphaMult() == 0.0f) {
+                weapon.disable(false);
+            }
+        }
     }
 
     @Override
