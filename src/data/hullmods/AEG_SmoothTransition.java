@@ -52,13 +52,15 @@ public class AEG_SmoothTransition implements EveryFrameCombatPlugin {
     }
 
     private boolean isLeftArmWeapon(WeaponAPI weapon) {
-        // Implement your logic to determine if the weapon is part of the left arm set
-        return weapon.getSlot().getId().startsWith("LeftArm");
+        // Check if the weapon ID matches the left arm weapon IDs
+        String slotId = weapon.getSlot().getId();
+        return slotId.equals("AEG_4g_armleft1") || slotId.equals("AEG_4g_armleft2") || slotId.equals("AEG_4g_armleft3");
     }
 
     private boolean isRightArmWeapon(WeaponAPI weapon) {
-        // Implement your logic to determine if the weapon is part of the right arm set
-        return weapon.getSlot().getId().startsWith("RightArm");
+        // Check if the weapon ID matches the right arm weapon IDs
+        String slotId = weapon.getSlot().getId();
+        return slotId.equals("AEG_4g_armright1") || slotId.equals("AEG_4g_armright2") || slotId.equals("AEG_4g_armright3");
     }
 
     private void switchWeapon(WeaponAPI newWeapon, WeaponAPI currentWeapon) {
