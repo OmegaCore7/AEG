@@ -1,20 +1,20 @@
 {
-  "id": "AEG_4g_torso",
+  "id": "AEG_4g_shoulder_r",
   "specClass": "projectile",
   "projectileSpecId": "AEG_dummy_invisible",
   "type": "DECORATIVE",
   "size": "SMALL",
-  "turretSprite": "graphics/ships/4g/4g_body.png",
-  "hardpointSprite": "graphics/ships/4g/4g_body.png",
+  "turretSprite": "graphics/ships/4g/4g_rightshoulder.png",
+  "hardpointSprite": "graphics/ships/4g/4g_rightshoulder.png",
   "turretOffsets": [
-    56,
+    0,
     0
   ],
   "turretAngleOffsets": [
     0
   ],
   "hardpointOffsets": [
-    84,
+    12.5,
     0
   ],
   "hardpointAngleOffsets": [

@@ -12,17 +12,26 @@
   "shieldRadius": 188,
   "viewOffset": 0,
   "builtInWeapons": {
-    "WS0001": "AEG_4g_head"
+    "WS0001": "AEG_4g_torso"
   },
   "weaponSlots": [
     {
       "id": "WS0001",
       "size": "SMALL",
-      "type": "BUILT_IN",
+      "type": "DECORATIVE",
       "mount": "TURRET",
-      "arc": 82,
+      "arc": 0,
       "angle": 0,
-      "locations": [3, -0]
+      "locations": [2, -0]
+    },
+    {
+      "id": "WS0002",
+      "size": "SMALL",
+      "type": "DECORATIVE",
+      "mount": "TURRET",
+      "arc": 0,
+      "angle": 0,
+      "locations": [26, -0]
     }
   ],
   "engineSlots": [
