@@ -1,0 +1,65 @@
+{
+  "id": "AEG_4g_head",
+  "specClass": "beam",
+  "type": "ENERGY",
+  "size": "SMALL",
+  "collisionClass": "RAY",
+  "collisionClassByFighter": "RAY_FIGHTER",
+  "turretSprite": "graphics/ships/4g/4g_head_00.png",
+  "turretGlowSprite": "graphics/ships/4g/4g_head_glow.png",
+  "hardpointSprite": "graphics/ships/4g/4g_head_00.png",
+  "hardpointGlowSprite": "graphics/ships/4g/4g_head_glow.png",
+  "glowColor": [
+    255,
+    255,
+    255,
+    255
+  ],
+  "hitGlowRadius": 0,
+  "turretOffsets": [
+    8,
+    -4,
+    8,
+    4
+  ],
+  "turretAngleOffsets": [
+    0,
+    0
+  ],
+  "hardpointOffsets": [
+    56.5,
+    -4,
+    56.5,
+    4
+  ],
+  "hardpointAngleOffsets": [
+    0,
+    0
+  ],
+  "numFrames": 9,
+  "frameRate": 1,
+  "fringeColor": [
+    255,
+    100,
+    0,
+    255
+  ],
+  "coreColor": [
+    255,
+    255,
+    255,
+    255
+  ],
+  "darkCore": true,
+  "width": 2,
+  "textureType": LASER,
+  "textureScrollSpeed": 30,
+  "pixelsPerTexel": 5,
+  "pierceSet": [
+    PROJECTILE_FF,
+    PROJECTILE_NO_FF,
+    PROJECTILE_FIGHTER
+  ],
+  "fireSoundOne": "laser_intro",
+  "fireSoundTwo": "pd_laser_loop"
+}
