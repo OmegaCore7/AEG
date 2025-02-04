@@ -1,7 +1,7 @@
 {
   "id": "AEG_4g_legs",
   "specClass": "beam",
-  "type": "ENERGY",
+  "type": "DECORATIVE",
   "size": "SMALL",
   "collisionClass": "RAY",
   "collisionClassByFighter": "RAY_FIGHTER",

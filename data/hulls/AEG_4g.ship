@@ -12,7 +12,10 @@
   "shieldRadius": 188,
   "viewOffset": 0,
   "builtInWeapons": {
-    "WS0001": "AEG_4g_torso"
+    "WS0001": "AEG_4g_torso",
+    "WS0003": "AEG_4g_shoulder_l",
+    "WS0004": "AEG_4g_shoulder_r",
+    "WS0005": "AEG_4g_head"
   },
   "weaponSlots": [
     {
@@ -20,7 +23,7 @@
       "size": "SMALL",
       "type": "DECORATIVE",
       "mount": "TURRET",
-      "arc": 0,
+      "arc": 45,
       "angle": 0,
       "locations": [2, -0]
     },
@@ -31,7 +34,37 @@
       "mount": "TURRET",
       "arc": 0,
       "angle": 0,
-      "locations": [26, -0]
+      "locations": [57.5, -17.5]
+    },
+    {
+      "id": "WS0003",
+      "size": "SMALL",
+      "type": "DECORATIVE",
+      "mount": "TURRET",
+      "arc": 360,
+      "angle": 0,
+      "locations": [2, 35],
+      "renderOrderMod": 2
+    },
+    {
+      "id": "WS0004",
+      "size": "SMALL",
+      "type": "DECORATIVE",
+      "mount": "TURRET",
+      "arc": 360,
+      "angle": -0,
+      "locations": [2, -35],
+      "renderOrderMod": 2
+    },
+    {
+      "id": "WS0005",
+      "size": "SMALL",
+      "type": "BUILT_IN",
+      "mount": "TURRET",
+      "arc": 145,
+      "angle": 0,
+      "locations": [5, -0],
+      "renderOrderMod": 3
     }
   ],
   "engineSlots": [
