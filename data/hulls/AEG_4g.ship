@@ -17,6 +17,7 @@
     "WS0003": "AEG_4g_shoulder_l",
     "WS0004": "AEG_4g_shoulder_r",
     "WS0005": "AEG_4g_head",
+    "WS0006": "AEG_4G_boltingdriver",
     "WS0007": "AEG_4G_willknife"
   },
   "weaponSlots": [
