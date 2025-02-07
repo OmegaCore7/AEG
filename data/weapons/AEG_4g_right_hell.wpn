@@ -1,0 +1,32 @@
+{
+  "id": "AEG_4g_right_hell",
+  "specClass": "projectile",
+  "projectileSpecId": "AEG_dummy_invisible",
+  "type": "DECORATIVE",
+  "size": "SMALL",
+  "turretSprite": "graphics/ships/4g/4g_hell_armr.png",
+  "turretGlowSprite": "graphics/ships/4g/4g_hell_armr_glow.png",
+  "hardpointSprite": "graphics/ships/4g/4g_rightshoulder.png",
+  "glowColor": [
+    255,
+    0,
+    0,
+    250
+  ],
+  "turretOffsets": [
+    53,
+    -45.5
+  ],
+  "turretAngleOffsets": [
+    0
+  ],
+  "hardpointOffsets": [
+    12.5,
+    0
+  ],
+  "hardpointAngleOffsets": [
+    0
+  ],
+  "barrelMode": "LINKED",
+  "animationType": "GLOW"
+}

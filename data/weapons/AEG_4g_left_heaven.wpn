@@ -1,14 +1,21 @@
 {
-  "id": "AEG_4g_shoulder_r",
+  "id": "AEG_4g_left_heaven",
   "specClass": "projectile",
   "projectileSpecId": "AEG_dummy_invisible",
   "type": "DECORATIVE",
   "size": "SMALL",
-  "turretSprite": "graphics/ships/4g/4g_rightshoulder.png",
+  "turretSprite": "graphics/ships/4g/4g_heaven_arml.png",
+  "turretGlowSprite": "graphics/ships/4g/4g_heaven_arml_glow.png",
   "hardpointSprite": "graphics/ships/4g/4g_rightshoulder.png",
-  "turretOffsets": [
+  "glowColor": [
+    255,
+    255,
     0,
-    0
+    255
+  ],
+  "turretOffsets": [
+    53,
+    45.5
   ],
   "turretAngleOffsets": [
     0
@@ -21,5 +28,5 @@
     0
   ],
   "barrelMode": "LINKED",
-  "animationType": "NONE"
+  "animationType": "GLOW"
 }

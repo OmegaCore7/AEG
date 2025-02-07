@@ -14,11 +14,19 @@
   "builtInWeapons": {
     "WS0001": "AEG_4g_torso",
     "WS0002": "AEG_4g_legs",
-    "WS0003": "AEG_4g_shoulder_l",
-    "WS0004": "AEG_4g_shoulder_r",
+    "WS0003": "AEG_4g_left_shoulder",
+    "WS0004": "AEG_4g_right_shoulder",
     "WS0005": "AEG_4g_head",
-    "WS0006": "AEG_4G_boltingdriver",
-    "WS0007": "AEG_4G_willknife"
+    "WS0006": "AEG_4g_left_punch",
+    "WS0007": "AEG_4g_right_punch",
+    "WS0008": "AEG_4G_right_willknife",
+    "WS0009": "AEG_4G_left_boltingdriver",
+    "WS0010": "AEG_4G_left_protectshade",
+    "WS0011": "AEG_4g_right_brokenmagnum",
+    "WS0012": "AEG_4G_left_protectshade",
+    "WS0013": "AEG_4g_right_brokenmagnum",
+    "WS0014": "AEG_4g_left_heaven",
+    "WS0015": "AEG_4g_right_hell"
   },
   "weaponSlots": [
     {
@@ -86,6 +94,78 @@
       "arc": 90,
       "angle": -0,
       "locations": [0, -35]
+    },
+    {
+      "id": "WS0008",
+      "size": "SMALL",
+      "type": "BUILT_IN",
+      "mount": "TURRET",
+      "arc": 90,
+      "angle": -0,
+      "locations": [0, -35]
+    },
+    {
+      "id": "WS0009",
+      "size": "SMALL",
+      "type": "BUILT_IN",
+      "mount": "TURRET",
+      "arc": 90,
+      "angle": 0,
+      "locations": [0, 35]
+    },
+    {
+      "id": "WS0010",
+      "size": "SMALL",
+      "type": "BUILT_IN",
+      "mount": "TURRET",
+      "arc": 90,
+      "angle": 0,
+      "locations": [0, 35]
+    },
+    {
+      "id": "WS0011",
+      "size": "SMALL",
+      "type": "BUILT_IN",
+      "mount": "TURRET",
+      "arc": 90,
+      "angle": -0,
+      "locations": [0, -35]
+    },
+    {
+      "id": "WS0012",
+      "size": "SMALL",
+      "type": "BUILT_IN",
+      "mount": "TURRET",
+      "arc": 90,
+      "angle": 0,
+      "locations": [0, 35]
+    },
+    {
+      "id": "WS0013",
+      "size": "SMALL",
+      "type": "BUILT_IN",
+      "mount": "TURRET",
+      "arc": 90,
+      "angle": -0,
+      "locations": [0, -35]
+    },
+    {
+      "id": "WS0014",
+      "size": "SMALL",
+      "type": "DECORATIVE",
+      "mount": "TURRET",
+      "arc": 90,
+      "angle": 0.5,
+      "locations": [8.5, 31]
+    },
+    {
+      "id": "WS0015",
+      "size": "SMALL",
+      "type": "DECORATIVE",
+      "mount": "TURRET",
+      "arc": 90,
+      "angle": -0.5,
+      "locations": [8.5, -31]
     }
   ],
   "engineSlots": [
