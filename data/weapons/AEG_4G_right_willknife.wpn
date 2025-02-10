@@ -1,9 +1,10 @@
 {
-  "id": "AEG_4G_right_willknife",
+  "id": "AEG_4g_right_willknife",
   "specClass": "beam",
   "type": "ENERGY",
   "size": "SMALL",
-  "beamEffect": "data.scripts.weapons.AEG_4G_willknife",
+  "beamEffect": "data.weapons.scripts.AEG_4g_right_willknife",
+  "everyFrameEffect": "data.weapons.scripts.AEG_4g_right_willknifeEffect",
   "collisionClass": "RAY",
   "collisionClassByFighter": "RAY_FIGHTER",
   "turretSprite": "graphics/ships/4g/4g_willknife_armr.png",

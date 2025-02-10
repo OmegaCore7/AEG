@@ -1,24 +1,25 @@
 {
-  "id": "AEG_4G_left_protectshade",
+  "id": "AEG_4g_left_boltingdriver",
   "specClass": "beam",
   "type": "ENERGY",
   "size": "SMALL",
+  #"beamEffect": "data.scripts.weapons.AEG_4G_boltingdriver",
   "collisionClass": "RAY",
   "collisionClassByFighter": "RAY_FIGHTER",
-  "turretSprite": "graphics/ships/4g/4g_ps_arml_00.png",
-  "turretGlowSprite": "graphics/ships/4g/4g_ps_arml_glow.png",
+  "turretSprite": "graphics/ships/4g/4g_boltingdriver_arml.png",
+  "turretGlowSprite": "graphics/ships/4g/4g_boltingdriver_arml_glow.png",
   "hardpointSprite": "",
   "showDamageWhenDecorative": true,
   "glowColor": [
     255,
-    255,
-    50,
+    100,
+    0,
     255
   ],
   "hitGlowRadius": 10,
   "turretOffsets": [
     47,
-    36.5
+    32.5
   ],
   "turretAngleOffsets": [
     0
@@ -30,18 +31,16 @@
   "hardpointAngleOffsets": [
     0
   ],
-  "numFrames": 5,
-  "frameRate": 1,
   "beamFireOnlyOnFullCharge": true,
   "fringeColor": [
     255,
-    200,
+    100,
     50,
     255
   ],
   "coreColor": [
     255,
-    255,
+    200,
     200,
     255
   ],
