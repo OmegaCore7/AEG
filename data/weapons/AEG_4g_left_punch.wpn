@@ -6,7 +6,7 @@
   "size": "SMALL",
   "turretSprite": "graphics/ships/4g/4g_chargedfist_arml.png",
   "turretGlowSprite": "graphics/ships/4g/4g_chargedfist_arml_glow.png",
-  "hardpointSprite": "",
+  "hardpointSprite": "graphics/ships/4g/4g_chargedfist_arml.png",
   "glowColor": [
     255,
     255,
@@ -21,13 +21,10 @@
     0
   ],
   "hardpointOffsets": [
-    150,
-    49,
-    142,
-    19
+    99.5,
+    36
   ],
   "hardpointAngleOffsets": [
-    0,
     0
   ],
   "barrelMode": "ALTERNATING",

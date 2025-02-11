@@ -7,7 +7,8 @@
   "collisionClassByFighter": "RAY_FIGHTER",
   "turretSprite": "graphics/ships/4g/4g_ps_arml_00.png",
   "turretGlowSprite": "graphics/ships/4g/4g_ps_arml_glow.png",
-  "hardpointSprite": "",
+  "hardpointSprite": "graphics/ships/4g/4g_ps_arml_00.png",
+  "hardpointGlowSprite": "graphics/ships/4g/4g_ps_arml_glow.png",
   "showDamageWhenDecorative": true,
   "glowColor": [
     255,
@@ -17,15 +18,15 @@
   ],
   "hitGlowRadius": 10,
   "turretOffsets": [
-    47,
-    36.5
+    47.5,
+    37
   ],
   "turretAngleOffsets": [
     0
   ],
   "hardpointOffsets": [
-    0,
-    0
+    91,
+    37
   ],
   "hardpointAngleOffsets": [
     0
