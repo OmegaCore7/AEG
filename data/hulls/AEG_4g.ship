@@ -23,14 +23,12 @@
     "WS0009": "AEG_4g_left_boltingdriver",
     "WS0010": "AEG_4g_left_protectshade",
     "WS0011": "AEG_4g_right_brokenmagnum",
-    "WS0012": "AEG_4g_left_protectshade",
-    "WS0013": "AEG_4g_right_brokenmagnum",
-    "WS0014": "AEG_4g_left_heaven",
-    "WS0015": "AEG_4g_right_hell",
-    "WS0016": "pdburst",
-    "WS0017": "swarmer_fighter",
-    "WS0018": "swarmer_fighter",
-    "WS0019": "swarmer_fighter"
+    "WS0012": "AEG_4g_left_heaven",
+    "WS0013": "AEG_4g_right_hell",
+    "WS0014": "pdburst",
+    "WS0015": "swarmer_fighter",
+    "WS0016": "swarmer_fighter",
+    "WS0017": "swarmer_fighter"
   },
   "weaponSlots": [
     {
@@ -138,24 +136,6 @@
     {
       "id": "WS0012",
       "size": "SMALL",
-      "type": "BUILT_IN",
-      "mount": "TURRET",
-      "arc": 90,
-      "angle": 0,
-      "locations": [0, 35]
-    },
-    {
-      "id": "WS0013",
-      "size": "SMALL",
-      "type": "BUILT_IN",
-      "mount": "TURRET",
-      "arc": 90,
-      "angle": -0,
-      "locations": [0, -35]
-    },
-    {
-      "id": "WS0014",
-      "size": "SMALL",
       "type": "DECORATIVE",
       "mount": "TURRET",
       "arc": 90,
@@ -163,7 +143,7 @@
       "locations": [8.5, 31]
     },
     {
-      "id": "WS0015",
+      "id": "WS0013",
       "size": "SMALL",
       "type": "DECORATIVE",
       "mount": "TURRET",
@@ -172,7 +152,7 @@
       "locations": [8.5, -31]
     },
     {
-      "id": "WS0016",
+      "id": "WS0014",
       "size": "SMALL",
       "type": "BUILT_IN",
       "mount": "HIDDEN",
@@ -181,7 +161,7 @@
       "locations": [-37, 117.5]
     },
     {
-      "id": "WS0017",
+      "id": "WS0015",
       "size": "SMALL",
       "type": "BUILT_IN",
       "mount": "HIDDEN",
@@ -190,7 +170,7 @@
       "locations": [-37, -117.5]
     },
     {
-      "id": "WS0018",
+      "id": "WS0016",
       "size": "SMALL",
       "type": "BUILT_IN",
       "mount": "HIDDEN",
@@ -199,7 +179,7 @@
       "locations": [-37.5, 76.5]
     },
     {
-      "id": "WS0019",
+      "id": "WS0017",
       "size": "SMALL",
       "type": "BUILT_IN",
       "mount": "HIDDEN",
