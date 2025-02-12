@@ -117,8 +117,8 @@ public class AEG_4g_right_willknifeEffect implements EveryFrameWeaponEffectPlugi
             weapon.setCurrAngle(weapon.getCurrAngle() - (sineA * (TORSO_OFFSET / 7) * 0.7f) + (sinceG * TORSO_OFFSET * 0.5f));
         }
 
-        if (armR != null) {
-            armR.setCurrAngle(global - ((aim + LEFT_ARM_OFFSET) * sinceB) - ((overlap + aim * 0.25f) * (1 - sinceB)));
+        if (armR != null && pauldronR != null) {
+            armR.setCurrAngle(pauldronR.getCurrAngle());
         }
 
         if (pauldronR != null) {
