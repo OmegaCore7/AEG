@@ -44,9 +44,6 @@ public class AEG_4g_right_willknifeEffect implements EveryFrameWeaponEffectPlugi
     private float overlap = 0, heat = 0, originalRArmPos = 0f;
     private final float TORSO_OFFSET = -45, LEFT_ARM_OFFSET = -60, RIGHT_ARM_OFFSET = -25, MAX_OVERLAP = 10;
 
-    // Store original angles
-    private float originalTorsoAngle, originalRightShoulderAngle, originalWillknifeAngle;
-
     public void init() {
         runOnce = true;
 
@@ -55,22 +52,20 @@ public class AEG_4g_right_willknifeEffect implements EveryFrameWeaponEffectPlugi
                 case "WS0008":
                     if (willknife == null) {
                         willknife = w;
-                        originalWillknifeAngle = w.getCurrAngle();
                     }
                     break;
                 case "WS0001":
                     if (torso == null) {
                         torso = w;
-                        originalTorsoAngle = w.getCurrAngle();
                         limbInit++;
                     }
                     break;
                 case "WS0004":
                     if (rightShoulder == null) {
                         rightShoulder = w;
-                        originalRightShoulderAngle = w.getCurrAngle();
                         limbInit++;
                         originalRArmPos = rightShoulder.getSprite().getCenterY();
+
                     }
                     break;
             }
@@ -88,7 +83,6 @@ public class AEG_4g_right_willknifeEffect implements EveryFrameWeaponEffectPlugi
             init();
         }
 
-        // Handle ship acceleration and deceleration
         if (ship.getEngineController().isAccelerating()) {
             if (overlap > (MAX_OVERLAP - 0.1f)) {
                 overlap = MAX_OVERLAP;
@@ -113,7 +107,6 @@ public class AEG_4g_right_willknifeEffect implements EveryFrameWeaponEffectPlugi
         float aim = MathUtils.getShortestRotation(global, weapon.getCurrAngle());
         float sineA = 0, sinceB = 0, sineC = 0, sinceD = 0, sinceG = 0;
 
-        // Calculate sine values based on weapon charge level
         if (weapon.getChargeLevel() < 1) {
             sineA = MagicAnim.smoothNormalizeRange(weapon.getChargeLevel(), 0.25f, 1f);
             sinceB = MagicAnim.smoothNormalizeRange(weapon.getChargeLevel(), 0.25f, 1f);
@@ -133,25 +126,19 @@ public class AEG_4g_right_willknifeEffect implements EveryFrameWeaponEffectPlugi
             reverse = 1f;
         }
 
-        // Adjust weapon sprite position
         weapon.getSprite().setCenterY(originalRArmPos - (8 * sinceB) + (8 * sinceG));
-
-        // Adjust torso angle (reversed)
         if (torso != null) {
-            torso.setCurrAngle(global + (sineA * (TORSO_OFFSET) + (sinceG * -TORSO_OFFSET) + aim * 0.3f));
+            torso.setCurrAngle(global + (sineA * (-TORSO_OFFSET) + (sinceG * TORSO_OFFSET) + aim * 0.3f));
         }
 
-        // Handle weapon cooldown
         if (weapon.getCooldownRemaining() <= 0f && !weapon.isFiring()) {
             cooldown = false;
         }
 
-        // Adjust weapon angle
         if (weapon != null) {
             weapon.setCurrAngle(weapon.getCurrAngle() - (sineA * (TORSO_OFFSET / 7) * .7f) + (sinceG * TORSO_OFFSET * .5f));
         }
 
-        // Handle swinging motion
         if (weapon.getChargeLevel() >= 1f) {
             swinging = true;
         }
@@ -174,7 +161,6 @@ public class AEG_4g_right_willknifeEffect implements EveryFrameWeaponEffectPlugi
             swingLevel = 0f;
         }
 
-        // Adjust right shoulder angle
         if (rightShoulder != null) {
             rightShoulder.setCurrAngle(weapon.getCurrAngle() + RIGHT_ARM_OFFSET);
         }
@@ -183,7 +169,6 @@ public class AEG_4g_right_willknifeEffect implements EveryFrameWeaponEffectPlugi
             rightShoulder.setCurrAngle(global + sineA * (-TORSO_OFFSET) + (sinceG * TORSO_OFFSET) * 0.5f + aim * 0.75f + RIGHT_ARM_OFFSET * 0.5f);
         }
 
-        // Adjust torso angle (reversed)
         if (torso != null) {
             torso.setCurrAngle(global + ((aim + LEFT_ARM_OFFSET) * sinceB) + ((overlap + aim * 0.25f) * (1 - sinceB)));
         }
@@ -191,23 +176,9 @@ public class AEG_4g_right_willknifeEffect implements EveryFrameWeaponEffectPlugi
         if (torso != null) {
             torso.setCurrAngle(torso.getCurrAngle() + MathUtils.getShortestRotation(torso.getCurrAngle(), torso.getCurrAngle()) * 0.6f);
         }
-
-        // Reset angles when not swinging
-        if (!swinging) {
-            if (willknife != null) {
-                willknife.setCurrAngle(originalWillknifeAngle);
-            }
-            if (torso != null) {
-                torso.setCurrAngle(originalTorsoAngle);
-            }
-            if (rightShoulder != null) {
-                rightShoulder.setCurrAngle(originalRightShoulderAngle);
-            }
-        }
     }
 
     private void updateWeaponAngles() {
-        // Update angles for willknife, torso, and right shoulder
         if (willknife != null) {
             willknife.setCurrAngle(MathUtils.clampAngle(willknife.getCurrAngle() - swingLevel));
         }
@@ -240,7 +211,7 @@ public class AEG_4g_right_willknifeEffect implements EveryFrameWeaponEffectPlugi
     @Override
     public void onFire(DamagingProjectileAPI projectile, WeaponAPI weapon, CombatEngineAPI engine) {
         Vector2f origin = new Vector2f(weapon.getLocation());
-        Vector2f offset = new Vector2f(TURRET_OFFSET, -15f);
+        Vector2f offset = new Vector2f(TURRET_OFFSET, -30f);
         VectorUtils.rotate(offset, weapon.getCurrAngle(), offset);
         Vector2f.add(offset, origin, origin);
         float shipFacing = weapon.getCurrAngle();
