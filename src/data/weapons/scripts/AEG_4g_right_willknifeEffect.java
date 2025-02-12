@@ -20,7 +20,7 @@ public class AEG_4g_right_willknifeEffect implements EveryFrameWeaponEffectPlugi
     private ShipAPI ship;
     private SpriteAPI sprite;
     private AnimationAPI anim, aGlow, aGlow2;
-    private WeaponAPI willknife, torso, rightShoulder;
+    private WeaponAPI head, armL, armR, pauldronL, pauldronR, torso, wGlow, hGlow, cannon;
 
     private float delay = 0.1f;
     private float timer = 0;
@@ -39,7 +39,6 @@ public class AEG_4g_right_willknifeEffect implements EveryFrameWeaponEffectPlugi
     private static final Color MUZZLE_FLASH_COLOR_GLOW = new Color(255, 255, 255, 50);
     private static final float MUZZLE_FLASH_DURATION = 0.15f;
     private static final float MUZZLE_FLASH_SIZE = 10.0f;
-    private static final float SWING_ANGLE = 25f; // Added SWING_ANGLE constant
 
     private float overlap = 0, heat = 0, originalRArmPos = 0f;
     private final float TORSO_OFFSET = -45, LEFT_ARM_OFFSET = -60, RIGHT_ARM_OFFSET = -25, MAX_OVERLAP = 10;
@@ -49,11 +48,6 @@ public class AEG_4g_right_willknifeEffect implements EveryFrameWeaponEffectPlugi
 
         for (WeaponAPI w : ship.getAllWeapons()) {
             switch (w.getSlot().getId()) {
-                case "WS0008":
-                    if (willknife == null) {
-                        willknife = w;
-                    }
-                    break;
                 case "WS0001":
                     if (torso == null) {
                         torso = w;
@@ -61,11 +55,22 @@ public class AEG_4g_right_willknifeEffect implements EveryFrameWeaponEffectPlugi
                     }
                     break;
                 case "WS0004":
-                    if (rightShoulder == null) {
-                        rightShoulder = w;
+                    if (pauldronR == null) {
+                        pauldronR = w;
                         limbInit++;
-                        originalRArmPos = rightShoulder.getSprite().getCenterY();
-
+                    }
+                    break;
+                case "WS0005":
+                    if (head == null) {
+                        head = w;
+                        limbInit++;
+                    }
+                    break;
+                case "WS0008":
+                    if (armR == null) {
+                        armR = w;
+                        limbInit++;
+                        originalRArmPos = armR.getSprite().getCenterY();
                     }
                     break;
             }
@@ -79,155 +84,81 @@ public class AEG_4g_right_willknifeEffect implements EveryFrameWeaponEffectPlugi
         system = ship.getSystem();
         anim = weapon.getAnimation();
 
-        if (!runOnce) {
-            init();
-        }
+        init();
 
         if (ship.getEngineController().isAccelerating()) {
-            if (overlap > (MAX_OVERLAP - 0.1f)) {
-                overlap = MAX_OVERLAP;
-            } else {
-                overlap = Math.min(MAX_OVERLAP, overlap + ((MAX_OVERLAP - overlap) * amount * 5));
-            }
+            overlap = Math.min(MAX_OVERLAP, overlap + ((MAX_OVERLAP - overlap) * amount * 5));
         } else if (ship.getEngineController().isDecelerating() || ship.getEngineController().isAcceleratingBackwards()) {
-            if (overlap < -(MAX_OVERLAP - 0.1f)) {
-                overlap = -MAX_OVERLAP;
-            } else {
-                overlap = Math.max(-MAX_OVERLAP, overlap + ((-MAX_OVERLAP + overlap) * amount * 5));
-            }
+            overlap = Math.max(-MAX_OVERLAP, overlap + ((-MAX_OVERLAP + overlap) * amount * 5));
         } else {
-            if (Math.abs(overlap) < 0.1f) {
-                overlap = 0;
-            } else {
-                overlap -= (overlap / 2) * amount * 3;
-            }
+            overlap -= (overlap / 2) * amount * 3;
         }
 
         float global = ship.getFacing();
         float aim = MathUtils.getShortestRotation(global, weapon.getCurrAngle());
-        float sineA = 0, sinceB = 0, sineC = 0, sinceD = 0, sinceG = 0;
-
-        if (weapon.getChargeLevel() < 1) {
-            sineA = MagicAnim.smoothNormalizeRange(weapon.getChargeLevel(), 0.25f, 1f);
-            sinceB = MagicAnim.smoothNormalizeRange(weapon.getChargeLevel(), 0.25f, 1f);
-            sinceG = MagicAnim.smoothNormalizeRange(weapon.getChargeLevel(), 0.0f, 0.25f) * 1 * reverse;
-        } else {
-            sineA = 1;
-            sinceB = 1;
-        }
-
-        sineC = 0;
+        float sineA = MagicAnim.smoothNormalizeRange(weapon.getChargeLevel(), 0.25f, 1f);
+        float sinceB = MagicAnim.smoothNormalizeRange(weapon.getChargeLevel(), 0.25f, 1f);
+        float sinceG = MagicAnim.smoothNormalizeRange(weapon.getChargeLevel(), 0.0f, 0.25f) * reverse;
 
         if (weapon.getChargeLevel() > 0.33 && sinceG > 0) {
             reverse -= amount + 0.08;
         }
-
         if (weapon.getChargeLevel() <= 0) {
             reverse = 1f;
         }
 
         weapon.getSprite().setCenterY(originalRArmPos - (8 * sinceB) + (8 * sinceG));
-        if (torso != null) {
-            torso.setCurrAngle(global + (sineA * (-TORSO_OFFSET) + (sinceG * TORSO_OFFSET) + aim * 0.3f));
-        }
 
-        if (weapon.getCooldownRemaining() <= 0f && !weapon.isFiring()) {
-            cooldown = false;
+        if (torso != null) {
+            torso.setCurrAngle(global + (sineA * TORSO_OFFSET) + (sinceG * -TORSO_OFFSET) + aim * 0.3f);
         }
 
         if (weapon != null) {
-            weapon.setCurrAngle(weapon.getCurrAngle() - (sineA * (TORSO_OFFSET / 7) * .7f) + (sinceG * TORSO_OFFSET * .5f));
+            weapon.setCurrAngle(weapon.getCurrAngle() - (sineA * (TORSO_OFFSET / 7) * 0.7f) + (sinceG * TORSO_OFFSET * 0.5f));
         }
 
-        if (weapon.getChargeLevel() >= 1f) {
-            swinging = true;
+        if (armR != null) {
+            armR.setCurrAngle(global - ((aim + LEFT_ARM_OFFSET) * sinceB) - ((overlap + aim * 0.25f) * (1 - sinceB)));
         }
 
-        if (swinging == true && (weapon.getChargeLevel() <= 0f)) {
-            swinging = false;
-            swingLevel = 0f;
-            cooldown = true;
+        if (pauldronR != null) {
+            pauldronR.setCurrAngle(torso.getCurrAngle() - MathUtils.getShortestRotation(torso.getCurrAngle(), armR.getCurrAngle()) * 0.6f);
         }
 
-        if (animInterval.intervalElapsed()) {
-            swingLevel -= 0.5;
-            swingLevel2 += 0.5;
+        if (armL != null) {
+            armL.setCurrAngle(global + ((aim + LEFT_ARM_OFFSET) * sinceB) + ((overlap + aim * 0.25f) * (1 - sinceB)));
         }
 
-        if (swingLevel > 9) {
-            swingLevel = 9;
-        }
-        if (!swinging) {
-            swingLevel = 0f;
+        if (pauldronL != null) {
+            pauldronL.setCurrAngle(torso.getCurrAngle() + MathUtils.getShortestRotation(torso.getCurrAngle(), armL.getCurrAngle()) * 0.6f);
         }
 
-        if (rightShoulder != null) {
-            rightShoulder.setCurrAngle(weapon.getCurrAngle() + RIGHT_ARM_OFFSET);
+        if (wGlow != null) {
+            wGlow.setCurrAngle(weapon.getCurrAngle());
         }
 
-        if (rightShoulder != null) {
-            rightShoulder.setCurrAngle(global + sineA * (-TORSO_OFFSET) + (sinceG * TORSO_OFFSET) * 0.5f + aim * 0.75f + RIGHT_ARM_OFFSET * 0.5f);
-        }
-
-        if (torso != null) {
-            torso.setCurrAngle(global + ((aim + LEFT_ARM_OFFSET) * sinceB) + ((overlap + aim * 0.25f) * (1 - sinceB)));
-        }
-
-        if (torso != null) {
-            torso.setCurrAngle(torso.getCurrAngle() + MathUtils.getShortestRotation(torso.getCurrAngle(), torso.getCurrAngle()) * 0.6f);
+        if (hGlow != null) {
+            hGlow.setCurrAngle(head.getCurrAngle());
         }
     }
 
-    private void updateWeaponAngles() {
-        if (willknife != null) {
-            willknife.setCurrAngle(MathUtils.clampAngle(willknife.getCurrAngle() - swingLevel));
-        }
-        if (torso != null) {
-            torso.setCurrAngle(MathUtils.clampAngle(torso.getCurrAngle() - swingLevel));
-        }
-        if (rightShoulder != null) {
-            rightShoulder.setCurrAngle(MathUtils.clampAngle(rightShoulder.getCurrAngle() - swingLevel));
-        }
-    }
-
-    @Override
     public void onHit(DamagingProjectileAPI projectile, CombatEntityAPI target, Vector2f point, boolean shieldHit, ApplyDamageResultAPI damageResult, CombatEngineAPI engine) {
-        Vector2f origin = new Vector2f(projectile.getLocation());
-        Vector2f offset = new Vector2f(TURRET_OFFSET, -15f);
-        VectorUtils.rotate(offset, projectile.getFacing(), offset);
-        Vector2f.add(offset, origin, origin);
-        float shipFacing = projectile.getFacing();
-        Vector2f shipVelocity = projectile.getSource().getVelocity();
-        shipVelocity = MathUtils.getPointOnCircumference(projectile.getSource().getVelocity(), (float) Math.random() * 20f, projectile.getFacing() + 90f - (float) Math.random() * 180f);
-
-        if (Math.random() > 0.75) {
-            engine.spawnExplosion(origin, shipVelocity, MUZZLE_FLASH_COLOR_ALT, MUZZLE_FLASH_SIZE * 0.5f, MUZZLE_FLASH_DURATION);
-        } else {
-            engine.spawnExplosion(origin, shipVelocity, MUZZLE_FLASH_COLOR, MUZZLE_FLASH_SIZE, MUZZLE_FLASH_DURATION);
-        }
-        engine.addSmoothParticle(origin, shipVelocity, MUZZLE_FLASH_SIZE * 3f, 1f, MUZZLE_FLASH_DURATION * 2f, MUZZLE_FLASH_COLOR_GLOW);
+        // Implement onHit logic here
     }
 
-    @Override
     public void onFire(DamagingProjectileAPI projectile, WeaponAPI weapon, CombatEngineAPI engine) {
         Vector2f origin = new Vector2f(weapon.getLocation());
-        Vector2f offset = new Vector2f(TURRET_OFFSET, -30f);
+        Vector2f offset = new Vector2f(TURRET_OFFSET, -15f);
         VectorUtils.rotate(offset, weapon.getCurrAngle(), offset);
         Vector2f.add(offset, origin, origin);
         float shipFacing = weapon.getCurrAngle();
         Vector2f shipVelocity = weapon.getShip().getVelocity();
         shipVelocity = MathUtils.getPointOnCircumference(ship.getVelocity(), (float) Math.random() * 20f, weapon.getCurrAngle() + 90f - (float) Math.random() * 180f);
-
         if (Math.random() > 0.75) {
             engine.spawnExplosion(origin, shipVelocity, MUZZLE_FLASH_COLOR_ALT, MUZZLE_FLASH_SIZE * 0.5f, MUZZLE_FLASH_DURATION);
         } else {
             engine.spawnExplosion(origin, shipVelocity, MUZZLE_FLASH_COLOR, MUZZLE_FLASH_SIZE, MUZZLE_FLASH_DURATION);
         }
         engine.addSmoothParticle(origin, shipVelocity, MUZZLE_FLASH_SIZE * 3f, 1f, MUZZLE_FLASH_DURATION * 2f, MUZZLE_FLASH_COLOR_GLOW);
-
-        // Additional logic to handle the swinging motion
-        swinging = true;
-        swingLevel = -SWING_ANGLE;
-        updateWeaponAngles();
     }
 }
