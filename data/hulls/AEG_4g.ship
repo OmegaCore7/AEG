@@ -102,7 +102,7 @@
       "size": "SMALL",
       "type": "BUILT_IN",
       "mount": "TURRET",
-      "arc": 90,
+      "arc": 125,
       "angle": -0,
       "locations": [0, -35]
     },
@@ -111,7 +111,7 @@
       "size": "SMALL",
       "type": "BUILT_IN",
       "mount": "TURRET",
-      "arc": 90,
+      "arc": 125,
       "angle": 0,
       "locations": [0, 35]
     },

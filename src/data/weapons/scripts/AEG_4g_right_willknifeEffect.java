@@ -43,6 +43,10 @@ public class AEG_4g_right_willknifeEffect implements EveryFrameWeaponEffectPlugi
     private float overlap = 0, heat = 0, originalRArmPos = 0f;
     private final float TORSO_OFFSET = -45, LEFT_ARM_OFFSET = -60, RIGHT_ARM_OFFSET = -25, MAX_OVERLAP = 10;
 
+    private float pauseTimer = 0f;
+    private boolean isPaused = false;
+    private static final float PAUSE_DURATION = 0.33f;
+
     public void init() {
         runOnce = true;
 
@@ -86,6 +90,19 @@ public class AEG_4g_right_willknifeEffect implements EveryFrameWeaponEffectPlugi
 
         init();
 
+        if (isPaused) {
+            pauseTimer += amount;
+            if (pauseTimer >= PAUSE_DURATION) {
+                isPaused = false;
+                pauseTimer = 0f;
+            }
+            return; // Skip the rest of the advance method while paused
+        }
+
+        if (weapon.getChargeLevel() >= 0.25f && weapon.getChargeLevel() < 0.25f + amount) {
+            isPaused = true;
+        }
+
         if (ship.getEngineController().isAccelerating()) {
             overlap = Math.min(MAX_OVERLAP, overlap + ((MAX_OVERLAP - overlap) * amount * 5));
         } else if (ship.getEngineController().isDecelerating() || ship.getEngineController().isAcceleratingBackwards()) {
@@ -97,7 +114,6 @@ public class AEG_4g_right_willknifeEffect implements EveryFrameWeaponEffectPlugi
         float global = ship.getFacing();
         float aim = MathUtils.getShortestRotation(global, weapon.getCurrAngle());
         float sineA = MagicAnim.smoothNormalizeRange(weapon.getChargeLevel(), 0.25f, 1f);
-        float sinceB = MagicAnim.smoothNormalizeRange(weapon.getChargeLevel(), 0.25f, 1f);
         float sinceG = MagicAnim.smoothNormalizeRange(weapon.getChargeLevel(), 0.0f, 0.25f) * reverse;
 
         if (weapon.getChargeLevel() > 0.33 && sinceG > 0) {
@@ -107,30 +123,32 @@ public class AEG_4g_right_willknifeEffect implements EveryFrameWeaponEffectPlugi
             reverse = 1f;
         }
 
-        weapon.getSprite().setCenterY(originalRArmPos - (8 * sinceB) + (8 * sinceG));
+        weapon.getSprite().setCenterY(originalRArmPos - (8 * sineA) + (8 * sinceG));
 
+        // Reversed Torso Motion
         if (torso != null) {
-            torso.setCurrAngle(global + (sineA * TORSO_OFFSET) + (sinceG * -TORSO_OFFSET) + aim * 0.3f);
+            torso.setCurrAngle(global - (sineA * TORSO_OFFSET) - (sinceG * -TORSO_OFFSET) - aim * 0.3f);
         }
 
         if (weapon != null) {
-            weapon.setCurrAngle(weapon.getCurrAngle() - (sineA * (TORSO_OFFSET / 7) * 0.7f) + (sinceG * TORSO_OFFSET * 0.5f));
+            weapon.setCurrAngle(weapon.getCurrAngle() + (sineA * (TORSO_OFFSET / 7) * 0.7f) - (sinceG * TORSO_OFFSET * 0.5f));
         }
 
+        // Adjust Right Arm and Pauldron to Follow Reversed Torso Motion
         if (armR != null && pauldronR != null) {
             armR.setCurrAngle(pauldronR.getCurrAngle());
         }
-
         if (pauldronR != null) {
-            pauldronR.setCurrAngle(torso.getCurrAngle() - MathUtils.getShortestRotation(torso.getCurrAngle(), armR.getCurrAngle()) * 0.6f);
+            pauldronR.setCurrAngle(torso.getCurrAngle() + MathUtils.getShortestRotation(torso.getCurrAngle(), armR.getCurrAngle()) * 0.6f);
         }
 
+        // Adjust Left Arm and Pauldron to Follow Reversed Torso Motion
         if (armL != null) {
-            armL.setCurrAngle(global + ((aim + LEFT_ARM_OFFSET) * sinceB) + ((overlap + aim * 0.25f) * (1 - sinceB)));
+            armL.setCurrAngle(global - ((aim + LEFT_ARM_OFFSET) * sineA) - ((overlap + aim * 0.25f) * (1 - sineA)));
         }
 
         if (pauldronL != null) {
-            pauldronL.setCurrAngle(torso.getCurrAngle() + MathUtils.getShortestRotation(torso.getCurrAngle(), armL.getCurrAngle()) * 0.6f);
+            pauldronL.setCurrAngle(torso.getCurrAngle() - MathUtils.getShortestRotation(torso.getCurrAngle(), armL.getCurrAngle()) * 0.6f);
         }
 
         if (wGlow != null) {
@@ -154,11 +172,14 @@ public class AEG_4g_right_willknifeEffect implements EveryFrameWeaponEffectPlugi
         float shipFacing = weapon.getCurrAngle();
         Vector2f shipVelocity = weapon.getShip().getVelocity();
         shipVelocity = MathUtils.getPointOnCircumference(ship.getVelocity(), (float) Math.random() * 20f, weapon.getCurrAngle() + 90f - (float) Math.random() * 180f);
+
+        // Trigger particle and glow effects immediately
+        engine.spawnExplosion(origin, shipVelocity, MUZZLE_FLASH_COLOR, MUZZLE_FLASH_SIZE, MUZZLE_FLASH_DURATION);
+        engine.addSmoothParticle(origin, shipVelocity, MUZZLE_FLASH_SIZE * 3f, 1f, MUZZLE_FLASH_DURATION * 2f, MUZZLE_FLASH_COLOR_GLOW);
+
+        // Alternate color for variety
         if (Math.random() > 0.75) {
             engine.spawnExplosion(origin, shipVelocity, MUZZLE_FLASH_COLOR_ALT, MUZZLE_FLASH_SIZE * 0.5f, MUZZLE_FLASH_DURATION);
-        } else {
-            engine.spawnExplosion(origin, shipVelocity, MUZZLE_FLASH_COLOR, MUZZLE_FLASH_SIZE, MUZZLE_FLASH_DURATION);
         }
-        engine.addSmoothParticle(origin, shipVelocity, MUZZLE_FLASH_SIZE * 3f, 1f, MUZZLE_FLASH_DURATION * 2f, MUZZLE_FLASH_COLOR_GLOW);
     }
 }
