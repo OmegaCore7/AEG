@@ -4,7 +4,7 @@
   "projectileSpecId": "AEG_4g_brokenmagnum_torp",
   "type": "MISSILE",
   "size": "SMALL",
-  "everyFrameEffect": "data.weapons.scripts.AEG_4g_right_brokenmagnumEffect",
+  #"everyFrameEffect": "data.weapons.scripts.AEG_4g_right_brokenmagnumEffect",
   "turretSprite": "graphics/ships/4g/4g_brokenmagnum_armr.png",
   "turretGlowSprite": "graphics/ships/4g/4g_brokenmagnum_armr_glow.png",
   "hardpointSprite": "graphics/ships/4g/4g_brokenmagnum_armr.png",

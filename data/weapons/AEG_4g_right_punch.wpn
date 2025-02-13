@@ -1,9 +1,11 @@
 {
   "id": "AEG_4g_right_punch",
-  "specClass": "projectile",
-  "projectileSpecId": "AEG_dummy_invisible",
+  "specClass": "beam",
   "type": "ENERGY",
   "size": "SMALL",
+  "everyFrameEffect": "data.weapons.scripts.AEG_4g_punches",
+  "collisionClass": "RAY",
+  "collisionClassByFighter": "RAY_FIGHTER",
   "turretSprite": "graphics/ships/4g/4g_chargedfist_armr.png",
   "turretGlowSprite": "graphics/ships/4g/4g_chargedfist_armr_glow.png",
   "hardpointSprite": "graphics/ships/4g/4g_chargedfist_armr.png",
@@ -13,6 +15,7 @@
     0,
     255
   ],
+  "hitGlowRadius": 0,
   "turretOffsets": [
     64,
     -32.5
@@ -22,22 +25,31 @@
   ],
   "hardpointOffsets": [],
   "hardpointAngleOffsets": [],
-  "barrelMode": "ALTERNATING",
-  "animationType": "GLOW_AND_FLASH",
-  "autocharge": true,
-  "muzzleFlashSpec": {
-    "length": -34,
-    "spread": 15,
-    "particleSizeMin": 15,
-    "particleSizeRange": 15,
-    "particleDuration": 0.2,
-    "particleCount": 30,
-    "particleColor": [
-      255,
-      0,
-      0,
-      255
-    ]
-  },
+  "beamFireOnlyOnFullCharge": true,
+  "fringeColor": [
+    50,
+    255,
+    100,
+    255
+  ],
+  "coreColor": [
+    200,
+    255,
+    200,
+    255
+  ],
+  "width": 0,
+  "textureType": [
+    "graphics/armaa/fx/armaa_parax_beam_fringe.png",
+    "graphics/armaa/fx/armaa_ppa_beam_core.png"
+  ],
+  "textureScrollSpeed": 300,
+  "pixelsPerTexel": 3,
+  "pierceSet": [
+    PROJECTILE_FF,
+    PROJECTILE_NO_FF,
+    PROJECTILE_FIGHTER
+  ],
+  "fireSoundOne": "laser_intro",
   "fireSoundTwo": "plasma_cannon_fire"
 }
