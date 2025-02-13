@@ -3,6 +3,7 @@
   "specClass": "beam",
   "type": "DECORATIVE",
   "size": "SMALL",
+  "everyFrameEffect": "data.weapons.scripts.AEG_4g_legs",
   "collisionClass": "RAY",
   "collisionClassByFighter": "RAY_FIGHTER",
   "turretSprite": "graphics/ships/4g/legs/4g_legs_00.png",

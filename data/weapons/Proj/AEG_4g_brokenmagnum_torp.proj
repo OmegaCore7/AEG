@@ -2,7 +2,7 @@
 	"id":"AEG_4g_brokenmagnum_torp",
 	"specClass":"missile",	
 	"missileType":"MISSILE",
-	"sprite":"graphics/missiles/AEG_ironcutter_torp.png",
+	"sprite":"graphics/missiles/4g_brokenmagnum_torp.png",
 	"onHitEffect":"data.weapons.onhit.AEG_IronCutterPierce",
 	"size":[26,50],
 	"center":[13,25],
