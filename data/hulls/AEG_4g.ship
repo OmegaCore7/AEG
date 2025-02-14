@@ -17,8 +17,6 @@
     "WS0003": "AEG_4g_left_shoulder",
     "WS0004": "AEG_4g_right_shoulder",
     "WS0005": "AEG_4g_head",
-    "WS0006": "AEG_4g_left_punch",
-    "WS0007": "AEG_4g_right_punch",
     "WS0008": "AEG_4g_right_willknife",
     "WS0009": "AEG_4g_left_boltingdriver",
     "WS0010": "AEG_4g_left_protectshade",
@@ -54,7 +52,7 @@
       "size": "SMALL",
       "type": "DECORATIVE",
       "mount": "TURRET",
-      "arc": 360,
+      "arc": 60,
       "angle": 0,
       "locations": [0, 35],
       "renderOrderMod": 2
@@ -64,7 +62,7 @@
       "size": "SMALL",
       "type": "DECORATIVE",
       "mount": "TURRET",
-      "arc": 360,
+      "arc": 60,
       "angle": -0,
       "locations": [0, -35],
       "renderOrderMod": 2
@@ -84,8 +82,8 @@
       "size": "SMALL",
       "type": "BUILT_IN",
       "mount": "TURRET",
-      "arc": 90,
-      "angle": -0,
+      "arc": 35,
+      "angle": 0,
       "locations": [0, 35]
     },
     {
@@ -93,8 +91,8 @@
       "size": "SMALL",
       "type": "BUILT_IN",
       "mount": "TURRET",
-      "arc": 90,
-      "angle": 0,
+      "arc": 35,
+      "angle": -0,
       "locations": [0, -35]
     },
     {
