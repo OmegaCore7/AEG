@@ -1,7 +1,7 @@
 {
   "variantId": "AEG_4g_g",
   "hullId": "AEG_4g",
-  "displayName": "GGGG ",
+  "displayName": "Final",
   "goalVariant": false,
   "fluxCapacitors": 0,
   "fluxVents": 0,
@@ -11,21 +11,20 @@
   "weaponGroups": [
     {
       "autofire": false,
-      "mode": "LINKED",
-      "weapons": {}
-    },
-    {
-      "autofire": false,
-      "mode": "LINKED",
+      "mode": "ALTERNATING",
       "weapons": {
-        "WS0008": "AEG_4g_right_willknife"
+        "WS0001": "AEG_4g_torso",
+        "WS0003": "AEG_4g_left_shoulder",
+        "WS0004": "AEG_4g_right_shoulder",
+        "WS0006": "AEG_4g_left_punch",
+        "WS0007": "AEG_4g_right_punch"
       }
     },
     {
       "autofire": false,
       "mode": "LINKED",
       "weapons": {
-        "WS0009": "AEG_4g_left_boltingdriver"
+        "WS0011": "AEG_4g_right_brokenmagnum"
       }
     },
     {
@@ -39,7 +38,14 @@
       "autofire": false,
       "mode": "LINKED",
       "weapons": {
-        "WS0011": "AEG_4g_right_brokenmagnum"
+        "WS0009": "AEG_4g_left_boltingdriver"
+      }
+    },
+    {
+      "autofire": false,
+      "mode": "LINKED",
+      "weapons": {
+        "WS0008": "AEG_4g_right_willknife"
       }
     },
     {
@@ -50,7 +56,7 @@
       }
     },
     {
-      "autofire": false,
+      "autofire": true,
       "mode": "LINKED",
       "weapons": {
         "WS0014": "riftlance",

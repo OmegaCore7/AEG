@@ -5,22 +5,18 @@ import com.fs.starfarer.api.combat.*;
 import com.fs.starfarer.api.util.IntervalUtil;
 import com.fs.starfarer.api.graphics.SpriteAPI;
 import org.magiclib.util.MagicAnim;
-import java.awt.Color;
 import org.lazywizard.lazylib.MathUtils;
-import org.lazywizard.lazylib.VectorUtils;
 import org.lwjgl.util.vector.Vector2f;
-import com.fs.starfarer.api.util.Misc;
-import org.magiclib.util.MagicFakeBeam;
 import com.fs.starfarer.api.combat.listeners.ApplyDamageResultAPI;
 
-public class AEG_4g_right_willknifeEffect implements EveryFrameWeaponEffectPlugin, OnFireEffectPlugin, OnHitEffectPlugin {
+public class AEG_4g_rightpunch implements EveryFrameWeaponEffectPlugin, OnFireEffectPlugin, OnHitEffectPlugin {
 
     private boolean runOnce = false, lockNloaded = false;
     private ShipSystemAPI system;
     private ShipAPI ship;
     private SpriteAPI sprite;
     private AnimationAPI anim, aGlow, aGlow2;
-    private WeaponAPI head, armL, armR, pauldronL, pauldronR, torso, wGlow, hGlow, cannon;
+    private WeaponAPI head, armR, pauldronR, torso, wGlow, hGlow, cannon;
 
     private float delay = 0.1f;
     private float timer = 0;
@@ -34,18 +30,9 @@ public class AEG_4g_right_willknifeEffect implements EveryFrameWeaponEffectPlugi
     private IntervalUtil animInterval = new IntervalUtil(0.012f, 0.012f);
     public float TURRET_OFFSET = 30f;
     private int limbInit = 0;
-    private static final Color MUZZLE_FLASH_COLOR = new Color(111,250,236,50);
-    private static final Color MUZZLE_FLASH_COLOR_ALT = new Color(111,250,236,100);
-    private static final Color MUZZLE_FLASH_COLOR_GLOW = new Color(255, 255, 255, 50);
-    private static final float MUZZLE_FLASH_DURATION = 0.15f;
-    private static final float MUZZLE_FLASH_SIZE = 10.0f;
 
     private float overlap = 0, heat = 0, originalRArmPos = 0f;
-    private final float TORSO_OFFSET = -45, LEFT_ARM_OFFSET = -60, RIGHT_ARM_OFFSET = -25, MAX_OVERLAP = 10;
-
-    private float pauseTimer = 0f;
-    private boolean isPaused = false;
-    private static final float PAUSE_DURATION = 0.33f;
+    private final float TORSO_OFFSET = -45, RIGHT_ARM_OFFSET = -25, MAX_OVERLAP = 10;
 
     public void init() {
         runOnce = true;
@@ -70,7 +57,7 @@ public class AEG_4g_right_willknifeEffect implements EveryFrameWeaponEffectPlugi
                         limbInit++;
                     }
                     break;
-                case "WS0008":
+                case "WS0007":
                     if (armR == null) {
                         armR = w;
                         limbInit++;
@@ -90,22 +77,9 @@ public class AEG_4g_right_willknifeEffect implements EveryFrameWeaponEffectPlugi
 
         init();
 
-        // Check if the willknife weapon (WS0008) is selected
+        // Check if the right punch weapon (WS0007) is selected
         if (ship.getSelectedGroupAPI().getActiveWeapon() != armR) {
-            return; // Do nothing if the willknife weapon is not selected
-        }
-
-        if (isPaused) {
-            pauseTimer += amount;
-            if (pauseTimer >= PAUSE_DURATION) {
-                isPaused = false;
-                pauseTimer = 0f;
-            }
-            return; // Skip the rest of the advance method while paused
-        }
-
-        if (weapon.getChargeLevel() >= 0.25f && weapon.getChargeLevel() < 0.25f + amount) {
-            isPaused = true;
+            return; // Do nothing if the right punch weapon is not selected
         }
 
         if (ship.getEngineController().isAccelerating()) {
@@ -130,7 +104,7 @@ public class AEG_4g_right_willknifeEffect implements EveryFrameWeaponEffectPlugi
 
         weapon.getSprite().setCenterY(originalRArmPos - (8 * sineA) + (8 * sinceG));
 
-        // Reversed Torso Motion
+        // Torso Motion
         if (torso != null) {
             torso.setCurrAngle(global - (sineA * TORSO_OFFSET) - (sinceG * -TORSO_OFFSET) - aim * 0.3f);
         }
@@ -139,21 +113,12 @@ public class AEG_4g_right_willknifeEffect implements EveryFrameWeaponEffectPlugi
             weapon.setCurrAngle(weapon.getCurrAngle() + (sineA * (TORSO_OFFSET / 7) * 0.7f) - (sinceG * TORSO_OFFSET * 0.5f));
         }
 
-        // Adjust Right Arm and Pauldron to Follow Reversed Torso Motion
+        // Adjust Right Arm and Pauldron to Follow Torso Motion
         if (armR != null && pauldronR != null) {
             armR.setCurrAngle(pauldronR.getCurrAngle());
         }
         if (pauldronR != null) {
             pauldronR.setCurrAngle(torso.getCurrAngle() + MathUtils.getShortestRotation(torso.getCurrAngle(), armR.getCurrAngle()) * 0.6f);
-        }
-
-        // Adjust Left Arm and Pauldron to Follow Reversed Torso Motion
-        if (armL != null) {
-            armL.setCurrAngle(global - ((aim + LEFT_ARM_OFFSET) * sineA) - ((overlap + aim * 0.25f) * (1 - sineA)));
-        }
-
-        if (pauldronL != null) {
-            pauldronL.setCurrAngle(torso.getCurrAngle() - MathUtils.getShortestRotation(torso.getCurrAngle(), armL.getCurrAngle()) * 0.6f);
         }
 
         if (wGlow != null) {
@@ -170,21 +135,6 @@ public class AEG_4g_right_willknifeEffect implements EveryFrameWeaponEffectPlugi
     }
 
     public void onFire(DamagingProjectileAPI projectile, WeaponAPI weapon, CombatEngineAPI engine) {
-        Vector2f origin = new Vector2f(weapon.getLocation());
-        Vector2f offset = new Vector2f(TURRET_OFFSET, -15f);
-        VectorUtils.rotate(offset, weapon.getCurrAngle(), offset);
-        Vector2f.add(offset, origin, origin);
-        float shipFacing = weapon.getCurrAngle();
-        Vector2f shipVelocity = weapon.getShip().getVelocity();
-        shipVelocity = MathUtils.getPointOnCircumference(ship.getVelocity(), (float) Math.random() * 20f, weapon.getCurrAngle() + 90f - (float) Math.random() * 180f);
-
-        // Trigger particle and glow effects immediately
-        engine.spawnExplosion(origin, shipVelocity, MUZZLE_FLASH_COLOR, MUZZLE_FLASH_SIZE, MUZZLE_FLASH_DURATION);
-        engine.addSmoothParticle(origin, shipVelocity, MUZZLE_FLASH_SIZE * 3f, 1f, MUZZLE_FLASH_DURATION * 2f, MUZZLE_FLASH_COLOR_GLOW);
-
-        // Alternate color for variety
-        if (Math.random() > 0.75) {
-            engine.spawnExplosion(origin, shipVelocity, MUZZLE_FLASH_COLOR_ALT, MUZZLE_FLASH_SIZE * 0.5f, MUZZLE_FLASH_DURATION);
-        }
+        // Removed muzzle flash and particle/glow effects
     }
 }
