@@ -33,7 +33,7 @@
     0
   ],
   "numFrames": 5,
-  "frameRate": 1,
+  "frameRate": 5,
   "beamFireOnlyOnFullCharge": true,
   "fringeColor": [
     255,
@@ -47,7 +47,7 @@
     200,
     255
   ],
-  "width": 24,
+  "width": 4,
   "textureType": [
     "graphics/armaa/fx/armaa_parax_beam_fringe.png",
     "graphics/armaa/fx/armaa_ppa_beam_core.png"
