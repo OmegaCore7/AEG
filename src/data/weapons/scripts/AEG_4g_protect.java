@@ -12,7 +12,7 @@ public class AEG_4g_protect implements BeamEffectPlugin {
 
     private IntervalUtil fireInterval = new IntervalUtil(2f, 2f); // Interval set to 2 seconds
     private final Vector2f ZERO = new Vector2f();
-    private static final Color PARTICLE_COLOR = new Color(255, 255, 100, 255); // Changed particle color
+    private static final Color PARTICLE_COLOR = new Color(255, 255, 50, 255); // Changed particle color
     private boolean runOnce = false;
     private boolean runOnce2 = false;
     private WeaponAPI weapon;
@@ -42,7 +42,7 @@ public class AEG_4g_protect implements BeamEffectPlugin {
                         shieldSprite,
                         weaponLocation,
                         ZERO,
-                        new Vector2f(shieldRadius + 50f, shieldRadius + 50f),
+                        new Vector2f(shieldRadius, shieldRadius),
                         new Vector2f(shieldRadius + 100f, shieldRadius + 100f),
                         360f,
                         0f,

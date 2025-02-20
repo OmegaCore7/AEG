@@ -47,7 +47,7 @@
     200,
     255
   ],
-  "width": 30,
+  "width": 24,
   "textureType": [
     "graphics/armaa/fx/armaa_parax_beam_fringe.png",
     "graphics/armaa/fx/armaa_ppa_beam_core.png"
