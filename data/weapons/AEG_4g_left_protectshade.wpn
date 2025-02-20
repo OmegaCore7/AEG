@@ -4,6 +4,7 @@
   "type": "ENERGY",
   "size": "SMALL",
   "beamEffect": "data.weapons.scripts.AEG_4g_protect",
+  "everyFrameEffect": "data.weapons.scripts.AEG_4g_protectEffect",
   "collisionClass": "RAY",
   "collisionClassByFighter": "RAY_FIGHTER",
   "turretSprite": "graphics/ships/4g/4g_ps_arml_00.png",
@@ -19,8 +20,8 @@
   ],
   "hitGlowRadius": 10,
   "turretOffsets": [
-    55,
-    37
+    62,
+    39
   ],
   "turretAngleOffsets": [
     0
