@@ -4,18 +4,17 @@
   "projectileSpecId": "AEG_4g_brokenmagnum_torp",
   "type": "MISSILE",
   "size": "SMALL",
-  #"everyFrameEffect": "data.weapons.scripts.AEG_4g_right_brokenmagnumEffect",
-  "turretSprite": "graphics/ships/4g/4g_brokenmagnum_armr.png",
+  "everyFrameEffect": "data.weapons.scripts.AEG_4g_right_brokenmagnumEffect",
+  "turretSprite": "graphics/ships/4g/4g_brokenmagnum_armr_00.png",
   "turretGlowSprite": "graphics/ships/4g/4g_brokenmagnum_armr_glow.png",
-  "hardpointSprite": "graphics/ships/4g/4g_brokenmagnum_armr.png",
+  "hardpointSprite": "graphics/ships/4g/4g_brokenmagnum_armr_00.png",
+    "numFrames": 2,
+    "frameRate": 1,
   "glowColor": [
     255,
     100,
     50,
     255
-  ],
-  "renderHints": [
-    RENDER_LOADED_MISSILES
   ],
   "turretOffsets": [
     40,
@@ -25,8 +24,8 @@
     -1.5
   ],
   "hardpointOffsets": [
-    123,
-    13.5
+    83.5,
+    -33
   ],
   "hardpointAngleOffsets": [
     0

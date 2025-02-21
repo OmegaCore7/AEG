@@ -57,7 +57,7 @@ public class AEG_4g_protectEffect implements EveryFrameWeaponEffectPlugin {
             weapon.getAnimation().setFrame(frameIndex);
         }
 
-        if (shieldActive) {
+        if (shieldActive && weapon.isFiring() && weapon.getShip().getSelectedGroupAPI().getActiveWeapon() == weapon) {
             activationTime += amount;
             if (activationTime > 10f) {
                 fluxIncreaseInterval.advance(amount);
@@ -75,6 +75,8 @@ public class AEG_4g_protectEffect implements EveryFrameWeaponEffectPlugin {
 
             // Reduce incoming beam damage
             reduceIncomingBeamDamage(weapon.getShip());
+        } else {
+            deactivateShield(weapon.getShip());
         }
     }
 
@@ -120,7 +122,7 @@ public class AEG_4g_protectEffect implements EveryFrameWeaponEffectPlugin {
                         Global.getCombatEngine().spawnExplosion(
                                 projectile.getLocation(),
                                 new Vector2f(),
-                                new Color(255, 100, 50), // Color of the explosion
+                                new Color(255, 180, 50), // Color of the explosion
                                 projectile.getDamageAmount(),
                                 0.25f // Smaller explosion for projectiles
                         );
@@ -143,9 +145,9 @@ public class AEG_4g_protectEffect implements EveryFrameWeaponEffectPlugin {
                         Global.getCombatEngine().spawnExplosion(
                                 missile.getLocation(),
                                 new Vector2f(),
-                                new Color(255, 250, 50), // Color of the explosion
+                                new Color(255, 225, 50), // Color of the explosion
                                 missile.getDamageAmount(),
-                                1.25f // Larger explosion for missiles
+                                1.10f // Larger explosion for missiles
                         );
                         break;
                     }
