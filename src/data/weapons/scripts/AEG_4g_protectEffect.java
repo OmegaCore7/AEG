@@ -5,8 +5,8 @@ import com.fs.starfarer.api.combat.*;
 import com.fs.starfarer.api.util.IntervalUtil;
 import org.lazywizard.lazylib.MathUtils;
 import org.lwjgl.util.vector.Vector2f;
-import org.magiclib.util.MagicRender;
-import org.lwjgl.util.vector.Vector2f;
+
+import java.awt.Color;
 
 public class AEG_4g_protectEffect implements EveryFrameWeaponEffectPlugin {
     private int frameIndex = 0;
@@ -109,17 +109,47 @@ public class AEG_4g_protectEffect implements EveryFrameWeaponEffectPlugin {
     private void reflectProjectilesAndMissiles(ShipAPI ship) {
         for (DamagingProjectileAPI projectile : Global.getCombatEngine().getProjectiles()) {
             if (projectile.getOwner() != ship.getOwner() && MathUtils.getDistance(ship, projectile) < RADIUS) {
+                // Reflect projectiles
                 projectile.setOwner(ship.getOwner());
                 projectile.setFacing(projectile.getFacing() + 180f);
-                projectile.setCollisionClass(CollisionClass.PROJECTILE_FF); // Set collision class to friendly fire
+
+                // Check for collision with enemy ships
+                for (ShipAPI enemy : Global.getCombatEngine().getShips()) {
+                    if (enemy.getOwner() != ship.getOwner() && enemy.isAlive() && MathUtils.getDistance(projectile, enemy) < projectile.getCollisionRadius()) {
+                        Global.getCombatEngine().removeEntity(projectile);
+                        Global.getCombatEngine().spawnExplosion(
+                                projectile.getLocation(),
+                                new Vector2f(),
+                                new Color(255, 100, 50), // Color of the explosion
+                                projectile.getDamageAmount(),
+                                0.25f // Smaller explosion for projectiles
+                        );
+                        break;
+                    }
+                }
             }
         }
 
         for (MissileAPI missile : Global.getCombatEngine().getMissiles()) {
             if (missile.getOwner() != ship.getOwner() && MathUtils.getDistance(ship, missile) < RADIUS) {
+                // Reflect missiles
                 missile.setOwner(ship.getOwner());
                 missile.setFacing(missile.getFacing() + 180f);
-                missile.setCollisionClass(CollisionClass.PROJECTILE_FF); // Set collision class to friendly fire
+
+                // Check for collision with enemy ships
+                for (ShipAPI enemy : Global.getCombatEngine().getShips()) {
+                    if (enemy.getOwner() != ship.getOwner() && enemy.isAlive() && MathUtils.getDistance(missile, enemy) < missile.getCollisionRadius()) {
+                        Global.getCombatEngine().removeEntity(missile);
+                        Global.getCombatEngine().spawnExplosion(
+                                missile.getLocation(),
+                                new Vector2f(),
+                                new Color(255, 250, 50), // Color of the explosion
+                                missile.getDamageAmount(),
+                                1.25f // Larger explosion for missiles
+                        );
+                        break;
+                    }
+                }
             }
         }
     }
