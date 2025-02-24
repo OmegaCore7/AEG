@@ -33,7 +33,7 @@
   "hardpointAngleOffsets": [
     0
   ],
-  "numFrames": 5,
+  "numFrames": 6,
   "frameRate": 5,
   "beamFireOnlyOnFullCharge": true,
   "fringeColor": [

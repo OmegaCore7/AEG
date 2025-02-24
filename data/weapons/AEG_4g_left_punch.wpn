@@ -7,9 +7,11 @@
   "everyFrameEffect": "data.weapons.scripts.AEG_4g_leftpunch",
   "collisionClass": "RAY",
   "collisionClassByFighter": "RAY_FIGHTER",
-  "turretSprite": "graphics/ships/4g/4g_chargedfist_arml.png",
+  "turretSprite": "graphics/ships/4g/4g_chargedfist_arml_00.png",
   "turretGlowSprite": "graphics/ships/4g/4g_chargedfist_arml_glow.png",
-  "hardpointSprite": "graphics/ships/4g/4g_chargedfist_arml.png",
+  "hardpointSprite": "graphics/ships/4g/4g_chargedfist_arml_00.png",
+  "numFrames": 2,
+  "frameRate": 1,
   "glowColor": [
     255,
     255,

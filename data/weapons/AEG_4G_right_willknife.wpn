@@ -7,10 +7,12 @@
   "everyFrameEffect": "data.weapons.scripts.AEG_4g_right_willknifeEffect",
   "collisionClass": "RAY",
   "collisionClassByFighter": "RAY_FIGHTER",
-  "turretSprite": "graphics/ships/4g/4g_willknife_armr.png",
+  "turretSprite": "graphics/ships/4g/4g_willknife_armr_00.png",
   "turretGlowSprite": "graphics/ships/4g/4g_willknife_armr_glow.png",
   "hardpointSprite": "",
   "showDamageWhenDecorative": true,
+    "numFrames": 2,
+    "frameRate": 1,
   "glowColor": [
     0,
     255,

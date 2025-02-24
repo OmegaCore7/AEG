@@ -8,7 +8,7 @@
   "turretSprite": "graphics/ships/4g/4g_brokenmagnum_armr_00.png",
   "turretGlowSprite": "graphics/ships/4g/4g_brokenmagnum_armr_glow.png",
   "hardpointSprite": "graphics/ships/4g/4g_brokenmagnum_armr_00.png",
-    "numFrames": 2,
+    "numFrames": 3,
     "frameRate": 1,
   "glowColor": [
     255,
