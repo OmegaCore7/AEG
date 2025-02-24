@@ -62,6 +62,17 @@ public class AEG_4g_leftimpact implements BeamEffectPlugin {
                 runOnce2 = true;
         }
 
+        // Check if the weapon is selected or active
+        boolean isSelected = weapon == ship.getSelectedGroupAPI().getActiveWeapon();
+        boolean isActive = weapon.isFiring() || weapon.getChargeLevel() > 0;
+
+        // Switch frames based on the weapon's state
+        if (isSelected || isActive) {
+            weapon.getAnimation().setFrame(0);
+        } else {
+            weapon.getAnimation().setFrame(1);
+        }
+
         float beamWidth = beam.getWidth();
 
         beam.getDamage().setDamage(0);
@@ -231,4 +242,5 @@ public class AEG_4g_leftimpact implements BeamEffectPlugin {
                 }
             }
         }
-    }}
+    }
+}

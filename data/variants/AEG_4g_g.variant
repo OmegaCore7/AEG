@@ -14,9 +14,6 @@
       "mode": "ALTERNATING",
       "weapons": {
         "WS0001": "AEG_4g_torso",
-        "WS0003": "AEG_4g_left_shoulder",
-        "WS0004": "AEG_4g_right_shoulder",
-        "WS0006": "AEG_4g_left_punch",
         "WS0007": "AEG_4g_right_punch"
       }
     },
@@ -24,6 +21,14 @@
       "autofire": false,
       "mode": "LINKED",
       "weapons": {
+        "WS0006": "AEG_4g_left_punch"
+      }
+    },
+    {
+      "autofire": false,
+      "mode": "LINKED",
+      "weapons": {
+        "WS0004": "AEG_4g_right_shoulder",
         "WS0011": "AEG_4g_right_brokenmagnum"
       }
     },
@@ -31,6 +36,7 @@
       "autofire": false,
       "mode": "LINKED",
       "weapons": {
+        "WS0003": "AEG_4g_left_shoulder",
         "WS0010": "AEG_4g_left_protectshade"
       }
     },
@@ -42,7 +48,7 @@
       }
     },
     {
-      "autofire": false,
+      "autofire": true,
       "mode": "LINKED",
       "weapons": {
         "WS0008": "AEG_4g_right_willknife"
@@ -52,13 +58,7 @@
       "autofire": true,
       "mode": "LINKED",
       "weapons": {
-        "WS0005": "AEG_4g_head"
-      }
-    },
-    {
-      "autofire": true,
-      "mode": "LINKED",
-      "weapons": {
+        "WS0005": "AEG_4g_head",
         "WS0014": "riftlance",
         "WS0015": "riftlance",
         "WS0016": "swarmer_fighter",

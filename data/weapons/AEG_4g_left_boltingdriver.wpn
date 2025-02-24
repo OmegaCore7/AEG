@@ -8,7 +8,7 @@
   "collisionClassByFighter": "RAY_FIGHTER",
   "turretSprite": "graphics/ships/4g/4g_boltingdriver_arml_00.png",
   "turretGlowSprite": "graphics/ships/4g/4g_boltingdriver_arml_glow.png",
-  "hardpointSprite": "",
+  "hardpointSprite": "graphics/ships/4g/4g_boltingdriver_arml_00.png",
   "showDamageWhenDecorative": true,
   "numFrames": 2,
   "frameRate": 1,
