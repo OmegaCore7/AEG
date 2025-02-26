@@ -6,6 +6,7 @@
   #"beamEffect": "data.scripts.weapons.AEG_4G_boltingdriver",
   "collisionClass": "RAY",
   "collisionClassByFighter": "RAY_FIGHTER",
+   "everyFrameEffect": "data.weapons.scripts.AEG_4g_left_boltdriver",
   "turretSprite": "graphics/ships/4g/4g_boltingdriver_arml_00.png",
   "turretGlowSprite": "graphics/ships/4g/4g_boltingdriver_arml_glow.png",
   "hardpointSprite": "graphics/ships/4g/4g_boltingdriver_arml_00.png",
