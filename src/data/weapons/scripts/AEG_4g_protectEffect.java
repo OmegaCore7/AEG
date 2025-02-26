@@ -31,6 +31,16 @@ public class AEG_4g_protectEffect implements EveryFrameWeaponEffectPlugin {
         float chargeLevel = weapon.getChargeLevel();
         timeSinceLastFrame += amount;
 
+        // Check if the weapon is selected or active
+        boolean isSelected = weapon == weapon.getShip().getSelectedGroupAPI().getActiveWeapon();
+        boolean isActive = weapon.isFiring() || chargeLevel > 0;
+
+        // Switch to frame 5 when the weapon is not selected and not active
+        if (!isSelected && !isActive) {
+            weapon.getAnimation().setFrame(5);
+            return;  // Skip the rest of the logic as we already set the frame
+        }
+
         if (timeSinceLastFrame >= frameDuration) {
             timeSinceLastFrame = 0f;
 

@@ -92,8 +92,13 @@ public class AEG_4g_right_willknifeEffect implements EveryFrameWeaponEffectPlugi
 
         // Check if the willknife weapon (WS0008) is selected
         if (ship.getSelectedGroupAPI().getActiveWeapon() != armR) {
+            // If not selected, ensure the animation frame is set to 0
+            weapon.getAnimation().setFrame(0);
             return; // Do nothing if the willknife weapon is not selected
         }
+
+        // If the weapon is selected and active, set to frame 1
+        weapon.getAnimation().setFrame(1);
 
         if (isPaused) {
             pauseTimer += amount;

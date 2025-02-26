@@ -48,6 +48,7 @@ public class AEG_4g_right_brokenmagnumEffect implements EveryFrameWeaponEffectPl
 
         // Check if the right broken magnum weapon (WS0011) is selected
         if (ship.getSelectedGroupAPI().getActiveWeapon() != armR) {
+            weapon.getAnimation().setFrame(2); // Set to frame 3 if the weapon is not selected
             return; // Do nothing if the right broken magnum weapon is not selected
         }
 
