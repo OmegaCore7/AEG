@@ -28,7 +28,9 @@
     "WS0014": "riftlance",
     "WS0015": "riftlance",
     "WS0016": "swarmer_fighter",
-    "WS0017": "swarmer_fighter"
+    "WS0017": "swarmer_fighter",
+    "WS0018": "AEG_4g_leftkneedrill",
+    "WS0019": "AEG_4g_rightkneedrill"
   },
   "weaponSlots": [
     {
@@ -37,8 +39,9 @@
       "type": "BUILT_IN",
       "mount": "TURRET",
       "arc": 20,
-      "angle": 0,
-      "locations": [2, -0]
+      "angle": 1.5,
+      "locations": [2, -0],
+      "renderOrderMod": 1
     },
     {
       "id": "WS0002",
@@ -186,6 +189,24 @@
       "arc": 360,
       "angle": -144.5,
       "locations": [-37.5, -76.5]
+    },
+    {
+      "id": "WS0018",
+      "size": "SMALL",
+      "type": "BUILT_IN",
+      "mount": "TURRET",
+      "arc": 10,
+      "angle": 0,
+      "locations": [30, 23]
+    },
+    {
+      "id": "WS0019",
+      "size": "SMALL",
+      "type": "BUILT_IN",
+      "mount": "TURRET",
+      "arc": 10,
+      "angle": -0,
+      "locations": [30, -23]
     }
   ],
   "engineSlots": [
