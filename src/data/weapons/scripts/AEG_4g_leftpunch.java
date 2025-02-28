@@ -51,12 +51,6 @@ public class AEG_4g_leftpunch implements EveryFrameWeaponEffectPlugin, OnFireEff
                         limbInit++;
                     }
                     break;
-                case "WS0005":
-                    if (head == null) {
-                        head = w;
-                        limbInit++;
-                    }
-                    break;
                 case "WS0006":
                     if (armL == null) {
                         armL = w;

@@ -32,7 +32,7 @@ public class AEG_4g_rightpunch implements EveryFrameWeaponEffectPlugin, OnFireEf
     private int limbInit = 0;
 
     private float overlap = 0, heat = 0, originalRArmPos = 0f;
-    private final float TORSO_OFFSET = -45, RIGHT_ARM_OFFSET = -25, MAX_OVERLAP = 10;
+    private final float TORSO_OFFSET = -35, RIGHT_ARM_OFFSET = -25, MAX_OVERLAP = 10;
 
     public void init() {
         runOnce = true;
@@ -51,17 +51,21 @@ public class AEG_4g_rightpunch implements EveryFrameWeaponEffectPlugin, OnFireEf
                         limbInit++;
                     }
                     break;
-                case "WS0005":
-                    if (head == null) {
-                        head = w;
-                        limbInit++;
-                    }
-                    break;
                 case "WS0007":
                     if (armR == null) {
                         armR = w;
                         limbInit++;
                         originalRArmPos = armR.getSprite().getCenterY();
+                    }
+                    break;
+                case "WS0008": // AEG_4g_right_willknife
+                    if (cannon == null) {
+                        cannon = w;
+                    }
+                    break;
+                case "WS0011": // AEG_4g_right_brokenmagnum
+                    if (cannon == null) {
+                        cannon = w;
                     }
                     break;
             }
@@ -77,7 +81,18 @@ public class AEG_4g_rightpunch implements EveryFrameWeaponEffectPlugin, OnFireEf
 
         init();
 
-        // Check if the right punch weapon (WS0007) is selected
+        // Check if "AEG_4g_right_willknife" (WS0008) or "AEG_4g_right_brokenmagnum" (WS0011) is selected
+        if (ship.getSelectedGroupAPI().getActiveWeapon() == armR || ship.getSelectedGroupAPI().getActiveWeapon() == cannon) {
+            // Switch the animation frame to 1 if either of the specific weapons is selected
+            if (weapon.getSlot().getId().equals("WS0008") || weapon.getSlot().getId().equals("WS0011")) {
+                anim.setFrame(1); // Switch to frame 1
+            }
+        } else {
+            // Otherwise, default to frame 0
+            anim.setFrame(0); // Keep at frame 0 if no special weapons are selected
+        }
+
+        // Now check if the right punch weapon (WS0007) is selected
         if (ship.getSelectedGroupAPI().getActiveWeapon() != armR) {
             return; // Do nothing if the right punch weapon is not selected
         }
@@ -131,10 +146,10 @@ public class AEG_4g_rightpunch implements EveryFrameWeaponEffectPlugin, OnFireEf
     }
 
     public void onHit(DamagingProjectileAPI projectile, CombatEntityAPI target, Vector2f point, boolean shieldHit, ApplyDamageResultAPI damageResult, CombatEngineAPI engine) {
-        // Implement onHit logic here
+        // Implement onHit logic here if needed for these specific weapons
     }
 
     public void onFire(DamagingProjectileAPI projectile, WeaponAPI weapon, CombatEngineAPI engine) {
-        // Removed muzzle flash and particle/glow effects
+        // Removed muzzle flash and particle/glow effects for simplicity
     }
 }
