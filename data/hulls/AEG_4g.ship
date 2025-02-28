@@ -156,7 +156,7 @@
       "size": "SMALL",
       "type": "BUILT_IN",
       "mount": "HIDDEN",
-      "arc": 180,
+      "arc": 360,
       "angle": 144.5,
       "locations": [-37, 117.5]
     },
@@ -165,7 +165,7 @@
       "size": "SMALL",
       "type": "BUILT_IN",
       "mount": "HIDDEN",
-      "arc": 180,
+      "arc": 360,
       "angle": -144.5,
       "locations": [-37, -117.5]
     },
@@ -174,7 +174,7 @@
       "size": "SMALL",
       "type": "BUILT_IN",
       "mount": "HIDDEN",
-      "arc": 180,
+      "arc": 360,
       "angle": 144.5,
       "locations": [-37.5, 76.5]
     },
@@ -183,7 +183,7 @@
       "size": "SMALL",
       "type": "BUILT_IN",
       "mount": "HIDDEN",
-      "arc": 180,
+      "arc": 360,
       "angle": -144.5,
       "locations": [-37.5, -76.5]
     }

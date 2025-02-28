@@ -32,7 +32,7 @@ public class AEG_4g_leftpunch implements EveryFrameWeaponEffectPlugin, OnFireEff
     private int limbInit = 0;
 
     private float overlap = 0, heat = 0, originalLArmPos = 0f;
-    private final float TORSO_OFFSET = -45, LEFT_ARM_OFFSET = -25, MAX_OVERLAP = 10;
+    private final float TORSO_OFFSET = -35, LEFT_ARM_OFFSET = -25, MAX_OVERLAP = 10;
 
     public void init() {
         runOnce = true;
@@ -76,6 +76,25 @@ public class AEG_4g_leftpunch implements EveryFrameWeaponEffectPlugin, OnFireEff
         anim = weapon.getAnimation();
 
         init();
+
+        // Check if WS0009 or WS0010 is selected
+        boolean isBoltingDriverSelected = false;
+        boolean isProtectShadeSelected = false;
+        for (WeaponAPI w : ship.getAllWeapons()) {
+            if (w.getSlot().getId().equals("WS0009") && ship.getSelectedGroupAPI().getActiveWeapon() == w) {
+                isBoltingDriverSelected = true;
+            }
+            if (w.getSlot().getId().equals("WS0010") && ship.getSelectedGroupAPI().getActiveWeapon() == w) {
+                isProtectShadeSelected = true;
+            }
+        }
+
+        // Set the frame of WS0006 based on the selection
+        if (isBoltingDriverSelected || isProtectShadeSelected) {
+            armL.getAnimation().setFrame(1); // Set frame to 1 (invisible)
+        } else {
+            armL.getAnimation().setFrame(0); // Set frame to 0 (visible)
+        }
 
         // Check if the left punch weapon (WS0006) is selected
         if (ship.getSelectedGroupAPI().getActiveWeapon() != armL) {
