@@ -82,17 +82,25 @@ public class AEG_4g_rightpunch implements EveryFrameWeaponEffectPlugin, OnFireEf
         init();
 
         // Check if "AEG_4g_right_willknife" (WS0008) or "AEG_4g_right_brokenmagnum" (WS0011) is selected
-        if (ship.getSelectedGroupAPI().getActiveWeapon() == armR || ship.getSelectedGroupAPI().getActiveWeapon() == cannon) {
-            // Switch the animation frame to 1 if either of the specific weapons is selected
-            if (weapon.getSlot().getId().equals("WS0008") || weapon.getSlot().getId().equals("WS0011")) {
-                anim.setFrame(1); // Switch to frame 1
+        boolean isWillknifeSelected = false;
+        boolean isBrokenmagnumSelected = false;
+        for (WeaponAPI w : ship.getAllWeapons()) {
+            if (w.getSlot().getId().equals("WS0008") && ship.getSelectedGroupAPI().getActiveWeapon() == w) {
+                isWillknifeSelected = true;
             }
-        } else {
-            // Otherwise, default to frame 0
-            anim.setFrame(0); // Keep at frame 0 if no special weapons are selected
+            if (w.getSlot().getId().equals("WS0011") && ship.getSelectedGroupAPI().getActiveWeapon() == w) {
+                isBrokenmagnumSelected = true;
+            }
         }
 
-        // Now check if the right punch weapon (WS0007) is selected
+        // Set the frame of WS0007 based on the selection
+        if (isWillknifeSelected || isBrokenmagnumSelected) {
+            armR.getAnimation().setFrame(1); // Set frame to 1 (invisible)
+        } else {
+            armR.getAnimation().setFrame(0); // Set frame to 0 (visible)
+        }
+
+        // Check if the right punch weapon (WS0007) is selected
         if (ship.getSelectedGroupAPI().getActiveWeapon() != armR) {
             return; // Do nothing if the right punch weapon is not selected
         }
@@ -117,7 +125,8 @@ public class AEG_4g_rightpunch implements EveryFrameWeaponEffectPlugin, OnFireEf
             reverse = 1f;
         }
 
-        weapon.getSprite().setCenterY(originalRArmPos - (8 * sineA) + (8 * sinceG));
+        // Increase the vertical displacement of the arm during the punch motion
+        weapon.getSprite().setCenterY(originalRArmPos - (20 * sineA) + (20 * sinceG));
 
         // Torso Motion
         if (torso != null) {

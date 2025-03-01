@@ -114,8 +114,8 @@ public class AEG_4g_leftpunch implements EveryFrameWeaponEffectPlugin, OnFireEff
         if (weapon.getChargeLevel() <= 0) {
             reverse = 1f;
         }
-
-        weapon.getSprite().setCenterY(originalLArmPos - (8 * sineA) + (8 * sinceG));
+        // Increase the vertical displacement of the arm during the punch motion
+        weapon.getSprite().setCenterY(originalLArmPos - (20 * sineA) + (20 * sinceG));
 
         // Torso Motion
         if (torso != null) {
