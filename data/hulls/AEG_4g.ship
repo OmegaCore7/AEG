@@ -179,8 +179,8 @@
       "size": "LARGE",
       "type": "BUILT_IN",
       "mount": "HIDDEN",
-      "arc": 16,
-      "angle": 90,
+      "arc": 39,
+      "angle": 126,
       "locations": [-37, 112]
     },
     {
@@ -188,8 +188,8 @@
       "size": "LARGE",
       "type": "BUILT_IN",
       "mount": "HIDDEN",
-      "arc": 16,
-      "angle": -90,
+      "arc": 39,
+      "angle": -126,
       "locations": [-37, -112]
     },
     {
@@ -217,7 +217,7 @@
       "mount": "HIDDEN",
       "arc": 0,
       "angle": 90,
-      "locations": [-38, 48.5]
+      "locations": [-37, 67.5]
     },
     {
       "id": "WS0021",
@@ -226,7 +226,7 @@
       "mount": "HIDDEN",
       "arc": 0,
       "angle": -90,
-      "locations": [-38, -48.5]
+      "locations": [-37, -67.5]
     }
   ],
   "engineSlots": [
