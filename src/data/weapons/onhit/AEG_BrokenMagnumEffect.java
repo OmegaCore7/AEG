@@ -60,4 +60,10 @@ public class AEG_BrokenMagnumEffect extends BaseEveryFrameCombatPlugin {
         CombatEngineAPI engine = Global.getCombatEngine();
         engine.spawnExplosion(location, new Vector2f(), new Color(255, 100, 0, 255), size, 1f);
     }
-}
+} jjjjhn
+
+
+
+
+
+9
