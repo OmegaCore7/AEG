@@ -7,9 +7,9 @@
   "height": 140,
   "width": 342,
   "center": [171, 70],
-  "collisionRadius": 192,
+  "collisionRadius": 179.5,
   "shieldCenter": [0, 0],
-  "shieldRadius": 188,
+  "shieldRadius": 177.5,
   "viewOffset": 0,
   "builtInWeapons": {
     "WS0001": "AEG_4g_torso",
@@ -27,10 +27,12 @@
     "WS0013": "AEG_4g_right_hell",
     "WS0014": "riftlance",
     "WS0015": "riftlance",
-    "WS0016": "swarmer_fighter",
-    "WS0017": "swarmer_fighter",
+    "WS0016": "locust",
+    "WS0017": "locust",
     "WS0018": "AEG_4g_leftkneedrill",
-    "WS0019": "AEG_4g_rightkneedrill"
+    "WS0019": "AEG_4g_rightkneedrill",
+    "WS0020": "hurricane",
+    "WS0021": "hurricane"
   },
   "weaponSlots": [
     {
@@ -161,7 +163,7 @@
       "mount": "HIDDEN",
       "arc": 360,
       "angle": 144.5,
-      "locations": [-37, 117.5]
+      "locations": [-37, 164]
     },
     {
       "id": "WS0015",
@@ -170,25 +172,25 @@
       "mount": "HIDDEN",
       "arc": 360,
       "angle": -144.5,
-      "locations": [-37, -117.5]
+      "locations": [-37, -164]
     },
     {
       "id": "WS0016",
-      "size": "SMALL",
+      "size": "LARGE",
       "type": "BUILT_IN",
       "mount": "HIDDEN",
-      "arc": 360,
-      "angle": 144.5,
-      "locations": [-37.5, 76.5]
+      "arc": 16,
+      "angle": 90,
+      "locations": [-37, 112]
     },
     {
       "id": "WS0017",
-      "size": "SMALL",
+      "size": "LARGE",
       "type": "BUILT_IN",
       "mount": "HIDDEN",
-      "arc": 360,
-      "angle": -144.5,
-      "locations": [-37.5, -76.5]
+      "arc": 16,
+      "angle": -90,
+      "locations": [-37, -112]
     },
     {
       "id": "WS0018",
@@ -207,6 +209,24 @@
       "arc": 10,
       "angle": -0,
       "locations": [30, -23]
+    },
+    {
+      "id": "WS0020",
+      "size": "LARGE",
+      "type": "BUILT_IN",
+      "mount": "HIDDEN",
+      "arc": 0,
+      "angle": 90,
+      "locations": [-38, 48.5]
+    },
+    {
+      "id": "WS0021",
+      "size": "LARGE",
+      "type": "BUILT_IN",
+      "mount": "HIDDEN",
+      "arc": 0,
+      "angle": -90,
+      "locations": [-38, -48.5]
     }
   ],
   "engineSlots": [
@@ -377,16 +397,12 @@
   ],
   "bounds": [
     -70, -33,
-    -45.5, -69,
-    -21.5, -63.5,
-    -19, -40,
+    -44.5, -62,
     14.5, -39,
     27.5, -21,
     27.5, 21,
     14.5, 39,
-    -19, 40,
-    -21.5, 63.5,
-    -45.5, 69,
+    -44.5, 62,
     -70, 33
   ]
 }

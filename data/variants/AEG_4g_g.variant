@@ -19,7 +19,7 @@
     },
     {
       "autofire": false,
-      "mode": "LINKED",
+      "mode": "ALTERNATING",
       "weapons": {
         "WS0007": "AEG_4g_right_punch",
         "WS0019": "AEG_4g_rightkneedrill"
@@ -27,35 +27,35 @@
     },
     {
       "autofire": false,
-      "mode": "LINKED",
+      "mode": "ALTERNATING",
       "weapons": {
         "WS0008": "AEG_4g_right_willknife"
       }
     },
     {
       "autofire": false,
-      "mode": "LINKED",
+      "mode": "ALTERNATING",
       "weapons": {
         "WS0010": "AEG_4g_left_protectshade"
       }
     },
     {
       "autofire": false,
-      "mode": "LINKED",
+      "mode": "ALTERNATING",
       "weapons": {
         "WS0011": "AEG_4g_right_brokenmagnum"
       }
     },
     {
       "autofire": true,
-      "mode": "LINKED",
+      "mode": "ALTERNATING",
       "weapons": {
         "WS0009": "AEG_4g_left_boltingdriver"
       }
     },
     {
       "autofire": true,
-      "mode": "LINKED",
+      "mode": "ALTERNATING",
       "weapons": {
         "WS0001": "AEG_4g_torso",
         "WS0003": "AEG_4g_left_shoulder",
@@ -63,8 +63,10 @@
         "WS0005": "AEG_4g_head",
         "WS0014": "riftlance",
         "WS0015": "riftlance",
-        "WS0016": "swarmer_fighter",
-        "WS0017": "swarmer_fighter"
+        "WS0016": "locust",
+        "WS0017": "locust",
+        "WS0020": "hurricane",
+        "WS0021": "hurricane"
       }
     }
   ],
