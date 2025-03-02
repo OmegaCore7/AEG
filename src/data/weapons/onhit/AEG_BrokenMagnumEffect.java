@@ -4,23 +4,21 @@ import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.combat.*;
 import com.fs.starfarer.api.input.InputEventAPI;
 import org.lwjgl.util.vector.Vector2f;
-import org.magiclib.util.MagicRender;
 
 import java.awt.*;
 import java.util.List;
 
 public class AEG_BrokenMagnumEffect extends BaseEveryFrameCombatPlugin {
     private DamagingProjectileAPI projectile;
-    private boolean hasPierced = false;
+    private Vector2f previousLocation;
 
-    // No-argument constructor
     public AEG_BrokenMagnumEffect() {
     }
 
-    // Constructor with projectile parameter
     public AEG_BrokenMagnumEffect(DamagingProjectileAPI projectile) {
         this.projectile = projectile;
         this.projectile.setCollisionClass(CollisionClass.NONE);
+        this.previousLocation = new Vector2f(projectile.getLocation());
     }
 
     @Override
@@ -32,75 +30,39 @@ public class AEG_BrokenMagnumEffect extends BaseEveryFrameCombatPlugin {
         CombatEntityAPI target = projectile.getDamageTarget();
         if (target instanceof ShipAPI) {
             ShipAPI ship = (ShipAPI) target;
-            if (ship.getShield() != null && ship.getShield().isWithinArc(projectile.getLocation())) {
-                spawnEMPArc(projectile.getLocation(), ship);
-                applyKnockback(ship, projectile.getVelocity());
-            } else if (ship.getCollisionClass() != CollisionClass.NONE) {
-                spawnExplosion(projectile.getLocation());
-                applyKnockback(ship, projectile.getVelocity());
-                applyDamageOverTime(ship);
-            }
+            calculateTrajectoryAndSpawnExplosions(ship);
         }
+
+        // Update previous location
+        previousLocation.set(projectile.getLocation());
     }
 
-    private void spawnEMPArc(Vector2f location, ShipAPI ship) {
-        CombatEngineAPI engine = Global.getCombatEngine();
-        engine.spawnEmpArcPierceShields(
-                projectile.getSource(),
-                location,
-                null,
-                ship,
-                DamageType.ENERGY,
-                100f,
-                100f,
-                10000f,
-                null,
-                10f,
-                Color.CYAN,
-                Color.WHITE
-        );
-    }
+    private void calculateTrajectoryAndSpawnExplosions(ShipAPI ship) {
+        Vector2f currentLocation = projectile.getLocation();
+        Vector2f velocity = projectile.getVelocity();
+        float shipSize = ship.getCollisionRadius();
+        float explosionSize = 50f; // Constant explosion size
 
-    private void spawnExplosion(Vector2f location) {
-        CombatEngineAPI engine = Global.getCombatEngine();
-        engine.spawnExplosion(location, new Vector2f(), new Color(255, 100, 0, 255), 100f, 1f);
-    }
+        // Calculate the end point of the trajectory based on ship size
+        Vector2f endPoint = new Vector2f(currentLocation);
+        endPoint.translate(velocity.x * (shipSize / 100), velocity.y * (shipSize / 100)); // Adjust the multiplier as needed
 
-    private void applyKnockback(ShipAPI ship, Vector2f projectileVelocity) {
-        Vector2f knockback = new Vector2f(projectileVelocity);
-        knockback.scale(0.1f); // Adjust the scale factor as needed
-        ship.getVelocity().translate(knockback.x, knockback.y);
-    }
+        // Calculate the number of explosions based on ship size
+        int numExplosions = (int) (shipSize / 50); // Adjust the divisor as needed
 
-    private void applyDamageOverTime(ShipAPI ship) {
-        CombatEngineAPI engine = Global.getCombatEngine();
-        float damagePerSecond = 10f; // Adjust as needed
-        float duration = 5f; // Duration of the damage over time effect
-
-        // Apply initial damage
-        engine.applyDamage(
-                ship,
-                ship.getLocation(),
-                projectile.getDamageAmount(),
-                DamageType.HIGH_EXPLOSIVE,
-                0f,
-                false,
-                false,
-                projectile.getSource()
-        );
-
-        // Apply damage over time
-        for (int i = 0; i < duration; i++) {
-            engine.applyDamage(
-                    ship,
-                    ship.getLocation(),
-                    damagePerSecond,
-                    DamageType.HIGH_EXPLOSIVE,
-                    0f,
-                    false,
-                    true,
-                    projectile.getSource()
+        // Spawn explosions along the trajectory
+        for (int i = 0; i < numExplosions; i++) {
+            float t = (float) i / (numExplosions - 1);
+            Vector2f explosionPoint = new Vector2f(
+                    previousLocation.x + t * (endPoint.x - previousLocation.x),
+                    previousLocation.y + t * (endPoint.y - previousLocation.y)
             );
+            spawnExplosion(explosionPoint, explosionSize);
         }
+    }
+
+    private void spawnExplosion(Vector2f location, float size) {
+        CombatEngineAPI engine = Global.getCombatEngine();
+        engine.spawnExplosion(location, new Vector2f(), new Color(255, 50, 0, 255), size, 1f);
     }
 }
