@@ -27,28 +27,23 @@ public class AEG_BrokenMagnumEffect extends BaseEveryFrameCombatPlugin {
             return;
         }
 
-        CombatEntityAPI target = projectile.getDamageTarget();
-        if (target instanceof ShipAPI) {
-            ShipAPI ship = (ShipAPI) target;
-            calculateTrajectoryAndSpawnExplosions(ship);
-        }
+        calculateTrajectoryAndSpawnExplosions();
 
         // Update previous location
         previousLocation.set(projectile.getLocation());
     }
 
-    private void calculateTrajectoryAndSpawnExplosions(ShipAPI ship) {
+    private void calculateTrajectoryAndSpawnExplosions() {
         Vector2f currentLocation = projectile.getLocation();
         Vector2f velocity = projectile.getVelocity();
-        float shipSize = ship.getCollisionRadius();
         float explosionSize = 50f; // Constant explosion size
 
-        // Calculate the end point of the trajectory based on ship size
+        // Calculate the end point of the trajectory based on projectile velocity
         Vector2f endPoint = new Vector2f(currentLocation);
-        endPoint.translate(velocity.x * (shipSize / 100), velocity.y * (shipSize / 100)); // Adjust the multiplier as needed
+        endPoint.translate(velocity.x * 2, velocity.y * 2); // Adjust the multiplier as needed
 
-        // Calculate the number of explosions based on ship size
-        int numExplosions = (int) (shipSize / 50); // Adjust the divisor as needed
+        // Calculate the number of explosions based on a fixed distance
+        int numExplosions = 10; // Adjust the number of explosions as needed
 
         // Spawn explosions along the trajectory
         for (int i = 0; i < numExplosions; i++) {
@@ -63,6 +58,6 @@ public class AEG_BrokenMagnumEffect extends BaseEveryFrameCombatPlugin {
 
     private void spawnExplosion(Vector2f location, float size) {
         CombatEngineAPI engine = Global.getCombatEngine();
-        engine.spawnExplosion(location, new Vector2f(), new Color(255, 50, 0, 255), size, 1f);
+        engine.spawnExplosion(location, new Vector2f(), new Color(255, 100, 0, 255), size, 1f);
     }
 }
