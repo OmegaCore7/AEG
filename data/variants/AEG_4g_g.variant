@@ -13,16 +13,14 @@
       "autofire": false,
       "mode": "ALTERNATING",
       "weapons": {
-        "WS0006": "AEG_4g_left_punch",
-        "WS0018": "AEG_4g_leftkneedrill"
+        "WS0006": "AEG_4g_left_punch"
       }
     },
     {
       "autofire": false,
       "mode": "ALTERNATING",
       "weapons": {
-        "WS0007": "AEG_4g_right_punch",
-        "WS0019": "AEG_4g_rightkneedrill"
+        "WS0007": "AEG_4g_right_punch"
       }
     },
     {
@@ -50,7 +48,8 @@
       "autofire": true,
       "mode": "ALTERNATING",
       "weapons": {
-        "WS0009": "AEG_4g_left_boltingdriver"
+        "WS0009": "AEG_4g_left_boltingdriver",
+        "WS0019": "AEG_4g_rightkneedrill"
       }
     },
     {

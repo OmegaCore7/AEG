@@ -1,15 +1,16 @@
 {
   "id": "AEG_4g_rightkneedrill",
   "specClass": "projectile",
-  "projectileSpecId": "heavyneedler_shot",
+  "projectileSpecId": "AEG_dummy_invisible",
   "type": "BALLISTIC",
   "size": "SMALL",
+  "everyFrameEffect": "data.weapons.scripts.AEG_right_kneedrill",
   "turretSprite": "graphics/ships/4g/4g_drill_legr_00.png",
   "turretGlowSprite": "graphics/ships/4g/4g_drill_legr_glow.png",
   "hardpointSprite": "graphics/ships/4g/4g_drill_legr_00.png",
   "hardpointGlowSprite": "graphics/ships/4g/4g_drill_legr_glow.png",
-      "numFrames": 2,
-      "frameRate": 1,
+      "numFrames": 7,
+      "frameRate": 7,
   "glowColor": [
     255,
     255,
@@ -18,10 +19,7 @@
   ],
   "specialWeaponGlowHeight": 30,
   "specialWeaponGlowWidth": 10,
-  "visualRecoil": 2,
-  "renderHints": [
-    "RENDER_BARREL_BELOW"
-  ],
+  "visualRecoil": 1,
   "turretOffsets": [
     57,
     0
