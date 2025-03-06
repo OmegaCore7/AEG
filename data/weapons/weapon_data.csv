@@ -113,5 +113,5 @@ Targeting Laser,AEG_4g_head,,,,1500,10,10,10,,80,,,,,ENERGY,,10,,,,,,,,,1000000,
 Bolting Driver,AEG_4g_left_boltingdriver,,,,800,200,,0,20,80,,,,,ENERGY,,600,0.33,0.33,1,,,,,,1000,,,,,"SYSTEM,DANGEROUS,FIRE_WHEN_INEFFICIENT,PD_ALSO,PD","no_drop, no_sell, no_drop_salvage, doNotModify",,,,Strike,,,,,"%s: Deals full damage immediately on contact, slightly pushing the user back.",The Sanctioned Action Is To Cut,,,TRUE,999,,
 Protect Shade,AEG_4g_left_protectshade,,,500000,1,1,,,,80,,,,,ENERGY,,300,	0.25	,	0.33,,,,,,,,,,,,,,,no_drop,,,,,,,,,,,,,,
 Left Fist of Protection,AEG_4g_left_punch,,,500000,44,3000,,,20,80,,,,,KINETIC,,,0.33,0.33,0.60,,,,,,1000,,,,,,,,no_drop,,,,,,,,,,,,,,
-Right Spiral Drill,AEG_4g_rightkneedrill,,,,75,,200,,10,80,,60	,1,60,HIGH_EXPLOSIVE,50,,0.33,0.33,60,0.1,0.1	,2		,,0.2,,1000,,,100
+Right Spiral Drill,AEG_4g_rightkneedrill,,,,75,,200,,10,80,,60	,1,60,HIGH_EXPLOSIVE,50,,0.33,0.33,60,0.1,0.1	,2		,0.5,0.2,,1000,,,100
 ,,,,,,,,,,,,,,,,,,,,,,,,
