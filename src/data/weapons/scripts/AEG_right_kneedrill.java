@@ -1,9 +1,6 @@
 package data.weapons.scripts;
 
-import com.fs.starfarer.api.combat.CombatEngineAPI;
-import com.fs.starfarer.api.combat.EveryFrameWeaponEffectPlugin;
-import com.fs.starfarer.api.combat.WeaponAPI;
-import com.fs.starfarer.api.combat.ShipAPI;
+import com.fs.starfarer.api.combat.*;
 import org.lwjgl.util.vector.Vector2f;
 
 public class AEG_right_kneedrill implements EveryFrameWeaponEffectPlugin {
@@ -19,44 +16,41 @@ public class AEG_right_kneedrill implements EveryFrameWeaponEffectPlugin {
 
     private int currentFrame = FRAME_INVISIBLE; // Start in an invisible state
     private boolean coolingDown = false; // Tracks cooldown state
+    private boolean wasFiring = false; // Tracks if weapon was firing to allow full animation cycle
 
     @Override
     public void advance(float amount, CombatEngineAPI engine, WeaponAPI weapon) {
         if (weapon == null || engine == null) return; // Safety check
 
-        ShipAPI playerShip = engine.getPlayerShip();
-        if (playerShip == null || playerShip.getWeaponGroupFor(weapon) == null) return;
+        ShipAPI playerShip = weapon.getShip();
+        if (playerShip == null) return;
 
-        boolean correctWeaponSelected = isWeaponGroupSelected(playerShip, WEAPON_ID);
         boolean isFiring = weapon.isFiring();
 
-        if (correctWeaponSelected && isFiring) {
-            // Charging up: Move from 1 → 6
+        if (isFiring) {
+            wasFiring = true; // Weapon was fired, ensure animation plays fully
             if (currentFrame < FRAME_MAX) {
                 currentFrame++;
             }
-            // Stay at frame 6 while firing
             coolingDown = false;
             applyEffects(playerShip);
-        } else if (currentFrame > FRAME_INVISIBLE) {
-            // Cooling down: Move from 6 → 0
-            coolingDown = true;
-            currentFrame--;
-        } else {
-            // Fully retracted, stay invisible
-            coolingDown = false;
+            forceEngineBoost(playerShip, true);
+        }
+        // Allow animation to continue if weapon was fired, even if deselected
+        else if (wasFiring) {
+            if (currentFrame > FRAME_INVISIBLE) {
+                currentFrame--;
+                coolingDown = true;
+            } else {
+                // Once fully retracted, reset wasFiring
+                wasFiring = false;
+                coolingDown = false;
+            }
+            forceEngineBoost(playerShip, false);
         }
 
         // Apply the current animation frame
         weapon.getAnimation().setFrame(currentFrame);
-    }
-
-    private boolean isWeaponGroupSelected(ShipAPI playerShip, String weaponId) {
-        if (playerShip.getSelectedGroupAPI() == null) return false;
-        for (WeaponAPI w : playerShip.getSelectedGroupAPI().getWeaponsCopy()) {
-            if (weaponId.equals(w.getId())) return true;
-        }
-        return false;
     }
 
     private void applyEffects(ShipAPI playerShip) {
@@ -77,5 +71,15 @@ public class AEG_right_kneedrill implements EveryFrameWeaponEffectPlugin {
         Vector2f shipVelocity = playerShip.getVelocity();
         shipVelocity.x += pushX;
         shipVelocity.y += pushY;
+    }
+
+    private void forceEngineBoost(ShipAPI playerShip, boolean activate) {
+        if (playerShip.getEngineController() != null) {
+            if (activate) {
+                playerShip.getEngineController().extendFlame(this, 0.5f, 2.0f, 2.0f);
+            } else {
+                playerShip.getEngineController().extendFlame(this, 0.0f, 1.0f, 1.0f);
+            }
+        }
     }
 }
