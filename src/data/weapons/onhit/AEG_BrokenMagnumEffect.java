@@ -1,69 +1,72 @@
 package data.weapons.onhit;
 
-import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.combat.*;
-import com.fs.starfarer.api.input.InputEventAPI;
+import com.fs.starfarer.api.combat.listeners.ApplyDamageResultAPI;
 import org.lwjgl.util.vector.Vector2f;
 
 import java.awt.*;
-import java.util.List;
 
-public class AEG_BrokenMagnumEffect extends BaseEveryFrameCombatPlugin {
-    private DamagingProjectileAPI projectile;
-    private Vector2f previousLocation;
-
-    public AEG_BrokenMagnumEffect() {
-    }
-
-    public AEG_BrokenMagnumEffect(DamagingProjectileAPI projectile) {
-        this.projectile = projectile;
-        this.projectile.setCollisionClass(CollisionClass.NONE);
-        this.previousLocation = new Vector2f(projectile.getLocation());
-    }
-
+public class AEG_BrokenMagnumEffect implements OnHitEffectPlugin {
     @Override
-    public void advance(float amount, List<InputEventAPI> events) {
-        if (projectile == null || projectile.didDamage()) {
-            return;
+    public void onHit(DamagingProjectileAPI projectile, CombatEntityAPI target, Vector2f point, boolean shieldHit, ApplyDamageResultAPI damageResult, CombatEngineAPI engine) {
+        // Calculate entry and exit points
+        Vector2f exitPoint = calculateExitPoint(target, point);
+
+        // Deal damage along the line
+        dealLineDamage(target, point, exitPoint, engine, projectile, shieldHit);
+
+        // Visual effects
+        createVisualEffects(engine, point, exitPoint, shieldHit);
+
+        // Remove the original projectile
+        engine.removeEntity(projectile);
+    }
+
+    private Vector2f calculateExitPoint(CombatEntityAPI target, Vector2f entryPoint) {
+        // Calculate the exit point on the opposite side of the ship
+        Vector2f direction = new Vector2f();
+        Vector2f.sub(target.getLocation(), entryPoint, direction);
+        direction.normalise();
+        direction.scale(target.getCollisionRadius() * 2);
+        Vector2f exitPoint = new Vector2f();
+        Vector2f.add(entryPoint, direction, exitPoint);
+        return exitPoint;
+    }
+
+    private void dealLineDamage(CombatEntityAPI target, Vector2f entryPoint, Vector2f exitPoint, CombatEngineAPI engine, DamagingProjectileAPI projectile, boolean shieldHit) {
+        // Deal damage along the line between entry and exit points
+        Vector2f direction = new Vector2f();
+        Vector2f.sub(exitPoint, entryPoint, direction);
+        direction.normalise();
+        float damageAmount = projectile.getDamageAmount();
+        if (shieldHit) {
+            damageAmount *= 2;
         }
 
-        calculateTrajectoryAndSpawnExplosions();
-
-        // Update previous location
-        previousLocation.set(projectile.getLocation());
-    }
-
-    private void calculateTrajectoryAndSpawnExplosions() {
-        Vector2f currentLocation = projectile.getLocation();
-        Vector2f velocity = projectile.getVelocity();
-        float explosionSize = 50f; // Constant explosion size
-
-        // Calculate the end point of the trajectory based on projectile velocity
-        Vector2f endPoint = new Vector2f(currentLocation);
-        endPoint.translate(velocity.x * 2, velocity.y * 2); // Adjust the multiplier as needed
-
-        // Calculate the number of explosions based on a fixed distance
-        int numExplosions = 10; // Adjust the number of explosions as needed
-
-        // Spawn explosions along the trajectory
-        for (int i = 0; i < numExplosions; i++) {
-            float t = (float) i / (numExplosions - 1);
-            Vector2f explosionPoint = new Vector2f(
-                    previousLocation.x + t * (endPoint.x - previousLocation.x),
-                    previousLocation.y + t * (endPoint.y - previousLocation.y)
-            );
-            spawnExplosion(explosionPoint, explosionSize);
+        // Apply damage along the line with more frequent points
+        for (float i = 0; i <= 1; i += 0.010f) { // Increased frequency of damage application
+            Vector2f point = new Vector2f(entryPoint);
+            point.x += direction.x * i * target.getCollisionRadius();
+            point.y += direction.y * i * target.getCollisionRadius();
+            engine.applyDamage(target, point, damageAmount, DamageType.HIGH_EXPLOSIVE, 0, false, false, projectile.getSource());
         }
     }
 
-    private void spawnExplosion(Vector2f location, float size) {
-        CombatEngineAPI engine = Global.getCombatEngine();
-        engine.spawnExplosion(location, new Vector2f(), new Color(255, 100, 0, 255), size, 1f);
+    private void createVisualEffects(CombatEngineAPI engine, Vector2f entryPoint, Vector2f exitPoint, boolean shieldHit) {
+        // Create visual effects along the line
+        Vector2f direction = new Vector2f();
+        Vector2f.sub(exitPoint, entryPoint, direction);
+        direction.normalise();
+
+        // Generate explosions along the line with no size change, just more frequent
+        for (float i = 0; i <= 1; i += 0.010f) { // Increased frequency of visual explosions
+            Vector2f point = new Vector2f(entryPoint);
+            point.x += direction.x * i * 100; // Adjust explosion spacing
+            point.y += direction.y * i * 100;
+
+            // Spawn the explosion with a fixed size
+            engine.spawnExplosion(point, new Vector2f(), Color.ORANGE, 75, 1);
+        }
+
     }
-} jjjjhn
-
-
-
-
-
-9
+}

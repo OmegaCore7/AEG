@@ -6,6 +6,7 @@
   "size": "SMALL",
   "turretSprite": "graphics/ships/4g/4g_body.png",
   "hardpointSprite": "graphics/ships/4g/4g_body.png",
+  "showDamageWhenDecorative": true,
   "turretOffsets": [
     56,
     0

@@ -8,6 +8,7 @@
   "collisionClassByFighter": "RAY_FIGHTER",
   "turretSprite": "graphics/ships/4g/legs/4g_legs_00.png",
   "hardpointSprite": "graphics/ships/4g/legs/4g_legs_00.png",
+  "showDamageWhenDecorative": true,
   "glowColor": [
     255,
     255,

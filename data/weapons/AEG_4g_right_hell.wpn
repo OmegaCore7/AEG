@@ -4,6 +4,7 @@
   "projectileSpecId": "AEG_dummy_invisible",
   "type": "DECORATIVE",
   "size": "SMALL",
+  "showDamageWhenDecorative": true,
   "everyFrameEffect": "data.weapons.scripts.AEG_4g_right_hell",
   "turretSprite": "graphics/ships/4g/4g_hell_armr_00.png",
   "turretGlowSprite": "graphics/ships/4g/4g_hell_armr_glow.png",
