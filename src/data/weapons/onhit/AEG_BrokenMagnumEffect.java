@@ -4,97 +4,69 @@ import com.fs.starfarer.api.combat.*;
 import com.fs.starfarer.api.combat.listeners.ApplyDamageResultAPI;
 import org.lwjgl.util.vector.Vector2f;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+import java.awt.*;
 
 public class AEG_BrokenMagnumEffect implements OnHitEffectPlugin {
-    private static final float MIN_EXPLOSION_RADIUS = 30f;
-    private static final float MAX_EXPLOSION_RADIUS = 50f;
-    private static final float MAX_EXPLOSION_DAMAGE = 200f;
-    private static final float BASE_EXPLOSION_DAMAGE = 50f;
-    private static final float MAX_SPARK_DAMAGE = 100f; // EMP damage for sparks
-    private static final float MAX_LINE_LENGTH = 300f; // Length of explosion line
-    private static final Random random = new Random();
-
     @Override
     public void onHit(DamagingProjectileAPI projectile, CombatEntityAPI target, Vector2f point, boolean shieldHit, ApplyDamageResultAPI damageResult, CombatEngineAPI engine) {
-        if (projectile == null || target == null || engine == null || point == null) {
-            return; // Prevent crashes if any required object is missing
-        }
+        // Calculate entry and exit points
+        Vector2f exitPoint = calculateExitPoint(target, point);
 
-        // Get missile's velocity and calculate its trajectory if possible
-        Vector2f velocity = new Vector2f(projectile.getVelocity());
-        Vector2f position = new Vector2f(point);
+        // Deal damage along the line
+        dealLineDamage(target, point, exitPoint, engine, projectile, shieldHit);
 
-        // Determine explosion path length
-        int explosionCount = Math.max(5, (int) (MAX_LINE_LENGTH / 50f)); // Approximate number of explosion points
+        // Visual effects
+        createVisualEffects(engine, point, exitPoint, shieldHit);
 
-        // If the projectile hits a shield, spawn sparks and connected explosions
+        // Remove the original projectile
+        engine.removeEntity(projectile);
+    }
+
+    private Vector2f calculateExitPoint(CombatEntityAPI target, Vector2f entryPoint) {
+        // Calculate the exit point on the opposite side of the ship
+        Vector2f direction = new Vector2f();
+        Vector2f.sub(target.getLocation(), entryPoint, direction);
+        direction.normalise();
+        direction.scale(target.getCollisionRadius() * 2);
+        Vector2f exitPoint = new Vector2f();
+        Vector2f.add(entryPoint, direction, exitPoint);
+        return exitPoint;
+    }
+
+    private void dealLineDamage(CombatEntityAPI target, Vector2f entryPoint, Vector2f exitPoint, CombatEngineAPI engine, DamagingProjectileAPI projectile, boolean shieldHit) {
+        // Deal damage along the line between entry and exit points
+        Vector2f direction = new Vector2f();
+        Vector2f.sub(exitPoint, entryPoint, direction);
+        direction.normalise();
+        float damageAmount = projectile.getDamageAmount();
         if (shieldHit) {
-            spawnShieldEffects(projectile, position, velocity, explosionCount, engine);
-        } else {
-            // If it doesn't hit a shield, spawn only explosions
-            spawnExplosionEffects(projectile, position, velocity, explosionCount, engine);
+            damageAmount *= 2;
+        }
+
+        // Apply damage along the line with more frequent points
+        for (float i = 0; i <= 1; i += 0.010f) { // Increased frequency of damage application
+            Vector2f point = new Vector2f(entryPoint);
+            point.x += direction.x * i * target.getCollisionRadius();
+            point.y += direction.y * i * target.getCollisionRadius();
+            engine.applyDamage(target, point, damageAmount, DamageType.HIGH_EXPLOSIVE, 0, false, false, projectile.getSource());
         }
     }
 
-    // Spawn sparks and connected explosions on shield hit
-    private void spawnShieldEffects(DamagingProjectileAPI projectile, Vector2f start, Vector2f velocity, int explosionCount, CombatEngineAPI engine) {
-        // Randomly decide the number of sparks and their length
-        int sparkCount = random.nextInt(5) + 3; // Between 3 and 7 sparks
-        for (int i = 0; i < sparkCount; i++) {
-            // Create random spark points within the explosion trajectory
-            Vector2f sparkPoint = new Vector2f(start.x + random.nextFloat() * MAX_LINE_LENGTH, start.y + random.nextFloat() * MAX_LINE_LENGTH);
-            engine.spawnExplosion(sparkPoint, new Vector2f(), projectile.getProjectileSpec().getFringeColor(), random.nextFloat() * 20f + 10f, 0.2f); // Spark explosion
-
-            // Apply EMP damage for each spark
-            engine.applyDamage(null, sparkPoint, MAX_SPARK_DAMAGE, DamageType.KINETIC, 100f, false, true, projectile.getSource());
-        }
-
-        // Spawn connected explosions along the missile's trajectory
-        List<Vector2f> explosionPoints = calculateExplosionPath(start, velocity, explosionCount);
-        for (int i = 0; i < explosionPoints.size(); i++) {
-            Vector2f explosionPoint = explosionPoints.get(i);
-            float explosionRadius = MIN_EXPLOSION_RADIUS + random.nextFloat() * (MAX_EXPLOSION_RADIUS - MIN_EXPLOSION_RADIUS);
-            engine.spawnExplosion(explosionPoint, new Vector2f(), projectile.getProjectileSpec().getFringeColor(), explosionRadius, 0.2f);
-
-            // Apply EMP damage as part of the connected explosions
-            float explosionDamage = BASE_EXPLOSION_DAMAGE + (MAX_EXPLOSION_DAMAGE - BASE_EXPLOSION_DAMAGE) * ((float) i / explosionCount);
-            engine.applyDamage(null, explosionPoint, explosionDamage, DamageType.HIGH_EXPLOSIVE, 0f, false, false, projectile.getSource());
-        }
-    }
-
-    // Spawn explosion effects when no shield is hit
-    private void spawnExplosionEffects(DamagingProjectileAPI projectile, Vector2f start, Vector2f velocity, int explosionCount, CombatEngineAPI engine) {
-        // Spawn connected explosions along the missile's trajectory
-        List<Vector2f> explosionPoints = calculateExplosionPath(start, velocity, explosionCount);
-        for (int i = 0; i < explosionPoints.size(); i++) {
-            Vector2f explosionPoint = explosionPoints.get(i);
-            float explosionRadius = MIN_EXPLOSION_RADIUS + random.nextFloat() * (MAX_EXPLOSION_RADIUS - MIN_EXPLOSION_RADIUS);
-            engine.spawnExplosion(explosionPoint, new Vector2f(), projectile.getProjectileSpec().getFringeColor(), explosionRadius, 0.2f);
-
-            // Apply explosion damage, scaling as the explosions go along the trajectory
-            float explosionDamage = BASE_EXPLOSION_DAMAGE + (MAX_EXPLOSION_DAMAGE - BASE_EXPLOSION_DAMAGE) * ((float) i / explosionCount);
-            engine.applyDamage(null, explosionPoint, explosionDamage, DamageType.HIGH_EXPLOSIVE, 0f, false, false, projectile.getSource());
-        }
-    }
-
-    // Calculate the path of explosions along the missile's trajectory
-    private List<Vector2f> calculateExplosionPath(Vector2f start, Vector2f velocity, int explosionCount) {
-        List<Vector2f> points = new ArrayList<>();
-
-        if (velocity.length() == 0) return points; // Prevent division by zero
-
-        float stepSize = velocity.length() / explosionCount; // Adjust explosion spacing
-        Vector2f direction = new Vector2f(velocity);
+    private void createVisualEffects(CombatEngineAPI engine, Vector2f entryPoint, Vector2f exitPoint, boolean shieldHit) {
+        // Create visual effects along the line
+        Vector2f direction = new Vector2f();
+        Vector2f.sub(exitPoint, entryPoint, direction);
         direction.normalise();
 
-        for (int i = 1; i <= explosionCount; i++) {
-            float scale = i * stepSize;
-            Vector2f newPoint = new Vector2f(start.x + direction.x * scale, start.y + direction.y * scale);
-            points.add(newPoint);
+        // Generate explosions along the line with no size change, just more frequent
+        for (float i = 0; i <= 1; i += 0.010f) { // Increased frequency of visual explosions
+            Vector2f point = new Vector2f(entryPoint);
+            point.x += direction.x * i * 100; // Adjust explosion spacing
+            point.y += direction.y * i * 100;
+
+            // Spawn the explosion with a fixed size
+            engine.spawnExplosion(point, new Vector2f(), Color.ORANGE, 75, 1);
         }
-        return points;
+
     }
 }
