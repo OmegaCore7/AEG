@@ -9,8 +9,6 @@
   "turretGlowSprite": "graphics/ships/4g/4g_heaven_arml_glow.png",
   "hardpointSprite": "graphics/ships/4g/4g_heaven_arml_00.png",
   "showDamageWhenDecorative": true,
-  "numFrames": 2,
-  "frameRate": 1,
   "glowColor": [
     255,
     255,
@@ -19,7 +17,7 @@
   ],
   "turretOffsets": [
     53,
-    45.5
+    45
   ],
   "turretAngleOffsets": [
     0
@@ -32,5 +30,7 @@
     0
   ],
   "barrelMode": "LINKED",
-  "animationType": "GLOW"
+  "animationType": "GLOW",
+  "numFrames": 2,
+  "frameRate": 1
 }
