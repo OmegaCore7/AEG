@@ -34,11 +34,11 @@ public class AEG_4g_kneedrillhit implements OnHitEffectPlugin {
         );
 
         // Spawn the EMP lightning arc
-        engine.spawnEmpArcVisual(point, target, targetPoint, null, 10f, Color.GREEN, Color.WHITE);
+        engine.spawnEmpArcVisual(point, target, targetPoint, null, 5f, new Color(100,255,100,175), new Color(180,255,180,200));
     }
 
     private void spawnExplosion(CombatEngineAPI engine, Vector2f point) {
         // Spawn explosion at the point of impact
-        engine.spawnExplosion(point, new Vector2f(), Color.ORANGE, 75, 1);
+        engine.spawnExplosion(point, new Vector2f(), Color.gray, 10,1);
     }
 }
