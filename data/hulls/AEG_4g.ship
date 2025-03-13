@@ -11,6 +11,11 @@
   "shieldCenter": [0, 0],
   "shieldRadius": 177.5,
   "viewOffset": 0,
+  "builtInMods": [
+    "AEG_4g_genesicaura",
+    "ecm",
+    "eccm"
+  ],
   "builtInWeapons": {
     "WS0001": "AEG_4g_torso",
     "WS0002": "AEG_4g_legs",

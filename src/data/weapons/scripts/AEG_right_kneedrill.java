@@ -5,7 +5,7 @@ import org.lwjgl.util.vector.Vector2f;
 
 public class AEG_right_kneedrill implements EveryFrameWeaponEffectPlugin {
 
-    private static final float PUSH_FORCE = 25f; // Forward push force
+    private static final float PUSH_FORCE = 10f; // Forward push force
     private static final float SPEED_BUFF = 1.2f; // 20% speed buff
     private static final float MANEUVER_BUFF = 1.5f; // 50% maneuverability buff
     private static final String BUFF_ID = "AEG_kneedrill_buff";
