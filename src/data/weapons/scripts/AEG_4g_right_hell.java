@@ -78,7 +78,7 @@ public class AEG_4g_right_hell implements EveryFrameWeaponEffectPlugin {
 
         // First ripple effect (near the weapon's location)
         MagicRender.battlespace(
-                Global.getSettings().getSprite("graphics/fx/shields64.png"),
+                Global.getSettings().getSprite("graphics/fx/wormhole_ring_bright3.png"),
                 firingPoint,
                 new Vector2f(0f, 0f),
                 new Vector2f(shieldRadius, shieldRadius),
@@ -94,7 +94,7 @@ public class AEG_4g_right_hell implements EveryFrameWeaponEffectPlugin {
 
         // Second ripple effect (further out from the weapon)
         MagicRender.battlespace(
-                Global.getSettings().getSprite("graphics/fx/starburst_glow1.png"),
+                Global.getSettings().getSprite("graphics/fx/explosion_ring0.png"),
                 firingPoint,
                 new Vector2f(0f, 0f),
                 new Vector2f(shieldRadius * 0.8f, shieldRadius * 0.8f),
@@ -110,7 +110,7 @@ public class AEG_4g_right_hell implements EveryFrameWeaponEffectPlugin {
 
         // Third ripple effect (even further out from the weapon)
         MagicRender.battlespace(
-                Global.getSettings().getSprite("graphics/fx/wormhole_ring.png"),
+                Global.getSettings().getSprite("graphics/fx/starburst_glow1.png"),
                 firingPoint,
                 new Vector2f(0f, 0f),
                 new Vector2f(shieldRadius * 0.6f, shieldRadius * 0.6f),
