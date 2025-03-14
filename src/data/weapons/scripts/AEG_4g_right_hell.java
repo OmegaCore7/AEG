@@ -85,7 +85,7 @@ public class AEG_4g_right_hell implements EveryFrameWeaponEffectPlugin {
                 new Vector2f(shieldRadius + 200f, shieldRadius + 200f),
                 360f,
                 0f,
-                PARTICLE_COLOR,
+                new Color(255,0,0,255),
                 true,
                 0.2f, // Brightness duration
                 0f,
