@@ -153,8 +153,8 @@
       "size": "SMALL",
       "type": "DECORATIVE",
       "mount": "TURRET",
-      "arc": 90,
-      "angle": -0,
+      "arc": 121,
+      "angle": 0,
       "locations": [8.5, 31],
       "renderOrderMod": 2
     },
@@ -163,8 +163,8 @@
       "size": "SMALL",
       "type": "DECORATIVE",
       "mount": "TURRET",
-      "arc": 90,
-      "angle": 0,
+      "arc": 121,
+      "angle": -0,
       "locations": [8.5, -31],
       "renderOrderMod": 2
     },
