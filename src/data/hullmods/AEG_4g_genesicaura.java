@@ -6,7 +6,6 @@ import com.fs.starfarer.api.combat.listeners.ApplyDamageResultAPI;
 import com.fs.starfarer.api.combat.listeners.DamageListener;
 import org.lazywizard.lazylib.combat.CombatUtils;
 import org.lwjgl.util.vector.Vector2f;
-import org.magiclib.util.MagicRender;
 
 import java.awt.*;
 import java.util.Random;
@@ -14,32 +13,38 @@ import java.util.Random;
 public class AEG_4g_genesicaura extends BaseHullMod implements DamageListener {
     private static final float EMP_RESISTANCE = 0.99f;
     private static final float DAMAGE_REDUCTION_NEAR_ENEMY = 0.1f;
-    private static final float BASE_REGEN_RATE = 1f; // Base regeneration rate
-    private static final float RING_MIN_SIZE = 5f;
-    private static final float RING_MAX_SIZE = 300f;
+    private static final float BASE_REGEN_RATE = 0.05f; // Base regeneration rate
+    private static final float CHECK_INTERVAL = 10f; // Interval for switching between hull and armor regeneration
+    private static final float ANIMATION_INTERVAL = 2f; // Interval for playing the animation
+    private float timeSinceLastCheck = 0f;
+    private float timeSinceLastAnimation = 0f;
+    private boolean regeneratingArmor = false;
 
     @Override
     public void advanceInCombat(ShipAPI ship, float amount) {
         if (ship.getFluxTracker().isOverloadedOrVenting()) return;
 
-        // Hull regeneration
-        if (ship.getHitpoints() < ship.getMaxHitpoints()) {
-            float hullRegenRate = BASE_REGEN_RATE * (1 - ship.getHitpoints() / ship.getMaxHitpoints());
-            float hullRegen = ship.getMaxHitpoints() * hullRegenRate * amount;
-            ship.setHitpoints(ship.getHitpoints() + hullRegen);
-        } else {
-            // Armor regeneration
-            float[][] armorGrid = ship.getArmorGrid().getGrid();
-            for (int x = 0; x < armorGrid.length; x++) {
-                for (int y = 0; y < armorGrid[x].length; y++) {
-                    float currentArmor = armorGrid[x][y];
-                    float maxArmor = ship.getArmorGrid().getMaxArmorInCell();
-                    float armorRegenRate = BASE_REGEN_RATE * (1 - currentArmor / maxArmor);
-                    if (currentArmor < maxArmor) {
-                        armorGrid[x][y] = Math.min(currentArmor + maxArmor * armorRegenRate * amount, maxArmor);
-                    }
-                }
+        timeSinceLastCheck += amount;
+        timeSinceLastAnimation += amount;
+
+        if (timeSinceLastCheck >= CHECK_INTERVAL) {
+            timeSinceLastCheck = 0f;
+            if (ship.getHitpoints() / ship.getMaxHitpoints() >= 0.9f) {
+                regeneratingArmor = true;
+            } else {
+                regeneratingArmor = false;
             }
+        }
+
+        if (timeSinceLastAnimation >= ANIMATION_INTERVAL) {
+            timeSinceLastAnimation = 0f;
+            playLightningEffect(ship);
+        }
+
+        if (regeneratingArmor) {
+            regenerateArmor(ship, amount);
+        } else {
+            regenerateHull(ship, amount);
         }
 
         // EMP resistance
@@ -59,47 +64,57 @@ public class AEG_4g_genesicaura extends BaseHullMod implements DamageListener {
             ship.getMutableStats().getHullDamageTakenMult().unmodify("AEG_4g_genesicaura_near_enemy");
             ship.getMutableStats().getArmorDamageTakenMult().unmodify("AEG_4g_genesicaura_near_enemy");
         }
+    }
 
-        // Absorb projectiles and missiles
-        for (DamagingProjectileAPI projectile : CombatUtils.getProjectilesWithinRange(ship.getLocation(), 600f)) {
-            if (shouldAbsorbProjectile(ship, projectile)) {
-                absorbProjectile(ship, projectile);
+    private void regenerateHull(ShipAPI ship, float amount) {
+        if (ship.getHitpoints() < ship.getMaxHitpoints()) {
+            float hullRegenRate = BASE_REGEN_RATE * (1 - ship.getHitpoints() / ship.getMaxHitpoints());
+            float hullRegen = ship.getMaxHitpoints() * hullRegenRate * amount;
+            ship.setHitpoints(Math.min(ship.getHitpoints() + hullRegen, ship.getMaxHitpoints())); // Ensure healing to max hitpoints
+        }
+    }
+
+    private void regenerateArmor(ShipAPI ship, float amount) {
+        float[][] armorGrid = ship.getArmorGrid().getGrid();
+        for (int x = 0; x < armorGrid.length; x++) {
+            for (int y = 0; y < armorGrid[x].length; y++) {
+                float currentArmor = armorGrid[x][y];
+                float maxArmor = ship.getArmorGrid().getMaxArmorInCell();
+                float armorRegenRate = BASE_REGEN_RATE * (1 - currentArmor / maxArmor);
+                if (currentArmor < maxArmor) {
+                    armorGrid[x][y] = Math.min(currentArmor + maxArmor * armorRegenRate * amount, maxArmor);
+                }
             }
         }
     }
 
-    private boolean shouldAbsorbProjectile(ShipAPI ship, DamagingProjectileAPI projectile) {
-        float distance = Vector2f.sub(projectile.getLocation(), ship.getLocation(), null).length();
-        float chance = getAbsorbChance(distance);
-        return new Random().nextFloat() < chance;
-    }
-
-    private void absorbProjectile(ShipAPI ship, DamagingProjectileAPI projectile) {
-        Vector2f point = projectile.getLocation();
-        projectile.setDamageAmount(0);  // Set damage to 0 to effectively absorb it
-        projectile.setHitpoints(0);  // Destroy the projectile
-
-        // Create electrical hit spark effect
-        MagicRender.singleframe(
-                Global.getSettings().getSprite("graphics/fx/electric_spark.png"),
-                point,
-                new Vector2f(20f, 20f),  // Adjust size as needed
-                0,
-                new Color(0, 255, 255, 255),
-                true
-        );
-    }
-
-    private float getAbsorbChance(float distance) {
-        if (distance <= 200f) {
-            return 0.75f;  // 75% chance within 200 units
-        } else if (distance <= 400f) {
-            return 0.5f;  // 50% chance within 400 units
-        } else if (distance <= 600f) {
-            return 0.25f;  // 25% chance within 600 units
+    private void playLightningEffect(ShipAPI ship) {
+        Color color;
+        if (ship.getSystem().isActive()) {
+            color = new Color(0, 255, 0, 255); // Green when the ship system is active
         } else {
-            return 0f;  // No chance beyond 600 units
+            color = regeneratingArmor ? new Color(255, 69, 0, 255) : new Color(255, 165, 0, 255); // Orangish Red for armor, Orangish Yellow for hull
         }
+
+        for (int i = 0; i < 2; i++) {
+            Vector2f startPoint = getRandomPointOnShip(ship);
+            Vector2f endPoint = getRandomPointOnShip(ship);
+            Global.getCombatEngine().spawnEmpArcVisual(
+                    startPoint,
+                    ship,
+                    endPoint,
+                    ship,
+                    10f, // Thickness of the bolt
+                    color,
+                    color
+            );
+        }
+    }
+
+    private Vector2f getRandomPointOnShip(ShipAPI ship) {
+        float x = ship.getLocation().x + (new Random().nextFloat() - 0.5f) * ship.getCollisionRadius();
+        float y = ship.getLocation().y + (new Random().nextFloat() - 0.5f) * ship.getCollisionRadius();
+        return new Vector2f(x, y);
     }
 
     @Override
