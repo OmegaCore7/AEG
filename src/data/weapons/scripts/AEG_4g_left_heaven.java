@@ -17,47 +17,125 @@ public class AEG_4g_left_heaven implements EveryFrameWeaponEffectPlugin {
     // Updated firing offset coordinates (relative to the weapon)
     private static final Vector2f FIRING_OFFSET = new Vector2f(60, 45);
 
+    private float chargeupElapsed = 0f; // Track elapsed charge-up time
+
     @Override
     public void advance(float amount, CombatEngineAPI engine, WeaponAPI weapon) {
         if (engine.isPaused() || weapon.getShip() == null) {
             return;
         }
 
+        ShipAPI ship = weapon.getShip();
         if (!runOnce) {
             init(weapon);
             runOnce = true;
         }
 
-        ShipAPI ship = weapon.getShip();
+        ShipSystemAPI system = ship.getSystem();
 
-        if (ship.getSystem() != null) {
-            ShipSystemAPI system = ship.getSystem();
+        // Reset ripple effect flag when system is off
+        if (system == null || (!system.isChargeup() && !system.isActive())) {
+            rippleEffectTriggered = false;  // Reset after charge-up/active state
+            return; // Return if the system is not activated
+        }
 
-            // Handle weapon frame and color based on system state
-            if (system.isChargeup()) {
-                weapon.getSprite().setColor(CHARGEUP_COLOR); // Yellow during charge-up
-                weapon.getAnimation().setFrame(1); // Charge-up frame
-            } else if (system.isActive()) {
-                weapon.getSprite().setColor(ACTIVE_COLOR); // Green when active
-                weapon.getAnimation().setFrame(1); // Active frame (same as charge-up)
-            } else {
-                weapon.getSprite().setColor(Color.WHITE); // Default white when system is off
-                weapon.getAnimation().setFrame(0); // Idle frame
-            }
-
-            // If system is in charge-up and ripple hasn't been triggered, do so
-            if (system.isChargeup() && !rippleEffectTriggered) {
-                triggerRippleEffect(weapon); // Use the fixed firing point relative to the weapon and ship facing
-                rippleEffectTriggered = true;  // Set flag to prevent re-triggering
-            }
-
-            // Reset ripple effect flag when system is off
-            if (!system.isChargeup() && !system.isActive()) {
-                rippleEffectTriggered = false;  // Reset after charge-up/active state
-            }
+        if (system.isChargeup()) {
+            chargeupElapsed += amount;
+            handleChargeupMovements(weapon, ship, chargeupElapsed);
+        } else if (system.isActive()) {
+            lockWeaponAngles(weapon, ship);
+            chargeupElapsed = 0f; // Reset charge-up elapsed time
         } else {
-            weapon.getSprite().setColor(Color.WHITE); // Reset to white when system is off
+            resetWeaponState(weapon);
+            chargeupElapsed = 0f; // Reset charge-up elapsed time
+        }
+
+        // Handle weapon frame and color based on system state
+        if (system.isChargeup()) {
+            weapon.getSprite().setColor(CHARGEUP_COLOR); // Yellow during charge-up
+            weapon.getAnimation().setFrame(1); // Charge-up frame
+        } else if (system.isActive()) {
+            weapon.getSprite().setColor(ACTIVE_COLOR); // Green when active
+            weapon.getAnimation().setFrame(1); // Active frame (same as charge-up)
+        } else {
+            weapon.getSprite().setColor(Color.WHITE); // Default white when system is off
             weapon.getAnimation().setFrame(0); // Idle frame
+        }
+
+        // If system is in charge-up and ripple hasn't been triggered, do so
+        if (system.isChargeup() && !rippleEffectTriggered) {
+            triggerRippleEffect(weapon); // Use the fixed firing point relative to the weapon and ship facing
+            rippleEffectTriggered = true;  // Set flag to prevent re-triggering
+        }
+    }
+
+    private void handleChargeupMovements(WeaponAPI weapon, ShipAPI ship, float elapsed) {
+        // Logic to move the arm and shoulder during charge-up
+        float shipFacing = ship.getFacing();
+        float chargeupDuration = 4.0f; // Total charge-up duration
+
+        // Calculate the progress of the charge-up phase
+        float progress = (elapsed - 0.5f) / (chargeupDuration - 0.5f); // Adjust for 0.5-second pause
+
+        if (progress < 0) {
+            progress = 0; // Ensure progress doesn't go negative
+        }
+
+        // Interpolate angles based on progress
+        float weaponAngle = interpolateAngle(progress, shipFacing - 20, shipFacing - 40, shipFacing - 61);
+        float shoulderAngle = interpolateAngle(progress, shipFacing - 5, shipFacing - 10, shipFacing - 16);
+
+        // Hold at angle 0 for the first 0.5 seconds
+        if (elapsed < 0.5f) {
+            weaponAngle = shipFacing;
+            shoulderAngle = shipFacing;
+        }
+
+        setWeaponAngle(weapon, weaponAngle);
+        setShoulderAngle(ship, shoulderAngle);
+    }
+
+    private float interpolateAngle(float progress, float startAngle, float midAngle, float endAngle) {
+        // Interpolate angles with pitstops and back-and-forth motion
+        if (progress < 0.25f) {
+            return lerp(startAngle, midAngle, progress / 0.25f);
+        } else if (progress < 0.5f) {
+            return lerp(midAngle, startAngle, (progress - 0.25f) / 0.25f);
+        } else if (progress < 0.75f) {
+            return lerp(startAngle, endAngle, (progress - 0.5f) / 0.25f);
+        } else {
+            return lerp(endAngle, startAngle, (progress - 0.75f) / 0.25f);
+        }
+    }
+
+    private float lerp(float start, float end, float t) {
+        return start + t * (end - start);
+    }
+
+    private void lockWeaponAngles(WeaponAPI weapon, ShipAPI ship) {
+        // Lock angles when the system is active
+        setWeaponAngle(weapon, ship.getFacing() - 61);
+        setShoulderAngle(ship, ship.getFacing() - 16);
+    }
+
+    private void resetWeaponState(WeaponAPI weapon) {
+        // Reset weapon state when the system is off
+        weapon.getSprite().setColor(Color.WHITE);
+        weapon.getAnimation().setFrame(0);
+    }
+
+    private void setWeaponAngle(WeaponAPI weapon, float angle) {
+        // Logic to set the weapon angle
+        weapon.setCurrAngle(angle);
+    }
+
+    private void setShoulderAngle(ShipAPI ship, float angle) {
+        // Logic to set the shoulder angle (assuming shoulder is a weapon slot)
+        for (WeaponAPI w : ship.getAllWeapons()) {
+            if (w.getSlot().getId().equals("WS0003")) {
+                w.setCurrAngle(angle);
+                break;
+            }
         }
     }
 
