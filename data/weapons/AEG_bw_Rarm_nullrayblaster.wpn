@@ -4,6 +4,7 @@
   "projectileSpecId": "amblaster_shot",
   "type": "ENERGY",
   "size": "SMALL",
+  "everyFrameEffect": "data.weapons.scripts.AEG_BlitzwingnrblasterEffect",
   "turretSprite": "graphics/ships/blitzwing/Blitzwing_armR00.png",
   "turretGlowSprite": "graphics/ships/blitzwing/Blitzwing_armR_glow.png",
   "hardpointSprite": "graphics/ships/blitzwing/Blitzwing_armR00.png",
@@ -31,7 +32,7 @@
   "barrelMode": "ALTERNATING",
   "animationType": "GLOW_AND_FLASH",
   "numFrames": 10,
-  "frameRate": 20,
+  "frameRate": 10,
   "autocharge": true,
   "muzzleFlashSpec": {
     "length": 50,

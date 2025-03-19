@@ -5,6 +5,7 @@
   "size": "SMALL",
   "collisionClass": "RAY",
   "collisionClassByFighter": "RAY_FIGHTER",
+  "everyFrameEffect": "data.weapons.scripts.AEG_BlitzwingMHeadEffect",
   "turretSprite": "graphics/ships/blitzwing/Blitzwing_mhead00.png",
   "hardpointSprite": "graphics/ships/blitzwing/Blitzwing_mhead00.png",
   "glowColor": [
@@ -47,7 +48,7 @@
     0
   ],
   "numFrames": 7,
-  "frameRate": 20,
+  "frameRate": 7,
   "fringeColor": [
     155,
     0,
