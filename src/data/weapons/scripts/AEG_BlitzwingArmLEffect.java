@@ -50,19 +50,23 @@ public class AEG_BlitzwingArmLEffect implements EveryFrameWeaponEffectPlugin {
         }
 
         if (weapon.isFiring()) {
-            firing = true;
-            if (currentFrame >= 9 && currentFrame < 14) {
-                currentFrame++;
-            } else {
-                currentFrame = 9;
-            }
+            if (system.getState() == SystemState.IN || system.getState() == SystemState.OUT) {
+                firing = true;
+                if (currentFrame >= 9 && currentFrame < 14) {
+                    currentFrame++;
+                } else {
+                    currentFrame = 9;
+                }
 
-            // Increase fire rate and decrease recoil
-            if (fireRateMultiplier < MAX_FIRE_RATE_MULTIPLIER) {
-                fireRateMultiplier += FIRE_RATE_INCREMENT;
-            }
-            if (recoilReduction < MAX_RECOIL_REDUCTION) {
-                recoilReduction += RECOIL_REDUCTION_INCREMENT;
+                // Increase fire rate and decrease recoil
+                if (fireRateMultiplier < MAX_FIRE_RATE_MULTIPLIER) {
+                    fireRateMultiplier += FIRE_RATE_INCREMENT;
+                }
+                if (recoilReduction < MAX_RECOIL_REDUCTION) {
+                    recoilReduction += RECOIL_REDUCTION_INCREMENT;
+                }
+            } else {
+                currentFrame = 0; // Stay at frame 00 if firing when the system is not active
             }
         } else {
             firing = false;
