@@ -1,0 +1,66 @@
+{
+  "variantId": "AEG_broly_fp",
+  "hullId": "AEG_broly",
+  "displayName": "Broly Full Power",
+  "goalVariant": false,
+  "fluxCapacitors": 0,
+  "fluxVents": 0,
+  "quality": 1,
+  "permaMods": [],
+  "hullMods": [],
+  "weaponGroups": [
+    {
+      "autofire": true,
+      "mode": "LINKED",
+      "weapons": {
+        "WS0003": "AEG_broly_arm_l"
+      }
+    },
+    {
+      "autofire": true,
+      "mode": "LINKED",
+      "weapons": {
+        "WS0004": "AEG_broly_arm_r"
+      }
+    },
+    {
+      "autofire": true,
+      "mode": "LINKED",
+      "weapons": {
+        "WS0006": "AEG_broly_bshell_ec"
+      }
+    },
+    {
+      "autofire": true,
+      "mode": "LINKED",
+      "weapons": {
+        "WS0005": "AEG_broly_bshellpd"
+      }
+    },
+    {
+      "autofire": true,
+      "mode": "LINKED",
+      "weapons": {
+        "WS0007": "AEG_broly_gblaster_r",
+        "WS0008": "AEG_broly_gblaster_l",
+        "WS0011": "AEG_broly_head"
+      }
+    },
+    {
+      "autofire": false,
+      "mode": "LINKED",
+      "weapons": {
+        "WS0009": "AEG_broly_cblaster"
+      }
+    },
+    {
+      "autofire": false,
+      "mode": "LINKED",
+      "weapons": {
+        "WS0013": "AEG_broly_omegablaster"
+      }
+    }
+  ],
+  "modules": [],
+  "wings": []
+}
