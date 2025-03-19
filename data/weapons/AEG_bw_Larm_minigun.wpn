@@ -6,6 +6,7 @@
   "size": "SMALL",
   "numFrames": 15,
   "frameRate": 20,
+  "everyFrameEffect": "data.weapons.scripts.AEG_BlitzwingArmLEffect",
   "turretSprite": "graphics/ships/blitzwing/Blitzwing_armL00.png",
   "hardpointSprite": "graphics/ships/blitzwing/Blitzwing_armL00.png",
   "turretOffsets": [

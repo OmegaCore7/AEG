@@ -4,6 +4,7 @@
   "projectileSpecId": "amsrm_srm",
   "type": "MISSILE",
   "size": "SMALL",
+  "everyFrameEffect": "data.weapons.scripts.AEG_BlitzwingChestEffect",
   "turretSprite": "graphics/ships/blitzwing/Blitzwing_chest00.png",
   "hardpointSprite": "graphics/ships/blitzwing/Blitzwing_chest00.png",
   "turretOffsets": [
