@@ -69,7 +69,7 @@ public class AEG_4G_SpectacularBeamEffect implements BeamEffectPlugin {
                     ship.getLocation().y + random.nextFloat() * ship.getCollisionRadius() * 2 - ship.getCollisionRadius()
             );
             engine.spawnEmpArcVisual(hitPoint, null, targetPoint, ship, 10f, new Color(255,150,0,255), Color.WHITE);
-            engine.applyDamage(ship, targetPoint, STRIKE_DAMAGE * damageMultiplier, DamageType.KINETIC, EMP_DAMAGE * damageMultiplier, false, true, null, true);
+            engine.applyDamage(ship, targetPoint, STRIKE_DAMAGE * damageMultiplier, DamageType.KINETIC, EMP_DAMAGE * damageMultiplier, true, true, null, true);
         }
     }
 
