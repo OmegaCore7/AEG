@@ -53,7 +53,7 @@
     255
   ],
   "darkCore": true,
-  "width": 5,
+  "width": 10,
   "textureType": LASER,
   "textureScrollSpeed": 30,
   "pixelsPerTexel": 5,

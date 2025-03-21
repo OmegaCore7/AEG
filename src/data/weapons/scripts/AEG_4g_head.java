@@ -11,27 +11,40 @@ import java.util.Random;
 
 public class AEG_4g_head implements EveryFrameWeaponEffectPlugin {
 
-    private static final int NUM_FRAMES = 11;  // Total number of frames
-    private static final int LOOP_START_FRAME = 5;  // Frame to start looping from
-    private float elapsed = 0;  // Elapsed time tracker
-    private int currentFrame = 0;  // Current frame index
-    private boolean initialCycleComplete = false;  // Flag to check if initial cycle is complete
-    private static final float BASE_FRAME_DURATION = 4.0f / NUM_FRAMES;  // Base duration for each frame (speed cut in half again)
-    private static final float MAX_FRAME_DURATION = 0.75f / (NUM_FRAMES - LOOP_START_FRAME);  // Max speed for looped animation
+    private static final int NUM_FRAMES = 11;
+    private static final int LOOP_START_FRAME = 5;
+    private float elapsed = 0;
+    private int currentFrame = 0;
+    private boolean initialCycleComplete = false;
+    private boolean overloadCycleComplete = false;
+    private boolean particlesActive = true;
+    private float particleRestartTimer = 0;
+    private static final float BASE_FRAME_DURATION = 4.0f / NUM_FRAMES;
+    private static final float MAX_FRAME_DURATION = 0.75f / (NUM_FRAMES - LOOP_START_FRAME);
     private Random random = new Random();
-    private float chargeUpTime = 0;  // Timer for charge-up duration
-    private static final float CHARGE_UP_DURATION = 4.0f;  // Charge-up duration in seconds
-    private static final float PARTICLE_DELAY = 2.0f;  // Delay before particles start spawning
-    private float combatStartTime = 0;  // Timer for combat start
+    private float chargeUpTime = 0;
+    private static final float CHARGE_UP_DURATION = 4.0f;
+    private static final float PARTICLE_DELAY = 2.0f;
+    private float combatStartTime = 0;
 
     private static final Vector2f[] PARTICLE_OFFSETS = {
-            new Vector2f(-19, 7),
-            new Vector2f(-19, -7),
-            new Vector2f(-21, 17),
-            new Vector2f(-21, -17),
+            new Vector2f(-23, 7),
+            new Vector2f(-23, -7),
+            new Vector2f(-25, 28),
+            new Vector2f(-25, -28),
             new Vector2f(-40, 17),
-            new Vector2f(-40, -17)
+            new Vector2f(-40, -17),
+            new Vector2f(-55, 0),
+            new Vector2f(-55, -45),
+            new Vector2f(-55, 45),
+            new Vector2f(-80, 0),
+            new Vector2f(-70, -18),
+            new Vector2f(-70, 18)
     };
+
+    private static final int MIN_PARTICLES = 2;
+    private static final int MAX_PARTICLES = 5;
+    private static final float SPAWN_RADIUS = 5.0f;
 
     @Override
     public void advance(float amount, CombatEngineAPI engine, WeaponAPI weapon) {
@@ -40,66 +53,94 @@ public class AEG_4g_head implements EveryFrameWeaponEffectPlugin {
 
         elapsed += amount;
 
-        // Track charge-up time
         if (ship.getSystem().isActive()) {
             chargeUpTime += amount;
         } else {
             chargeUpTime = 0;
         }
 
-        // Change weapon color based on charge-up time
         Color particleColor;
         if (chargeUpTime >= CHARGE_UP_DURATION) {
-            weapon.getSprite().setColor(Color.GREEN);  // Change weapon color to green
+            weapon.getSprite().setColor(Color.GREEN);
             particleColor = Color.GREEN;
         } else {
-            weapon.getSprite().setColor(Color.WHITE);  // Reset weapon color to default (white)
-            particleColor = new Color(255, 140, 0);  // Initial color (orange)
+            weapon.getSprite().setColor(Color.WHITE);
+            particleColor = new Color(255, 140, 0);
         }
 
-        // Adjust frame duration based on ship's speed
         float speedFactor = Math.min(ship.getVelocity().length() / ship.getMaxSpeed(), 1.0f);
         float frameDuration = BASE_FRAME_DURATION * (1.0f - speedFactor) + MAX_FRAME_DURATION * speedFactor;
 
-        // Cycle through frames
         if (elapsed > frameDuration) {
-            if (!initialCycleComplete) {
-                currentFrame = (currentFrame + 1) % NUM_FRAMES;
-                if (currentFrame == 0) {
-                    initialCycleComplete = true;
-                    currentFrame = LOOP_START_FRAME;  // Jump directly to frame 5
+            if (ship.getFluxTracker().isOverloaded() || ship.getFluxTracker().isVenting()) {
+                if (!overloadCycleComplete) {
+                    currentFrame = (currentFrame - 1 + NUM_FRAMES) % NUM_FRAMES;
+                    if (currentFrame == 0) {
+                        overloadCycleComplete = true;
+                        currentFrame = 0;  // Hold on frame 1
+                        particlesActive = false;  // Stop particles during overload and venting
+                    }
                 }
             } else {
-                currentFrame = LOOP_START_FRAME + (currentFrame - LOOP_START_FRAME + 1) % (NUM_FRAMES - LOOP_START_FRAME);
+                if (overloadCycleComplete) {
+                    currentFrame = (currentFrame + 1) % NUM_FRAMES;
+                    if (currentFrame == NUM_FRAMES - 1) {
+                        overloadCycleComplete = false;
+                        initialCycleComplete = false;
+                        particleRestartTimer = 0;  // Reset particle restart timer
+                    }
+                } else {
+                    if (!initialCycleComplete) {
+                        currentFrame = (currentFrame + 1) % NUM_FRAMES;
+                        if (currentFrame == 0) {
+                            initialCycleComplete = true;
+                            currentFrame = LOOP_START_FRAME;
+                        }
+                    } else {
+                        currentFrame = LOOP_START_FRAME + (currentFrame - LOOP_START_FRAME + 1) % (NUM_FRAMES - LOOP_START_FRAME);
+                    }
+                }
             }
             weapon.getAnimation().setFrame(currentFrame);
             elapsed -= frameDuration;
         }
 
-        // Track combat start time
         if (combatStartTime < PARTICLE_DELAY) {
             combatStartTime += amount;
-            return;  // Skip particle spawning until delay is over
+            return;
         }
 
-        // Spawn particles flowing backward relative to weapon's facing
-        for (Vector2f offset : PARTICLE_OFFSETS) {
+        if (!particlesActive) {
+            particleRestartTimer += amount;
+            if (particleRestartTimer >= 2.0f) {
+                particlesActive = true;  // Restart particles after 2 seconds
+            }
+            return;
+        }
+
+        int numParticles = random.nextInt(MAX_PARTICLES - MIN_PARTICLES + 1) + MIN_PARTICLES;
+
+        for (int i = 0; i < numParticles; i++) {
+            Vector2f offset = PARTICLE_OFFSETS[random.nextInt(PARTICLE_OFFSETS.length)];
             Vector2f spawnLocation = new Vector2f(weapon.getLocation());
             Vector2f.add(spawnLocation, Misc.rotateAroundOrigin(new Vector2f(offset), weapon.getCurrAngle()), spawnLocation);
 
-            float angleOffset = random.nextFloat() * 30f - 15f;  // Random angle offset within a range
-            float angle = weapon.getCurrAngle() + 180f + angleOffset;  // Reverse direction with random offset
-            float speed = 50f + random.nextFloat() * 50f;  // Adjust speed range as needed
-            float size = 5f + random.nextFloat() * 5f;  // Adjust size range as needed
-            float duration = 1f + random.nextFloat() * 1f;  // Adjust duration range as needed
+            float angleOffset = random.nextFloat() * 30f - 15f;
+            float angle = weapon.getCurrAngle() + 180f + angleOffset;
+            float speed = 50f + random.nextFloat() * 50f;
+            float size = 5f + random.nextFloat() * 5f;
+            float duration = 1f + random.nextFloat() * 1f;
+
+            Vector2f randomOffset = new Vector2f(random.nextFloat() * SPAWN_RADIUS * 2 - SPAWN_RADIUS, random.nextFloat() * SPAWN_RADIUS * 2 - SPAWN_RADIUS);
+            Vector2f.add(spawnLocation, randomOffset, spawnLocation);
 
             engine.addHitParticle(
                     spawnLocation,
                     (Vector2f) Misc.getUnitVectorAtDegreeAngle(angle).scale(speed),
                     size,
-                    1f,  // Initial brightness
+                    1f,
                     duration,
-                    particleColor  // Color based on charge-up time
+                    particleColor
             );
         }
     }

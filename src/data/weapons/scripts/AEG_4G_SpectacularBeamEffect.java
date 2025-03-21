@@ -20,10 +20,13 @@ public class AEG_4G_SpectacularBeamEffect implements BeamEffectPlugin {
     private static final float ARMOR_DAMAGE_MULTIPLIER = 2f;
     private static final float LIGHTNING_INTERVAL = 1f;
     private static final float SMOKE_START_SIZE = 5f;
-    private static final float SMOKE_END_SIZE = 10f;
+    private static final float SMOKE_END_SIZE = 20f;
     private static final float SMOKE_DURATION = 1f;
+    private static final float FIGHTER_DAMAGE_MULTIPLIER = 5f;
+    private static final float MALFUNCTION_INCREMENT = 0.01f;  // Incremental increase in malfunction chance per second
 
     private float lightningTimer = 0f;
+    private float beamHitDuration = 0f;
     private Random random = new Random();
 
     @Override
@@ -35,32 +38,38 @@ public class AEG_4G_SpectacularBeamEffect implements BeamEffectPlugin {
             ShipAPI ship = (ShipAPI) target;
             Vector2f hitPoint = beam.getTo();
 
+            float damageMultiplier = ship.isFighter() ? FIGHTER_DAMAGE_MULTIPLIER : 1f;
+
             if (ship.getShield() != null && ship.getShield().isWithinArc(hitPoint)) {
                 // Hitting shield
-                beam.getDamage().setDamage(beam.getDamage().getDamage() + KINETIC_DAMAGE);
+                beam.getDamage().setDamage(beam.getDamage().getDamage() + KINETIC_DAMAGE * damageMultiplier);
                 lightningTimer += amount;
                 if (lightningTimer >= LIGHTNING_INTERVAL) {
                     lightningTimer = 0f;
-                    spawnEmpLightning(engine, hitPoint, ship);
+                    spawnEmpLightning(engine, hitPoint, ship, damageMultiplier);
                 }
             } else {
                 // Hitting hull
-                beam.getDamage().setDamage(beam.getDamage().getDamage() + HIGH_EXPLOSIVE_DAMAGE * ARMOR_DAMAGE_MULTIPLIER);
+                beam.getDamage().setDamage(beam.getDamage().getDamage() + HIGH_EXPLOSIVE_DAMAGE * ARMOR_DAMAGE_MULTIPLIER * damageMultiplier);
                 spawnEnergySplash(engine, hitPoint);
                 spawnSmoke(engine, hitPoint);
-                ship.getMutableStats().getCriticalMalfunctionChance().modifyFlat("SpectacularBeamEffect", 0.1f);
+                beamHitDuration += amount;
+                ship.getMutableStats().getCriticalMalfunctionChance().modifyFlat("SpectacularBeamEffect", beamHitDuration * MALFUNCTION_INCREMENT);
             }
+        } else {
+            // Reset beam hit duration if not hitting a ship
+            beamHitDuration = 0f;
         }
     }
 
-    private void spawnEmpLightning(CombatEngineAPI engine, Vector2f hitPoint, ShipAPI ship) {
+    private void spawnEmpLightning(CombatEngineAPI engine, Vector2f hitPoint, ShipAPI ship, float damageMultiplier) {
         for (int i = 0; i < 3; i++) {
             Vector2f targetPoint = new Vector2f(
                     ship.getLocation().x + random.nextFloat() * ship.getCollisionRadius() * 2 - ship.getCollisionRadius(),
                     ship.getLocation().y + random.nextFloat() * ship.getCollisionRadius() * 2 - ship.getCollisionRadius()
             );
-            engine.spawnEmpArcVisual(hitPoint, null, targetPoint, ship, 10f, Color.CYAN, Color.WHITE);
-            engine.applyDamage(ship, targetPoint, STRIKE_DAMAGE, DamageType.ENERGY, EMP_DAMAGE, false, false, null, true);
+            engine.spawnEmpArcVisual(hitPoint, null, targetPoint, ship, 10f, new Color(255,150,0,255), Color.WHITE);
+            engine.applyDamage(ship, targetPoint, STRIKE_DAMAGE * damageMultiplier, DamageType.KINETIC, EMP_DAMAGE * damageMultiplier, false, true, null, true);
         }
     }
 
@@ -69,7 +78,7 @@ public class AEG_4G_SpectacularBeamEffect implements BeamEffectPlugin {
             float angle = random.nextFloat() * 360f;
             float speed = 50f + random.nextFloat() * 50f;
             Vector2f velocity = (Vector2f) Misc.getUnitVectorAtDegreeAngle(angle).scale(speed);
-            engine.addHitParticle(hitPoint, velocity, 10f, 1f, 0.5f, Color.YELLOW);
+            engine.addHitParticle(hitPoint, velocity, 5f, 1f, 0.5f, Color.YELLOW);
         }
     }
 
