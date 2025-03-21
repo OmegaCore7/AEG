@@ -9,6 +9,7 @@
   "turretGlowSprite": "graphics/ships/4g/4g_drill_legr_glow.png",
   "hardpointSprite": "graphics/ships/4g/4g_drill_legr_00.png",
   "hardpointGlowSprite": "graphics/ships/4g/4g_drill_legr_glow.png",
+    "showDamageWhenDecorative": true,
   "glowColor": [
     255,
     255,

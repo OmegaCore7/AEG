@@ -17,6 +17,9 @@ public class AEG_4g_legs implements EveryFrameWeaponEffectPlugin {
     private IntervalUtil interval = new IntervalUtil(0.08f, 0.08f);
     private IntervalUtil interval2;
     private Color ogColor;
+    private float chargeUpTime = 0;
+    private static final float CHARGE_UP_DURATION = 4.0f;
+    private boolean colorChanged = false;
 
     public void init(WeaponAPI weapon, float amount) {
         runOnce = true;
@@ -87,6 +90,21 @@ public class AEG_4g_legs implements EveryFrameWeaponEffectPlugin {
         }
         Color defColor = ship.getSpriteAPI().getAverageColor();
 
+        if (ship.getSystem().isActive()) {
+            chargeUpTime += amount;
+            if (chargeUpTime >= CHARGE_UP_DURATION && !colorChanged) {
+                colorChanged = true;
+            }
+        } else {
+            chargeUpTime = 0;
+            colorChanged = false;
+        }
+
+        if (isRightKneeDrillActive(ship)) {
+            renderFrame(weapon, "graphics/ships/4g/legs/4g_legs_06.png", colorChanged ? Color.GREEN : Color.WHITE);
+            return;
+        }
+
         interval.advance(amount);
         if (ship.getEngineController().isAcceleratingBackwards() || ship.getEngineController().isDecelerating()) {
             if (interval.intervalElapsed()) {
@@ -119,20 +137,31 @@ public class AEG_4g_legs implements EveryFrameWeaponEffectPlugin {
         if (frame >= 10) {
             frameStr = String.valueOf(frame);
         }
-        SpriteAPI spr = Global.getSettings().getSprite("graphics/ships/4g/legs/4g_legs_" + frameStr + ".png");
+        String spritePath = "graphics/ships/4g/legs/4g_legs_" + frameStr + ".png";
+        Color renderColor = colorChanged ? Color.GREEN : Color.WHITE;
 
-        Color color = new Color(defColor.getRed() * 2, defColor.getGreen() * 2, defColor.getBlue() * 2, defColor.getAlpha());
-        color = new Color(255, 255, 255);
-        color = new Color(color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f, (color.getAlpha() / 255f) * ship.getCombinedAlphaMult());
+        renderFrame(weapon, spritePath, renderColor);
+    }
 
+    private void renderFrame(WeaponAPI weapon, String spritePath, Color color) {
+        SpriteAPI spr = Global.getSettings().getSprite(spritePath);
         MagicRender.singleframe(
                 spr,
                 new Vector2f(weapon.getLocation().getX(), weapon.getLocation().getY()),
                 new Vector2f(spr.getWidth(), spr.getHeight()),
-                ship.getFacing() - 90f,
+                weapon.getShip().getFacing() - 90f,
                 color,
                 false,
                 CombatEngineLayers.BELOW_SHIPS_LAYER
         );
+    }
+
+    private boolean isRightKneeDrillActive(ShipAPI ship) {
+        for (WeaponAPI weapon : ship.getAllWeapons()) {
+            if ("AEG_4g_rightkneedrill".equals(weapon.getId()) && weapon.isFiring()) {
+                return true;
+            }
+        }
+        return false;
     }
 }

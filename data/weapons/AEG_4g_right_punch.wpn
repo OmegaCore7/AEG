@@ -10,6 +10,7 @@
   "turretSprite": "graphics/ships/4g/4g_chargedfist_armr_00.png",
   "turretGlowSprite": "graphics/ships/4g/4g_chargedfist_armr_glow.png",
   "hardpointSprite": "graphics/ships/4g/4g_chargedfist_armr_00.png",
+    "showDamageWhenDecorative": true,
   "numFrames": 2,
   "frameRate": 1,
   "glowColor": [

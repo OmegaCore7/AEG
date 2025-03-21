@@ -11,6 +11,7 @@
   "turretGlowSprite": "graphics/ships/4g/4g_head_glow.png",
   "hardpointSprite": "graphics/ships/4g/4g_head_00.png",
   "hardpointGlowSprite": "graphics/ships/4g/4g_head_glow.png",
+    "showDamageWhenDecorative": true,
   "glowColor": [
     255,
     255,
