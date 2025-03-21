@@ -21,6 +21,8 @@ public class AEG_4g_head implements EveryFrameWeaponEffectPlugin {
     private Random random = new Random();
     private float chargeUpTime = 0;  // Timer for charge-up duration
     private static final float CHARGE_UP_DURATION = 4.0f;  // Charge-up duration in seconds
+    private static final float PARTICLE_DELAY = 2.0f;  // Delay before particles start spawning
+    private float combatStartTime = 0;  // Timer for combat start
 
     private static final Vector2f[] PARTICLE_OFFSETS = {
             new Vector2f(-19, 7),
@@ -72,6 +74,12 @@ public class AEG_4g_head implements EveryFrameWeaponEffectPlugin {
             }
             weapon.getAnimation().setFrame(currentFrame);
             elapsed -= frameDuration;
+        }
+
+        // Track combat start time
+        if (combatStartTime < PARTICLE_DELAY) {
+            combatStartTime += amount;
+            return;  // Skip particle spawning until delay is over
         }
 
         // Spawn particles flowing backward relative to weapon's facing

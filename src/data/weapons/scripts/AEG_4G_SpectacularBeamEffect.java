@@ -1,12 +1,17 @@
 package data.weapons.scripts;
 
-import com.fs.starfarer.api.combat.*;
+import com.fs.starfarer.api.combat.BeamAPI;
+import com.fs.starfarer.api.combat.BeamEffectPlugin;
+import com.fs.starfarer.api.combat.CombatEngineAPI;
+import com.fs.starfarer.api.combat.CombatEntityAPI;
+import com.fs.starfarer.api.combat.DamageType;
+import com.fs.starfarer.api.combat.ShipAPI;
 import com.fs.starfarer.api.util.Misc;
 import org.lwjgl.util.vector.Vector2f;
 import java.awt.Color;
 import java.util.Random;
 
-public class AEG_4G_SpectacularBeamEffect implements EveryFrameWeaponEffectPlugin {
+public class AEG_4G_SpectacularBeamEffect implements BeamEffectPlugin {
 
     private static final float EMP_DAMAGE = 100f;
     private static final float STRIKE_DAMAGE = 50f;
@@ -22,32 +27,28 @@ public class AEG_4G_SpectacularBeamEffect implements EveryFrameWeaponEffectPlugi
     private Random random = new Random();
 
     @Override
-    public void advance(float amount, CombatEngineAPI engine, WeaponAPI weapon) {
+    public void advance(float amount, CombatEngineAPI engine, BeamAPI beam) {
         if (engine.isPaused()) return;
 
-        for (BeamAPI beam : engine.getBeams()) {
-            if (beam.getWeapon() == weapon) {
-                CombatEntityAPI target = beam.getDamageTarget();
-                if (target instanceof ShipAPI) {
-                    ShipAPI ship = (ShipAPI) target;
-                    Vector2f hitPoint = beam.getTo();
+        CombatEntityAPI target = beam.getDamageTarget();
+        if (target instanceof ShipAPI) {
+            ShipAPI ship = (ShipAPI) target;
+            Vector2f hitPoint = beam.getTo();
 
-                    if (ship.getShield() != null && ship.getShield().isWithinArc(hitPoint)) {
-                        // Hitting shield
-                        beam.getDamage().setDamage(beam.getDamage().getDamage() + KINETIC_DAMAGE);
-                        lightningTimer += amount;
-                        if (lightningTimer >= LIGHTNING_INTERVAL) {
-                            lightningTimer = 0f;
-                            spawnEmpLightning(engine, hitPoint, ship);
-                        }
-                    } else {
-                        // Hitting hull
-                        beam.getDamage().setDamage(beam.getDamage().getDamage() + HIGH_EXPLOSIVE_DAMAGE);
-                        spawnEnergySplash(engine, hitPoint);
-                        spawnSmoke(engine, hitPoint);
-                        ship.getMutableStats().getCriticalMalfunctionChance().modifyFlat("SpectacularBeamEffect", 0.1f);
-                    }
+            if (ship.getShield() != null && ship.getShield().isWithinArc(hitPoint)) {
+                // Hitting shield
+                beam.getDamage().setDamage(beam.getDamage().getDamage() + KINETIC_DAMAGE);
+                lightningTimer += amount;
+                if (lightningTimer >= LIGHTNING_INTERVAL) {
+                    lightningTimer = 0f;
+                    spawnEmpLightning(engine, hitPoint, ship);
                 }
+            } else {
+                // Hitting hull
+                beam.getDamage().setDamage(beam.getDamage().getDamage() + HIGH_EXPLOSIVE_DAMAGE * ARMOR_DAMAGE_MULTIPLIER);
+                spawnEnergySplash(engine, hitPoint);
+                spawnSmoke(engine, hitPoint);
+                ship.getMutableStats().getCriticalMalfunctionChance().modifyFlat("SpectacularBeamEffect", 0.1f);
             }
         }
     }
@@ -58,7 +59,7 @@ public class AEG_4G_SpectacularBeamEffect implements EveryFrameWeaponEffectPlugi
                     ship.getLocation().x + random.nextFloat() * ship.getCollisionRadius() * 2 - ship.getCollisionRadius(),
                     ship.getLocation().y + random.nextFloat() * ship.getCollisionRadius() * 2 - ship.getCollisionRadius()
             );
-            engine.spawnEmpArcVisual(hitPoint, null, targetPoint, ship, 5f, new Color(255,150,50), Color.WHITE);
+            engine.spawnEmpArcVisual(hitPoint, null, targetPoint, ship, 10f, Color.CYAN, Color.WHITE);
             engine.applyDamage(ship, targetPoint, STRIKE_DAMAGE, DamageType.ENERGY, EMP_DAMAGE, false, false, null, true);
         }
     }
