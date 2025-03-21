@@ -57,12 +57,18 @@ public class AEG_4g_genesicaura extends BaseHullMod implements DamageListener {
                 enemyNearby = true;
                 ship.getMutableStats().getHullDamageTakenMult().modifyMult("AEG_4g_genesicaura_near_enemy", DAMAGE_REDUCTION_NEAR_ENEMY);
                 ship.getMutableStats().getArmorDamageTakenMult().modifyMult("AEG_4g_genesicaura_near_enemy", DAMAGE_REDUCTION_NEAR_ENEMY);
+                ship.getMutableStats().getKineticDamageTakenMult().modifyMult("AEG_4g_genesicaura_near_enemy", DAMAGE_REDUCTION_NEAR_ENEMY);
+                ship.getMutableStats().getHighExplosiveDamageTakenMult().modifyMult("AEG_4g_genesicaura_near_enemy", DAMAGE_REDUCTION_NEAR_ENEMY);
+                ship.getMutableStats().getEnergyDamageTakenMult().modifyMult("AEG_4g_genesicaura_near_enemy", DAMAGE_REDUCTION_NEAR_ENEMY);
                 break;
             }
         }
         if (!enemyNearby) {
             ship.getMutableStats().getHullDamageTakenMult().unmodify("AEG_4g_genesicaura_near_enemy");
             ship.getMutableStats().getArmorDamageTakenMult().unmodify("AEG_4g_genesicaura_near_enemy");
+            ship.getMutableStats().getKineticDamageTakenMult().unmodify("AEG_4g_genesicaura_near_enemy");
+            ship.getMutableStats().getHighExplosiveDamageTakenMult().unmodify("AEG_4g_genesicaura_near_enemy");
+            ship.getMutableStats().getEnergyDamageTakenMult().unmodify("AEG_4g_genesicaura_near_enemy");
         }
     }
 
