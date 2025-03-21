@@ -37,8 +37,8 @@
     0,
     0
   ],
-  "numFrames": 9,
-  "frameRate": 9,
+  "numFrames": 11,
+  "frameRate": 2.5,
   "fringeColor": [
     255,
     100,
@@ -52,7 +52,7 @@
     255
   ],
   "darkCore": true,
-  "width": 0,
+  "width": 3,
   "textureType": LASER,
   "textureScrollSpeed": 30,
   "pixelsPerTexel": 5,
