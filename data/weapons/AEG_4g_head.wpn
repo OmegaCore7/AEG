@@ -4,6 +4,7 @@
   "type": "ENERGY",
   "size": "SMALL",
   "everyFrameEffect": "data.weapons.scripts.AEG_4g_head",
+  "beamEffect": "data.weapons.scripts.AEG_4G_SpectacularBeamEffect",
   "collisionClass": "RAY",
   "collisionClassByFighter": "RAY_FIGHTER",
   "turretSprite": "graphics/ships/4g/4g_head_00.png",

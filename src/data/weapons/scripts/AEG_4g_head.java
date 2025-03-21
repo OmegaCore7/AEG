@@ -25,6 +25,8 @@ public class AEG_4g_head implements EveryFrameWeaponEffectPlugin {
     private static final Vector2f[] PARTICLE_OFFSETS = {
             new Vector2f(-19, 7),
             new Vector2f(-19, -7),
+            new Vector2f(-21, 17),
+            new Vector2f(-21, -17),
             new Vector2f(-40, 17),
             new Vector2f(-40, -17)
     };
