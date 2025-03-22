@@ -12,8 +12,8 @@
 
   	"flameoutOnImpactChance":0,
 
-  	"clampTurnRateAfter":true,
-  	"clampMaxSpeedAfter":true,
+  	"clampTurnRateAfter":false,
+  	"clampMaxSpeedAfter":false,
 
   	"useSound":"system_maneuvering_jets",
   	"loopSound":"system_maneuvering_jets_loop",
