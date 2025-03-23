@@ -1,0 +1,59 @@
+{
+  "id": "AEG_Blitzwing_legs",
+  "specClass": "beam",
+  "type": "DECORATIVE",
+  "size": "SMALL",
+  "everyFrameEffect": "data.weapons.scripts.AEG_Blitzwing_legs",
+  "collisionClass": "RAY",
+  "collisionClassByFighter": "RAY_FIGHTER",
+  "turretSprite": "graphics/ships/blitzwing/legs/Blitzwing_legs_00.png",
+  "hardpointSprite": "graphics/ships/blitzwing/legs/Blitzwing_legs_00.png",
+  "showDamageWhenDecorative": true,
+  "glowColor": [
+    255,
+    255,
+    255,
+    255
+  ],
+  "hitGlowRadius": 0,
+  "turretOffsets": [
+    13,
+    0
+  ],
+  "turretAngleOffsets": [
+    0
+  ],
+  "hardpointOffsets": [
+    28,
+    0
+  ],
+  "hardpointAngleOffsets": [
+    0
+  ],
+  "numFrames": 12,
+  "frameRate": 1,
+  "fringeColor": [
+    255,
+    100,
+    0,
+    255
+  ],
+  "coreColor": [
+    255,
+    255,
+    255,
+    255
+  ],
+  "darkCore": true,
+  "width": 2,
+  "textureType": LASER,
+  "textureScrollSpeed": 30,
+  "pixelsPerTexel": 5,
+  "pierceSet": [
+    PROJECTILE_FF,
+    PROJECTILE_NO_FF,
+    PROJECTILE_FIGHTER
+  ],
+  "fireSoundOne": "laser_intro",
+  "fireSoundTwo": "pd_laser_loop"
+}

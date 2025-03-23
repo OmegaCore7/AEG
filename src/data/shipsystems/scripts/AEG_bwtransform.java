@@ -17,11 +17,16 @@ public class AEG_bwtransform extends BaseShipSystemScript {
     private static final int ACCEL_BUFF = 500;
     private static final int DECCEL_BUFF = 500;
     private static final int SPEED_BUFF = 100;
+    private static final int UNIVERSAL_SPEED_BUFF = 50; // Universal speed buff
+    private static final float FORWARD_PUSH_DURATION = 1f; // 1 second forward push
 
     @Override
     public void apply(MutableShipStatsAPI stats, String id, State state, float effectLevel) {
         ShipAPI ship = (ShipAPI) stats.getEntity();
         if (ship == null) return;
+
+        // Apply universal speed buff when the system is not active
+        stats.getMaxSpeed().modifyPercent(id, UNIVERSAL_SPEED_BUFF);
 
         if (state == State.IN) {
             // Apply visual effects for the maneuver
@@ -50,7 +55,6 @@ public class AEG_bwtransform extends BaseShipSystemScript {
             stats.getShieldDamageTakenMult().modifyMult(id, DAMAGE_TAKEN_REDUCTION);
         } else if (state == State.OUT) {
             // Reset stats after the system is deactivated
-            stats.getMaxSpeed().modifyPercent(id, SPEED_BUFF);
             stats.getAcceleration().unmodify(id);
             stats.getDeceleration().unmodify(id);
             stats.getTurnAcceleration().unmodify(id);
@@ -58,6 +62,12 @@ public class AEG_bwtransform extends BaseShipSystemScript {
             stats.getHullDamageTakenMult().unmodify(id);
             stats.getArmorDamageTakenMult().unmodify(id);
             stats.getShieldDamageTakenMult().unmodify(id);
+
+            // Apply forward push force
+            float facing = ship.getFacing();
+            Vector2f forwardPush = new Vector2f((float) Math.cos(Math.toRadians(facing)), (float) Math.sin(Math.toRadians(facing)));
+            forwardPush.scale(PUSH_FORCE * FORWARD_PUSH_DURATION);
+            Vector2f.add(ship.getVelocity(), forwardPush, ship.getVelocity());
         }
     }
 

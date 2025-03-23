@@ -16,7 +16,8 @@
     "WS0002": "AEG_bw_Rarm_nullrayblaster",
     "WS0003": "AEG_Blitzwing_Jetpack",
     "WS0004": "AEG_bw_Larm_minigun",
-    "WS0006": "AEG_bw_mhead"
+    "WS0006": "AEG_bw_mhead",
+    "WS0010": "AEG_Blitzwing_legs"
   },
   "weaponSlots": [
     {
@@ -82,6 +83,33 @@
       "arc": 15,
       "angle": -0,
       "locations": [14.5, -11]
+    },
+    {
+      "id": "WS0008",
+      "size": "SMALL",
+      "type": "BUILT_IN",
+      "mount": "TURRET",
+      "arc": 9,
+      "angle": 0,
+      "locations": [7, -0]
+    },
+    {
+      "id": "WS0009",
+      "size": "SMALL",
+      "type": "BUILT_IN",
+      "mount": "TURRET",
+      "arc": 9,
+      "angle": -0,
+      "locations": [7, 0]
+    },
+    {
+      "id": "WS0010",
+      "size": "SMALL",
+      "type": "DECORATIVE",
+      "mount": "TURRET",
+      "arc": 9,
+      "angle": 0,
+      "locations": [-2.5, -0]
     }
   ],
   "engineSlots": [

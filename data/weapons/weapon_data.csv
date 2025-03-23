@@ -38,6 +38,7 @@ Null-Ray Blaster,AEG_bw_Rarm_nullrayblaster,,,900,1000,,1400,,0,30,9,20,,,ENERGY
 Dual Shoulder Sabot Launcher,AEG_Blitzwing_Jetpack,,,1200,1200,,100,,15,10,10,12,,,KINETIC,0,,0,8.75,3,0.25,0,0,0,0,,150,50,8,300,,,GUIDED_POOR,"missile13, strike8, rare_bp, merc, ind, no_drop",,Unknown,,Anti Shield,Slow,Poor,,,"Submunition hits on hull or armor have a %s chance to arc to weapons and engines, dealing %s EMP damage.",25% | 200,,,TRUE,17
 Blitz Assault Minigun,AEG_bw_Larm_minigun,,,1000,600,,75,10,3,30,10,,,,HIGH_EXPLOSIVE,60,,0,0.15,1,,0,20,1,0,,800,,,30,,,,"he15, SR, lowtech_bp, midline_bp, merc, ind, no_drop",,Unknown,,Anti Armor,,,,,,,,,,
 Optic PD Beams,AEG_bw_mhead,,,200,400,75,,,0,100,4,,,,ENERGY,,40,0,0.25,,,,,,,2400,,,,,,,PD,"pd7, beam7, SR, hightech_bp, midline_bp, merc, ind, no_drop",,Unknown,,Point Defense,,,,,,,,,,
+,AEG_Blitzwing_legs,,,500000,600,1,,,,,,,,,,,,,,,,,,,,,,,,,,,,no_drop,,,,,,,,,,,,,,
 ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,23
 #Crimson Cascade,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,23
 CCX Left U-Tech Plasma Cannon,AEG_rmleftarm,,,7500,800,,400,,,20,30,,,,ENERGY,250,,0.33,1.01,5,0.33,,,,,,750,,,500,,,"STRIKE, USE_VS_FRIGATES","energy20, rare_bp, hist1t, merc, ind, no_drop",,,,General,,Excellent,,,,,,,,26
