@@ -63,25 +63,28 @@ public class AEG_bwtransform extends BaseShipSystemScript {
             stats.getArmorDamageTakenMult().unmodify(id);
             stats.getShieldDamageTakenMult().unmodify(id);
 
-            // Apply forward push force
+            // Apply forward push force and visual effects
             float facing = ship.getFacing();
             Vector2f forwardPush = new Vector2f((float) Math.cos(Math.toRadians(facing)), (float) Math.sin(Math.toRadians(facing)));
             forwardPush.scale(PUSH_FORCE * FORWARD_PUSH_DURATION);
             Vector2f.add(ship.getVelocity(), forwardPush, ship.getVelocity());
+
+            // Increase engine flame size during the push
+            ship.getEngineController().extendFlame(id, 2.0f, 2.0f, 2.0f);
         }
     }
 
     private void applyVisualEffects(ShipAPI ship, float effectLevel) {
         ship.setJitterUnder(
                 ship,
-                Color.CYAN,
+                Color.GREEN,
                 0.5f * effectLevel,
                 5,
                 5 + 5f * effectLevel,
                 5 + 10f * effectLevel
         );
         if (Math.random() > 0.9f) {
-            ship.addAfterimage(new Color(0, 200, 255, 64), 0, 0, -ship.getVelocity().x, -ship.getVelocity().y, 5 + 50 * effectLevel, 0, 0, 2 * effectLevel, false, false, false);
+            ship.addAfterimage(new Color(0, 255, 200, 64), 0, 0, -ship.getVelocity().x, -ship.getVelocity().y, 5 + 50 * effectLevel, 0, 0, 2 * effectLevel, false, false, false);
         }
     }
 }
