@@ -5,6 +5,7 @@
   "size": "SMALL",
   "collisionClass": "RAY",
   "collisionClassByFighter": "RAY_FIGHTER",
+  "beamEffect": "data.weapons.scripts.AEG_BlitzwingMHeadBeamEffect",
   "everyFrameEffect": "data.weapons.scripts.AEG_BlitzwingMHeadEffect",
   "turretSprite": "graphics/ships/blitzwing/Blitzwing_mhead00.png",
   "hardpointSprite": "graphics/ships/blitzwing/Blitzwing_mhead00.png",
@@ -61,7 +62,7 @@
     255,
     255
   ],
-  "width": 2,
+  "width": 4,
   "textureType": ROUGH,
   "textureScrollSpeed": 64,
   "pixelsPerTexel": 5,

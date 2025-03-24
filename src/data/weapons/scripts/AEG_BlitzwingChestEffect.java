@@ -13,7 +13,6 @@ public class AEG_BlitzwingChestEffect implements EveryFrameWeaponEffectPlugin {
     private int hitCount = 0;
     private static final int MAX_HIT_COUNT = 5;
     private static final float COOLDOWN_REDUCTION = 0.1f; // Cooldown reduction per hit
-    private static final int BURST_INCREASE = 2; // Burst increase per hit
 
     @Override
     public void advance(float amount, CombatEngineAPI engine, WeaponAPI weapon) {
@@ -57,14 +56,10 @@ public class AEG_BlitzwingChestEffect implements EveryFrameWeaponEffectPlugin {
                 hitCount++;
                 if (hitCount <= MAX_HIT_COUNT) {
                     system.setCooldown(system.getCooldown() - COOLDOWN_REDUCTION);
-                    MutableShipStatsAPI stats = ship.getMutableStats();
-                    stats.getBallisticWeaponDamageMult().modifyFlat("BlitzwingChestEffect", BURST_INCREASE * hitCount);
                 }
             }
         } else {
             hitCount = 0; // Reset hit count when the system is not active
-            MutableShipStatsAPI stats = ship.getMutableStats();
-            stats.getBallisticWeaponDamageMult().unmodify("BlitzwingChestEffect");
         }
     }
 }

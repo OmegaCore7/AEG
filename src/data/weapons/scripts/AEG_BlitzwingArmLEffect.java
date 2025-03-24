@@ -13,10 +13,10 @@ public class AEG_BlitzwingArmLEffect implements EveryFrameWeaponEffectPlugin {
     private boolean firing = false;
     private float fireRateMultiplier = 1.0f;
     private float recoilReduction = 0.0f;
-    private static final float MAX_FIRE_RATE_MULTIPLIER = 2.0f;
-    private static final float MAX_RECOIL_REDUCTION = 0.5f;
-    private static final float FIRE_RATE_INCREMENT = 0.01f;
-    private static final float RECOIL_REDUCTION_INCREMENT = 0.01f;
+    private static final float MAX_FIRE_RATE_MULTIPLIER = 2.5f;
+    private static final float MAX_RECOIL_REDUCTION = 1.0f;
+    private static final float FIRE_RATE_INCREMENT = 0.05f;
+    private static final float RECOIL_REDUCTION_INCREMENT = 0.05f;
 
     @Override
     public void advance(float amount, CombatEngineAPI engine, WeaponAPI weapon) {
@@ -66,6 +66,10 @@ public class AEG_BlitzwingArmLEffect implements EveryFrameWeaponEffectPlugin {
             }
         } else {
             firing = false;
+        }
+
+        // Maintain values while the system is active
+        if (system.getState() == SystemState.IDLE || system.getState() == SystemState.COOLDOWN) {
             fireRateMultiplier = 1.0f;
             recoilReduction = 0.0f;
         }
