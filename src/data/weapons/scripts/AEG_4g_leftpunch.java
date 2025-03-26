@@ -83,8 +83,11 @@ public class AEG_4g_leftpunch implements EveryFrameWeaponEffectPlugin, OnFireEff
             }
         }
 
-        // Set the frame of WS0006 based on the selection
-        if (isBoltingDriverSelected || isProtectShadeSelected) {
+        // Check if the ship system is active
+        boolean isShipSystemActive = ship.getSystem().isActive();
+
+        // Set the frame of WS0006 based on the selection and ship system status
+        if (isBoltingDriverSelected || isProtectShadeSelected || isShipSystemActive) {
             armL.getAnimation().setFrame(1); // Set frame to 1 (invisible)
         } else {
             armL.getAnimation().setFrame(0); // Set frame to 0 (visible)
@@ -141,12 +144,33 @@ public class AEG_4g_leftpunch implements EveryFrameWeaponEffectPlugin, OnFireEff
         if (hGlow != null) {
             hGlow.setCurrAngle(head.getCurrAngle());
         }
+
+        // Apply the speed and maneuverability boost during the charge-up portion of the charge level
+        if (weapon.getChargeLevel() > 0 && weapon.getChargeLevel() < 1) {
+            ship.getMutableStats().getMaxSpeed().modifyMult("AEG_4g_leftpunch", 2f); // Increase speed by 2x
+            ship.getMutableStats().getAcceleration().modifyMult("AEG_4g_leftpunch", 2f); // Increase acceleration by 2x
+            ship.getMutableStats().getDeceleration().modifyMult("AEG_4g_leftpunch", 2f); // Increase deceleration by 2x
+            ship.getMutableStats().getTurnAcceleration().modifyMult("AEG_4g_leftpunch", 2f); // Increase turn acceleration by 2x
+            ship.getMutableStats().getMaxTurnRate().modifyMult("AEG_4g_leftpunch", 2f); // Increase max turn rate by 2x
+
+            // Trigger engine flare-up response
+            ship.getEngineController().extendFlame(ship.getEngineController().getShipEngines().size(), 2f, 1f, 1f); // Adjust the duration and intensity as needed
+        } else {
+            // Reset the stats after the charge-up
+            ship.getMutableStats().getMaxSpeed().unmodify("AEG_4g_leftpunch");
+            ship.getMutableStats().getAcceleration().unmodify("AEG_4g_leftpunch");
+            ship.getMutableStats().getDeceleration().unmodify("AEG_4g_leftpunch");
+            ship.getMutableStats().getTurnAcceleration().unmodify("AEG_4g_leftpunch");
+            ship.getMutableStats().getMaxTurnRate().unmodify("AEG_4g_leftpunch");
+        }
     }
 
+    @Override
     public void onHit(DamagingProjectileAPI projectile, CombatEntityAPI target, Vector2f point, boolean shieldHit, ApplyDamageResultAPI damageResult, CombatEngineAPI engine) {
         // Implement onHit logic here
     }
 
+    @Override
     public void onFire(DamagingProjectileAPI projectile, WeaponAPI weapon, CombatEngineAPI engine) {
         // Removed muzzle flash and particle/glow effects
     }
