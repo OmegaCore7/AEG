@@ -50,8 +50,8 @@
       "size": "SMALL",
       "type": "DECORATIVE",
       "mount": "TURRET",
-      "arc": 7,
-      "angle": 5,
+      "arc": 18,
+      "angle": 0,
       "locations": [37, 8],
       "renderOrderMod": 2
     },
@@ -61,7 +61,7 @@
       "type": "UNIVERSAL",
       "mount": "TURRET",
       "arc": 35,
-      "angle": 10,
+      "angle": 0,
       "locations": [10, -26],
       "renderOrderMod": 4
     },
@@ -70,7 +70,7 @@
       "size": "SMALL",
       "type": "DECORATIVE",
       "mount": "TURRET",
-      "arc": 12,
+      "arc": 35,
       "angle": 0,
       "locations": [10, 23],
       "renderOrderMod": 1
@@ -81,7 +81,7 @@
       "type": "DECORATIVE",
       "mount": "TURRET",
       "arc": 35,
-      "angle": 10,
+      "angle": 0,
       "locations": [10, -26],
       "renderOrderMod": 4
     },

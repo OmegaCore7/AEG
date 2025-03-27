@@ -6,9 +6,8 @@ import org.lwjgl.util.vector.Vector2f;
 public class AEG_CoreLeftArmEffect implements EveryFrameWeaponEffectPlugin, OnFireEffectPlugin {
 
     private Vector2f initialOffset = new Vector2f(37f, 8f); // Initial offset relative to the ship's facing
-    private float maxDistancePositive = 2f; // Maximum positive distance the arm weapon can move
-    private float maxDistanceNegative = -2f; // Maximum negative distance the arm weapon can move
-    private float movementSpeed = 50f; // Speed at which the arm weapon moves
+    private float maxDistancePositive = 16f; // Maximum positive distance the arm weapon can move
+    private float maxDistanceNegative = -16f; // Maximum negative distance the arm weapon can move
 
     @Override
     public void advance(float amount, CombatEngineAPI engine, WeaponAPI weapon) {
@@ -34,17 +33,17 @@ public class AEG_CoreLeftArmEffect implements EveryFrameWeaponEffectPlugin, OnFi
             // Calculate the direction of movement based on the difference between the deco gun's angle and the ship's facing
             float angleDifference = decoGunAngle - shipFacing;
 
+            // Normalize the angle difference to a range of -1 to 1
+            float normalizedAngleDifference = angleDifference / 35f; // Assuming 35 degrees is the maximum arc
+
+            // Calculate the target position based on the normalized angle difference
+            float targetPositionY = initialOffset.y + normalizedAngleDifference * (maxDistancePositive - maxDistanceNegative) / 2;
+
             // Get the current position of the arm (relative to the ship's position)
             Vector2f currentArmPosition = weapon.getSlot().getLocation();
 
-            // Move the arm based on the angle difference
-            if (angleDifference > 0 && currentArmPosition.y < initialOffset.y + maxDistancePositive) {
-                // Move the arm upwards
-                currentArmPosition.y += movementSpeed * amount;
-            } else if (angleDifference < 0 && currentArmPosition.y > initialOffset.y + maxDistanceNegative) {
-                // Move the arm downwards
-                currentArmPosition.y -= movementSpeed * amount;
-            }
+            // Directly set the arm's position to the target position for faster response
+            currentArmPosition.y = targetPositionY;
 
             // Ensure the arm position stays within bounds
             currentArmPosition.y = Math.min(Math.max(currentArmPosition.y, initialOffset.y + maxDistanceNegative), initialOffset.y + maxDistancePositive);
