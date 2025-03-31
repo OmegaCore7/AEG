@@ -1,27 +1,22 @@
 {
   "id": "AEG_4g_left_boltingdriver",
-  "specClass": "beam",
+  "specClass": "projectile",
+  "projectileSpecId": "AEG_boltingdriver_shot",
   "type": "ENERGY",
   "size": "SMALL",
-  #"beamEffect": "data.scripts.weapons.AEG_4G_boltingdriver",
-  "collisionClass": "RAY",
-  "collisionClassByFighter": "RAY_FIGHTER",
-   "everyFrameEffect": "data.weapons.scripts.AEG_4g_left_boltdriver",
+  "everyFrameEffect": "data.weapons.scripts.AEG_4g_left_boltdriver",
   "turretSprite": "graphics/ships/4g/4g_boltingdriver_arml_00.png",
   "turretGlowSprite": "graphics/ships/4g/4g_boltingdriver_arml_glow.png",
   "hardpointSprite": "graphics/ships/4g/4g_boltingdriver_arml_00.png",
   "showDamageWhenDecorative": true,
-  "numFrames": 2,
-  "frameRate": 1,
   "glowColor": [
     255,
-    100,
+    255,
     0,
     255
   ],
-  "hitGlowRadius": 10,
   "turretOffsets": [
-    47,
+    43,
     32.5
   ],
   "turretAngleOffsets": [
@@ -34,31 +29,23 @@
   "hardpointAngleOffsets": [
     0
   ],
-  "beamFireOnlyOnFullCharge": true,
-  "fringeColor": [
-    255,
-    100,
-    50,
-    255
-  ],
-  "coreColor": [
-    255,
-    200,
-    200,
-    255
-  ],
-  "width": 30,
-  "textureType": [
-    "graphics/armaa/fx/armaa_parax_beam_fringe.png",
-    "graphics/armaa/fx/armaa_ppa_beam_core.png"
-  ],
-  "textureScrollSpeed": 300,
-  "pixelsPerTexel": 3,
-  "pierceSet": [
-    PROJECTILE_FF,
-    PROJECTILE_NO_FF,
-    PROJECTILE_FIGHTER
-  ],
-  "fireSoundOne": "laser_intro",
-  "fireSoundTwo": "armaa_saber_loop"
+  "barrelMode": "ALTERNATING",
+  "animationType": "GLOW_AND_FLASH",
+  "numFrames": 2,
+  "frameRate": 1,
+  "muzzleFlashSpec": {
+    "length": 75,
+    "spread": 20,
+    "particleSizeMin": 20,
+    "particleSizeRange": 15,
+    "particleDuration": 0.12,
+    "particleCount": 25,
+    "particleColor": [
+      200,
+      200,
+      50,
+      255
+    ]
+  },
+  "fireSoundTwo": "antimatter_blaster_fire"
 }
