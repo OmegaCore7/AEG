@@ -12,6 +12,8 @@ import java.util.List;
 
 public class AEG_BoltingDriverEffect implements OnHitEffectPlugin {
 
+    private static boolean effectActive = false;
+
     @Override
     public void onHit(DamagingProjectileAPI projectile, final CombatEntityAPI target, final Vector2f point, boolean shieldHit, ApplyDamageResultAPI damageResult, final CombatEngineAPI engine) {
         // Create hit particles
@@ -28,45 +30,53 @@ public class AEG_BoltingDriverEffect implements OnHitEffectPlugin {
                     10f, target.getShield() != null ? target.getShield().getRingColor() : Misc.getHighlightColor(), target.getShield() != null ? target.getShield().getRingColor() : Misc.getHighlightColor());
         }
 
-        // Apply 10 second timer effect
-        engine.addPlugin(new BaseEveryFrameCombatPlugin() {
-            private float timer = 10f;
+        // Apply 10 second timer effect if not already active
+        if (!effectActive) {
+            effectActive = true;
+            engine.addPlugin(new BaseEveryFrameCombatPlugin() {
+                private float timer = 10f;
 
-            @Override
-            public void advance(float amount, List<InputEventAPI> events) {
-                if (timer <= 0) {
-                    engine.removePlugin(this);
-                    return;
-                }
+                @Override
+                public void advance(float amount, List<InputEventAPI> events) {
+                    if (timer <= 0) {
+                        engine.removePlugin(this);
+                        effectActive = false;
+                        return;
+                    }
 
-                timer -= amount;
+                    timer -= amount;
 
-                // Create expanding ring and nebula effects
-                float radius = 700f * (1 - timer / 10f);
-                for (int i = 0; i < 5; i++) {
-                    Vector2f nebulaPoint = Misc.getPointWithinRadius(point, radius);
-                    float nebulaSize = 50f + (float)(Math.random() * 100f);
-                    engine.addNebulaParticle(nebulaPoint, new Vector2f(), nebulaSize, 1, 0.5f, 0.5f, 1f, Misc.getHighlightColor());
-                }
+                    // Create expanding ring and nebula effects along the circumference
+                    float radius = 700f * (1 - timer / 10f);
+                    for (int i = 0; i < 5; i++) {
+                        float angle = (float) (Math.random() * 2 * Math.PI);
+                        Vector2f nebulaPoint = new Vector2f(
+                                point.x + radius * (float) Math.cos(angle),
+                                point.y + radius * (float) Math.sin(angle)
+                        );
+                        float nebulaSize = 50f + (float)(Math.random() * 100f);
+                        engine.addNebulaParticle(nebulaPoint, new Vector2f(), nebulaSize, 1, 0.5f, 0.5f, 1f, Misc.getHighlightColor());
+                    }
 
-                // Apply pull and push effects
-                for (CombatEntityAPI entity : CombatUtils.getEntitiesWithinRange(point, 700f)) {
-                    if (entity instanceof ShipAPI) {
-                        Vector2f direction = Vector2f.sub(entity.getLocation(), point, null);
-                        float distance = direction.length();
-                        direction.normalise();
+                    // Apply pull and push effects
+                    for (CombatEntityAPI entity : CombatUtils.getEntitiesWithinRange(point, 700f)) {
+                        if (entity instanceof ShipAPI) {
+                            Vector2f direction = Vector2f.sub(entity.getLocation(), point, null);
+                            float distance = direction.length();
+                            direction.normalise();
 
-                        if (entity == target) {
-                            // Pull the hit ship
-                            direction.scale(-150f);
-                        } else if (entity.getOwner() != engine.getPlayerShip().getOwner()) {
-                            // Push other ships
-                            direction.scale(150f);
+                            if (entity == target) {
+                                // Pull the hit ship
+                                direction.scale(-150f);
+                            } else if (entity.getOwner() != engine.getPlayerShip().getOwner()) {
+                                // Push other ships
+                                direction.scale(150f);
+                            }
+                            Vector2f.add(entity.getVelocity(), direction, entity.getVelocity());
                         }
-                        Vector2f.add(entity.getVelocity(), direction, entity.getVelocity());
                     }
                 }
-            }
-        });
+            });
+        }
     }
 }
