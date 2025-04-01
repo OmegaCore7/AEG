@@ -4,10 +4,9 @@ import com.fs.starfarer.api.combat.*;
 import com.fs.starfarer.api.combat.listeners.ApplyDamageResultAPI;
 import com.fs.starfarer.api.input.InputEventAPI;
 import com.fs.starfarer.api.util.Misc;
-import org.lwjgl.util.vector.Vector2f;
 import org.lazywizard.lazylib.combat.CombatUtils;
+import org.lwjgl.util.vector.Vector2f;
 
-import java.awt.Color;
 import java.util.List;
 
 public class AEG_BoltingDriverEffect implements OnHitEffectPlugin {
@@ -30,11 +29,11 @@ public class AEG_BoltingDriverEffect implements OnHitEffectPlugin {
                     10f, target.getShield() != null ? target.getShield().getRingColor() : Misc.getHighlightColor(), target.getShield() != null ? target.getShield().getRingColor() : Misc.getHighlightColor());
         }
 
-        // Apply 10 second timer effect if not already active
+        // Apply 20 second timer effect if not already active
         if (!effectActive) {
             effectActive = true;
             engine.addPlugin(new BaseEveryFrameCombatPlugin() {
-                private float timer = 10f;
+                private float timer = 20f;
 
                 @Override
                 public void advance(float amount, List<InputEventAPI> events) {
@@ -61,6 +60,11 @@ public class AEG_BoltingDriverEffect implements OnHitEffectPlugin {
                     // Apply pull and push effects
                     for (CombatEntityAPI entity : CombatUtils.getEntitiesWithinRange(point, 700f)) {
                         if (entity instanceof ShipAPI) {
+                            ShipAPI ship = (ShipAPI) entity;
+                            if (ship == engine.getPlayerShip()) {
+                                continue; // Skip the player ship
+                            }
+
                             Vector2f direction = Vector2f.sub(entity.getLocation(), point, null);
                             float distance = direction.length();
                             direction.normalise();
@@ -68,7 +72,7 @@ public class AEG_BoltingDriverEffect implements OnHitEffectPlugin {
                             if (entity == target) {
                                 // Pull the hit ship
                                 direction.scale(-150f);
-                            } else if (entity.getOwner() != engine.getPlayerShip().getOwner()) {
+                            } else {
                                 // Push other ships
                                 direction.scale(150f);
                             }
