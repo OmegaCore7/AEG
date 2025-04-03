@@ -4,6 +4,7 @@
   "projectileSpecId": "AEG_dummy_invisible",
   "type": "DECORATIVE",
   "size": "SMALL",
+  "everyFrameEffect": "data.weapons.scripts.AEG_4G_ChangeWeaponColorPlugin",
   "turretSprite": "graphics/ships/4g/4g_body.png",
   "hardpointSprite": "graphics/ships/4g/4g_body.png",
   "showDamageWhenDecorative": true,

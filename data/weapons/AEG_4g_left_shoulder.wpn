@@ -6,6 +6,7 @@
   "size": "SMALL",
   "turretSprite": "graphics/ships/4g/4g_leftshoulder.png",
   "hardpointSprite": "graphics/ships/4g/4g_leftshoulder.png",
+  "everyFrameEffect": "data.weapons.scripts.AEG_4G_ChangeWeaponColorPlugin",
   "showDamageWhenDecorative": true,
   "turretOffsets": [
     0,

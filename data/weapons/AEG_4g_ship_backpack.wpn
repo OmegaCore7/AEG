@@ -1,12 +1,12 @@
 {
-  "id": "AEG_4g_right_shoulder",
+  "id": "AEG_4g_ship_backpack",
   "specClass": "projectile",
   "projectileSpecId": "AEG_dummy_invisible",
   "type": "DECORATIVE",
   "size": "SMALL",
-  "turretSprite": "graphics/ships/4g/4g_rightshoulder.png",
-  "hardpointSprite": "graphics/ships/4g/4g_rightshoulder.png",
   "everyFrameEffect": "data.weapons.scripts.AEG_4G_ChangeWeaponColorPlugin",
+  "turretSprite": "graphics/ships/4g/4g_ship_backpack.png",
+  "hardpointSprite": "graphics/ships/4g/4g_leftshoulder.png",
   "showDamageWhenDecorative": true,
   "turretOffsets": [
     0,

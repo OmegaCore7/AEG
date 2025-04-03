@@ -34,6 +34,7 @@
     "WS0015": "riftlance",
     "WS0016": "locust",
     "WS0017": "locust",
+    "WS0018": "AEG_4g_ship_backpack",
     "WS0019": "AEG_4g_rightkneedrill",
     "WS0020": "hurricane",
     "WS0021": "hurricane"
@@ -45,7 +46,7 @@
       "type": "BUILT_IN",
       "mount": "TURRET",
       "arc": 20,
-      "angle": 1.5,
+      "angle": 0,
       "locations": [2, -0],
       "renderOrderMod": 1
     },
@@ -230,6 +231,15 @@
       "arc": 0,
       "angle": -90,
       "locations": [-37, -70.5]
+    },
+    {
+      "id": "WS0018",
+      "size": "SMALL",
+      "type": "BUILT_IN",
+      "mount": "TURRET",
+      "arc": 4,
+      "angle": 0,
+      "locations": [-37, -0]
     }
   ],
   "engineSlots": [
