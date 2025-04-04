@@ -55,7 +55,7 @@
     },
     {
       "autofire": true,
-      "mode": "ALTERNATING",
+      "mode": "LINKED",
       "weapons": {
         "WS0001": "AEG_4g_torso",
         "WS0003": "AEG_4g_left_shoulder",

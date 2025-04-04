@@ -2,7 +2,7 @@
     "id": "AEG_HellHeaven",
     "type":"ENGINE_MOD",
     "aiType":"MANEUVERING_JETS",
-    #"statsScript": "data.shipsystems.scripts.AEG_HellHeaven",
+    "statsScript": "data.shipsystems.scripts.AEG_HellHeaven",
     "flameoutOnImpactChance": 0,
 
     "clampTurnRateAfter": true,
