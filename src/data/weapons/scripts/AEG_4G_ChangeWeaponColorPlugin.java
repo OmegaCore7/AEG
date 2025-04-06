@@ -36,23 +36,23 @@ public class AEG_4G_ChangeWeaponColorPlugin implements EveryFrameWeaponEffectPlu
         // Apply effects during charge-up phase
         if (timeElapsed > 0f && timeElapsed < 4f) {
             // Dynamic particle effect during charge-up
-            float ballSize = 10f + (40f * (timeElapsed / 4f)); // Ball grows over time, max size 50f
+            float ballSize = 2f + (20f * (timeElapsed / 4f)); // Ball grows over time, max size 22f
             Vector2f ballLocation = new Vector2f(ship.getLocation().x, ship.getLocation().y + 70);
 
             // Create swirling particles to form the ball
-            for (int i = 0; i < 50; i++) {
+            for (int i = 0; i < 5; i++) {
                 float angle = (float) (Math.random() * 2 * Math.PI);
                 float distance = (float) (Math.random() * ballSize);
                 Vector2f particlePoint = new Vector2f(
                         ballLocation.x + distance * (float) Math.cos(angle),
                         ballLocation.y + distance * (float) Math.sin(angle)
                 );
-                float particleSize = 5f + (float)(Math.random() * 10f);
+                float particleSize = 2f + (float)(Math.random() * 5f);
                 engine.addHitParticle(particlePoint, new Vector2f(), particleSize, 1, 0.5f, NEBULA_COLOR);
             }
 
             // Particles flowing into the ball
-            for (int i = 0; i < 10; i++) {
+            for (int i = 0; i < 4; i++) {
                 float angle = (float) (Math.random() * 2 * Math.PI);
                 Vector2f particlePoint = new Vector2f(
                         ballLocation.x + 75f * (float) Math.cos(angle),
@@ -62,7 +62,7 @@ public class AEG_4G_ChangeWeaponColorPlugin implements EveryFrameWeaponEffectPlu
                         (ballLocation.x - particlePoint.x) / 4f,
                         (ballLocation.y - particlePoint.y) / 4f
                 ); // Particles move towards the ball
-                float particleSize = 5f + (float)(Math.random() * 10f);
+                float particleSize = 2f + (float)(Math.random() * 5f);
                 float transparency = 0.1f + (0.9f * (1 - timeElapsed / 4f)); // More transparent further away
                 Color particleColor = new Color(
                         (int)(NEBULA_COLOR.getRed() * transparency + TEAL_COLOR.getRed() * (1 - transparency)),
@@ -77,9 +77,11 @@ public class AEG_4G_ChangeWeaponColorPlugin implements EveryFrameWeaponEffectPlu
             if (lightningInterval.intervalElapsed()) {
                 Vector2f startPoint = new Vector2f(ship.getLocation().x + 60, ship.getLocation().y + 70);
                 Vector2f endPoint = new Vector2f(ship.getLocation().x - 60, ship.getLocation().y + 70);
+                Vector2f centerPoint = new Vector2f(ship.getLocation().x - 0, ship.getLocation().y + 70);
                 float lightningLength = 70f - (65f * (timeElapsed / 4f)); // Shortens over time
                 engine.spawnEmpArc(ship, startPoint, ship, ship, DamageType.ENERGY, 0, 0, 1000f, null, 10f, new Color(255,0,0), new Color(255,200,200,255));
                 engine.spawnEmpArc(ship, endPoint, ship, ship, DamageType.ENERGY, 0, 0, 1000f, null, 10f, new Color(255,255,0), new Color(255,255,200,255));
+                engine.spawnEmpArc(ship, centerPoint, ship, ship, DamageType.ENERGY, 0, 0, 1000f, null, 10f, new Color(0,255,0), new Color(200,255,200,255));
             }
         }
 
