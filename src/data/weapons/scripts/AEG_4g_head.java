@@ -61,8 +61,8 @@ public class AEG_4g_head implements EveryFrameWeaponEffectPlugin {
 
         Color particleColor;
         if (chargeUpTime >= CHARGE_UP_DURATION) {
-            weapon.getSprite().setColor(Color.GREEN);
-            particleColor = Color.GREEN;
+            weapon.getSprite().setColor(new Color(0, 255, 100, 255));
+            particleColor = new Color(0, 255, 100, 255);
         } else {
             weapon.getSprite().setColor(Color.WHITE);
             particleColor = new Color(255, 140, 0);

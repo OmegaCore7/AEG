@@ -101,7 +101,7 @@ public class AEG_4g_legs implements EveryFrameWeaponEffectPlugin {
         }
 
         if (isRightKneeDrillActive(ship)) {
-            renderFrame(weapon, "graphics/ships/4g/legs/4g_legs_06.png", colorChanged ? Color.GREEN : Color.WHITE);
+            renderFrame(weapon, "graphics/ships/4g/legs/4g_legs_06.png", colorChanged ? new Color(0,255,100,255) : Color.WHITE);
             return;
         }
 
@@ -138,7 +138,7 @@ public class AEG_4g_legs implements EveryFrameWeaponEffectPlugin {
             frameStr = String.valueOf(frame);
         }
         String spritePath = "graphics/ships/4g/legs/4g_legs_" + frameStr + ".png";
-        Color renderColor = colorChanged ? Color.GREEN : Color.WHITE;
+        Color renderColor = colorChanged ? new Color(0,255,100,255) : Color.WHITE;
 
         renderFrame(weapon, spritePath, renderColor);
     }

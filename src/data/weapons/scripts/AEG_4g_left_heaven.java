@@ -9,7 +9,7 @@ import org.magiclib.util.MagicRender;
 public class AEG_4g_left_heaven implements EveryFrameWeaponEffectPlugin {
 
     private static final Color CHARGEUP_COLOR = new Color(255, 255, 0, 255); // Yellow color for charge-up
-    private static final Color ACTIVE_COLOR = new Color(0, 255, 0, 255); // Green color for active
+    private static final Color ACTIVE_COLOR = new Color(0, 255, 100, 255); // Green color for active
     private static final Color PARTICLE_COLOR = new Color(255, 255, 50, 255); // Ripple effect color
     private boolean runOnce = false;
     private boolean rippleEffectTriggered = false;  // Flag to ensure ripple effect is triggered only once

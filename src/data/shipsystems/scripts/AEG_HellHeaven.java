@@ -13,7 +13,7 @@ import java.util.ArrayList;
 public class AEG_HellHeaven extends BaseShipSystemScript {
 
     private static final float RADIUS = 1000f;
-    private static final Color NEBULA_COLOR = new Color(0, 255, 0, 255); // Green color
+    private static final Color NEBULA_COLOR = new Color(0, 255, 100, 255); // Green color
     private IntervalUtil effectInterval = new IntervalUtil(0.1f, 0.1f); // Interval for effect updates
     private IntervalUtil smallLightningInterval = new IntervalUtil(1f, 2f); // Interval for small lightning effects
     private IntervalUtil largeLightningInterval = new IntervalUtil(4f, 4f); // Interval for large lightning bolt
