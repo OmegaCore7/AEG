@@ -76,13 +76,13 @@ public class AEG_4G_ChangeWeaponColorPlugin implements EveryFrameWeaponEffectPlu
             // Lightning strikes to the front of the ship, gradually moving towards (70, 0)
             if (lightningInterval.intervalElapsed()) {
                 float progress = timeElapsed / 4f;
-                Vector2f startPoint = transformRelativeToShip(ship, new Vector2f(70, 65 * (1 - progress)));
-                Vector2f endPoint = transformRelativeToShip(ship, new Vector2f(70, -65 * (1 - progress)));
+                Vector2f startPoint = transformRelativeToShip(ship, new Vector2f(70, -65 * (1 - progress)));
+                Vector2f endPoint = transformRelativeToShip(ship, new Vector2f(70, 65 * (1 - progress)));
                 Vector2f centerPoint = transformRelativeToShip(ship, new Vector2f(70, 0));
                 float lightningLength = 70f - (65f * progress); // Shortens over time
-                engine.spawnEmpArc(ship, startPoint, ship, ship, DamageType.ENERGY, 0, 0, 1000f, null, 10f, new Color(255,0,0), new Color(255,200,200,255));
-                engine.spawnEmpArc(ship, endPoint, ship, ship, DamageType.ENERGY, 0, 0, 1000f, null, 10f, new Color(255,255,0), new Color(255,255,200,255));
-                engine.spawnEmpArc(ship, centerPoint, ship, ship, DamageType.ENERGY, 0, 0, 1000f, null, 10f, new Color(0,255,100), new Color(200,255,200,255));
+                engine.spawnEmpArc(ship, startPoint, ship, ship, DamageType.ENERGY, 0, 0, 100f, null, 10f, new Color(255,0,0), new Color(255,200,200,255));
+                engine.spawnEmpArc(ship, endPoint, ship, ship, DamageType.ENERGY, 0, 0, 100f, null, 10f, new Color(255,255,0), new Color(255,255,200,255));
+                engine.spawnEmpArc(ship, centerPoint, ship, ship, DamageType.ENERGY, 0, 0, 100f, null, 10f, new Color(0,255,100), new Color(200,255,200,255));
             }
         }
 
