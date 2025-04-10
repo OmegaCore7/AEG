@@ -11,6 +11,9 @@ import java.awt.Color;
 import java.util.List;
 import java.util.ArrayList;
 
+// Import the helper script
+import data.shipsystems.helpers.AEG_4g_HHImpact;
+
 public class AEG_HellHeaven extends BaseShipSystemScript {
 
     private static final float RADIUS = 1000f;
@@ -25,7 +28,7 @@ public class AEG_HellHeaven extends BaseShipSystemScript {
     private int rightIndex = 15;
 
     @Override
-    public void apply(final MutableShipStatsAPI stats, final String id, State state, float effectLevel) {
+    public void apply(final MutableShipStatsAPI stats, final String id, final State state, final float effectLevel) {
         final ShipAPI ship = (ShipAPI) stats.getEntity();
         if (ship == null) return;
 
@@ -143,8 +146,8 @@ public class AEG_HellHeaven extends BaseShipSystemScript {
                         stats.getArmorDamageTakenMult().modifyMult(id, 0.01f);
                         stats.getShieldDamageTakenMult().modifyMult(id, 0.01f);
 
-                        // Handle weapon hits
-                        handleWeaponHits(ship);
+                        // Check for collision conditions and apply helper script
+                        new AEG_4g_HHImpact().apply(stats, id, state, effectLevel);
                     }
                 });
             }
@@ -268,65 +271,5 @@ public class AEG_HellHeaven extends BaseShipSystemScript {
             return new StatusData("HellHeaven system active", false);
         }
         return null;
-    }
-
-    private void handleWeaponHits(ShipAPI ship) {
-        for (DamagingProjectileAPI projectile : Global.getCombatEngine().getProjectiles()) {
-            if (projectile.getOwner() != ship.getOwner() && MathUtils.getDistance(ship, projectile) < RADIUS) {
-                // Prevent damage by removing the projectile
-                Global.getCombatEngine().removeEntity(projectile);
-
-                // Create splash particles
-                createSplashParticles(ship, projectile.getLocation(), projectile.getProjectileSpec().getFringeColor());
-            }
-        }
-
-        for (MissileAPI missile : Global.getCombatEngine().getMissiles()) {
-            if (missile.getOwner() != ship.getOwner() && MathUtils.getDistance(ship, missile) < RADIUS) {
-                // Prevent damage by removing the missile
-                Global.getCombatEngine().removeEntity(missile);
-
-                // Create splash particles
-                createSplashParticles(ship, missile.getLocation(), missile.getSpec().getGlowColor());
-            }
-        }
-
-        for (BeamAPI beam : Global.getCombatEngine().getBeams()) {
-            if (beam.getSource().getOwner() != ship.getOwner() && MathUtils.getDistance(ship, beam.getTo()) < RADIUS) {
-                // Prevent damage by setting the beam's endpoint to the ship's location
-                beam.getTo().set(ship.getLocation().x, ship.getLocation().y);
-
-                // Create splash particles
-                createSplashParticles(ship, beam.getTo(), beam.getWeapon().getSpec().getGlowColor());
-            }
-        }
-    }
-
-    private void createSplashParticles(ShipAPI ship, Vector2f impactPoint, Color initialColor) {
-        // Create particles splashing outward
-        for (int i = 0; i < 10; i++) {
-            float angle = (float) (Math.random() * 2 * Math.PI);
-            float distance = 5f + (float) (Math.random() * 10f);
-            Vector2f particlePoint = new Vector2f(
-                    impactPoint.x + distance * (float) Math.cos(angle),
-                    impactPoint.y + distance * (float) Math.sin(angle)
-            );
-            float particleSize = 2f + (float) (Math.random() * 5f);
-            float transparency = 1f - (distance / 15f); // Dimmer as they move away
-            Global.getCombatEngine().addHitParticle(particlePoint, new Vector2f(), particleSize, transparency, 0.5f, initialColor);
-        }
-
-        // Create particles returning to the ship
-        for (int i = 0; i < 5; i++) {
-            float angle = (float) (Math.random() * 2 * Math.PI);
-            float distance = 10f + (float) (Math.random() * 20f);
-            Vector2f reboundPoint = new Vector2f(
-                    ship.getLocation().x + distance * (float) Math.cos(angle),
-                    ship.getLocation().y + distance * (float) Math.sin(angle)
-            );
-            float particleSize = 3f + (float) (Math.random() * 6f);
-            float transparency = 1f - (distance / 30f); // Dimmer as they move away
-            Global.getCombatEngine().addHitParticle(reboundPoint, new Vector2f(), particleSize, transparency, 0.5f, new Color(0, 255, 255, 255));
-        }
     }
 }

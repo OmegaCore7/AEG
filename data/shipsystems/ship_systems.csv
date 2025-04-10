@@ -5,5 +5,5 @@ True Destruction Steel Fist Barrage,AEG_SteelBarrage,,,,,,,,5		,1,,,,15,True,,,,
 Giga Drill Breaker,AEG_GDBreaker,,,,,,,,,,,15		,0.05,5,True,,,,,,,,,,,,graphics/icons/hullsys/displacer.png
 Majin Change,AEG_MajinChange,,,,,,,,,,,20	,0.05,10,True,,,,,,,,,,,,graphics/icons/hullsys/displacer.png
 Quantum System Override	,AEG_QuantumComputation,,,,,,,,5		,0.09	,4,0,0,0.5,,,,,,,,,,,,,graphics/icons/hullsys/displacer.png
-Two Powers As One,AEG_HellHeaven,,,,,,,,,,4,30,0.05,0,False,,,,,,,,True,,,,graphics/icons/hullsys/displacer.png
+Two Powers As One,AEG_HellHeaven,,,,,,,,,,4,30,0.05,0,False,,,,True,,,,True,,,,graphics/icons/hullsys/displacer.png
 More than Meets the Eye	,AEG_bwtransform,,,,,,,,,,1,,1,,True,,,,,,,,,,,,graphics/icons/hullsys/displacer.png
