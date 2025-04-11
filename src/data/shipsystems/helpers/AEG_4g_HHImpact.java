@@ -4,6 +4,7 @@ import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.combat.*;
 import com.fs.starfarer.api.impl.combat.BaseShipSystemScript;
 import com.fs.starfarer.api.input.InputEventAPI;
+import com.fs.starfarer.api.util.IntervalUtil;
 import com.fs.starfarer.api.util.Misc;
 import org.lazywizard.lazylib.MathUtils;
 import org.lwjgl.util.vector.Vector2f;
@@ -18,6 +19,7 @@ public class AEG_4g_HHImpact extends BaseShipSystemScript {
     private static final int EFFECT_DURATION = 3; // Reduced duration for efficiency
     private float lastImpactTime = 0f;
     private Random random = new Random();
+    private boolean collisionDetected = false;
 
     @Override
     public void apply(MutableShipStatsAPI stats, String id, State state, float effectLevel) {
