@@ -124,32 +124,33 @@ public class AEG_HellHeaven extends BaseShipSystemScript {
                         applyFieldDamage(ship, amount);
 
                         // Apply slowing and flux overload to enemy ships within the field
-                        applySlowingAndFluxOverload(ship);
+                        applySlowingAndFluxOverload(ship, amount);
 
                         // Create green lightning strikes on enemy ships within the field
                         if (enemyLightningInterval.intervalElapsed()) {
                             createEnemyLightningStrikes(ship);
                         }
 
-                        // Increase ship speed and maneuverability
-                        stats.getMaxSpeed().modifyMult(id, 3f);
-                        stats.getAcceleration().modifyMult(id, 2f);
-                        stats.getDeceleration().modifyMult(id, 2f);
-                        stats.getTurnAcceleration().modifyMult(id, 2f);
-                        stats.getMaxTurnRate().modifyMult(id, 2f);
-
-                        // Increase visual flame size on engines
-                        ship.getEngineController().extendFlame(id, 1.5f, 0.5f, 0.5f);
-
-                        // Reduce damage received by 99%
-                        stats.getHullDamageTakenMult().modifyMult(id, 0.01f);
-                        stats.getArmorDamageTakenMult().modifyMult(id, 0.01f);
-                        stats.getShieldDamageTakenMult().modifyMult(id, 0.01f);
-
-                        // Check for collision conditions and apply helper script
-                        new AEG_4g_HHImpact().apply(stats, id, state, effectLevel);
+                        // Integrate the helper script for impact effects
+                        AEG_4g_HHImpact impactHelper = new AEG_4g_HHImpact();
+                        impactHelper.apply(stats, id, state, effectLevel);
                     }
                 });
+
+                // Increase ship speed and maneuverability
+                stats.getMaxSpeed().modifyMult(id, 3f);
+                stats.getAcceleration().modifyMult(id, 2f);
+                stats.getDeceleration().modifyMult(id, 2f);
+                stats.getTurnAcceleration().modifyMult(id, 2f);
+                stats.getMaxTurnRate().modifyMult(id, 2f);
+
+                // Increase visual flame size on engines
+                ship.getEngineController().extendFlame(id, 1.5f, 0.5f, 0.5f);
+
+                // Reduce damage received by 99%
+                stats.getHullDamageTakenMult().modifyMult(id, 0.01f);
+                stats.getArmorDamageTakenMult().modifyMult(id, 0.01f);
+                stats.getShieldDamageTakenMult().modifyMult(id, 0.01f);
             }
         } else {
             effectActive = false;
@@ -217,7 +218,7 @@ public class AEG_HellHeaven extends BaseShipSystemScript {
         }
     }
 
-    private void applySlowingAndFluxOverload(ShipAPI ship) {
+    private void applySlowingAndFluxOverload(ShipAPI ship, float amount) {
         for (ShipAPI enemy : Global.getCombatEngine().getShips()) {
             if (enemy.getOwner() != ship.getOwner() && MathUtils.getDistance(ship, enemy) < RADIUS) {
                 // Apply slowing effect
@@ -229,6 +230,12 @@ public class AEG_HellHeaven extends BaseShipSystemScript {
 
                 // Apply flux overload
                 enemy.getFluxTracker().beginOverloadWithTotalBaseDuration(1f);
+
+                // Apply force to hold enemy ships in place
+                Vector2f velocity = enemy.getVelocity();
+                Vector2f counterForce = new Vector2f(-velocity.x, -velocity.y);
+                enemy.getVelocity().set(0, 0); // Reset velocity to zero
+                enemy.getLocation().translate(counterForce.x * amount, counterForce.y * amount); // Apply counteracting force
             }
         }
     }
