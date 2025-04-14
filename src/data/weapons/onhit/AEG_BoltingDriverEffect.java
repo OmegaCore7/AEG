@@ -53,7 +53,7 @@ public class AEG_BoltingDriverEffect implements OnHitEffectPlugin {
                                 point.x + radius * (float) Math.cos(angle),
                                 point.y + radius * (float) Math.sin(angle)
                         );
-                        float nebulaSize = 50f + (float)(Math.random() * 100f);
+                        float nebulaSize = 25f + (float)(Math.random() * 50f);
                         engine.addNebulaParticle(nebulaPoint, new Vector2f(), nebulaSize, 1, 0.5f, 0.5f, 1f, Misc.getHighlightColor());
                     }
 
@@ -71,10 +71,10 @@ public class AEG_BoltingDriverEffect implements OnHitEffectPlugin {
 
                             if (entity == target) {
                                 // Pull the hit ship
-                                direction.scale(-150f);
+                                direction.scale(-125f);
                             } else {
                                 // Push other ships
-                                direction.scale(150f);
+                                direction.scale(125f);
                             }
                             Vector2f.add(entity.getVelocity(), direction, entity.getVelocity());
                         }
