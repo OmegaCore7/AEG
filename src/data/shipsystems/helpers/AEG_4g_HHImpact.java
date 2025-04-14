@@ -20,7 +20,7 @@ public class AEG_4g_HHImpact extends BaseShipSystemScript {
     private static final int EFFECT_DURATION = 3; // Reduced duration for efficiency
     private static final int EXPLOSION_DELAY = 2; // Delay before explosion
     private static final float DAMAGE_DELAY = 2f; // Delay before damage
-    private static final int EXPLOSION_DAMAGE = 4000; // Explosion damage
+    // Explosion damage
     private static final float EXPLOSION_RADIUS = 150f; // Radius of the explosion
     private float lastImpactTime = 0f;
     private Random random = new Random();
@@ -96,18 +96,20 @@ public class AEG_4g_HHImpact extends BaseShipSystemScript {
 
                                             if (elapsedTime >= explosionTime && elapsedTime < damageTime) {
                                                 Vector2f targetCenter = target.getLocation(); // Center of the enemy ship
-                                                Global.getCombatEngine().spawnExplosion(targetCenter, new Vector2f(0, 0), new Color(100, 255, 150,200), EXPLOSION_RADIUS, 1f);
+                                                Global.getCombatEngine().spawnExplosion(targetCenter, new Vector2f(0, 0), new Color(100, 255, 150, 200), EXPLOSION_RADIUS, 1f);
                                             }
 
                                             if (elapsedTime >= damageTime) {
                                                 Vector2f targetCenter = target.getLocation(); // Center of the enemy ship
-                                                Global.getCombatEngine().applyDamage(target, targetCenter, EXPLOSION_DAMAGE, DamageType.HIGH_EXPLOSIVE, 0f, false, false, ship);
+                                                float remainingHull = target.getHitpoints(); // Get the target's remaining hull points
+                                                Global.getCombatEngine().applyDamage(target, targetCenter, remainingHull, DamageType.HIGH_EXPLOSIVE, 0f, false, false, ship);
 
                                                 // Remove the plugin after damage
                                                 Global.getCombatEngine().removePlugin(this);
                                             }
                                         }
                                     });
+
                                 }
 
                                 // Update the last impact time
