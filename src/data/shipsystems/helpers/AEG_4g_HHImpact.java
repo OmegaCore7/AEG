@@ -115,9 +115,9 @@ public class AEG_4g_HHImpact extends BaseShipSystemScript {
                     location.x + 10f * (float) Math.cos(angle),
                     location.y + 10f * (float) Math.sin(angle)
             );
-            Global.getCombatEngine().addHitParticle(point, velocity, 4f + random.nextFloat() * 6f, 2f, 2f + random.nextFloat() * 2.1f, new Color(255, 240, 180, 255));
-            Global.getCombatEngine().addHitParticle(point, velocity, 5f + random.nextFloat() * 12f, 1.5f, 2.1f + random.nextFloat() * 2.2f, new Color(255, 160, 80, 225));
-            Global.getCombatEngine().addHitParticle(point, velocity, 11f + random.nextFloat() * 18f, 1f, 2.2f + random.nextFloat() * 2.3f, new Color(100, 100, 100, 100));
+            Global.getCombatEngine().addHitParticle(point, velocity, 4f + random.nextFloat() * 6f, 2f, 1.5f + random.nextFloat() * 2f, new Color(255, 240, 180, 255));
+            Global.getCombatEngine().addHitParticle(point, velocity, 5f + random.nextFloat() * 12f, 1.5f, 1.5f + random.nextFloat() * 2f, new Color(255, 160, 80, 225));
+            Global.getCombatEngine().addHitParticle(point, velocity, 11f + random.nextFloat() * 18f, 1f, 1.5f + random.nextFloat() * 2f, new Color(100, 100, 100, 100));
         }
     }
 
