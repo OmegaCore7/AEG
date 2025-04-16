@@ -71,15 +71,21 @@ public class AEG_4g_HHImpact extends BaseShipSystemScript {
                                     timer += amount;
 
                                     if (timer >= BUILDUP_DURATION) {
+                                        // Spawn explosion Chunks
+                                        spawnExplosionChunks(center, 5); // 20 chunks, tweak as needed
+
                                         // Final damage
                                         if (target.isAlive()) {
                                             Global.getCombatEngine().applyDamage(target, center, 8000f, DamageType.HIGH_EXPLOSIVE, 1000f, true, true, ship);
                                         }
 
+                                        // Spawn explosion Chunks
+                                        spawnExplosionChunks(center, 20); // 20 chunks, tweak as needed
+
                                         // 360° shockwave distortion ripple
                                         WaveDistortion ripple = new WaveDistortion();
                                         ripple.setLocation(center);
-                                        ripple.setSize(400f);
+                                        ripple.setSize(350f);
                                         ripple.setIntensity(25f);
                                         ripple.setArc(0, 360);
                                         ripple.fadeInIntensity(0.1f);
@@ -87,6 +93,7 @@ public class AEG_4g_HHImpact extends BaseShipSystemScript {
                                         ripple.setLifetime(0.7f);
                                         ripple.setAutoFadeIntensityTime(0.1f);
                                         DistortionShader.addDistortion(ripple);
+
 
 
                                         Global.getCombatEngine().removePlugin(this);
@@ -105,9 +112,46 @@ public class AEG_4g_HHImpact extends BaseShipSystemScript {
             }
         });
     }
+    private void spawnExplosionChunks(Vector2f center, int count) {
+        for (int i = 0; i < count; i++) {
+            float angle = random.nextFloat() * 360f;
+            float speed = 375f + random.nextFloat() * 50f; // Fast and erratic
+            Vector2f velocity = (Vector2f) Misc.getUnitVectorAtDegreeAngle(angle).scale(speed);
 
+            Vector2f spawnPoint = new Vector2f(
+                    center.x + (float)Math.cos(Math.toRadians(angle)) * 10f,
+                    center.y + (float)Math.sin(Math.toRadians(angle)) * 10f
+            );
+
+            float size = 10f + random.nextFloat() * 25f;
+            float duration = 2f + random.nextFloat() * 2f;
+
+            // Spewing metal chunk — addHitParticle with low fade
+            Global.getCombatEngine().addHitParticle(
+                    spawnPoint,
+                    velocity,
+                    size,
+                    1.5f,
+                    duration,
+                    new Color(50, 255, 100, 200) // metallic grey
+            );
+
+            // Optional glow on some chunks
+            if (random.nextFloat() < 0.3f) {
+                Global.getCombatEngine().addHitParticle(
+                        spawnPoint,
+                        velocity,
+                        size * 1.5f,
+                        1f,
+                        duration * 0.5f,
+                        new Color(255, 100, 50, 200) // glowing orange
+                );
+            }
+        }
+    }
     private void spawnImpactParticles(Vector2f location) {
-        for (int i = 0; i < 10; i++) {
+        int numParticles = Math.min(5, random.nextInt(8) + 3);  // Randomize but cap at 5-10 particles
+        for (int i = 0; i < numParticles; i++) {
             float angle = random.nextFloat() * 360f;
             float speed = 50f + random.nextFloat() * 100f;
             Vector2f velocity = (Vector2f) Misc.getUnitVectorAtDegreeAngle(angle).scale(speed);
