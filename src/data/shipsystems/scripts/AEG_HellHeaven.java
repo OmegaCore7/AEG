@@ -5,14 +5,13 @@ import com.fs.starfarer.api.combat.*;
 import com.fs.starfarer.api.impl.combat.BaseShipSystemScript;
 import com.fs.starfarer.api.input.InputEventAPI;
 import com.fs.starfarer.api.util.IntervalUtil;
+import data.shipsystems.helpers.AEG_4g_HHImpact;
 import org.lazywizard.lazylib.MathUtils;
 import org.lwjgl.util.vector.Vector2f;
-import java.awt.Color;
-import java.util.List;
-import java.util.ArrayList;
 
-// Import the helper script
-import data.shipsystems.helpers.AEG_4g_HHImpact;
+import java.awt.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class AEG_HellHeaven extends BaseShipSystemScript {
 
@@ -95,7 +94,7 @@ public class AEG_HellHeaven extends BaseShipSystemScript {
                         if (smallLightningInterval.intervalElapsed() && timer > chargeUpTime) {
                             Vector2f startPoint = ringPoints.get(leftIndex);
                             Vector2f endPoint = ringPoints.get(rightIndex);
-                            if (ship != null && startPoint != null && endPoint != null) {
+                            if (startPoint != null && endPoint != null) {
                                 float width = 10f + (float)(Math.random() * 20f); // Random width
                                 float transparency = 0.5f + (float)(Math.random() * 0.5f); // Random transparency
                                 Global.getCombatEngine().spawnEmpArc(ship, startPoint, ship, ship, DamageType.ENERGY, 0, 0, 1100f, null, width, NEBULA_COLOR, new Color(200,255,200,255));
@@ -108,7 +107,7 @@ public class AEG_HellHeaven extends BaseShipSystemScript {
                         if (largeLightningInterval.intervalElapsed() && timer > chargeUpTime) {
                             Vector2f startPoint = ringPoints.get(leftIndex);
                             Vector2f endPoint = ringPoints.get(rightIndex);
-                            if (ship != null && startPoint != null && endPoint != null) {
+                            if (startPoint != null && endPoint != null) {
                                 float width = 40f + (float)(Math.random() * 20f); // Random width
                                 float transparency = 0.5f + (float)(Math.random() * 0.5f); // Random transparency
                                 Global.getCombatEngine().spawnEmpArc(ship, startPoint, ship, ship, DamageType.ENERGY, 0, 0, 1100f, null, width, NEBULA_COLOR, new Color(200,255,200,255));
@@ -130,7 +129,6 @@ public class AEG_HellHeaven extends BaseShipSystemScript {
                         if (enemyLightningInterval.intervalElapsed()) {
                             createEnemyLightningStrikes(ship);
                         }
-
                         // Integrate the helper script for impact effects
                         AEG_4g_HHImpact impactHelper = new AEG_4g_HHImpact();
                         impactHelper.apply(stats, id, state, effectLevel);
@@ -221,24 +219,17 @@ public class AEG_HellHeaven extends BaseShipSystemScript {
     private void applySlowingAndFluxOverload(ShipAPI ship, float amount) {
         for (ShipAPI enemy : Global.getCombatEngine().getShips()) {
             if (enemy.getOwner() != ship.getOwner() && MathUtils.getDistance(ship, enemy) < RADIUS) {
-                // Apply slowing effect
-                enemy.getMutableStats().getMaxSpeed().modifyMult("AEG_HellHeaven", 0.5f);
-                enemy.getMutableStats().getAcceleration().modifyMult("AEG_HellHeaven", 0.5f);
-                enemy.getMutableStats().getDeceleration().modifyMult("AEG_HellHeaven", 0.5f);
-                enemy.getMutableStats().getTurnAcceleration().modifyMult("AEG_HellHeaven", 0.5f);
-                enemy.getMutableStats().getMaxTurnRate().modifyMult("AEG_HellHeaven", 0.5f);
+                    // Apply flux overload
+                    enemy.getFluxTracker().beginOverloadWithTotalBaseDuration(1f);
 
-                // Apply flux overload
-                enemy.getFluxTracker().beginOverloadWithTotalBaseDuration(1f);
-
-                // Apply force to hold enemy ships in place
-                Vector2f velocity = enemy.getVelocity();
-                Vector2f counterForce = new Vector2f(-velocity.x, -velocity.y);
-                enemy.getVelocity().set(0, 0); // Reset velocity to zero
-                enemy.getLocation().translate(counterForce.x * amount, counterForce.y * amount); // Apply counteracting force
+                    // Apply force to hold enemy ships in place
+                    Vector2f velocity = enemy.getVelocity();
+                    Vector2f counterForce = new Vector2f(-velocity.x, -velocity.y);
+                    enemy.getVelocity().set(0, 0); // Reset velocity to zero
+                    enemy.getLocation().translate(counterForce.x * amount, counterForce.y * amount); // Apply counteracting force
+                }
             }
         }
-    }
 
     private void createEnemyLightningStrikes(ShipAPI ship) {
         for (ShipAPI enemy : Global.getCombatEngine().getShips()) {

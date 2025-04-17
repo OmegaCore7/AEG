@@ -20,16 +20,15 @@ import java.util.Random;
 public class AEG_4g_HHImpact extends BaseShipSystemScript {
 
     private static final float SPEED_THRESHOLD = 230f;
-    private static final float HIGH_SPEED_THRESHOLD = 600f;
+    public static final float HIGH_SPEED_THRESHOLD = 600f;
     private static final float IMPACT_INTERVAL = 1f;
-    private static final float BUILDUP_DURATION = 2f;
-
+    public static final float BUILDUP_DURATION = 2f;
     private float lastImpactTime = 0f;
     private boolean explosionTriggered = false;
     private final Random random = new Random();
 
     @Override
-    public void apply(MutableShipStatsAPI stats, String id, State state, float effectLevel) {
+    public void apply(MutableShipStatsAPI stats, final String id, State state, float effectLevel) {
         final ShipAPI ship = (ShipAPI) stats.getEntity();
         if (ship == null || state != State.ACTIVE) return;
 
@@ -56,6 +55,8 @@ public class AEG_4g_HHImpact extends BaseShipSystemScript {
 
                         if (ship.getVelocity().length() > HIGH_SPEED_THRESHOLD && !explosionTriggered) {
                             explosionTriggered = true;
+                            // Increase break apart chance
+                            target.getMutableStats().getBreakProb().modifyFlat(id, 1.0f); // Set to 100%
 
                             Global.getCombatEngine().addPlugin(new BaseEveryFrameCombatPlugin() {
                                 float timer = 0f;
@@ -71,6 +72,7 @@ public class AEG_4g_HHImpact extends BaseShipSystemScript {
                                     timer += amount;
 
                                     if (timer >= BUILDUP_DURATION) {
+
                                         // Spawn explosion Chunks
                                         spawnExplosionChunks(center, 5); // 20 chunks, tweak as needed
 
@@ -94,9 +96,8 @@ public class AEG_4g_HHImpact extends BaseShipSystemScript {
                                         ripple.setAutoFadeIntensityTime(0.1f);
                                         DistortionShader.addDistortion(ripple);
 
-
-
                                         Global.getCombatEngine().removePlugin(this);
+
                                     }
                                 }
                             });
