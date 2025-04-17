@@ -57,7 +57,6 @@ public class AEG_HellHeaven extends BaseShipSystemScript {
 
                         Vector2f location = ship.getLocation();
                         float radius;
-
                         if (timer <= chargeUpTime) {
                             // Charge-up phase: expanding ring
                             radius = RADIUS * (timer / chargeUpTime);
@@ -132,6 +131,15 @@ public class AEG_HellHeaven extends BaseShipSystemScript {
                         // Integrate the helper script for impact effects
                         AEG_4g_HHImpact impactHelper = new AEG_4g_HHImpact();
                         impactHelper.apply(stats, id, state, effectLevel);
+
+                        // Gradually increase player ship flux while system is active
+                        if (ship == Global.getCombatEngine().getPlayerShip()) {
+                            float maxFlux = ship.getMaxFlux();
+                            float ventRate = ship.getMutableStats().getVentRateMult().base;
+                            float systemDuration = ship.getSystem().getChargeUpDur() + ship.getSystem().getChargeActiveDur() + ship.getSystem().getChargeDownDur();
+                            float fluxPerSecond = maxFlux + ventRate / systemDuration;
+                            ship.getFluxTracker().increaseFlux(fluxPerSecond * amount, false);
+                        }
                     }
                 });
 
@@ -151,12 +159,61 @@ public class AEG_HellHeaven extends BaseShipSystemScript {
                 stats.getShieldDamageTakenMult().modifyMult(id, 0.01f);
             }
         } else {
-            effectActive = false;
+            if (effectActive) {
+                effectActive = false;
+
+                final CombatEngineAPI engine = Global.getCombatEngine();
+                final Vector2f loc = ship.getLocation();
+
+                // Quick burst of green light on system end
+                engine.addSmoothParticle(loc, new Vector2f(), 300f, 2f, 0.5f + (float)(Math.random() * 1f), new Color(0, 255, 100, 255));
+                engine.addSmoothParticle(loc, new Vector2f(), 150f, 1.5f, 0.5f + (float)(Math.random() * 1f), new Color(150, 255, 150, 200));
+                engine.addSmoothParticle(loc, new Vector2f(), 80f, 1.2f, 0.4f + (float)(Math.random() * 0.9f), new Color(200, 255, 200, 180));
+
+                // Lingering fading nebula trail effect
+                engine.addPlugin(new BaseEveryFrameCombatPlugin() {
+                    private float duration = 1f + (float)(Math.random() * 2f); // How long the trail lasts
+                    private float timer = 0f;
+
+                    @Override
+                    public void advance(float amount, List<InputEventAPI> events) {
+                        timer += amount;
+                        if (timer > duration) {
+                            engine.removePlugin(this);
+                            return;
+                        }
+
+                        // Radiating particles
+                        for (int i = 0; i < 6; i++) {
+                            float angle = (float) (Math.random() * 2f * Math.PI);
+                            float speed = 50f + (float) (Math.random() * 200f);
+                            Vector2f velocity = new Vector2f(
+                                    speed * (float) Math.cos(angle),
+                                    speed * (float) Math.sin(angle)
+                            );
+
+                            engine.addNebulaParticle(
+                                    ship.getLocation(),
+                                    velocity,
+                                    30f + (float) (Math.random() * 50f),
+                                    1.5f,
+                                    0.5f,
+                                    0.5f,
+                                    1f,
+                                    new Color(0, 255, 100, 150)
+                            );
+                            ship.setVentCoreColor(new Color(0,255,180,255));
+                            ship.setVentFringeColor(new Color(0,255,100,255));
+                        }
+                    }
+                });
+            }
+        }
+
             stats.getHullDamageTakenMult().unmodify(id);
             stats.getArmorDamageTakenMult().unmodify(id);
             stats.getShieldDamageTakenMult().unmodify(id);
         }
-    }
 
     private void reflectProjectilesAndMissiles(ShipAPI ship) {
         for (DamagingProjectileAPI projectile : Global.getCombatEngine().getProjectiles()) {
@@ -181,7 +238,6 @@ public class AEG_HellHeaven extends BaseShipSystemScript {
                 }
             }
         }
-
         for (MissileAPI missile : Global.getCombatEngine().getMissiles()) {
             if (missile.getOwner() != ship.getOwner() && MathUtils.getDistance(ship, missile) < RADIUS) {
                 // Reflect missiles
@@ -205,7 +261,6 @@ public class AEG_HellHeaven extends BaseShipSystemScript {
             }
         }
     }
-
     private void applyFieldDamage(ShipAPI ship, float amount) {
         for (ShipAPI enemy : Global.getCombatEngine().getShips()) {
             if (enemy.getOwner() != ship.getOwner() && MathUtils.getDistance(ship, enemy) < RADIUS) {
@@ -215,7 +270,6 @@ public class AEG_HellHeaven extends BaseShipSystemScript {
             }
         }
     }
-
     private void applySlowingAndFluxOverload(ShipAPI ship, float amount) {
         for (ShipAPI enemy : Global.getCombatEngine().getShips()) {
             if (enemy.getOwner() != ship.getOwner() && MathUtils.getDistance(ship, enemy) < RADIUS) {
@@ -230,7 +284,6 @@ public class AEG_HellHeaven extends BaseShipSystemScript {
                 }
             }
         }
-
     private void createEnemyLightningStrikes(ShipAPI ship) {
         for (ShipAPI enemy : Global.getCombatEngine().getShips()) {
             if (enemy.getOwner() != ship.getOwner() && MathUtils.getDistance(ship, enemy) < RADIUS) {
@@ -252,7 +305,6 @@ public class AEG_HellHeaven extends BaseShipSystemScript {
             }
         }
     }
-
     private Vector2f transformRelativeToShip(ShipAPI ship, Vector2f relative) {
         float facing = ship.getFacing() * (float) Math.PI / 180f;
         float cos = (float) Math.cos(facing);
@@ -262,7 +314,6 @@ public class AEG_HellHeaven extends BaseShipSystemScript {
                 ship.getLocation().y + relative.x * sin + relative.y * cos
         );
     }
-
     @Override
     public StatusData getStatusData(int index, State state, float effectLevel) {
         if (state == State.ACTIVE) {

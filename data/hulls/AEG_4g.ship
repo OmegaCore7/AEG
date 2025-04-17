@@ -408,6 +408,8 @@
       }
     }
   ],
+  "customVentSprite": "graphics/fx/vent_core.png",
+  "customVentFringeSprite": "graphics/fx/vent_fringe.png",
   "bounds": [
     -60, -13,
     -22, -52,
