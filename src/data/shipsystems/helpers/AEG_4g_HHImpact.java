@@ -21,7 +21,7 @@ public class AEG_4g_HHImpact extends BaseShipSystemScript {
 
     private static final float SPEED_THRESHOLD = 230f;
     public static final float HIGH_SPEED_THRESHOLD = 539f;
-    private static final float IMPACT_INTERVAL = 1f;
+    private static final float IMPACT_INTERVAL = 2f;
     public static final float BUILDUP_DURATION = 2f;
     private float lastImpactTime = 0f;
     private boolean explosionTriggered = false;

@@ -23,14 +23,50 @@
       "autofire": false,
       "mode": "LINKED",
       "weapons": {
-        "WS0001": "AEG_thunderbreaker",
-        "WS0002": "AEG_ChestInferno",
+        "WS0002": "AEG_ChestInferno"
+      }
+    },
+    {
+      "autofire": false,
+      "mode": "ALTERNATING",
+      "weapons": {
         "WS0003": "AEG_zero_shoulder_l",
-        "WS0004": "AEG_zero_shoulder_r",
-        "WS0005": "AEG_ironcutter_l",
-        "WS0006": "AEG_zero_arm_r",
-        "WS0007": "AEG_photonbarrage",
+        "WS0005": "AEG_ironcutter_l"
+      }
+    },
+    {
+      "autofire": false,
+      "mode": "LINKED",
+      "weapons": {
+        "WS0006": "AEG_zero_arm_r"
+      }
+    },
+    {
+      "autofire": true,
+      "mode": "LINKED",
+      "weapons": {
+        "WS0004": "AEG_zero_shoulder_r"
+      }
+    },
+    {
+      "autofire": false,
+      "mode": "LINKED",
+      "weapons": {
         "WS0009": "AEG_rust"
+      }
+    },
+    {
+      "autofire": false,
+      "mode": "LINKED",
+      "weapons": {
+        "WS0007": "AEG_photonbarrage"
+      }
+    },
+    {
+      "autofire": false,
+      "mode": "LINKED",
+      "weapons": {
+        "WS0001": "AEG_thunderbreaker"
       }
     }
   ],

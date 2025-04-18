@@ -3,205 +3,252 @@ package data.weapons.onfire;
 import com.fs.starfarer.api.combat.BeamAPI;
 import com.fs.starfarer.api.combat.BeamEffectPlugin;
 import com.fs.starfarer.api.combat.CombatEngineAPI;
-import com.fs.starfarer.api.combat.DamageType;
 import com.fs.starfarer.api.util.IntervalUtil;
+import com.fs.starfarer.api.util.Misc;
 import org.lwjgl.util.vector.Vector2f;
 
-import java.awt.Color;
+import java.awt.*;
 import java.util.Random;
 
-public class AEG_PhotonBarrageBeamStats implements BeamEffectPlugin {
-
-    private static final float INITIAL_DAMAGE = 2000f;
-    private static final float SPLIT_BEAM_DAMAGE = 500f;
-    private static final float RANGE = 1000f;
-    private static final float BEAM_THICKNESS = 40f; // Updated standard width
+public class
+AEG_PhotonBarrageBeamStats implements BeamEffectPlugin {
+    private static final float EMP_STRIKE_WIDTH = 5f;
+    private static final float EMP_STRIKE_LENGTH = 75f;
+    private boolean hasBurstFired = false;
+    private float barrageTimer = 0f;
+    private float barrageInterval = 0.3f;
+    private float barrageIntensity = 1f;
+    private final IntervalUtil beamLightningInterval = new IntervalUtil(1f, 2f); // Controls lightning arc timing
     private static final Color BEAM_COLOR = new Color(255, 255, 0, 255); // Bright yellow color
     private static final Color PARTICLE_COLOR = new Color(220, 180, 100, 255); // Flame color
-    private static final int PARTICLE_COUNT = 50;
     private static final float PARTICLE_SIZE = 10f;
     private static final float PARTICLE_LIFETIME = 1.0f;
     private static final float PARTICLE_SPEED = 100f;
     private static final float CHARGE_UP_TIME = 3.0f; // Charge-up time in seconds
-
     private static final Color PLASMA_COLOR = new Color(255, 185, 0, 255); // Yellowish-orange color
-    private static final int PLASMA_COUNT = 20;
-    private static final float PLASMA_WIDTH = 5f;
-    private static final float PLASMA_LENGTH = 20f;
-    private static final float PLASMA_LIFETIME = 0.5f;
-    private static final float PLASMA_SPEED = 200f;
-    private static final float CONE_ANGLE = 45f; // Wide cone angle in degrees
-
-    private static final float SPLIT_BEAM_SPREAD_RADIUS = 50f; // Spread radius for split beams
-
+    private final IntervalUtil eyeLightningInterval = new IntervalUtil(0.5f, 1.2f);
     private final IntervalUtil fireInterval = new IntervalUtil(0.1f, 0.1f);
     private float chargeUpProgress = 0f;
-    private final Random random = new Random();
+    private static final Random random = new Random();
 
     @Override
     public void advance(float amount, CombatEngineAPI engine, BeamAPI beam) {
         chargeUpProgress += amount;
 
         if (chargeUpProgress < CHARGE_UP_TIME) {
-            // Calculate the size of the central ball based on charge-up progress
+            // CHARGING PHASE: glowing central orb and inward particles
             float centralBallSize = PARTICLE_SIZE * (chargeUpProgress / CHARGE_UP_TIME) * 5;
-
-            // Create the central ball
             engine.addHitParticle(
                     beam.getWeapon().getLocation(),
-                    new Vector2f(0, 0), // No velocity for the central ball
+                    new Vector2f(0, 0),
                     centralBallSize,
-                    1.0f, // Brightness
+                    1.0f,
                     PARTICLE_LIFETIME,
-                    new Color(255, 255, 255, 255) // White core
+                    new Color(255, 200 - random.nextInt(30), 150 - random.nextInt(40), 255)
             );
 
-            // Create smaller balls moving towards the central ball
-            for (int i = 0; i < PARTICLE_COUNT; i++) {
-                float angle = random.nextFloat() * 360f; // Random angle in degrees
-                float distance = random.nextFloat() * 300f; // Reduced radius to 300
+            int particleCount = 20 + random.nextInt(30); // Between 20–40
+            for (int i = 0; i < particleCount; i++) {
+                float angle = random.nextFloat() * 360f;
+                float maxRadius = 300f * (1f - (chargeUpProgress / CHARGE_UP_TIME));
+                float distance = random.nextFloat() * maxRadius;
                 Vector2f startPosition = new Vector2f(
                         (float) Math.cos(Math.toRadians(angle)) * distance,
                         (float) Math.sin(Math.toRadians(angle)) * distance
                 );
                 Vector2f.add(startPosition, beam.getWeapon().getLocation(), startPosition);
 
-                // Calculate velocity towards the central ball
                 Vector2f velocity = new Vector2f(beam.getWeapon().getLocation());
                 Vector2f.sub(velocity, startPosition, velocity);
-
-                // Check if the velocity vector is zero
                 if (velocity.lengthSquared() > 0) {
                     velocity.normalise();
                     velocity.scale(PARTICLE_SPEED);
                 } else {
-                    // Handle the zero vector case, e.g., set a default direction or skip this iteration
-                    velocity.set(1, 0); // Example: setting a default direction
+                    velocity.set(1, 0);
                     velocity.scale(PARTICLE_SPEED);
                 }
 
-                // Stagger the particles so they don't reach the center at the same time
-                float staggerFactor = random.nextFloat() * 0.5f + 0.5f; // Between 0.5 and 1.0
-                velocity.scale(staggerFactor);
-
-                // Calculate transparency based on distance to the center
+                velocity.scale(random.nextFloat() * 0.5f + 0.5f);
                 float transparency = 1.0f - (distance / 300f);
 
                 engine.addHitParticle(
                         startPosition,
                         velocity,
                         PARTICLE_SIZE,
-                        transparency, // Adjust transparency
+                        transparency,
                         PARTICLE_LIFETIME,
                         PARTICLE_COLOR
                 );
             }
         } else {
-            fireInterval.advance(amount);
-            if (fireInterval.intervalElapsed()) {
-                // Fire the initial beam
-                if (beam.getWeapon().getShip().getShipTarget() != null) {
-                    engine.spawnEmpArcPierceShields(
-                            beam.getWeapon().getShip(), beam.getWeapon().getLocation(), beam.getWeapon().getShip(), beam.getWeapon().getShip().getShipTarget(),
-                            DamageType.ENERGY, // Damage type
-                            INITIAL_DAMAGE * fireInterval.getIntervalDuration(), // Damage amount
-                            0f, // EMP damage
-                            RANGE, // Max range
-                            "tachyon_lance_emp_impact", // Impact sound
-                            BEAM_THICKNESS, // Thickness
-                            BEAM_COLOR, // Fringe color
-                            new Color(255, 255, 255, 255) // White core
+            // Burst fire after charge-up (only once)
+            if (!hasBurstFired) {
+                hasBurstFired = true;
+
+                Vector2f weaponLoc = beam.getWeapon().getLocation();
+                float baseAngle = beam.getWeapon().getCurrAngle();
+                int beamCount = 6;
+                float spread = 30f;
+
+                for (int i = 0; i < beamCount; i++) {
+                    float angle = baseAngle - spread / 2f + (spread / (beamCount - 1)) * i;
+                    Vector2f dir = Misc.getUnitVectorAtDegreeAngle(angle);
+                    dir.scale(80f + random.nextFloat() * 300f); // Beam length
+                    Vector2f end = Vector2f.add(weaponLoc, dir, null);
+
+                    // Nebula trail
+                    engine.addNebulaParticle(
+                            weaponLoc,
+                            Misc.ZERO,
+                            80f,
+                            1.8f,
+                            0.2f,
+                            0.3f,
+                            0.6f,
+                            new Color(255, 200 - random.nextInt(30), 100 - random.nextInt(40), 180)
                     );
-                }
-
-                // Create particle effects for the initial beam
-                for (int i = 0; i < PARTICLE_COUNT; i++) {
-                    Vector2f particleLocation = new Vector2f(beam.getWeapon().getLocation());
-                    Vector2f particleVelocity = new Vector2f((float) Math.random() * PARTICLE_SPEED - PARTICLE_SPEED / 2, (float) Math.random() * PARTICLE_SPEED - PARTICLE_SPEED / 2);
-                    engine.addHitParticle(
-                            particleLocation,
-                            particleVelocity,
-                            PARTICLE_SIZE,
-                            1.0f, // Brightness
-                            PARTICLE_LIFETIME,
-                            new Color(255, 255, 255, 255) // White core
-                    );
-                }
-
-                // Create plasma projectiles in a wide cone
-                for (int i = 0; i < PLASMA_COUNT; i++) {
-                    float angle = (random.nextFloat() * CONE_ANGLE) - (CONE_ANGLE / 2); // Random angle within the cone
-                    Vector2f plasmaDirection = new Vector2f((float) Math.cos(Math.toRadians(angle)), (float) Math.sin(Math.toRadians(angle)));
-                    plasmaDirection.scale(PLASMA_SPEED);
-
-                    Vector2f plasmaLocation = new Vector2f(beam.getWeapon().getLocation());
-                    engine.addHitParticle(
-                            plasmaLocation,
-                            plasmaDirection,
-                            PLASMA_WIDTH,
-                            1.0f, // Brightness
-                            PLASMA_LIFETIME,
-                            new Color(255, 255, 255, 255) // White core
-                    );
-
-                    // Create the beam-like spike effect
-                    Vector2f plasmaEndLocation = new Vector2f(plasmaLocation);
-                    Vector2f.add(plasmaEndLocation, (Vector2f) plasmaDirection.scale(PLASMA_LENGTH / PLASMA_SPEED), plasmaEndLocation);
-                    engine.addHitParticle(
-                            plasmaEndLocation,
-                            new Vector2f(0, 0), // No velocity for the end point
-                            PLASMA_WIDTH,
-                            1.0f, // Brightness
-                            PLASMA_LIFETIME,
-                            new Color(255, 255, 255, 255) // White core
-                    );
-                }
-                // Split into smaller beams with random angles
-                Vector2f beamStart = beam.getWeapon().getLocation();
-                Vector2f beamEnd = new Vector2f(beamStart);
-                Vector2f beamDirection = new Vector2f((float) Math.cos(Math.toRadians(beam.getWeapon().getCurrAngle())), (float) Math.sin(Math.toRadians(beam.getWeapon().getCurrAngle())));
-                beamDirection.scale(RANGE);
-                Vector2f.add(beamEnd, beamDirection, beamEnd);
-
-                for (int i = 0; i < 5; i++) {
-                    // Random position along the initial beam
-                    float t = random.nextFloat(); // Random value between 0 and 1
-                    Vector2f splitBeamStart = new Vector2f(
-                            beamStart.x + t * (beamEnd.x - beamStart.x),
-                            beamStart.y + t * (beamEnd.y - beamStart.y)
-                    );
-
-                    // Random offset within a 50-unit radius
-                    float angle = random.nextFloat() * 360f; // Random angle in degrees
-                    float distance = random.nextFloat() * SPLIT_BEAM_SPREAD_RADIUS; // Random distance within 50 units
-                    Vector2f offset = new Vector2f(
-                            (float) Math.cos(Math.toRadians(angle)) * distance,
-                            (float) Math.sin(Math.toRadians(angle)) * distance
-                    );
-                    Vector2f.add(splitBeamStart, offset, splitBeamStart);
-
-                    // Calculate the direction and end position of the split beam
-                    Vector2f splitBeamDirection = new Vector2f((float) Math.cos(Math.toRadians(angle)), (float) Math.sin(Math.toRadians(angle)));
-                    splitBeamDirection.scale(RANGE);
-
-                    Vector2f splitBeamEnd = new Vector2f(splitBeamStart);
-                    Vector2f.add(splitBeamEnd, splitBeamDirection, splitBeamEnd);
-
-                    if (beam.getWeapon().getShip().getShipTarget() != null) {
-                        engine.spawnEmpArcPierceShields(
-                                beam.getWeapon().getShip(), splitBeamStart, beam.getWeapon().getShip(), beam.getWeapon().getShip().getShipTarget(),
-                                DamageType.ENERGY, // Damage type
-                                SPLIT_BEAM_DAMAGE, // Damage amount
-                                0f, // EMP damage
-                                RANGE, // Max range
-                                "tachyon_lance_emp_impact", // Impact sound
-                                BEAM_THICKNESS / 2, // Thickness
-                                BEAM_COLOR, // Fringe color
-                                new Color(255, 255, 255, 255) // White core
-                        );
-                    }
                 }
             }
         }
+
+        if (hasBurstFired) {
+            eyeLightningInterval.advance(amount);
+            if (eyeLightningInterval.intervalElapsed()) {
+                Vector2f weaponLoc = beam.getWeapon().getLocation();
+                float baseAngle = beam.getWeapon().getCurrAngle();
+
+                Vector2f leftEyeOffset = new Vector2f(9.5f, 7f);
+                Vector2f rightEyeOffset = new Vector2f(9.5f, -7f);
+                float angleRad = (float) Math.toRadians(baseAngle);
+
+                Vector2f leftEyeWorld = Vector2f.add(weaponLoc, rotateVector(leftEyeOffset, angleRad), null);
+                Vector2f rightEyeWorld = Vector2f.add(weaponLoc, rotateVector(rightEyeOffset, angleRad), null);
+
+                int leftEyeArcs = 4;
+                int rightEyeArcs = 4;
+
+                for (int i = 0; i < leftEyeArcs; i++) {
+                    spawnEmpArc(engine, leftEyeWorld, -1);
+                }
+                for (int i = 0; i < rightEyeArcs; i++) {
+                    spawnEmpArc(engine, rightEyeWorld, 1);
+                }
+            }
+        }
+        // 🔥 FIRING PHASE: EMP arcs crawling up the beam
+        beamLightningInterval.advance(amount);
+        if (beamLightningInterval.intervalElapsed()) {
+            Vector2f from = beam.getFrom();
+            Vector2f to = beam.getTo();
+            float empDistance = Misc.getDistance(from, to);
+
+            for (float i = 0; i < empDistance; i += 10f + random.nextFloat() * 5f) {
+                Vector2f point = new Vector2f(
+                        from.x + (to.x - from.x) * (i / empDistance),
+                        from.y + (to.y - from.y) * (i / empDistance)
+                );
+
+                Vector2f flicker = new Vector2f(
+                        point.x + (random.nextFloat() * 10f - 5f),
+                        point.y + (random.nextFloat() * 10f - 5f)
+                );
+
+                engine.spawnEmpArcVisual(
+                        point,
+                        null,
+                        flicker,
+                        null,
+                        5f,
+                        new Color(255, 200 - random.nextInt(30), 100 - random.nextInt(40), 255), // Core
+                        new Color(255, 150 - random.nextInt(30), 50 - random.nextInt(40), 255)  // Fringe
+                );
+            }
+        }
+
+        // Barrage effect
+        if (hasBurstFired) {
+            barrageTimer += amount;
+            if (barrageTimer >= barrageInterval) {
+                barrageTimer -= barrageInterval;
+                barrageInterval *= 0.95f;
+                barrageInterval = Math.max(barrageInterval, 0.05f);
+                barrageIntensity += 0.05f;
+
+                Vector2f weaponLoc = beam.getWeapon().getLocation();
+                float baseAngle = beam.getWeapon().getCurrAngle();
+                float angle = baseAngle + (random.nextFloat() - 0.5f) * 30f * barrageIntensity;
+
+                Vector2f dir = Misc.getUnitVectorAtDegreeAngle(angle);
+                dir.scale(300f + random.nextFloat() * 200f); // variable streak length
+                Vector2f velocity = new Vector2f(dir);
+                Vector2f particleStart = new Vector2f(weaponLoc);
+                Vector2f.add(particleStart, new Vector2f(
+                        (random.nextFloat() - 0.5f) * 30f,
+                        (random.nextFloat() - 0.5f) * 30f), particleStart); // little spray offset
+
+                // Main bright "plasma orb"
+                engine.addHitParticle(
+                        particleStart,
+                        velocity,
+                        20f + random.nextFloat() * 10f,
+                        2 - random.nextInt(1),
+                        0.2f + random.nextFloat() * 0.2f,
+                        PLASMA_COLOR
+                );
+
+                // Trail effect using nebula
+                engine.addNebulaParticle(
+                        particleStart,
+                        velocity,
+                        30f + random.nextFloat() * 20f,
+                        2f,
+                        0.3f,
+                        0.5f,
+                        0.7f,
+                        new Color(255, 120 + random.nextInt(80), 50 + random.nextInt(50), 180)
+                );
+
+                // Faint glow for flare
+                engine.addSmoothParticle(
+                        particleStart,
+                        velocity,
+                        40f,
+                        0.8f,
+                        0.1f,
+                        new Color(255, 180, 100, 200)
+                );
+            }
+        }
     }
+    // Function to spawn the EMP arc at the given position (visual only)
+    private void spawnEmpArc(CombatEngineAPI engine, Vector2f eyePosition, int direction) {
+        float angle = random.nextFloat() * 180f; // total spread range
+        float angleRad = (float) Math.toRadians(angle) * direction; // mirror for left/right
+        float length = EMP_STRIKE_LENGTH * (0.7f + random.nextFloat() * 0.6f); // 70%–130% length
+        float dx = (float) Math.cos(angleRad) * length;
+        float dy = (float) Math.sin(angleRad) * length;
+        Vector2f end = new Vector2f(eyePosition.x + dx, eyePosition.y + dy);
+
+        Color EMP_CORE_COLOR = new Color(255, 225 - random.nextInt(30), 150 - random.nextInt(40), 255);
+        Color EMP_FRINGE_COLOR = new Color(255, 150 - random.nextInt(30), 50 - random.nextInt(40), 255);
+
+        engine.spawnEmpArcVisual(
+                eyePosition,
+                null,
+                end,
+                null,
+                EMP_STRIKE_WIDTH,
+                EMP_CORE_COLOR,
+                EMP_FRINGE_COLOR
+        );
+    }
+    private Vector2f rotateVector(Vector2f vec, float angleRad) {
+        float cos = (float) Math.cos(angleRad);
+        float sin = (float) Math.sin(angleRad);
+        return new Vector2f(
+                vec.x * cos - vec.y * sin,
+                vec.x * sin + vec.y * cos
+        );
+    }
+
 }

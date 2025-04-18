@@ -7,6 +7,7 @@ import java.awt.Color;
 import java.util.*;
 
 public class AEG_ThunderBoltOnHitEffect implements BeamEffectPlugin {
+    private final IntervalUtil beamLightningInterval = new IntervalUtil(1f, 2f); // controls lightning arc timing
     private static final Color CORE_COLOR = new Color(255, 255, 255, 255);
     private static final Color FRINGE_COLOR = new Color(105, 105, 255, 255);
     private static final float INITIAL_CHAIN_RANGE = 1500f;
@@ -14,7 +15,6 @@ public class AEG_ThunderBoltOnHitEffect implements BeamEffectPlugin {
     private static final float DAMAGE_RETENTION_PER_CHAIN = .85f;
     private static final int MAXIMUM_CHAINS = 5;
     private final IntervalUtil fireInterval = new IntervalUtil(0.1f, 0.1f);
-    private final IntervalUtil beamLightningInterval = new IntervalUtil(1f, 2f);
 
     @Override
     public void advance(float amount, CombatEngineAPI engine, BeamAPI beam) {
