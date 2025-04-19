@@ -1,0 +1,20 @@
+{
+	"id":"AEG_bp_shot",
+	"specClass":"projectile",
+	"spawnType":"BALLISTIC_AS_BEAM",
+	"collisionClass":"RAY",
+	"collisionClassByFighter":"RAY_FIGHTER",
+	#"OnHitEffect": "data.weapons.scripts.AEG_4g_leftpunch",
+	"length":200.0,
+	"width":40,
+	"fadeTime":0.3,
+	"fringeColor":[255,180,50,255],
+	"coreColor":[255,255,180,200],
+	"textureType":"ROUGH",  # now also used for "BALLISTIC_AS_BEAM", if specified
+	#"textureType":["graphics/fx/emp_arcs.png","graphics/fx/emp_arcs.png"],
+	"textureScrollSpeed":-256,
+	"pixelsPerTexel":1.0,
+	"passThroughMissiles":true,
+	"passThroughFighters":true,
+	"passThroughFightersOnlyWhenDestroyed":true,
+}
