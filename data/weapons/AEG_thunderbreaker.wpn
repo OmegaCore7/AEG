@@ -8,7 +8,7 @@
   "collisionClass": "RAY",
   "collisionClassByFighter": "RAY_FIGHTER",
   "turretSprite": "graphics/ships/zero/zero_scrander.png",
-  "turretGlowSprite": "graphics/ships/zero/zero_scrander_glow.png",
+  "turretGlowSprite": "graphics/ships/zero/zero_scrander.png",
   "hardpointSprite": "graphics/ships/zero/zero_scrander.png",
   "hardpointGlowSprite": "graphics/ships/zero/zero_scrander_glow.png",
   "glowColor": [
@@ -20,16 +20,10 @@
   "hitGlowRadius": 0,
   "turretOffsets": [
     0,
-    0,
-    -91.5,
-    380.5,
-    58.5,
-    -286.5
+    0
   ],
   "turretAngleOffsets": [
-    2,
-    -14,
-    14
+    2
   ],
   "hardpointOffsets": [
     -30,
