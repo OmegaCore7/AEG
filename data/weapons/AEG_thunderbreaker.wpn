@@ -14,22 +14,22 @@
   "glowColor": [
     255,
     255,
-    255,
+    0,
     255
   ],
   "hitGlowRadius": 0,
   "turretOffsets": [
+    0,
+    0,
     -91.5,
     380.5,
-    0,
-    0,
     58.5,
     -286.5
   ],
   "turretAngleOffsets": [
     2,
-    0,
-    0
+    -14,
+    14
   ],
   "hardpointOffsets": [
     -30,
@@ -40,15 +40,15 @@
   ],
   "beamFireOnlyOnFullCharge": true,
   "fringeColor": [
-    105,
-    105,
     255,
+    180,
+    50,
     255
   ],
   "coreColor": [
     255,
     255,
-    255,
+    200,
     255
   ],
   "convergeOnPoint": true,

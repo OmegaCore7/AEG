@@ -33,9 +33,9 @@ CCX Right Shoulder,AEG_rm_rightshoulder,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,9.75
 #BLITZWING TRANSFORMER,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,10
 Blitz Torpedo Launcher,AEG_BlitzTorpLauncher,,,300,1200,,1000,,40,10,1,1,0.05,1,HIGH_EXPLOSIVE,500,,0,1,1,,0,0,0,0,,400,150,4,300,,,GUIDED_POOR,"strike7, missile0, base_bp, ind, reload_1_and_a_half_pt, no_drop",,Unknown,,Torpedo,Fast,Good,,,,,,,TRUE,19.75
-Blitzwing Chest Cannon,AEG_bw_chestarmor,,,40000,1200,,1000,,15,50,7,3,0.10,1,ENERGY,1000,,0,0.5,1,,0,0,0,0,,1000,200,3,250,,,"DO_NOT_AIM, DO_NOT_CONSERVE","utility8, missile9, strike7, omega, restricted, no_drop",,Unknown,,Anti Small Craft,Extremely Fast,Excellent,,,,,,,TRUE,12.31
-Null-Ray Blaster,AEG_bw_Rarm_nullrayblaster,,,900,1000,,1400,,0,30,9,20,0.10,1,ENERGY,800,,1,1,3,0.1,0,0,0,0,,1000,,,100,,,"STRIKE, USE_VS_FRIGATES, GROUP_ALTERNATING","strike10, rare_bp, hist1t, merc, ind, no_drop",SR_strike_only,Unknown,,Strike,,,,,,,,,,4.5
-Dual Shoulder Sabot Launcher,AEG_Blitzwing_Jetpack,,,1200,1200,,100,,15,10,10,12,0.20,2,KINETIC,500,,0,8.75,3,0.25,0,0,0,0,,150,50,8,300,,,GUIDED_POOR,"missile13, strike8, rare_bp, merc, ind, no_drop",,Unknown,,Anti Shield,Slow,Poor,,,"Submunition hits on hull or armor have a %s chance to arc to weapons and engines, dealing %s EMP damage.",25% | 200,,,TRUE,17
+Blitzwing Chest Cannon,AEG_bw_chestarmor,,,40000,1200,,1000,,15,50,7,3,0.1,1,ENERGY,1000,,0,0.5,1,,0,0,0,0,,1000,200,3,250,,,"DO_NOT_AIM, DO_NOT_CONSERVE","utility8, missile9, strike7, omega, restricted, no_drop",,Unknown,,Anti Small Craft,Extremely Fast,Excellent,,,,,,,TRUE,12.31
+Null-Ray Blaster,AEG_bw_Rarm_nullrayblaster,,,900,1000,,1400,,0,30,9,20,0.1,1,ENERGY,800,,1,1,3,0.1,0,0,0,0,,1000,,,100,,,"STRIKE, USE_VS_FRIGATES, GROUP_ALTERNATING","strike10, rare_bp, hist1t, merc, ind, no_drop",SR_strike_only,Unknown,,Strike,,,,,,,,,,4.5
+Dual Shoulder Sabot Launcher,AEG_Blitzwing_Jetpack,,,1200,1200,,100,,15,10,10,12,0.2,2,KINETIC,500,,0,8.75,3,0.25,0,0,0,0,,150,50,8,300,,,GUIDED_POOR,"missile13, strike8, rare_bp, merc, ind, no_drop",,Unknown,,Anti Shield,Slow,Poor,,,"Submunition hits on hull or armor have a %s chance to arc to weapons and engines, dealing %s EMP damage.",25% | 200,,,TRUE,17
 Blitz Assault Minigun,AEG_bw_Larm_minigun,,,1000,600,,75,10,3,30,10,,,,HIGH_EXPLOSIVE,60,,0,0.15,1,,0,20,1,10,,800,,,30,,,,"he15, SR, lowtech_bp, midline_bp, merc, ind, no_drop",,Unknown,,Anti Armor,,,,,,,,,,
 Optic PD Beams,AEG_bw_mhead,,,200,400,75,,,0,100,4,,,,ENERGY,,40,0,0.25,,,,,,,2400,,,,,,,PD,"pd7, beam7, SR, hightech_bp, midline_bp, merc, ind, no_drop",,Unknown,,Point Defense,,,,,,,,,,
 ,AEG_Blitzwing_legs,,,500000,600,1,,,,,,,,,,,,,,,,,,,,,,,,,,,,no_drop,,,,,,,,,,,,,,
@@ -56,11 +56,13 @@ Test Weapon,AEG_testweapon,,,1200,2000,,100,,3,60,10,,,,ENERGY,15,,7,0.2,1,0.5,0
 Mazin Impact,AEG_zero_shoulder_l,,,500000,2500,,300,,10,45,10,40,1,10,HIGH_EXPLOSIVE,10,,0,5,40,0.01,0.01,,,,,300,1000,1500,30,,,,,,,,General,,,,,,,,,,
 Cross Knife Swarmer PD,AEG_zero_shoulder_r,,,500000,1000,,150,100,15,50,3,80,"1		","10	",HIGH_EXPLOSIVE,10,,0,5,40,0.2,0,0,0,0,,300,100,5,50,,,"ANTI_FTR, DO_NOT_AIM, DO_NOT_CONSERVE","utility8, missile0, missile_bp, merc, ind, no_drop",,,,Anti Small Craft,Fast,Excellent,,,,,,,,10
 Gigantic Iron Cutter,AEG_zero_arm_r,,,500000,5000,,5000,5000,9999,45,10,1,,,HIGH_EXPLOSIVE,1000,,"5		",2,1,0.25,0,0,0,,,1000,2000,30,100000,,,DO_NOT_AIM,"missile12, strike9, missile_bp, merc, ind, no_drop",,,,Finisher,Fast,Excellent,,,,,,,TRUE,12
-Iron Cutter,AEG_ironcutter_l,,,500000,2500,,1200,,1000,45,10,1,0.25,1,HIGH_EXPLOSIVE,200,,0,2,1,0.25,0,0,0,,,300,700,1500,1000,,,DO_NOT_AIM,"missile12, strike9, missile_bp, merc, ind, no_drop",,,,Finisher,Fast,Excellent,,,,,,,TRUE,12
-Barrage Photon Beam,AEG_photonbarrage,,,500000,5000,2500,,200,500,55,4,,,,ENERGY,,2700,3,3,,,,,,,2400,,,,,,,,"beam9, LR, hightech_bp, midline_bp, merc, ind, no_drop",,,,General,,,,,,,,,,
-Chest Inferno,AEG_ChestInferno,,,100000,1500,,200,,3,60,4,200,0.1,200,ENERGY,2,,0,0.01,200,0.05,0,0,0,0,,500,,,,,,,"energy15, SR, omega, restricted, no_drop",,Unknown,,General,,,,,,,,,,
-Rust Hurrecane,AEG_rust,,,500000,2000,,200,200,75,55,10,50,0.25	,20,ENERGY,50,,2,10,50,0.05,0,0.1,0,0,,200,500,20,5000,,,"STRIKE, DO_NOT_AIM","strike20, missile20, omega, restricted, no_drop",,Unknown,,Guided Torpedo,Slow,Excellent,,,,,,,TRUE,
+Iron Cutter,AEG_ironcutter_l,,,500000,2500,,1200,,1000,45,10,1,0.05,1,HIGH_EXPLOSIVE,200,,0,2,1,0.25,0,0,0,,,300,700,1500,1000,,,DO_NOT_AIM,"missile12, strike9, missile_bp, merc, ind, no_drop",,,,Finisher,Fast,Excellent,,,,,,,TRUE,12
+Barrage Photon Beam Core,AEG_photonbeam,,,500000,2500,2500,,200,500,55,4,,,,ENERGY,,2700,3,3,,,,,,,2400,,,,,,,,"beam9, LR, hightech_bp, midline_bp, merc, ind, no_drop",,,,General,,,,,,,,,,
+Barrage Photon Beam Barrage,AEG_photonbarrage,,,100000,2500,,500,75,500,55,,,,,ENERGY,150,,3,0.2,1,,0,10,2,5,,1000,,,,,,"SYSTEM,SHOW_IN_CODEX",,TPC_only,,,General,,,,,,,,,,40
+Chest Inferno,AEG_ChestInferno,,,100000,1500,,200,,3,60,4,300,0.1,300,ENERGY,2,,0,0.01,300,0.05,0,0,0,0,,500,,,,,,,"energy15, SR, omega, restricted, no_drop",,Unknown,,General,,,,,,,,,,
+Rust Hurrecane,AEG_rust,,,500000,2000,,200,200,75,55,10,50,0.01,20,ENERGY,50,,2,10,50,0.05,0,0.1,0,0,,200,500,20,5000,,,"STRIKE, DO_NOT_AIM","strike20, missile20, omega, restricted, no_drop",,Unknown,,Guided Torpedo,Slow,Excellent,,,,,,,TRUE,
 God ThunderBolt Breaker,AEG_thunderbreaker,,,500000,2500,1400,0,100,0,25,25,0,0,0,ENERGY,0,700,2,0.05,0,0,0,0,0,0,10000,0,0,0,0,0,0,,,,,,General,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 #Gurren Lagann,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 Double Arm Drill,AEG_gurrenl_arm_l,,,200,1500,,100,,15,30,4,6,1,6,KINETIC,0,,0,1,2,,0,0,0,0,,200,300,8,300,,,GUIDED_POOR,"missile8, strike2, missile_bp, merc, ind, no_drop",,,,Anti Shield,Fast,Excellent,,,"Submunition hits on hull or armor have a %s chance to arc to weapons and engines, dealing %s EMP damage.",25% | 200,,,TRUE,11.75
@@ -101,9 +103,9 @@ Core Main Cannon,AEG_core_decogun,,,500000,600,1,,,,,,,,,,,,,,,,,,,,,,,,,,,,no_d
 ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 #Genesic GaoGaiGar,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-Will Saber	,AEG_4g_right_willknife,,,,1500,1000,,0,20,80,,,,,ENERGY,,600,0.33,0.33,0.60,,,,,,1000000,,,,,"SYSTEM,DANGEROUS,FIRE_WHEN_INEFFICIENT,PD_ALSO,PD","no_drop, no_sell, no_drop_salvage, doNotModify",,,,Strike,,,,,"%s: Deals full damage immediately on contact, slightly pushing the user back.",The Sanctioned Action Is To Cut,,,TRUE,999,,
-Broken Magnum,AEG_4g_right_brokenmagnum,,,500000,1500,,250,,,80,,1,0.1,1,HIGH_EXPLOSIVE,750,,0.33		,0.33,1,,,,,,,500,1000,30,1500,,,,,,Strike,,,,,,,,,,,,
-Right Fist of Destruction,AEG_4g_right_punch,,,500000,44,3000,,,20,80,,,,,HIGH_EXPLOSIVE,,,0.33,0.33,0.60,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+"Will Saber	",AEG_4g_right_willknife,,,,1500,1000,,0,20,80,,,,,ENERGY,,600,0.33,0.33,0.6,,,,,,1000000,,,,,"SYSTEM,DANGEROUS,FIRE_WHEN_INEFFICIENT,PD_ALSO,PD","no_drop, no_sell, no_drop_salvage, doNotModify",,,,Strike,,,,,"%s: Deals full damage immediately on contact, slightly pushing the user back.",The Sanctioned Action Is To Cut,,,TRUE,999,,
+Broken Magnum,AEG_4g_right_brokenmagnum,,,500000,1500,,250,,,80,,1,0.1,1,HIGH_EXPLOSIVE,750,,"0.33		",0.33,1,,,,,,,500,1000,30,1500,,,,,,Strike,,,,,,,,,,,,
+Right Fist of Destruction,AEG_4g_right_punch,,,500000,44,3000,,,20,80,,,,,HIGH_EXPLOSIVE,,,0.33,0.33,0.6,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 Critical Laser,AEG_4g_head,,,,1500,100,10,10,,80,,,,,ENERGY,,200,,,,,,,,,1000000,,,,,,,,,,,,,,,,,,,,,,
 ,AEG_4g_right_shoulder,,,500000,600,1,,,,80,,,,,,,,,,,,,,,,,,,,,,,,no_drop,,,,,,,,,,,,,,
 ,AEG_4g_left_shoulder,,,500000,600,1,,,,80,,,,,,,,,,,,,,,,,,,,,,,,no_drop,,,,,,,,,,,,,,
@@ -112,8 +114,7 @@ Critical Laser,AEG_4g_head,,,,1500,100,10,10,,80,,,,,ENERGY,,200,,,,,,,,,1000000
 ,AEG_4g_torso,,,500000,600,1,,,,80,,,,,,,,,,,,,,,,,,,,,,,,no_drop,,,,,,,,,,,,,,
 ,AEG_4g_ship_backpack,,,500000,600,1,,,,6,,,,,,,,,,,,,,,,,,,,,,,,no_drop,,,,,,,,,,,,,,
 ,AEG_4g_legs,,,500000,600,1,,,,,,,,,,,,,,,,,,,,,,,,,,,,no_drop,,,,,,,,,,,,,,
-Bolting Driver,AEG_4g_left_boltingdriver,,,2250,1500,,275,400,40,80,,9,0.25,3,KINETIC,350,,0,2,3		,0.5,,,,,,1000,,,600,,,,"kinetic15, LR, no_drop",,,,Anti Shield,,,,,,,,,,5.5
-Protect Shade,AEG_4g_left_protectshade,,,500000,1,1,,,,80,,,,,ENERGY,,300,	0.25	,	0.33,,,,,,,,,,,,,,,no_drop,,,,,,,,,,,,,,
-Left Fist of Protection,AEG_4g_left_punch,,,500000,44,3000,,,20,80,,,,,KINETIC,,,0.33,0.33,0.60,,,,,,1000,,,,,,,,no_drop,,,,,,,,,,,,,,
-Right Spiral Drill,AEG_4g_rightkneedrill,,,,75,,200,,10,80,,60	,1,60,HIGH_EXPLOSIVE,50,,0.33,0.33,60,0.1,0	,10		,1,1,,1000,,,200
-,,,,,,,,,,,,,,,,,,,,,,,,
+Bolting Driver,AEG_4g_left_boltingdriver,,,2250,1500,,275,400,40,80,,9,0.25,3,KINETIC,350,,0,2,"3		",0.5,,,,,,1000,,,600,,,,"kinetic15, LR, no_drop",,,,Anti Shield,,,,,,,,,,5.5
+Protect Shade,AEG_4g_left_protectshade,,,500000,1,1,,,,80,,,,,ENERGY,,300,"	0.25	","	0.33",,,,,,,,,,,,,,,no_drop,,,,,,,,,,,,,,
+Left Fist of Protection,AEG_4g_left_punch,,,500000,44,3000,,,20,80,,,,,KINETIC,,,0.33,0.33,0.6,,,,,,1000,,,,,,,,no_drop,,,,,,,,,,,,,,
+Right Spiral Drill,AEG_4g_rightkneedrill,,,,75,,200,,10,80,,"60	",1,60,HIGH_EXPLOSIVE,50,,0.33,0.33,60,0.1,"0	","10		",1,1,,1000,,,200,,,,,,,,,,,,,,,,,,
