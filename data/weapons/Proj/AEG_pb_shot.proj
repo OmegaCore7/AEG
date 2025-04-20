@@ -5,7 +5,6 @@
 	"collisionClass":"RAY",
 	"collisionClassByFighter":"RAY_FIGHTER",
 	#"OnHitEffect": "data.weapons.scripts.AEG_pb_shot",
-	"everyFrameEffect": "data.weapons.scripts.AEG_PhotonBarrageFrame",
 	"length":200.0,
 	"width":40,
 	"fadeTime":0.3,

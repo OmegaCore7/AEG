@@ -6,7 +6,6 @@
   "size": "SMALL",
   "turretSprite": "graphics/ships/zero/zero_head.png",
   "hardpointSprite": "",
-  "everyFrameEffect": "data.weapons.scripts.AEG_PhotonBarrageFrame",
   "glowColor": [
     255,
     150,
