@@ -4,6 +4,7 @@
   "projectileSpecId": "AEG_bp_shot",
   "type": "ENERGY",
   "size": "SMALL",
+  "everyFrameEffect": "data.weapons.scripts.AEG_PhotonBarrageEffect",
   "turretSprite": "graphics/ships/zero/zero_head.png",
   "hardpointSprite": "",
   "glowColor": [

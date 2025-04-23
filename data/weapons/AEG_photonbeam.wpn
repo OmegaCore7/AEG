@@ -10,7 +10,6 @@
   "turretGlowSprite": "graphics/ships/zero/zero_head_glow.png",
   "hardpointSprite": "graphics/ships/zero/zero_head.png",
   "hardpointGlowSprite": "graphics/ships/zero/zero_head_glow.png",
-  "autocharge": true,
   "glowColor": [
     255,
     205,
@@ -40,18 +39,18 @@
   ],
   "fringeColor": [
     255,
-    255,
-    0,
+    180,
+    50,
     225
   ],
   "coreColor": [
     255,
-    255,
-    255,
+    200,
+    180,
     255
   ],
   "width": 40,
-  "textureType": ROUGH,
+  "textureType": SMOOTH,
   "textureScrollSpeed": 100,
   "pixelsPerTexel": 10,
   "pierceSet": [
