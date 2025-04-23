@@ -18,7 +18,7 @@ AEG_PhotonBarrageBeamStats implements BeamEffectPlugin {
     private float barrageTimer = 0f;
     private float barrageInterval = 0.3f;
     private float barrageIntensity = 1f;
-    private final IntervalUtil beamLightningInterval = new IntervalUtil(1f, 2f); // Controls lightning arc timing
+    private final IntervalUtil beamLightningInterval = new IntervalUtil(2f, 3f); // Controls lightning arc timing
     private static final Color BEAM_COLOR = new Color(255, 255, 0, 255); // Bright yellow color
     private static final Color PARTICLE_COLOR = new Color(220, 180, 100, 255); // Flame color
     private static final float PARTICLE_SIZE = 10f;
