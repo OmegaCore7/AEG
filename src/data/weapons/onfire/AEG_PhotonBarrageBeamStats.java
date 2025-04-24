@@ -3,6 +3,7 @@ package data.weapons.onfire;
 import com.fs.starfarer.api.combat.BeamAPI;
 import com.fs.starfarer.api.combat.BeamEffectPlugin;
 import com.fs.starfarer.api.combat.CombatEngineAPI;
+import com.fs.starfarer.api.combat.CombatEntityAPI;
 import com.fs.starfarer.api.util.IntervalUtil;
 import com.fs.starfarer.api.util.Misc;
 import org.lwjgl.util.vector.Vector2f;
@@ -12,6 +13,7 @@ import java.util.Random;
 
 public class
 AEG_PhotonBarrageBeamStats implements BeamEffectPlugin {
+    private float beamColorTimer = 0f;
     private static final float EMP_STRIKE_WIDTH = 5f;
     private static final float EMP_STRIKE_LENGTH = 75f;
     private boolean hasBurstFired = false;
@@ -34,7 +36,7 @@ AEG_PhotonBarrageBeamStats implements BeamEffectPlugin {
     @Override
     public void advance(float amount, CombatEngineAPI engine, BeamAPI beam) {
         chargeUpProgress += amount;
-
+        beamColorTimer += amount;
         if (chargeUpProgress < CHARGE_UP_TIME) {
             // CHARGING PHASE: glowing central orb and inward particles
             float centralBallSize = PARTICLE_SIZE * (chargeUpProgress / CHARGE_UP_TIME) * 5;
@@ -110,7 +112,7 @@ AEG_PhotonBarrageBeamStats implements BeamEffectPlugin {
                 }
             }
         }
-
+        //LIGHTNING THAT COMES OUT THE EYES WHEN FIRING
         if (hasBurstFired) {
             eyeLightningInterval.advance(amount);
             if (eyeLightningInterval.intervalElapsed()) {
@@ -133,7 +135,64 @@ AEG_PhotonBarrageBeamStats implements BeamEffectPlugin {
                 for (int i = 0; i < rightEyeArcs; i++) {
                     spawnEmpArc(engine, rightEyeWorld, 1);
                 }
-            }
+// Color shifting between bright and dark versions of yellow, orange, and red
+// The color will smoothly transition over time, staying within the warm spectrum
+                float speed = 2f;
+                float r = (float) (0.6f + 0.4f * Math.sin(beamColorTimer * speed)) * 255f; // strong red base
+                float g = (float) (0.3f + 0.2f * Math.sin(beamColorTimer * speed + 1f)) * 255f; // subtle green for yellow tint
+                float b = 0f; // No blue at all
+
+                float alpha = 180f + 75f * (float) Math.sin(beamColorTimer * speed * 1.5f);
+
+// If you want to go *completely red/orange*, clamp or remove green further:
+                g = Math.min(g, 100f); // Keep green low to avoid yellow tipping into full yellow-green
+
+                Color smoothDynamicColor = new Color(
+                        (int)Math.min(r + random.nextInt(10) - 5, 255),
+                        (int)Math.min(g + random.nextInt(10) - 5, 100),
+                        0,
+                        (int)Math.min(alpha + random.nextInt(20) - 10, 255)
+                );
+
+
+// Now spawn EMP arcs at several points along the beam
+                Vector2f from = beam.getFrom(); // Start of the beam (weapon position)
+                Vector2f to = beam.getTo();     // End of the beam
+
+// Calculate the total distance of the beam
+                float distance = Misc.getDistance(from, to);
+
+// Define the step size (the smaller the value, the more arcs will be created)
+                float stepSize = 50f; // Every 50 units along the beam
+
+// Create arcs along the beam
+                for (float i = 0; i < distance; i += stepSize) {
+                    // Calculate the position of each EMP arc along the beam
+                    float ratio = i / distance; // Percentage of the way from the start to the end of the beam
+                    Vector2f point = new Vector2f(
+                            from.x + (to.x - from.x) * ratio,  // Interpolated X position
+                            from.y + (to.y - from.y) * ratio   // Interpolated Y position
+                    );
+
+                    // Add a slight flicker/randomness to the arc for some visual variation
+                    Vector2f flicker = new Vector2f(
+                            point.x + (random.nextFloat() * 10f - 5f),
+                            point.y + (random.nextFloat() * 10f - 5f)
+                    );
+
+                    // Spawn the EMP arc visual along the beam
+                    engine.spawnEmpArcVisual(
+                            point,                    // The position along the beam
+                            null,                     // No origin (visual arc)
+                            flicker,                  // Randomized flicker point
+                            null,                     // No target
+                            6f,                       // Arc thickness
+                            smoothDynamicColor,       // Core color (smooth color shift)
+                            smoothDynamicColor        // Fringe color (same as core for simplicity)
+                    );
+                }
+// Add a smooth particle at the beam tip for additional visual impact
+                engine.addSmoothParticle(beam.getTo(), new Vector2f(), 35f, 1.2f, 0.2f, smoothDynamicColor);}
         }
         // 🔥 FIRING PHASE: EMP arcs crawling up the beam
         beamLightningInterval.advance(amount);
@@ -159,8 +218,26 @@ AEG_PhotonBarrageBeamStats implements BeamEffectPlugin {
                         flicker,
                         null,
                         5f,
-                        new Color(255, 200 - random.nextInt(30), 100 - random.nextInt(40), 255), // Core
-                        new Color(255, 150 - random.nextInt(30), 50 - random.nextInt(40), 255)  // Fringe
+                        new Color(255, 200 - random.nextInt(30), 100 - random.nextInt(40), 255 - random.nextInt(50)), // Core
+                        new Color(255, 150 - random.nextInt(30), 50 - random.nextInt(40), 255 - random.nextInt(50))  // Fringe
+                );
+            }
+            // ⚡ Final zap from beam end to the current target (if any)
+            if (beam.getDamageTarget() != null && beam.getTo() != null) {
+                CombatEntityAPI target = beam.getDamageTarget();
+                Vector2f beamEnd = beam.getTo();
+
+                Color EMP_CORE_COLOR = new Color(255, 225 - random.nextInt(40), 150 - random.nextInt(50), 255 - random.nextInt(50));
+                Color EMP_FRINGE_COLOR = new Color(255, 150 - random.nextInt(40), 50 - random.nextInt(50), 255 - random.nextInt(50));
+
+                engine.spawnEmpArcVisual(
+                        beamEnd,
+                        beam.getSource(),
+                        target.getLocation(),
+                        target,
+                        20f,  // Thickness
+                        EMP_CORE_COLOR,
+                        EMP_FRINGE_COLOR
                 );
             }
         }
