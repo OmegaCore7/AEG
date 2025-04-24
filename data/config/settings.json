@@ -6,13 +6,14 @@
 		"AEG_IncarnationModulePlugin": "data.weapons.scripts.AEG_IncarnationModulePlugin",
 		"AEG_PurgePlugin": "data.weapons.scripts.AEG_PurgePlugin"
 	},
-
-	 "fx": {
-      "sparkfx_00": "graphics/fx/sparkfx_00.png",
-      "sparkfx_01": "graphics/fx/sparkfx_01.png",
-      "sparkfx_02": "graphics/fx/sparkfx_02.png",
-      "sparkfx_03": "graphics/fx/sparkfx_03.png",
-      "sparkfx_04": "graphics/fx/sparkfx_04.png",
-      "sparkfx_05": "graphics/fx/sparkfx_05.png"
-	}
+	"fx":{
+			"sparkfx_00":"graphics/fx/sparkfx_00.png",
+			"sparkfx_01":"graphics/fx/sparkfx_01.png",
+			"sparkfx_02":"graphics/fx/sparkfx_02.png",
+			"sparkfx_03":"graphics/fx/sparkfx_03.png",
+			"sparkfx_04":"graphics/fx/sparkfx_04.png",
+			"sparkfx_05":"graphics/fx/sparkfx_05.png",
+			"sparkfx_06":"graphics/fx/sparkfx_06.png",
+			"AEG_zero":"graphics/fx/AEG_zero.png"
+		}
 }

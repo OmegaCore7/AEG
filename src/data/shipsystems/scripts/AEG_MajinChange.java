@@ -11,7 +11,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class AEG_MajinChange extends BaseShipSystemScript {
-
+    private static final float MAX_DURATION = 999f; // For visuals
+    private boolean visualActive = false;
     private static final float DOMAIN_RADIUS = 2500f;
     private static final float EXPANSION_SPEED = 500f; // Speed at which the effect expands
     private static final float HEAL_PERCENTAGE = 0.50f; // Heal 50% of the damage
@@ -31,11 +32,15 @@ public class AEG_MajinChange extends BaseShipSystemScript {
         boolean isActive = state == State.IN || state == State.ACTIVE;
 
         if (isActive) {
+            // Register projectile blocking once
+            if (!ship.hasListenerOfClass(AEG_RealityMarbleBlocker.class)) {
+                ship.addListener(new AEG_RealityMarbleBlocker(ship, currentRadius));
+            }
             // Gradually increase the radius
             currentRadius = Math.min(DOMAIN_RADIUS, currentRadius + EXPANSION_SPEED * Global.getCombatEngine().getElapsedInLastFrame());
 
-            // Create visual effects within the current radius
-            visualsHelper.createDomainVisuals(engine, ship, true, currentRadius);
+            // visualsHelper.createDomainVisuals(engine, ship, true, currentRadius);
+            visualsHelper.renderDomain(engine, ship, currentRadius, DOMAIN_RADIUS, isActive);
 
             // Boost all passive abilities
             restoreArmor(ship, 0.1f * Global.getCombatEngine().getElapsedInLastFrame()); // Example boost for armor regeneration
@@ -60,37 +65,18 @@ public class AEG_MajinChange extends BaseShipSystemScript {
             }
 
             // Full Power Causality Weapon
-            ship.addListener(new DamageTakenModifier() {
-                @Override
-                public String modifyDamageTaken(Object param, CombatEntityAPI target, DamageAPI damage, Vector2f point, boolean shieldHit) {
-                    if (target instanceof ShipAPI && target == ship) {
-                        float hullLevel = ship.getHullLevel();
-                        if (hullLevel <= 0.20f) {
-                            float damageAmount = damage.getDamage();
-                            float healAmount = damageAmount * HEAL_PERCENTAGE;
-                            float reflectAmount = damageAmount * REFLECT_PERCENTAGE;
-
-                            // Heal the ship
-                            ship.setHitpoints(ship.getHitpoints() + healAmount);
-
-                            // Reflect damage to enemies within the radius
-                            for (ShipAPI enemy : getEnemiesWithinRange(ship, currentRadius)) {
-                                engine.applyDamage(enemy, point, reflectAmount, damage.getType(), 0f, false, false, ship);
-                            }
-
-                            // Nullify the original damage
-                            damage.setDamage(0);
-                            return "full_power_causality_weapon";
-                        }
-                    }
-                    return null;
-                }
-            });
+            if (!ship.hasListenerOfClass(AEG_CausalityListener.class)) {
+                ship.addListener(new AEG_CausalityListener(ship, engine));
+            }
         } else {
             // Remove all modifications when the system is not active
             deactivate(stats, id);
             currentRadius = 0f; // Reset the radius when the system is deactivated
+            //Remove Listeners
+            ship.removeListenerOfClass(AEG_RealityMarbleBlocker.class);
+            ship.removeListenerOfClass(AEG_CausalityListener.class);
         }
+
     }
 
     private void restoreArmor(ShipAPI ship, float amount) {
