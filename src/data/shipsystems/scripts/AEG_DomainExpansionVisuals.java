@@ -37,7 +37,7 @@ public class AEG_DomainExpansionVisuals {
                 0f, 0f,
                 new Color(
                         255,                     // red
-                        140 + random.nextInt(100), // yellow/orange
+                        140 + random.nextInt(110), // yellow/orange
                         20 + random.nextInt(50),  // just a hint of red/orange
                         70 + random.nextInt(185)   // alpha
                 ),
@@ -73,7 +73,7 @@ public class AEG_DomainExpansionVisuals {
                     new Vector2f(0f, 0f)  // Velocity (stationary ripple)
             );
             ripple.setSize(currentRadius);
-            ripple.setIntensity(15f); // adjust to taste
+            ripple.setIntensity(15f - random.nextInt(7)); // adjust to taste
             ripple.setFrameRate(60f);
             ripple.setLifetime(0.5f);
             ripple.fadeInIntensity(0.3f);
