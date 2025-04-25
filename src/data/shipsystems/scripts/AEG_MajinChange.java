@@ -1,16 +1,21 @@
 package data.shipsystems.scripts;
 
 import com.fs.starfarer.api.Global;
-import com.fs.starfarer.api.combat.*;
-import com.fs.starfarer.api.combat.listeners.DamageTakenModifier;
+import com.fs.starfarer.api.combat.ArmorGridAPI;
+import com.fs.starfarer.api.combat.CombatEngineAPI;
+import com.fs.starfarer.api.combat.MutableShipStatsAPI;
+import com.fs.starfarer.api.combat.ShipAPI;
 import com.fs.starfarer.api.impl.combat.BaseShipSystemScript;
 import org.lazywizard.lazylib.MathUtils;
-import org.lwjgl.util.vector.Vector2f;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class AEG_MajinChange extends BaseShipSystemScript {
+    private float arcTimer = 0f;
+    private float fogTimer = 0f;
+    private final float ARC_INTERVAL = 0.4f; // every 0.4 seconds
+    private final float FOG_INTERVAL = 0.3f; // every 0.3 seconds
     private static final float MAX_DURATION = 999f; // For visuals
     private boolean visualActive = false;
     private static final float DOMAIN_RADIUS = 2500f;
@@ -32,6 +37,19 @@ public class AEG_MajinChange extends BaseShipSystemScript {
         boolean isActive = state == State.IN || state == State.ACTIVE;
 
         if (isActive) {
+            // Tick timers
+            arcTimer -= engine.getElapsedInLastFrame();
+            fogTimer -= engine.getElapsedInLastFrame();
+
+            if (arcTimer <= 0f) {
+                AEG_DomainExpansionVisuals.spawnEdgeLightning(engine, ship, currentRadius);
+                arcTimer = ARC_INTERVAL;
+            }
+
+            if (fogTimer <= 0f) {
+                AEG_DomainExpansionVisuals.spawnEnemyGroundEffect(engine, ship, currentRadius);
+                fogTimer = FOG_INTERVAL;
+            }
             // Register projectile blocking once
             if (!ship.hasListenerOfClass(AEG_RealityMarbleBlocker.class)) {
                 ship.addListener(new AEG_RealityMarbleBlocker(ship, currentRadius));
@@ -105,6 +123,7 @@ public class AEG_MajinChange extends BaseShipSystemScript {
     }
 
     private void deactivate(MutableShipStatsAPI stats, String id) {
+        ShipAPI ship = (ShipAPI) stats.getEntity();
         // Reset all stats to their original values
         stats.getEnergyWeaponDamageMult().unmodify(id);
         stats.getBallisticWeaponDamageMult().unmodify(id);
@@ -118,5 +137,13 @@ public class AEG_MajinChange extends BaseShipSystemScript {
         stats.getDeceleration().unmodify(id);
         stats.getTurnAcceleration().unmodify(id);
         stats.getMaxTurnRate().unmodify(id);
+        //Clear Timers
+        arcTimer = 0f;
+        fogTimer = 0f;
+
+        // Clear visuals
+        if (ship != null && Global.getCombatEngine() != null) {
+            visualsHelper.renderDomain(Global.getCombatEngine(), ship, 0f, DOMAIN_RADIUS, false);
+        }
     }
 }
