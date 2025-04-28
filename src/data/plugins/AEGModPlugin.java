@@ -4,9 +4,13 @@ import com.fs.starfarer.api.BaseModPlugin;
 import com.fs.starfarer.api.Global;
 import exerelin.campaign.SectorManager;
 import data.scripts.world.AEGNameGen;
+import org.dark.shaders.util.ShaderLib;
 
 public class AEGModPlugin extends BaseModPlugin {
-
+    @Override
+    public void onApplicationLoad() throws Exception {
+        ShaderLib.init();
+    }
     @Override
     public void onNewGame() {
         super.onNewGame();

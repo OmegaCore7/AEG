@@ -22,6 +22,7 @@ public class AEG_7BlackBoxes extends BaseHullMod {
     private boolean lastStandTriggered = false; // Flag to track if Last Stand Protocol has been triggered
     private boolean damageReductionActive = false; // Flag to track if damage reduction is active
 
+
     @Override
     public void advanceInCombat(ShipAPI ship, float amount) {
         if (ship == null) return;
@@ -64,19 +65,31 @@ public class AEG_7BlackBoxes extends BaseHullMod {
         }
 
         // Last Stand Protocol
-        if (!lastStandTriggered && (ship.getHullLevel() <= 0.05f || ship.getHitpoints() - ship.getMaxHitpoints() * 0.05f <= 4000)) {
+        if (!lastStandTriggered &&
+                (ship.getHullLevel() <= 0.05f || ship.getHitpoints() <= ship.getMaxHitpoints() * 0.05f)) {
             Global.getLogger(this.getClass()).info("Last Stand Protocol triggered");
-            ShipAPI attacker = findAttackingShip(ship);
+            ship.setHitpoints(ship.getMaxHitpoints() * 0.25f);
+
+            AEG_7BlackBoxesAttackerTracker tracker = (AEG_7BlackBoxesAttackerTracker) ship.getCustomData().get("AEG_7_AttackerTracker");
+            ShipAPI attacker = null;
+            if (tracker != null) {
+                float timeSinceHit = Global.getCombatEngine().getTotalElapsedTime(false) - tracker.getLastDamageTime();
+                if (timeSinceHit <= 2f) {
+                    attacker = tracker.getLastAttacker();
+                }
+            }
+
             if (attacker != null) {
                 Global.getLogger(this.getClass()).info("Attacker found: " + attacker.getName());
                 dealFatalDamage(attacker);
-                ship.setHitpoints(ship.getMaxHitpoints() * 0.25f);
-                lastStandTriggered = true; // Set the flag to true after triggering
-                damageReductionActive = true; // Activate damage reduction
-                damageReductionTimer.advance(0); // Reset the timer
             } else {
                 Global.getLogger(this.getClass()).info("No attacker found");
             }
+
+            lastStandTriggered = true;
+            damageReductionActive = true;
+            damageReductionTimer.advance(0); // Reset timer
+
         }
 
         // Damage Reduction
@@ -123,7 +136,11 @@ public class AEG_7BlackBoxes extends BaseHullMod {
 
     @Override
     public void applyEffectsAfterShipCreation(ShipAPI ship, String id) {
-        // Apply any effects that need to be set after the ship is created
+        if (ship.getCustomData().get("AEG_7_AttackerTracker") == null) {
+            AEG_7BlackBoxesAttackerTracker tracker = new AEG_7BlackBoxesAttackerTracker();
+            ship.addListener(tracker);
+            ship.setCustomData("AEG_7_AttackerTracker", tracker);
+        }
     }
 
     @Override
