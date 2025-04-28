@@ -46,10 +46,6 @@ public class AEG_MajinChange extends BaseShipSystemScript {
                 arcTimer = ARC_INTERVAL;
             }
 
-            if (fogTimer <= 0f) {
-                AEG_DomainExpansionVisuals.spawnEnemyGroundEffect(engine, ship, currentRadius);
-                fogTimer = FOG_INTERVAL;
-            }
             // Register projectile blocking once
             if (!ship.hasListenerOfClass(AEG_RealityMarbleBlocker.class)) {
                 ship.addListener(new AEG_RealityMarbleBlocker(ship, currentRadius));
@@ -58,7 +54,7 @@ public class AEG_MajinChange extends BaseShipSystemScript {
             currentRadius = Math.min(DOMAIN_RADIUS, currentRadius + EXPANSION_SPEED * Global.getCombatEngine().getElapsedInLastFrame());
 
             // visualsHelper.createDomainVisuals(engine, ship, true, currentRadius);
-            visualsHelper.renderDomain(engine, ship, currentRadius, DOMAIN_RADIUS, isActive);
+            visualsHelper.renderDomain(engine, ship, currentRadius, isActive);
 
             // Boost all passive abilities
             restoreArmor(ship, 0.1f * Global.getCombatEngine().getElapsedInLastFrame()); // Example boost for armor regeneration
@@ -143,7 +139,7 @@ public class AEG_MajinChange extends BaseShipSystemScript {
 
         // Clear visuals
         if (ship != null && Global.getCombatEngine() != null) {
-            visualsHelper.renderDomain(Global.getCombatEngine(), ship, 0f, DOMAIN_RADIUS, false);
+            visualsHelper.renderDomain(Global.getCombatEngine(), ship, 0f, false);
         }
     }
 }

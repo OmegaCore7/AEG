@@ -2,7 +2,6 @@ package data.shipsystems.scripts;
 
 import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.combat.CombatEngineAPI;
-import com.fs.starfarer.api.combat.CombatEngineLayers;
 import com.fs.starfarer.api.combat.ShipAPI;
 import org.dark.shaders.distortion.DistortionShader;
 import org.dark.shaders.distortion.RippleDistortion;
@@ -17,11 +16,9 @@ public class AEG_DomainExpansionVisuals {
 
     private static final String DISTORTION_SPRITE = "graphics/fx/wormhole_ring_bright2.png";
     private static final Random random = new Random();
-    private boolean ringRendered = false;
 
-    public void renderDomain(CombatEngineAPI engine, ShipAPI ship, final float currentRadius, final float maxRadius, boolean isActive) {
+    public void renderDomain(CombatEngineAPI engine, ShipAPI ship, final float currentRadius, boolean isActive) {
         if (!isActive) {
-            ringRendered = false;
             return;
         }
 
@@ -118,5 +115,6 @@ public class AEG_DomainExpansionVisuals {
             );
         }
     }
+
 
 }

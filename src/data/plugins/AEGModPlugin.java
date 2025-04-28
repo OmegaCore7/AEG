@@ -2,16 +2,19 @@ package data.plugins;
 
 import com.fs.starfarer.api.BaseModPlugin;
 import com.fs.starfarer.api.Global;
+import com.fs.starfarer.api.graphics.SpriteAPI;
 import exerelin.campaign.SectorManager;
 import data.scripts.world.AEGNameGen;
 import org.dark.shaders.util.ShaderLib;
 
 public class AEGModPlugin extends BaseModPlugin {
+    public static SpriteAPI ringSprite;
     @Override
     public void onApplicationLoad() throws Exception {
         ShaderLib.init();
     }
-    @Override
+
+@Override
     public void onNewGame() {
         super.onNewGame();
 

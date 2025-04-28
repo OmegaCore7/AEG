@@ -1,17 +1,22 @@
 package data.weapons.onhit;
 
+import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.combat.*;
 import com.fs.starfarer.api.combat.listeners.ApplyDamageResultAPI;
 import com.fs.starfarer.api.input.InputEventAPI;
 import com.fs.starfarer.api.util.Misc;
 import org.lazywizard.lazylib.combat.CombatUtils;
 import org.lwjgl.util.vector.Vector2f;
+import org.magiclib.util.MagicRender;
 
+import java.awt.*;
 import java.util.List;
+import java.util.Random;
 
 public class AEG_BoltingDriverEffect implements OnHitEffectPlugin {
-
+    private static final String DISTORTION_SPRITE = "graphics/fx/wormhole_ring_bright2.png";
     private static boolean effectActive = false;
+    private static final Random random = new Random();
 
     @Override
     public void onHit(DamagingProjectileAPI projectile, final CombatEntityAPI target, final Vector2f point, boolean shieldHit, ApplyDamageResultAPI damageResult, final CombatEngineAPI engine) {
@@ -53,14 +58,35 @@ public class AEG_BoltingDriverEffect implements OnHitEffectPlugin {
                                 point.x + radius * (float) Math.cos(angle),
                                 point.y + radius * (float) Math.sin(angle)
                         );
-                        float nebulaSize = 25f + (float)(Math.random() * 50f);
+                        float nebulaSize = 25f + (float) (Math.random() * 50f);
                         engine.addNebulaParticle(nebulaPoint, new Vector2f(), nebulaSize, 1, 0.5f, 0.5f, 1f, Misc.getHighlightColor());
                     }
+                    ShipAPI ship = null;
+                    final Vector2f ringLocation = new Vector2f(point);
 
+                    // === 1. Giant shimmer dome using a transparent sprite ===
+                    MagicRender.battlespace(
+                            Global.getSettings().getSprite(DISTORTION_SPRITE),
+                            ringLocation,
+                            new Vector2f(),
+                            new Vector2f(700, 700),
+                            new Vector2f(),
+                            0f, 0f,
+                            new Color(
+                                    255 - random.nextInt(110),                     // red
+                                    140 + random.nextInt(110), // yellow/orange
+                                    20 + random.nextInt(120),  // just a hint of red/orange
+                                    70 + random.nextInt(185)   // alpha
+                            ),
+                            true,
+                            0f,
+                            0.2f,
+                            0.1f
+                    );
                     // Apply pull and push effects
                     for (CombatEntityAPI entity : CombatUtils.getEntitiesWithinRange(point, 700f)) {
                         if (entity instanceof ShipAPI) {
-                            ShipAPI ship = (ShipAPI) entity;
+                            ship = (ShipAPI) entity;
                             if (ship == engine.getPlayerShip()) {
                                 continue; // Skip the player ship
                             }
