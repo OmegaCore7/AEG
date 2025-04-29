@@ -10,9 +10,9 @@
   "hardpointGlowSprite": "graphics/ships/zero/zero_arm_r_glow.png",
   "glowColor": [
     255,
-    150,
+    255,
     50,
-    255
+    25
   ],
   "turretOffsets": [
     78,

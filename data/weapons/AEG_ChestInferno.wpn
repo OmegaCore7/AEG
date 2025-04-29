@@ -5,15 +5,15 @@
   "type": "ENERGY",
   "mountTypeOverride": "HYBRID",
   "size": "SMALL",
-  "everyFrameEffect": "com.fs.starfarer.api.impl.combat.CryofluxTransducerEffect",
+  "everyFrameEffect": "data.weapons.scripts.AEG_ChestInferno",
   "turretSprite": "graphics/ships/zero/zero_chest.png",
   "turretGlowSprite": "graphics/ships/zero/zero_chest_glow.png",
   "hardpointSprite": "graphics/ships/zero/zero_chest.png",
   "hardpointGlowSprite": "graphics/ships/zero/zero_chest_glow.png",
   "glowColor": [
-    155,
-    115,
-    115,
+    255,
+    255,
+    0,
     255
   ],
   "turretOffsets": [
@@ -58,8 +58,21 @@
     0
   ],
   "barrelMode": "LINKED",
-  "animationType": "GLOW",
+  "animationType": "GLOW_AND_FLASH",
   "autocharge": true,
-  "requiresFullCharge": false,
+  "muzzleFlashSpec": {
+    "length": 30,
+    "spread": 20,
+    "particleSizeMin": 10,
+    "particleSizeRange": 10,
+    "particleDuration": 0.5,
+    "particleCount": 10,
+    "particleColor": [
+      255,
+      200,
+      50,
+      255
+    ]
+  },
   "fireSoundTwo": "cryoblaster_fire"
 }
