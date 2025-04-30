@@ -2,16 +2,18 @@ package data.weapons.scripts;
 
 import com.fs.starfarer.api.combat.*;
 import com.fs.starfarer.api.input.InputEventAPI;
+import com.fs.starfarer.api.util.Misc;
 import org.lwjgl.util.vector.Vector2f;
+
+import java.util.List;
 
 public class AEG_ChestInfernoLimbController implements EveryFrameCombatPlugin {
 
     private CombatEngineAPI engine;
-    private boolean initialized = false;
 
-    private static final String MAIN_WEAPON_SLOT = "WS0002";
-    private static final String ARM_L = "WS0005";
-    private static final String ARM_R = "WS0006";
+    private static final String MAIN_WEAPON_SLOT = "WS0002";  // AEG_ChestInferno
+    private static final String ARM_L = "WS0006";
+    private static final String ARM_R = "WS0005";
     private static final String SHOULDER_L = "WS0003";
     private static final String SHOULDER_R = "WS0004";
 
@@ -21,54 +23,51 @@ public class AEG_ChestInfernoLimbController implements EveryFrameCombatPlugin {
     }
 
     @Override
-    public void advance(float amount, java.util.List<InputEventAPI> events) {
+    public void advance(float amount, List<InputEventAPI> events) {
         if (engine == null || engine.isPaused()) return;
 
         for (ShipAPI ship : engine.getShips()) {
             if (ship == null || !ship.isAlive()) continue;
 
-            WeaponAPI main = getWeaponBySlot(ship, MAIN_WEAPON_SLOT);
-            if (main == null) continue;
+            WeaponAPI inferno = getWeaponBySlot(ship, MAIN_WEAPON_SLOT);
+            if (inferno == null) continue;
 
-            // Only run when the player has this weapon selected
-            if (ship != engine.getPlayerShip()) continue;
-            WeaponGroupAPI selectedGroup = ship.getSelectedGroupAPI();
-            if (selectedGroup == null || !selectedGroup.getWeaponsCopy().contains(main)) continue;
+            // Only animate if the inferno weapon is selected
+            WeaponGroupAPI selected = ship.getSelectedGroupAPI();
+            if (selected == null || !selected.getWeaponsCopy().contains(inferno)) continue;
 
-            float charge = main.getChargeLevel();
+            float charge = inferno.getChargeLevel();
+            float facing = ship.getFacing();
 
             // Interpolated limb angles based on charge
-            float armBase = 78f;
-            float armCharge = 65f;
-            float armFire = 82f;
+            float armLStart = 15f, armLCharge = 65f, armLFire = 82f;
+            float armRStart = -15f, armRCharge = -65f, armRFire = -82f;
 
-            float shoulderBase = 0f;
-            float shoulderCharge = 30f;
-            float shoulderFire = 25f;
+            float shoulderLStart = 0f, shoulderLCharge = 30f, shoulderLFire = 25f;
+            float shoulderRStart = 0f, shoulderRCharge = -30f, shoulderRFire = -25f;
 
-            // Custom mapping for smooth pose blending
+// Smooth phase blending
             float t = charge;
+            float chargeT = mapCharge(t, 0.2f, 0.7f);
+            float fireT = mapCharge(t, 0.7f, 1.0f);
 
-            float armT = mapCharge(t, 0.2f, 0.7f);
-            float fireT = mapCharge(t, 0.7f, 1f);
+// Final interpolated angles
+            float finalArmL = lerp(armLStart, lerp(armLCharge, armLFire, fireT), chargeT);
+            float finalArmR = lerp(armRStart, lerp(armRCharge, armRFire, fireT), chargeT);
+            float finalShoulderL = lerp(shoulderLStart, lerp(shoulderLCharge, shoulderLFire, fireT), chargeT);
+            float finalShoulderR = lerp(shoulderRStart, lerp(shoulderRCharge, shoulderRFire, fireT), chargeT);
 
-            float leftArmAngle = lerp(armBase, lerp(armCharge, armFire, fireT), armT);
-            float rightArmAngle = leftArmAngle;
-
-            float leftShoulderAngle = lerp(shoulderBase, lerp(shoulderCharge, shoulderFire, fireT), armT);
-            float rightShoulderAngle = leftShoulderAngle;
-
-            // Apply rotations
-            rotateWeapon(ship, ARM_L, -leftArmAngle);
-            rotateWeapon(ship, ARM_R, rightArmAngle);
-            rotateWeapon(ship, SHOULDER_L, -leftShoulderAngle);
-            rotateWeapon(ship, SHOULDER_R, rightShoulderAngle);
+// Apply rotations relative to ship
+            rotateWeapon(ship, ARM_L, ship.getFacing() + finalArmL);
+            rotateWeapon(ship, ARM_R, ship.getFacing() + finalArmR);
+            rotateWeapon(ship, SHOULDER_L, ship.getFacing() + finalShoulderL);
+            rotateWeapon(ship, SHOULDER_R, ship.getFacing() + finalShoulderR);
         }
     }
 
     private WeaponAPI getWeaponBySlot(ShipAPI ship, String slotId) {
         for (WeaponAPI w : ship.getAllWeapons()) {
-            if (slotId.equals(w.getSlot().getId())) {
+            if (w.getSlot() != null && slotId.equals(w.getSlot().getId())) {
                 return w;
             }
         }
@@ -86,7 +85,6 @@ public class AEG_ChestInfernoLimbController implements EveryFrameCombatPlugin {
         return a + t * (b - a);
     }
 
-    // Maps charge level to a 0–1 range within a subrange
     private float mapCharge(float charge, float min, float max) {
         if (charge < min) return 0f;
         if (charge > max) return 1f;
@@ -94,7 +92,7 @@ public class AEG_ChestInfernoLimbController implements EveryFrameCombatPlugin {
     }
 
     @Override
-    public void processInputPreCoreControls(float amount, java.util.List<InputEventAPI> events) {}
+    public void processInputPreCoreControls(float amount, List<InputEventAPI> events) {}
 
     @Override
     public void renderInWorldCoords(ViewportAPI viewport) {}
