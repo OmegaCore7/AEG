@@ -14,6 +14,7 @@ import java.util.List;
 
 public class AEG_ChestInferno extends BaseCombatLayeredRenderingPlugin
         implements OnFireEffectPlugin, OnHitEffectPlugin, EveryFrameWeaponEffectPlugin {
+    private AEG_ChestInfernoChargeEffectHelper chargeHelper = new AEG_ChestInfernoChargeEffectHelper();
 
     protected List<AEG_ChestInferno> trails = new ArrayList<>();
     protected DamagingProjectileAPI proj;
@@ -45,7 +46,11 @@ public class AEG_ChestInferno extends BaseCombatLayeredRenderingPlugin
         trails.add(0, trail);
     }
 
+
     public void advance(float amount, CombatEngineAPI engine, WeaponAPI weapon) {
+        // Call the visual helper here
+        AEG_ChestInfernoChargeEffectHelper.advance(amount, engine, weapon);
+
         if (Global.getCombatEngine().isPaused()) return;
         Iterator<AEG_ChestInferno> iter = trails.iterator();
         while (iter.hasNext()) {
@@ -228,3 +233,4 @@ public class AEG_ChestInferno extends BaseCombatLayeredRenderingPlugin
         }
     }
 }
+

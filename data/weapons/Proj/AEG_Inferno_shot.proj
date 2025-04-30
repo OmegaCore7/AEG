@@ -4,7 +4,6 @@
 	"specClass":"projectile",
 	"onFireEffectPlugin": "data.scripts.weapons.AEG_ChestInferno",
     "onHitEffectPlugin": "data.scripts.weapons.AEG_ChestInferno",
-    "everyFrameEffectPlugin": "data.scripts.weapons.AEG_ChestInferno",
 	"spawnType":"BALLISTIC_AS_BEAM",
 	"collisionClass":"RAY",
 	"collisionClassByFighter":"RAY_FIGHTER",
