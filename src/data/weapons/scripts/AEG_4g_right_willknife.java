@@ -1,19 +1,18 @@
 package data.weapons.scripts;
 
-import org.lwjgl.util.vector.Vector2f;
 import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.combat.*;
-import com.fs.starfarer.api.util.IntervalUtil;
-import org.lazywizard.lazylib.VectorUtils;
-import com.fs.starfarer.api.util.Misc;
 import com.fs.starfarer.api.graphics.SpriteAPI;
-import org.magiclib.util.MagicRender;
-import org.magiclib.plugins.MagicTrailPlugin;
-import java.util.List;
-import java.util.ArrayList;
-import org.lazywizard.lazylib.combat.CombatUtils;
-import java.awt.Color;
+import com.fs.starfarer.api.util.IntervalUtil;
 import org.lazywizard.lazylib.MathUtils;
+import org.lazywizard.lazylib.combat.CombatUtils;
+import org.lwjgl.util.vector.Vector2f;
+import org.magiclib.plugins.MagicTrailPlugin;
+import org.magiclib.util.MagicRender;
+
+import java.awt.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class AEG_4g_right_willknife implements BeamEffectPlugin {
 

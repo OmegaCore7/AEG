@@ -49,7 +49,7 @@ public class AEG_ChestInferno extends BaseCombatLayeredRenderingPlugin
 
     public void advance(float amount, CombatEngineAPI engine, WeaponAPI weapon) {
         // Call the visual helper here
-        AEG_ChestInfernoChargeEffectHelper.advance(amount, engine, weapon);
+        chargeHelper.advance(amount, engine, weapon);
 
         if (Global.getCombatEngine().isPaused()) return;
         Iterator<AEG_ChestInferno> iter = trails.iterator();
@@ -65,11 +65,11 @@ public class AEG_ChestInferno extends BaseCombatLayeredRenderingPlugin
                     Vector2f to = trail.proj.getLocation();
                     float dur = 1f + (float)Math.random() * 3f;
                     Global.getCombatEngine().addHitParticle(Misc.getDiff(from, to), new Vector2f(), 50f - random.nextInt(25), 1f + random.nextInt(1), dur, new Color(255, 200 - random.nextInt(100), 50 - random.nextInt(45)));
-                    Global.getCombatEngine().spawnEmpArcVisual(from, null, to, null, 2f, new Color(255, 200 - random.nextInt(150), 100 - random.nextInt(90)), new Color(255, 100 + random.nextInt(100), 0 + random.nextInt(200)));
+                    Global.getCombatEngine().spawnEmpArcVisual(from, null, to, null, 2f + random.nextInt(18), new Color(255, 200 - random.nextInt(150), 100 - random.nextInt(90)), new Color(255, 100 + random.nextInt(100), 0 + random.nextInt(200)));
                 }
             }
             // Rare but long, trailing arcs
-            if (Math.random() < 0.02f) { // lower frequency than usual arcs
+            if (Math.random() < 0.01f) { // lower frequency than usual arcs
                 Vector2f from = trail.proj.getLocation();
                 Vector2f dir = Misc.getUnitVectorAtDegreeAngle((float)Math.random() * 360f);
                 dir.scale(150f + (float)Math.random() * 100f);
@@ -77,7 +77,7 @@ public class AEG_ChestInferno extends BaseCombatLayeredRenderingPlugin
 
                 Global.getCombatEngine().spawnEmpArcVisual(
                         from, null, to, null,
-                        8f,
+                        8f + random.nextInt(42),
                         new Color(100 + random.nextInt(100), 200 - random.nextInt(50), 255, 200 + random.nextInt(55)),
                         new Color(20 + random.nextInt(100), 150 - random.nextInt(50), 255, 255 - random.nextInt(100))
                 );
@@ -146,7 +146,7 @@ public class AEG_ChestInferno extends BaseCombatLayeredRenderingPlugin
             engine.addSmoothParticle(
                     point,
                     new Vector2f(),
-                    100f,
+                    100f - random.nextInt(65),
                     0.5f,
                     2f + random.nextInt(6),
                     new Color(30, 10, 5, 90 + random.nextInt(100))
