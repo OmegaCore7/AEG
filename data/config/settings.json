@@ -4,7 +4,8 @@
 		"AEG_ArmorPiercePlugin": "data.weapons.scripts.AEG_ArmorPiercePlugin",
 		"AEG_BlackHoleGeneratorPlugin": "data.weapons.scripts.AEG_BlackHoleGeneratorPlugin",
 		"AEG_IncarnationModulePlugin": "data.weapons.scripts.AEG_IncarnationModulePlugin",
-		"AEG_PurgePlugin": "data.weapons.scripts.AEG_PurgePlugin"
+		"AEG_PurgePlugin": "data.weapons.scripts.AEG_PurgePlugin",
+		"AEG_ChestInfernoLimbController": "data.weapons.scripts.AEG_ChestInfernoLimbController"
 	},
 	"fx":{
 			"sparkfx_00":"graphics/fx/sparkfx_00.png",
