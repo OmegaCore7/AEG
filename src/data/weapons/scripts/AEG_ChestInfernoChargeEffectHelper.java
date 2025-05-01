@@ -102,7 +102,7 @@ public class AEG_ChestInfernoChargeEffectHelper {
             if (chargeProgress > 0.3f && Math.random() < NEBULA_CHANCE) {
                 float angle = (float) Math.random() * 360f;
                 Vector2f dir = Misc.getUnitVectorAtDegreeAngle(angle);
-                dir.scale(10f + chargeProgress * 20f);
+                dir.scale(10f + chargeProgress * 40f);
                 Vector2f smokeLoc = Vector2f.add(weaponLoc, dir, null);
 
                 engine.addNebulaParticle(
@@ -114,6 +114,17 @@ public class AEG_ChestInfernoChargeEffectHelper {
                         0.05f + random.nextFloat() * 0.5f,
                         NEBULA_BASE_DURATION + chargeProgress,
                         NEBULA_COLOR,
+                        false
+                );
+                engine.addNebulaParticle(
+                        smokeLoc,
+                        new Vector2f(shipVel),
+                        20 + chargeProgress * 40,
+                        1.2f + chargeProgress,
+                        0.2f + random.nextInt(1),
+                        0.05f + random.nextFloat() * 1.5f,
+                        NEBULA_BASE_DURATION + chargeProgress + random.nextInt(1),
+                        new Color(255,50 + random.nextInt(180),50 + random.nextInt(150),255 - random.nextInt(105)),
                         false
                 );
             }

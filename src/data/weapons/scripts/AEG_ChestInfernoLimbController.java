@@ -2,18 +2,17 @@ package data.weapons.scripts;
 
 import com.fs.starfarer.api.combat.*;
 import com.fs.starfarer.api.input.InputEventAPI;
-import com.fs.starfarer.api.util.Misc;
+import org.lazywizard.lazylib.MathUtils;
+import org.magiclib.util.MagicAnim;
 import org.lwjgl.util.vector.Vector2f;
 
-import java.awt.*;
 import java.util.List;
-import java.util.Random;
 
 public class AEG_ChestInfernoLimbController implements EveryFrameCombatPlugin {
 
     private CombatEngineAPI engine;
 
-    private static final String MAIN_WEAPON_SLOT = "WS0002";  // AEG_ChestInferno
+    private static final String MAIN_WEAPON_SLOT = "WS0002";
     private static final String ARM_L = "WS0006";
     private static final String ARM_R = "WS0005";
     private static final String SHOULDER_L = "WS0003";
@@ -22,8 +21,6 @@ public class AEG_ChestInfernoLimbController implements EveryFrameCombatPlugin {
     private final float RECOVERY_DURATION = 0.5f;
     private float recoveryProgress = 0f;
     private float lastCharge = 0f;
-    private boolean sparksTriggered = false;
-    private final Random rand = new Random();
 
     @Override
     public void init(CombatEngineAPI engine) {
@@ -46,7 +43,7 @@ public class AEG_ChestInfernoLimbController implements EveryFrameCombatPlugin {
             float charge = inferno.getChargeLevel();
             float facing = ship.getFacing();
 
-            // Define limb angles and positions
+            // Define limb poses
             float armLStartX = 78f, armLStartY = 8f, armLStartAngle = 0f;
             float armRStartX = -78f, armRStartY = 8f, armRStartAngle = 0f;
             float shoulderLStartAngle = 0f, shoulderRStartAngle = 0f;
@@ -64,75 +61,70 @@ public class AEG_ChestInfernoLimbController implements EveryFrameCombatPlugin {
             float finalShoulderLAngle, finalShoulderRAngle;
 
             if (charge > 0f) {
-                float tChargePhase = mapCharge(charge, 0.0f, 0.2f);  // Slam in
-                float tFirePhase = mapCharge(charge, 0.7f, 1.0f);    // Recoil to fire pose
+                float t = MagicAnim.smooth(charge);
 
                 if (charge < 0.2f) {
-                    // Phase 1: Slam
-                    finalArmLX = lerp(armLStartX, armLSlamX, tChargePhase);
-                    finalArmLY = lerp(armLStartY, armLSlamY, tChargePhase);
-                    finalArmLAngle = lerp(armLStartAngle, armLSlamAngle, tChargePhase);
+                    // Phase 1: Slam in
+                    float tSlam = charge / 0.2f;
+                    finalArmLX = lerp(armLStartX, -armLSlamX, tSlam);
+                    finalArmLY = lerp(armLStartY, -armLSlamY, tSlam);
+                    finalArmLAngle = lerp(armLStartAngle, -armLSlamAngle, tSlam);
 
-                    finalArmRX = lerp(armRStartX, armRSlamX, tChargePhase);
-                    finalArmRY = lerp(armRStartY, armRSlamY, tChargePhase);
-                    finalArmRAngle = lerp(armRStartAngle, armRSlamAngle, tChargePhase);
+                    finalArmRX = lerp(armRStartX, -armRSlamX, tSlam);
+                    finalArmRY = lerp(armRStartY, -armRSlamY, tSlam);
+                    finalArmRAngle = lerp(armRStartAngle, -armRSlamAngle, tSlam);
 
-                    finalShoulderLAngle = lerp(shoulderLStartAngle, shoulderLSlamAngle, tChargePhase);
-                    finalShoulderRAngle = lerp(shoulderRStartAngle, shoulderRSlamAngle, tChargePhase);
-
-                    // Handle spark burst during slam phase
-                    spawnSparksAt(ship, 0f, 75f); // World position relative to ship facing
-                    sparksTriggered = true;
+                    finalShoulderLAngle = lerp(shoulderLStartAngle, shoulderLSlamAngle, tSlam);
+                    finalShoulderRAngle = lerp(shoulderRStartAngle, shoulderRSlamAngle, tSlam);
                 } else if (charge < 0.7f) {
-                    // Phase 2: Hold slam pose
-                    finalArmLX = armLSlamX;
-                    finalArmLY = armLSlamY;
-                    finalArmLAngle = armLSlamAngle;
+                    // Phase 2: Hold slam
+                    finalArmLX = -armLSlamX;
+                    finalArmLY = -armLSlamY;
+                    finalArmLAngle = -armLSlamAngle;
 
-                    finalArmRX = armRSlamX;
-                    finalArmRY = armRSlamY;
-                    finalArmRAngle = armRSlamAngle;
+                    finalArmRX = -armRSlamX;
+                    finalArmRY = -armRSlamY;
+                    finalArmRAngle = -armRSlamAngle;
 
                     finalShoulderLAngle = shoulderLSlamAngle;
                     finalShoulderRAngle = shoulderRSlamAngle;
                 } else {
-                    // Phase 3: Recoil back through start into firing pose
-                    finalArmLX = lerp(armLSlamX, armLFireX, tFirePhase);
-                    finalArmLY = lerp(armLSlamY, armLFireY, tFirePhase);
-                    finalArmLAngle = lerp(armLSlamAngle, armLFireAngle, tFirePhase);
+                    // Phase 3: Recoil to fire
+                    float tRecoil = (charge - 0.7f) / 0.3f;
+                    finalArmLX = lerp(-armLSlamX, -armLFireX, tRecoil);
+                    finalArmLY = lerp(-armLSlamY, -armLFireY, tRecoil);
+                    finalArmLAngle = lerp(-armLSlamAngle, -armLFireAngle, tRecoil);
 
-                    finalArmRX = lerp(armRSlamX, armRFireX, tFirePhase);
-                    finalArmRY = lerp(armRSlamY, armRFireY, tFirePhase);
-                    finalArmRAngle = lerp(armRSlamAngle, armRFireAngle, tFirePhase);
+                    finalArmRX = lerp(-armRSlamX, -armRFireX, tRecoil);
+                    finalArmRY = lerp(-armRSlamY, -armRFireY, tRecoil);
+                    finalArmRAngle = lerp(-armRSlamAngle, -armRFireAngle, tRecoil);
 
-                    finalShoulderLAngle = lerp(shoulderLSlamAngle, shoulderLFireAngle, tFirePhase);
-                    finalShoulderRAngle = lerp(shoulderRSlamAngle, shoulderRFireAngle, tFirePhase);
+                    finalShoulderLAngle = lerp(shoulderLSlamAngle, shoulderLFireAngle, tRecoil);
+                    finalShoulderRAngle = lerp(shoulderRSlamAngle, shoulderRFireAngle, tRecoil);
                 }
 
                 recoveryProgress = 0f; // Cancel recovery
             } else {
-                // Recovery: return to idle
+                // Recovery to idle
                 recoveryProgress += amount;
                 float t = Math.min(recoveryProgress / RECOVERY_DURATION, 1f);
-                finalArmLX = lerp(armLFireX, armLStartX, t);
-                finalArmLY = lerp(armLFireY, armLStartY, t);
-                finalArmLAngle = lerp(armLFireAngle, armLStartAngle, t);
+                finalArmLX = lerp(-armLFireX, -armLStartX, t);
+                finalArmLY = lerp(-armLFireY, -armLStartY, t);
+                finalArmLAngle = lerp(-armLFireAngle, -armLStartAngle, t);
 
-                finalArmRX = lerp(armRFireX, armRStartX, t);
-                finalArmRY = lerp(armRFireY, armRStartY, t);
-                finalArmRAngle = lerp(armRFireAngle, armRStartAngle, t);
+                finalArmRX = lerp(-armRFireX, -armRStartX, t);
+                finalArmRY = lerp(-armRFireY, -armRStartY, t);
+                finalArmRAngle = lerp(-armRFireAngle, -armRStartAngle, t);
 
                 finalShoulderLAngle = lerp(shoulderLFireAngle, shoulderLStartAngle, t);
                 finalShoulderRAngle = lerp(shoulderRFireAngle, shoulderRStartAngle, t);
-
-                sparksTriggered = false; // Reset sparks for next activation
             }
 
-            // Update weapon positions and rotations
-            updateWeaponPosition(ship, ARM_L, finalArmLX, finalArmLY, facing + finalArmLAngle);
-            updateWeaponPosition(ship, ARM_R, finalArmRX, finalArmRY, facing + finalArmRAngle);
-            updateWeaponPosition(ship, SHOULDER_L, 0f, 0f, facing + finalShoulderLAngle); // Shoulders only rotate
-            updateWeaponPosition(ship, SHOULDER_R, 0f, 0f, facing + finalShoulderRAngle);
+            // Apply transforms
+            updateWeaponTransform(ship, ARM_L, finalArmLX, finalArmLY, facing + finalArmLAngle);
+            updateWeaponTransform(ship, ARM_R, finalArmRX, finalArmRY, facing + finalArmRAngle);
+            updateWeaponTransform(ship, SHOULDER_L, 0f, 0f, facing + finalShoulderLAngle);
+            updateWeaponTransform(ship, SHOULDER_R, 0f, 0f, facing + finalShoulderRAngle);
 
             lastCharge = charge;
         }
@@ -146,51 +138,27 @@ public class AEG_ChestInfernoLimbController implements EveryFrameCombatPlugin {
         }
         return null;
     }
-
-    private void updateWeaponPosition(ShipAPI ship, String slotId, float offsetX, float offsetY, float angle) {
+    private void updateWeaponTransform(ShipAPI ship, String slotId, float offsetX, float offsetY, float angle) {
         WeaponAPI weapon = getWeaponBySlot(ship, slotId);
         if (weapon != null) {
-            // Calculate new position based on ship location and offsets
-            Vector2f shipLoc = ship.getLocation();
-            float angleRad = (float) Math.toRadians(ship.getFacing());
-            float x = shipLoc.x + (float) Math.cos(angleRad) * offsetY - (float) Math.sin(angleRad) * offsetX;
-            float y = shipLoc.y + (float) Math.sin(angleRad) * offsetY + (float) Math.cos(angleRad) * offsetX;
+            // Ship's rotation in radians
+            float shipAngleRad = (float) Math.toRadians(ship.getFacing());
 
-            // Set weapon position
-            weapon.getLocation().set(x, y);
+            // Rotate local offset by ship's facing
+            float rotatedX = offsetX * (float) Math.cos(shipAngleRad) - offsetY * (float) Math.sin(shipAngleRad);
+            float rotatedY = offsetX * (float) Math.sin(shipAngleRad) + offsetY * (float) Math.cos(shipAngleRad);
 
-            // Set weapon rotation
+            // Add to ship's current position to get world coordinates
+            Vector2f worldPosition = new Vector2f(ship.getLocation().x + rotatedX, ship.getLocation().y + rotatedY);
+
+            // Apply position and rotation
+            weapon.getLocation().set(worldPosition);
             weapon.setCurrAngle(angle);
         }
     }
 
     private float lerp(float a, float b, float t) {
         return a + t * (b - a);
-    }
-
-    private float mapCharge(float charge, float min, float max) {
-        if (charge < min) return 0f;
-        if (charge > max) return 1f;
-        return (charge - min) / (max - min);
-    }
-    private void spawnSparksAt(ShipAPI ship, float offsetX, float offsetY) {
-        Vector2f shipLoc = ship.getLocation();
-        float angleRad = (float) Math.toRadians(ship.getFacing());
-        float x = shipLoc.x + (float) Math.cos(angleRad) * offsetY - (float) Math.sin(angleRad) * offsetX;
-        float y = shipLoc.y + (float) Math.sin(angleRad) * offsetY + (float) Math.cos(angleRad) * offsetX;
-
-        for (int i = 0; i < 6; i++) {
-            float dx = rand.nextFloat() * 10f - 5f;
-            float dy = rand.nextFloat() * 10f - 5f;
-            Vector2f loc = new Vector2f(x + dx, y + dy);
-            Color color = new Color(
-                    255 - rand.nextInt(55),
-                    180 - rand.nextInt(45),
-                    100 - rand.nextInt(50),
-                    255 - rand.nextInt(105)
-            );
-            engine.addSmoothParticle(loc, new Vector2f(), 10f + rand.nextFloat() * 5f, 1f, 0.2f, color);
-        }
     }
 
     @Override
