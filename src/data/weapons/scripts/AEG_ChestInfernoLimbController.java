@@ -1,11 +1,18 @@
 package data.weapons.scripts;
 
+import com.fs.starfarer.api.Global;
+import com.fs.starfarer.api.SoundAPI;
+import com.fs.starfarer.api.SoundPlayerAPI;
 import com.fs.starfarer.api.combat.*;
 import com.fs.starfarer.api.input.InputEventAPI;
 import org.lazywizard.lazylib.MathUtils;
-
+import org.lwjgl.util.vector.Vector2f;
+import org.dark.shaders.distortion.DistortionShader;
+import org.dark.shaders.distortion.WaveDistortion;
 import org.lwjgl.util.vector.Vector2f;
 import org.magiclib.util.MagicAnim;
+import sound.Sound;
+
 import java.awt.Color;
 import java.util.List;
 
@@ -61,21 +68,20 @@ public class AEG_ChestInfernoLimbController implements EveryFrameCombatPlugin {
             float finalArmLAngle, finalArmRAngle;
             float finalShoulderLAngle, finalShoulderRAngle;
 
-            boolean sparkTriggered = sparkTriggeredMap.containsKey(ship) ? sparkTriggeredMap.get(ship) : false;
+            Boolean sparkTriggered = sparkTriggeredMap.containsKey(ship) ? sparkTriggeredMap.get(ship) : false;
 
             if (charge > 0f) {
-                // Phase 1: Slam inward
-                if (charge < 0.15f) {
-                    float t = charge / 0.15f;
-                    t = (float) Math.pow(t, 6.0f); // jerk slam
+                if (charge < 0.1f) {
+                    // Phase 1: Slam inward (fast)
+                    float t = charge / 0.1f;
+                    t = (float) Math.pow(t, 6.0f);
                     finalArmLAngle = lerp(armLStartAngle, armLSlamAngle, t);
                     finalArmRAngle = lerp(armRStartAngle, armRSlamAngle, t);
                     finalShoulderLAngle = lerp(shoulderLStartAngle, shoulderLSlamAngle, t);
                     finalShoulderRAngle = lerp(shoulderRStartAngle, shoulderRSlamAngle, t);
-                    sparkTriggeredMap.put(ship, false); // reset spark state
-                }
-                // Phase 2: Hold
-                else if (charge < 0.65f) {
+                    sparkTriggeredMap.put(ship, false); // Reset
+                } else if (charge < 0.2f) {
+                    // Phase 2: Quick hold slam pose
                     finalArmLAngle = armLSlamAngle;
                     finalArmRAngle = armRSlamAngle;
                     finalShoulderLAngle = shoulderLSlamAngle;
@@ -83,39 +89,60 @@ public class AEG_ChestInfernoLimbController implements EveryFrameCombatPlugin {
 
                     if (!sparkTriggered) {
                         Vector2f sparkLoc = MathUtils.getPointOnCircumference(ship.getLocation(), 63f, ship.getFacing());
-                        engine.addHitParticle(sparkLoc, new Vector2f(), 20f, 1f, 0.2f, new Color(255, 220, 100));
-                        engine.addHitParticle(sparkLoc, new Vector2f(), 30f, 0.7f, 0.4f, new Color(255, 150, 50));
-                        engine.spawnEmpArcVisual(
-                                sparkLoc, ship,
-                                MathUtils.getPointOnCircumference(ship.getLocation(), 10f, ship.getFacing() + MathUtils.getRandomNumberInRange(-30f, 30f)),
-                                null,
-                                6f,
-                                new Color(255, 200, 180),
-                                new Color(255, 120, 60)
-                        );
+
+                        Global.getSoundPlayer().playSound("hellbore_fire", 1f, 1f, sparkLoc, new Vector2f());
+
+                        // Fast directional welding-style sparks
+                        for (int i = 0; i < 10; i++) {
+                            float angle = ship.getFacing() + MathUtils.getRandomNumberInRange(-40f, 40f);
+                            Vector2f velocity = MathUtils.getPointOnCircumference(null, MathUtils.getRandomNumberInRange(150f, 250f), angle);
+                            engine.addHitParticle(
+                                    sparkLoc,
+                                    velocity,
+                                    MathUtils.getRandomNumberInRange(3f, 5f),
+                                    1.2f,
+                                    0.2f,
+                                    new Color(255, 180, 80)
+                            );
+                        }
+
+                        // 🔄 ShaderLib wave distortion
+                        WaveDistortion wave = new WaveDistortion(sparkLoc, new Vector2f());
+                        wave.setIntensity(30f);      // shock strength
+                        wave.setSize(200f);          // radius of ripple
+                        wave.setLifetime(0.4f);      // duration
+                        wave.setArc(0f, 360f);       // full circle
+                        wave.fadeOutIntensity(0.5f); // smooth fade
+                        DistortionShader.addDistortion(wave);
+
                         sparkTriggeredMap.put(ship, true);
                     }
-                }
-                // Phase 3: Snap outward (fire)
-                else {
-                    float t = (charge - 0.65f) / 0.35f;
-                    t = (float) Math.pow(t, 0.3f); // snappy open
+                } else if (charge < 0.3f) {
+                    // Phase 3: Snap outward (fast)
+                    float t = (charge - 0.2f) / 0.1f;
+                    t = (float) Math.pow(t, 6.0f);
                     finalArmLAngle = lerp(armLSlamAngle, armLFireAngle, t);
                     finalArmRAngle = lerp(armRSlamAngle, armRFireAngle, t);
                     finalShoulderLAngle = lerp(shoulderLSlamAngle, shoulderLFireAngle, t);
                     finalShoulderRAngle = lerp(shoulderRSlamAngle, shoulderRFireAngle, t);
+                } else {
+                    // Phase 4: Hold arms open
+                    finalArmLAngle = armLFireAngle;
+                    finalArmRAngle = armRFireAngle;
+                    finalShoulderLAngle = shoulderLFireAngle;
+                    finalShoulderRAngle = shoulderRFireAngle;
                 }
 
                 recoveryProgress = 0f;
             } else {
-                // Recovery to idle
+                // Recovery
                 recoveryProgress += amount;
                 float t = Math.min(recoveryProgress / RECOVERY_DURATION, 1f);
                 finalArmLAngle = lerp(armLFireAngle, armLStartAngle, t);
                 finalArmRAngle = lerp(armRFireAngle, armRStartAngle, t);
                 finalShoulderLAngle = lerp(shoulderLFireAngle, shoulderLStartAngle, t);
                 finalShoulderRAngle = lerp(shoulderRFireAngle, shoulderRStartAngle, t);
-                sparkTriggeredMap.put(ship, false); // reset for next charge
+                sparkTriggeredMap.put(ship, false);
             }
 
             // Apply rotation
