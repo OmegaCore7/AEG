@@ -15,6 +15,7 @@ import sound.Sound;
 
 import java.awt.Color;
 import java.util.List;
+import java.util.Random;
 
 public class AEG_ChestInfernoLimbController implements EveryFrameCombatPlugin {
 
@@ -25,7 +26,7 @@ public class AEG_ChestInfernoLimbController implements EveryFrameCombatPlugin {
     private static final String ARM_R = "WS0005";
     private static final String SHOULDER_L = "WS0003";
     private static final String SHOULDER_R = "WS0004";
-
+    private Random rand = new Random();
     private final float RECOVERY_DURATION = 0.5f;
     private float recoveryProgress = 0f;
     private final java.util.Map<ShipAPI, Boolean> sparkTriggeredMap = new java.util.WeakHashMap<>();
@@ -93,16 +94,16 @@ public class AEG_ChestInfernoLimbController implements EveryFrameCombatPlugin {
                         Global.getSoundPlayer().playSound("hellbore_fire", 1f, 1f, sparkLoc, new Vector2f());
 
                         // Fast directional welding-style sparks
-                        for (int i = 0; i < 10; i++) {
+                        for (int i = 0; i < 10 + rand.nextInt(5); i++) {
                             float angle = ship.getFacing() + MathUtils.getRandomNumberInRange(-40f, 40f);
                             Vector2f velocity = MathUtils.getPointOnCircumference(null, MathUtils.getRandomNumberInRange(150f, 250f), angle);
                             engine.addHitParticle(
                                     sparkLoc,
                                     velocity,
-                                    MathUtils.getRandomNumberInRange(3f, 5f),
-                                    1.2f,
-                                    0.2f,
-                                    new Color(255, 180, 80)
+                                    3 + rand.nextInt(17),
+                                    1f + rand.nextInt(1),
+                                    0.2f + rand.nextInt(1),
+                                    new Color(255 - rand.nextInt(65), 180 - rand.nextInt(80), 80 - rand.nextInt(50),255 - rand.nextInt(105))
                             );
                         }
 
