@@ -63,9 +63,9 @@
       "size": "SMALL",
       "type": "BUILT_IN",
       "mount": "TURRET",
-      "arc": 133,
-      "angle": 15,
-      "locations": [12.5, 63],
+      "arc": 120,
+      "angle": -0,
+      "locations": [20, 63],
       "renderOrderMod": 2
     },
     {
@@ -73,9 +73,9 @@
       "size": "SMALL",
       "type": "BUILT_IN",
       "mount": "TURRET",
-      "arc": 133,
-      "angle": -15,
-      "locations": [12.5, -63],
+      "arc": 120,
+      "angle": 0,
+      "locations": [20, -63],
       "renderOrderMod": 2
     },
     {
