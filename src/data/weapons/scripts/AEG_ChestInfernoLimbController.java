@@ -95,7 +95,7 @@ public class AEG_ChestInfernoLimbController implements EveryFrameCombatPlugin {
 
                         // Fast directional welding-style sparks
                         for (int i = 0; i < 10 + rand.nextInt(5); i++) {
-                            float angle = ship.getFacing() + MathUtils.getRandomNumberInRange(-40f, 40f);
+                            float angle = ship.getFacing() + MathUtils.getRandomNumberInRange(-40f, 360f);
                             Vector2f velocity = MathUtils.getPointOnCircumference(null, MathUtils.getRandomNumberInRange(50f, 250f), angle);
                             engine.addHitParticle(
                                     sparkLoc,
@@ -104,6 +104,20 @@ public class AEG_ChestInfernoLimbController implements EveryFrameCombatPlugin {
                                     1f + rand.nextInt(2),
                                     0.2f + rand.nextInt(2),
                                     new Color(255 - rand.nextInt(65), 180 - rand.nextInt(80), 80 - rand.nextInt(50),255 - rand.nextInt(105))
+                            );
+
+                        }
+                        // Fast 360 Bright-style sparks
+                        for (int i = 0; i < 20 + rand.nextInt(5); i++) {
+                            float angle = 360;
+                            Vector2f velocity = MathUtils.getPointOnCircumference(null, MathUtils.getRandomNumberInRange(25f, 225f), angle);
+                            engine.addHitParticle(
+                                    sparkLoc,
+                                    velocity,
+                                    3 + rand.nextInt(9),
+                                    1f + rand.nextInt(3),
+                                    0.1f + rand.nextInt(3),
+                                    new Color(255 - rand.nextInt(60), 245 - rand.nextInt(60), 235 - rand.nextInt(60), 255 - rand.nextInt(75))
                             );
                         }
 
