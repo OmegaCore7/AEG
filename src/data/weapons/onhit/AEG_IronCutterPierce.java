@@ -5,7 +5,6 @@ import com.fs.starfarer.api.combat.listeners.ApplyDamageResultAPI;
 import com.fs.starfarer.api.input.InputEventAPI;
 import org.dark.shaders.distortion.DistortionShader;
 import org.dark.shaders.distortion.RippleDistortion;
-import org.lazywizard.lazylib.CollisionUtils;
 import org.lwjgl.util.vector.Vector2f;
 
 import java.awt.*;
@@ -14,7 +13,7 @@ import java.util.Random;
 
 public class AEG_IronCutterPierce implements OnHitEffectPlugin {
     private static final float LINE_LENGTH = 400f;
-    private static final float LINE_WIDTH = 80f;
+    private static final int EXPLOSION_SEGMENTS = 6;
     private final Random rand = new Random();
 
     @Override
@@ -50,7 +49,11 @@ public class AEG_IronCutterPierce implements OnHitEffectPlugin {
                 if (!triggered) {
                     triggered = true;
                     applyLineDamage(engine, target, point, finalDirection, projectile);
-                    spawnVisuals(engine, point, finalExitPoint, finalDirection, target, projectile);
+                    if (shieldHit) {
+                        spawnShieldEMP(engine, point, finalExitPoint, target, projectile);
+                    } else {
+                        spawnHullExplosions(engine, point, finalExitPoint);
+                    }
                 }
                 elapsed += amount;
                 if (elapsed > 0.25f) {
@@ -58,10 +61,21 @@ public class AEG_IronCutterPierce implements OnHitEffectPlugin {
                 }
             }
 
-            @Override public void processInputPreCoreControls(float amount, List<InputEventAPI> events) {}
-            @Override public void init(CombatEngineAPI engine) {}
-            @Override public void renderInWorldCoords(ViewportAPI viewport) {}
-            @Override public void renderInUICoords(ViewportAPI viewport) {}
+            @Override
+            public void processInputPreCoreControls(float amount, List<InputEventAPI> events) {
+            }
+
+            @Override
+            public void init(CombatEngineAPI engine) {
+            }
+
+            @Override
+            public void renderInWorldCoords(ViewportAPI viewport) {
+            }
+
+            @Override
+            public void renderInUICoords(ViewportAPI viewport) {
+            }
         });
 
         engine.removeEntity(projectile);
@@ -70,99 +84,96 @@ public class AEG_IronCutterPierce implements OnHitEffectPlugin {
     private void applyLineDamage(CombatEngineAPI engine, CombatEntityAPI target, Vector2f entryPoint,
                                  Vector2f direction, DamagingProjectileAPI projectile) {
         float baseDamage = projectile.getDamageAmount();
-        float ticks = 20f;
-        float damagePerTick = baseDamage / ticks;
-        float step = LINE_LENGTH / ticks;
+        float damagePerTick = baseDamage / EXPLOSION_SEGMENTS;
+        float step = LINE_LENGTH / EXPLOSION_SEGMENTS;
 
-        for (int i = 0; i <= ticks; i++) {
+        for (int i = 0; i <= EXPLOSION_SEGMENTS; i++) {
             Vector2f p = new Vector2f(entryPoint);
             p.x += direction.x * i * step;
             p.y += direction.y * i * step;
-            engine.applyDamage(target, p, damagePerTick, DamageType.HIGH_EXPLOSIVE, 0, false, false, projectile.getSource());
+            engine.applyDamage(target, p, damagePerTick, DamageType.HIGH_EXPLOSIVE, 50, false, false, projectile.getSource());
         }
     }
 
-    private void spawnVisuals(CombatEngineAPI engine, Vector2f entry, Vector2f exit, Vector2f direction,
-                              CombatEntityAPI target, DamagingProjectileAPI projectile) {
+    private void spawnHullExplosions(CombatEngineAPI engine, Vector2f entry, Vector2f exit) {
+        Vector2f dir = Vector2f.sub(exit, entry, null);
+        float distance = dir.length();
+        dir.normalise();
+        float step = distance / EXPLOSION_SEGMENTS;
 
-        // Big initial explosion
-        engine.spawnExplosion(entry, new Vector2f(), Color.WHITE, 40f, 0.6f);
-        RippleDistortion impactRipple = new RippleDistortion(entry, new Vector2f());
-        impactRipple.setSize(400f);
-        impactRipple.setIntensity(90f);
-        impactRipple.setLifetime(0.6f);
-        impactRipple.fadeInIntensity(0.1f);
-        impactRipple.fadeOutIntensity(0.4f);
-        DistortionShader.addDistortion(impactRipple);
+        for (int i = 0; i <= EXPLOSION_SEGMENTS; i++) {
+            Vector2f p = new Vector2f(entry);
+            p.x += dir.x * i * step;
+            p.y += dir.y * i * step;
 
-        Vector2f lineDir = new Vector2f(exit);
-        Vector2f.sub(lineDir, entry, lineDir);
-        float distance = lineDir.length();
-        lineDir.normalise();
+            // Random offset for non-perfect line
+            float angle = rand.nextFloat() * 360f;
+            float offsetDist = rand.nextFloat() * 25f;
+            Vector2f offset = new Vector2f(
+                    (float) Math.cos(Math.toRadians(angle)) * offsetDist,
+                    (float) Math.sin(Math.toRadians(angle)) * offsetDist
+            );
+            Vector2f.add(p, offset, p);
 
-        float segments = 15f;
-        float spacing = distance / segments;
+            // Random explosion attributes
+            float size = 75f + rand.nextFloat() * 60f + i * 10f;
+            float duration = 0.4f + rand.nextFloat() * 0.3f;
+            float alpha = 0.6f + rand.nextFloat() * 0.3f;
+            float brightness = 1.0f + rand.nextFloat() * 0.5f;
 
-        for (int i = 0; i <= segments; i++) {
-            Vector2f point = new Vector2f(entry);
-            point.x += lineDir.x * i * spacing;
-            point.y += lineDir.y * i * spacing;
+            Color color = new Color(
+                    (int) (180 + rand.nextFloat() * 75),
+                    (int) (80 + rand.nextFloat() * 100),
+                    (int) (40 + rand.nextFloat() * 40),
+                    (int) (255 * alpha)
+            );
 
-            // Glowing scorch line
-            engine.addHitParticle(point, new Vector2f(), 30f, 1f, 0.3f,
-                    new Color(255, 140 + rand.nextInt(115), 30 + rand.nextInt(50), 255));
+            engine.spawnExplosion(p, new Vector2f(), color, size, duration);
 
-            // Subtle burn nebulae
-            engine.addNebulaParticle(point, new Vector2f(), 20f + rand.nextFloat() * 15f, 1.5f, 0.3f, 0.8f,
-                    1.2f, new Color(50, 20, 10, 150), true);
+            RippleDistortion ripple = new RippleDistortion(p, new Vector2f());
+            ripple.setSize(size * (1.5f + rand.nextFloat() * 0.5f));
+            ripple.setIntensity(50f + rand.nextFloat() * 50f);
+            ripple.setLifetime(0.5f + rand.nextFloat() * 0.4f);
+            ripple.fadeInIntensity(0.1f + rand.nextFloat() * 0.1f);
+            ripple.fadeOutIntensity(0.3f + rand.nextFloat() * 0.2f);
+            DistortionShader.addDistortion(ripple);
+        }
+    }
 
-            // Welding sparks on sides
-            for (int s = 0; s < 2; s++) {
-                float angleOffset = (s == 0 ? 90f : -90f);
-                float angle = (float) Math.toDegrees(Math.atan2(lineDir.y, lineDir.x)) + angleOffset;
-                Vector2f sparkOffset = new Vector2f(
-                        (float) Math.cos(Math.toRadians(angle)) * (LINE_WIDTH * 0.5f),
-                        (float) Math.sin(Math.toRadians(angle)) * (LINE_WIDTH * 0.5f)
-                );
-                Vector2f sparkPoint = Vector2f.add(point, sparkOffset, null);
-                engine.addSmoothParticle(sparkPoint, new Vector2f(), 6f + rand.nextFloat() * 4f, 1f, 0.5f,
-                        new Color(255, 150 + rand.nextInt(100), 50));
-            }
+    private void spawnShieldEMP(CombatEngineAPI engine, Vector2f entry, Vector2f exit,
+                                CombatEntityAPI target, DamagingProjectileAPI projectile) {
+        Vector2f dir = Vector2f.sub(exit, entry, null);
+        float distance = dir.length();
+        dir.normalise();
+        float step = distance / EXPLOSION_SEGMENTS;
 
-            // Random black scorch accents
-            if (rand.nextFloat() < 0.3f) {
-                float offsetAngle = rand.nextFloat() * 360f;
-                float length = 20f + rand.nextFloat() * 40f;
-                Vector2f scorchEnd = new Vector2f(
-                        (float) Math.cos(Math.toRadians(offsetAngle)) * length,
-                        (float) Math.sin(Math.toRadians(offsetAngle)) * length
-                );
-                Vector2f accentPoint = Vector2f.add(point, scorchEnd, null);
-                engine.addHitParticle(accentPoint, new Vector2f(), 15f, 1f, 0.4f, new Color(30, 30, 30, 200));
-            }
+        for (int i = 0; i < EXPLOSION_SEGMENTS; i++) {
+            Vector2f p = new Vector2f(entry);
+            p.x += dir.x * i * step;
+            p.y += dir.y * i * step;
+
+            float angle = rand.nextFloat() * 360f;
+            float offsetDist = rand.nextFloat() * 35f;
+            Vector2f offset = new Vector2f(
+                    (float) Math.cos(Math.toRadians(angle)) * offsetDist,
+                    (float) Math.sin(Math.toRadians(angle)) * offsetDist
+            );
+            Vector2f.add(p, offset, p);
+
+            float coreSize = 30f + rand.nextFloat() * 60f;
+            Color fringe = new Color(100 + rand.nextInt(155), 255, 255, 180 + rand.nextInt(75));
+            Color core = new Color(50 + rand.nextInt(100), 255, 255, 150 + rand.nextInt(105));
+
+            engine.spawnEmpArcVisual(p, projectile.getSource(), p, target, coreSize, fringe, core);
         }
 
-        if (target instanceof ShipAPI && ((ShipAPI) target).getShield() != null &&
-                ((ShipAPI) target).getShield().isOn()) {
-
-            for (float i = 0.1f; i <= 0.9f; i += 0.15f) {
-                Vector2f arcPoint = new Vector2f(entry);
-                arcPoint.x += lineDir.x * i * distance;
-                arcPoint.y += lineDir.y * i * distance;
-
-                engine.spawnEmpArcVisual(arcPoint, projectile.getSource(), arcPoint, target,
-                        20f + rand.nextInt(30),
-                        new Color(50, 255 - rand.nextInt(100), 255, 200),
-                        new Color(200, 255, 255, 150));
-            }
-
-            RippleDistortion shieldRipple = new RippleDistortion(entry, new Vector2f());
-            shieldRipple.setSize(250f);
-            shieldRipple.setIntensity(65f);
-            shieldRipple.setLifetime(0.6f);
-            shieldRipple.fadeInIntensity(0.1f);
-            shieldRipple.fadeOutIntensity(0.3f);
-            DistortionShader.addDistortion(shieldRipple);
-        }
+        // Add central ripple on shield
+        RippleDistortion ripple = new RippleDistortion(entry, new Vector2f());
+        ripple.setSize(200f + rand.nextFloat() * 100f);
+        ripple.setIntensity(50f + rand.nextFloat() * 40f);
+        ripple.setLifetime(0.4f + rand.nextFloat() * 0.3f);
+        ripple.fadeInIntensity(0.1f + rand.nextFloat() * 0.1f);
+        ripple.fadeOutIntensity(0.3f + rand.nextFloat() * 0.2f);
+        DistortionShader.addDistortion(ripple);
     }
 }
