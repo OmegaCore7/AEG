@@ -178,7 +178,7 @@ public class AEG_IronCutterPierce implements OnHitEffectPlugin {
         Color coreColor = new Color(200 + rand.nextInt(55), 255, 255, 200 + rand.nextInt(56));
         float emp = 100f + rand.nextFloat() * 200f;
         float dam = 80f + rand.nextFloat() * 60f;
-        float thickness = 5f + rand.nextFloat() * 45f;
+        float thickness = 5f + rand.nextInt(45);
 
         engine.spawnEmpArcVisual(from, source, to.getLocation(), to, thickness, empColor, coreColor);
         engine.spawnEmpArc(source, from, to, to, DamageType.ENERGY, dam, emp, 10000f, null, thickness, empColor, coreColor);
