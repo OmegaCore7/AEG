@@ -1,17 +1,18 @@
 package data.weapons.onhit;
 
+import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.combat.*;
 import com.fs.starfarer.api.combat.listeners.ApplyDamageResultAPI;
 import com.fs.starfarer.api.input.InputEventAPI;
 import com.fs.starfarer.api.util.Misc;
 import org.dark.shaders.distortion.DistortionShader;
 import org.dark.shaders.distortion.RippleDistortion;
+import org.lazywizard.lazylib.MathUtils;
 import org.lwjgl.util.vector.Vector2f;
 
 import java.awt.*;
-import java.util.Iterator;
+import java.util.*;
 import java.util.List;
-import java.util.Random;
 
 public class AEG_IronCutterPierce implements OnHitEffectPlugin {
     private static final float LINE_LENGTH = 400f;
@@ -22,13 +23,17 @@ public class AEG_IronCutterPierce implements OnHitEffectPlugin {
                       final Vector2f point, final boolean shieldHit, ApplyDamageResultAPI damageResult,
                       final CombatEngineAPI engine) {
         if (engine == null || !(target instanceof ShipAPI)) return;
-        ShipAPI ship = (ShipAPI) target;
+
+        final ShipAPI ship = (ShipAPI) target;
+        final ShipAPI source = (ShipAPI) projectile.getSource();
 
         if (shieldHit) {
-            handleShieldHit(engine, projectile, ship, point);
+            // Use EMP logic from first script
+            handleEMPChain(engine, source, target, point);
             return;
         }
 
+        // Hull hit logic
         Vector2f direction = Vector2f.sub(target.getLocation(), point, null);
         if (direction.lengthSquared() == 0) {
             direction = new Vector2f(
@@ -39,14 +44,12 @@ public class AEG_IronCutterPierce implements OnHitEffectPlugin {
             direction.normalise();
         }
 
-        Vector2f exitPoint = new Vector2f(point);
+        final Vector2f exitPoint = new Vector2f(point);
         Vector2f scaledDir = new Vector2f(direction);
         scaledDir.scale(LINE_LENGTH);
         Vector2f.add(exitPoint, scaledDir, exitPoint);
 
         final Vector2f finalDirection = direction;
-        final Vector2f finalExitPoint = exitPoint;
-
         engine.addPlugin(new EveryFrameCombatPlugin() {
             private boolean triggered = false;
             private float elapsed = 0f;
@@ -56,18 +59,16 @@ public class AEG_IronCutterPierce implements OnHitEffectPlugin {
                 if (!triggered) {
                     triggered = true;
                     applyLineDamage(engine, target, point, finalDirection, projectile);
-                    spawnHullStrikeVisuals(engine, point, finalExitPoint, finalDirection, (ShipAPI) target, projectile);
+                    spawnHullStrikeVisuals(engine, point, exitPoint, finalDirection, ship, projectile);
                 }
                 elapsed += amount;
-                if (elapsed > 0.25f) {
-                    engine.removePlugin(this);
-                }
+                if (elapsed > 0.25f) engine.removePlugin(this);
             }
 
-            @Override public void processInputPreCoreControls(float amount, List<InputEventAPI> events) {}
             @Override public void init(CombatEngineAPI engine) {}
             @Override public void renderInWorldCoords(ViewportAPI viewport) {}
             @Override public void renderInUICoords(ViewportAPI viewport) {}
+            @Override public void processInputPreCoreControls(float amount, List<InputEventAPI> events) {}
         });
 
         engine.removeEntity(projectile);
@@ -97,13 +98,11 @@ public class AEG_IronCutterPierce implements OnHitEffectPlugin {
         final int segments = 6;
         final float spacing = distance / segments;
 
-        // First wave
         for (int i = 0; i <= segments; i++) {
             Vector2f point = getOffsetPointAlongLine(entry, lineDir, spacing * i);
             spawnExplosionWithRipple(engine, point, 60f + rand.nextFloat() * 80f, 0.3f + rand.nextFloat() * 0.3f);
         }
 
-        // Delay and schedule second wave and final strike
         engine.addPlugin(new BaseEveryFrameCombatPlugin() {
             float timer = 0f;
 
@@ -111,19 +110,18 @@ public class AEG_IronCutterPierce implements OnHitEffectPlugin {
             public void advance(float amount, List<InputEventAPI> events) {
                 timer += amount;
                 if (timer > 0.15f && timer < 0.5f) {
-                    // Second wave
                     for (int i = 0; i <= segments; i++) {
                         Vector2f point = getOffsetPointAlongLine(entry, lineDir, spacing * i);
                         spawnExplosionWithRipple(engine, point, 90f + rand.nextFloat() * 100f, 0.3f + rand.nextFloat() * 0.3f);
                     }
                 }
 
-                if (timer >= 0.5f + rand.nextInt(1)) {
+                if (timer >= 0.5f + rand.nextInt(2)) {
                     Vector2f finalStrikePoint = new Vector2f(target.getLocation());
                     finalStrikePoint.x += rand.nextFloat() * 80f - 40f;
                     finalStrikePoint.y += rand.nextFloat() * 80f - 40f;
 
-                    engine.spawnExplosion(finalStrikePoint, new Vector2f(), new Color(255, 100 + rand.nextInt(155), 20 + rand.nextInt(80), 255 - rand.nextInt(80)), 250f + rand.nextInt(100), 1.5f - rand.nextInt(1));
+                    engine.spawnExplosion(finalStrikePoint, new Vector2f(), new Color(255, 100 + rand.nextInt(155), 20 + rand.nextInt(80), 255 - rand.nextInt(80)), 250f + rand.nextInt(100), 1.5f);
                     RippleDistortion ripple = new RippleDistortion(finalStrikePoint, new Vector2f());
                     ripple.setSize(400f);
                     ripple.setIntensity(100f);
@@ -132,13 +130,105 @@ public class AEG_IronCutterPierce implements OnHitEffectPlugin {
                     ripple.fadeOutIntensity(0.4f);
                     DistortionShader.addDistortion(ripple);
 
-                    engine.applyDamage(target, finalStrikePoint, 300f, DamageType.HIGH_EXPLOSIVE, 0f,
-                            false, false, projectile.getSource());
-
+                    engine.applyDamage(target, finalStrikePoint, 300f, DamageType.HIGH_EXPLOSIVE, 0f, false, false, projectile.getSource());
                     engine.removePlugin(this);
                 }
             }
         });
+    }
+
+    private void handleEMPChain(final CombatEngineAPI engine, final ShipAPI source, final CombatEntityAPI initialTarget, final Vector2f point) {
+        int numArcs = 3 + rand.nextInt(3);
+
+        for (int i = 0; i < numArcs; i++) {
+            CombatEntityAPI empTarget = findRandomNearbyTarget(point, 500f, source);
+            if (empTarget != null) {
+                spawnEMPArc(engine, source, point, empTarget);
+            }
+        }
+
+        engine.addPlugin(new BaseEveryFrameCombatPlugin() {
+            private float timer = 0f;
+            private boolean triggered = false;
+            CombatEntityAPI currentTarget = initialTarget;
+
+            @Override
+            public void advance(float amount, List<InputEventAPI> events) {
+                if (engine.isPaused()) return;
+                timer += amount;
+
+                if (timer >= 0.4f && !triggered) {
+                    triggered = true;
+                    int delayedArcs = 2 + rand.nextInt(2);
+                    for (int i = 0; i < delayedArcs; i++) {
+                        CombatEntityAPI nextTarget = findRandomNearbyTarget(currentTarget.getLocation(), 600f, source);
+                        if (nextTarget != null) {
+                            spawnEMPArc(engine, source, currentTarget.getLocation(), nextTarget);
+                            currentTarget = nextTarget;
+                        }
+                    }
+                    engine.removePlugin(this);
+                }
+            }
+        });
+    }
+
+    private void spawnEMPArc(CombatEngineAPI engine, ShipAPI source, Vector2f from, CombatEntityAPI to) {
+        Color empColor = new Color(100 + rand.nextInt(100), 200 + rand.nextInt(55), 255, 200);
+        Color coreColor = new Color(200 + rand.nextInt(55), 255, 255, 200 + rand.nextInt(56));
+        float emp = 100f + rand.nextFloat() * 200f;
+        float dam = 80f + rand.nextFloat() * 60f;
+        float thickness = 5f + rand.nextFloat() * 45f;
+
+        engine.spawnEmpArcVisual(from, source, to.getLocation(), to, thickness, empColor, coreColor);
+        engine.spawnEmpArc(source, from, to, to, DamageType.ENERGY, dam, emp, 10000f, null, thickness, empColor, coreColor);
+
+        engine.spawnExplosion(to.getLocation(), new Vector2f(), empColor, 30f + rand.nextFloat() * 30f, 0.3f);
+
+        RippleDistortion ripple = new RippleDistortion(to.getLocation(), new Vector2f());
+        ripple.setSize(150f + rand.nextFloat() * 100f);
+        ripple.setIntensity(2f + rand.nextFloat() * 2f);
+        ripple.setFrameRate(60f);
+        ripple.fadeInSize(0.1f);
+        ripple.fadeOutIntensity(0.4f);
+        DistortionShader.addDistortion(ripple);
+    }
+
+    private CombatEntityAPI findRandomNearbyTarget(Vector2f point, float radius, ShipAPI sourceShip) {
+        List<CombatEntityAPI> candidates = new ArrayList<>();
+
+        // Ships
+        for (ShipAPI ship : Global.getCombatEngine().getShips()) {
+            if (ship == sourceShip || !ship.isAlive() || ship.isShuttlePod()) continue;
+
+            if (Misc.getDistance(point, ship.getLocation()) < radius) {
+                candidates.add(ship);
+            }
+        }
+
+        // Missiles
+        for (MissileAPI missile : Global.getCombatEngine().getMissiles()) {
+            if (missile.getOwner() == sourceShip.getOwner() || missile.isExpired() || missile.isFading() || missile.didDamage()) continue;
+
+            if (Misc.getDistance(point, missile.getLocation()) < radius) {
+                candidates.add(missile);
+            }
+        }
+
+        // Fighters (separate from ships for safety)
+        for (ShipAPI fighter : Global.getCombatEngine().getShips()) {
+            if (!fighter.isFighter() || fighter.getOwner() == sourceShip.getOwner() || !fighter.isAlive()) continue;
+
+            if (Misc.getDistance(point, fighter.getLocation()) < radius) {
+                candidates.add(fighter);
+            }
+        }
+
+        if (!candidates.isEmpty()) {
+            return candidates.get(rand.nextInt(candidates.size()));
+        }
+
+        return null;
     }
 
     private Vector2f getOffsetPointAlongLine(Vector2f origin, Vector2f dir, float distance) {
@@ -155,100 +245,16 @@ public class AEG_IronCutterPierce implements OnHitEffectPlugin {
     }
 
     private void spawnExplosionWithRipple(CombatEngineAPI engine, Vector2f location, float size, float duration) {
-        engine.spawnExplosion(location, new Vector2f(), new Color(255 - rand.nextInt(55), 150 - rand.nextInt(50),
-                50 + rand.nextInt(50), 255), size, duration);
+        engine.spawnExplosion(location, new Vector2f(), new Color(
+                255 - rand.nextInt(55),
+                150 - rand.nextInt(50),
+                50 + rand.nextInt(50),
+                255), size, duration);
 
         RippleDistortion ripple = new RippleDistortion(location, new Vector2f());
         ripple.setSize(size + rand.nextFloat() * 50f);
         ripple.setIntensity(60f + rand.nextFloat() * 40f);
         ripple.setLifetime(duration);
-        ripple.fadeInIntensity(0.1f);
-        ripple.fadeOutIntensity(0.3f);
-        DistortionShader.addDistortion(ripple);
-    }
-
-    private void handleShieldHit(final CombatEngineAPI engine, final DamagingProjectileAPI proj, final ShipAPI target, final Vector2f entry) {
-        Vector2f center = target.getLocation();
-        final Vector2f dir = Vector2f.sub(center, entry, null);
-        dir.normalise();
-
-        float distance = target.getCollisionRadius();
-        final int segments = 5;
-        final float spacing = distance / segments;
-
-        // First wave: immediate EMP arcs
-        for (int i = 0; i <= segments; i++) {
-            Vector2f point = getOffsetPointAlongLine(entry, dir, spacing * i);
-            CombatEntityAPI arcTarget = findNearbyTarget(engine, point, target);
-
-            engine.spawnEmpArcVisual(point, proj.getSource(), point, arcTarget,
-                    150f + rand.nextFloat() * 150f, // Increased length
-                    new Color(50 + rand.nextInt(100), 200 + rand.nextInt(55), 255, 180 + rand.nextInt(75)),
-                    new Color(150 + rand.nextInt(105), 255, 255, 140 + rand.nextInt(115)));
-
-            spawnEmpRipple(engine, point, 180f + rand.nextFloat() * 100f, 0.5f + rand.nextFloat() * 0.4f);
-        }
-
-        // Second wave: delayed larger chaining arcs
-        engine.addPlugin(new BaseEveryFrameCombatPlugin() {
-            float timer = 0f;
-            boolean fired = false;
-
-            @Override
-            public void advance(float amount, List<InputEventAPI> events) {
-                timer += amount;
-                if (!fired && timer > 0.4f) {
-                    fired = true;
-
-                    int bounceArcs = 3 + rand.nextInt(2);
-                    Vector2f currentPoint = getOffsetPointAlongLine(entry, dir, spacing * rand.nextInt(segments));
-                    CombatEntityAPI currentSource = proj.getSource();
-
-                    for (int i = 0; i < bounceArcs; i++) {
-                        CombatEntityAPI arcTarget = findNearbyTarget(engine, currentPoint, target);
-
-                        if (arcTarget != null) {
-                            Vector2f targetLoc = arcTarget.getLocation();
-
-                            engine.spawnEmpArcVisual(currentPoint, currentSource, currentPoint, arcTarget,
-                                    300f + rand.nextFloat() * 300f,
-                                    new Color(100 + rand.nextInt(155), 150 + rand.nextInt(105), 255, 130 + rand.nextInt(100)),
-                                    new Color(200, 255, 255, 120 + rand.nextInt(135)));
-
-                            spawnEmpRipple(engine, currentPoint, 250f + rand.nextFloat() * 150f, 0.6f + rand.nextFloat() * 0.4f);
-                            currentPoint = targetLoc;
-                            currentSource = arcTarget;
-                        }
-                    }
-
-                    engine.removePlugin(this);
-                }
-            }
-        });
-    }
-    private CombatEntityAPI findNearbyTarget(CombatEngineAPI engine, Vector2f point, ShipAPI originalTarget) {
-        float radius = 600f;
-        Iterator<Object> iter = engine.getAllObjectGrid().getCheckIterator(point, radius, radius);
-        while (iter.hasNext()) {
-            Object obj = iter.next();
-            if (!(obj instanceof CombatEntityAPI)) continue;
-
-            CombatEntityAPI entity = (CombatEntityAPI) obj;
-            if (entity == null || entity == originalTarget || entity.getOwner() != originalTarget.getOwner()) continue;
-
-            if (entity instanceof ShipAPI || entity instanceof MissileAPI || entity instanceof WeaponAPI || entity instanceof FighterLaunchBayAPI) {
-                if (Misc.getDistance(point, entity.getLocation()) < radius) {
-                    return entity;
-                }
-            }
-        }
-        return originalTarget;
-    }
-    private void spawnEmpRipple(CombatEngineAPI engine, Vector2f location, float size, float lifetime) {
-        RippleDistortion ripple = new RippleDistortion(location, new Vector2f());
-        ripple.setSize(size);
-        ripple.setIntensity(70f + rand.nextFloat() * 50f);
-        ripple.setLifetime(lifetime);
         ripple.fadeInIntensity(0.1f);
         ripple.fadeOutIntensity(0.3f);
         DistortionShader.addDistortion(ripple);
