@@ -174,8 +174,8 @@ public class AEG_IronCutterPierce implements OnHitEffectPlugin {
     }
 
     private void spawnEMPArc(CombatEngineAPI engine, ShipAPI source, Vector2f from, CombatEntityAPI to) {
-        Color empColor = new Color(100 + rand.nextInt(100), 200 + rand.nextInt(55), 255, 200);
-        Color coreColor = new Color(200 + rand.nextInt(55), 255, 255, 200 + rand.nextInt(56));
+        Color empColor = new Color(100 + rand.nextInt(155), 200 - rand.nextInt(100), 255 - rand.nextInt(200), 200 + rand.nextInt(55));
+        Color coreColor = new Color(200 + rand.nextInt(55), 255 - rand.nextInt(105), 255 - rand.nextInt(200), 200 + rand.nextInt(55));
         float emp = 100f + rand.nextFloat() * 200f;
         float dam = 80f + rand.nextFloat() * 60f;
         float thickness = 5f + rand.nextInt(45);
