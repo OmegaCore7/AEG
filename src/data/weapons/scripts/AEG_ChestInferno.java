@@ -15,7 +15,7 @@ import java.util.List;
 public class AEG_ChestInferno extends BaseCombatLayeredRenderingPlugin
         implements OnFireEffectPlugin, OnHitEffectPlugin, EveryFrameWeaponEffectPlugin {
     private AEG_ChestInfernoChargeEffectHelper chargeHelper = new AEG_ChestInfernoChargeEffectHelper();
-
+    private boolean wasCharging = false;
     protected List<AEG_ChestInferno> trails = new ArrayList<>();
     protected DamagingProjectileAPI proj;
     protected DamagingProjectileAPI prev;
@@ -60,7 +60,7 @@ public class AEG_ChestInferno extends BaseCombatLayeredRenderingPlugin
         // ⚡ Lightning arcs between chained projectiles
         for (AEG_ChestInferno trail : trails) {
             if (trail.prev != null && !trail.prev.isExpired()) {
-                if (Math.random() < 0.1f) {
+                if (Math.random() < 0.05f) {
                     Vector2f from = trail.prev.getLocation();
                     Vector2f to = trail.proj.getLocation();
                     float dur = 1f + (float)Math.random() * 3f;
@@ -69,7 +69,7 @@ public class AEG_ChestInferno extends BaseCombatLayeredRenderingPlugin
                 }
             }
             // Rare but long, trailing arcs
-            if (Math.random() < 0.01f) { // lower frequency than usual arcs
+            if (Math.random() < 0.025f) { // lower frequency than usual arcs
                 Vector2f from = trail.proj.getLocation();
                 Vector2f dir = Misc.getUnitVectorAtDegreeAngle((float)Math.random() * 360f);
                 dir.scale(150f + (float)Math.random() * 100f);

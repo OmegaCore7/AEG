@@ -1,6 +1,7 @@
 package data.weapons.scripts;
 
-import com.fs.starfarer.api.combat.WeaponGroupAPI;
+import com.fs.starfarer.api.Global;
+import com.fs.starfarer.api.SoundAPI;
 import com.fs.starfarer.api.combat.CombatEngineAPI;
 import com.fs.starfarer.api.combat.WeaponAPI;
 import com.fs.starfarer.api.util.Misc;
@@ -14,7 +15,10 @@ public class AEG_ChestInfernoChargeEffectHelper {
     // ================================
     // 🔧 CONFIGURATION
     // ================================
+
     private static final float MAX_CHARGE_DURATION = 6f;
+    private static boolean wasCharging = false;
+    private static boolean endSoundPlayed = false;
 
     // Plasma burst
     private static final float BASE_PARTICLE_SIZE = 30f;
@@ -41,8 +45,8 @@ public class AEG_ChestInfernoChargeEffectHelper {
     private static final float EXPLOSION_RADIUS = 80f;
     private static final float EXPLOSION_DURATION = 1f;
     private static final Color FLASH_COLOR = new Color(255, 255, 255, 220);
-    private static final Color FLASH_ARC_CORE = new Color(255, 255, 255, 200);
-    private static final Color FLASH_ARC_FRINGE = new Color(255, 255, 200, 180);
+    private static final Color FLASH_ARC_CORE = new Color(255, 255, 180, 200);
+    private static final Color FLASH_ARC_FRINGE = new Color(255, 200, 180, 180);
 
     // ================================
     // ⚙️ LOGIC
@@ -61,12 +65,28 @@ public class AEG_ChestInfernoChargeEffectHelper {
 
         Vector2f weaponLoc = weapon.getLocation();
         Vector2f shipVel = weapon.getShip().getVelocity();
+        boolean isCharging = weapon.isFiring() && weapon.getChargeLevel() > 0f;
+
+        // === Charging just started ===
+        if (isCharging && !wasCharging) {
+            Global.getSoundPlayer().playSound("system_phase_cloak_collision", 1f, 1f, weaponLoc, shipVel);
+            Global.getSoundPlayer().playSound("terrain_hyperspace_lightning", 1f, 1f, weaponLoc, shipVel);
+            Global.getSoundPlayer().playSound("system_nova_burst_fire", 1f, 1f, weaponLoc, shipVel);
+            endSoundPlayed = false;
+        }
+
+        // === Interrupted by venting only ===
+        if (!chargeComplete && wasCharging && weapon.getShip().getFluxTracker().isVenting() && !endSoundPlayed) {
+            Global.getSoundPlayer().playSound("system_burn_drive_deactivate", 1f, 1f, weaponLoc, shipVel);
+            endSoundPlayed = true;
+        }
+
+        wasCharging = isCharging;
 
         // Track charge progress (normalized)
         if (weapon.getChargeLevel() > 0f && !hasFired) {
             chargeTime += amount;
             float chargeProgress = Math.min(chargeTime / MAX_CHARGE_DURATION, 1f);
-
 
             // === Plasma flicker (timed to keep particle count sane) ===
             if (engine.getTotalElapsedTime(false) % 0.2f < 0.016f) {
@@ -78,9 +98,9 @@ public class AEG_ChestInfernoChargeEffectHelper {
                         BASE_PARTICLE_OPACITY + chargeProgress * PARTICLE_OPACITY_SCALE,
                         new Color(255, 100, 60, 140 + random.nextInt(115))
                 );
-            }
 
-            // === EMP arcs ===
+            }
+// === EMP arcs ===
             if (chargeProgress > 0.6f && Math.random() < ARC_CHANCE) {
                 float angle = (float) Math.random() * 360f;
                 Vector2f offset = Misc.getUnitVectorAtDegreeAngle(angle);
@@ -96,6 +116,7 @@ public class AEG_ChestInfernoChargeEffectHelper {
                         ARC_CORE_COLOR,
                         ARC_FRINGE_COLOR
                 );
+                Global.getSoundPlayer().playSound("terrain_hyperspace_lightning", 1f, 1f, weaponLoc, shipVel);
             }
 
             // === Nebula wisps ===
@@ -129,11 +150,31 @@ public class AEG_ChestInfernoChargeEffectHelper {
                 );
             }
 
+            // === Nebula wisps ===
+            if (chargeProgress > 0.3f && Math.random() < NEBULA_CHANCE) {
+                float angle = (float) Math.random() * 360f;
+                Vector2f dir = Misc.getUnitVectorAtDegreeAngle(angle);
+                dir.scale(10f + chargeProgress * 40f);
+                Vector2f smokeLoc = Vector2f.add(weaponLoc, dir, null);
+
+                engine.addNebulaParticle(
+                        smokeLoc,
+                        new Vector2f(shipVel),
+                        NEBULA_BASE_SIZE + chargeProgress * NEBULA_SIZE_SCALE,
+                        1.2f + chargeProgress,
+                        0.2f,
+                        0.05f + random.nextFloat() * 0.5f,
+                        NEBULA_BASE_DURATION + chargeProgress,
+                        NEBULA_COLOR,
+                        false
+                );
+            }
+
             // === Final flash ===
             if (chargeTime >= MAX_CHARGE_DURATION && !hasFired) {
                 hasFired = true;
-                chargeComplete = true;
-
+                chargeComplete = true;  // Set charge complete flag
+                Global.getSoundPlayer().playSound("system_emp_emitter_impact", 1f, 1f, weaponLoc, shipVel);
                 engine.spawnExplosion(weaponLoc, shipVel, FLASH_COLOR, EXPLOSION_RADIUS, EXPLOSION_DURATION);
                 engine.spawnEmpArcVisual(
                         weaponLoc,
@@ -159,10 +200,13 @@ public class AEG_ChestInfernoChargeEffectHelper {
             }
         }
 
+        // === Reset when weapon stops firing ===
         if (!weapon.isFiring()) {
             hasFired = false;
             chargeTime = 0f;
-            chargeComplete = false;
+            chargeComplete = false;  // Reset charge complete flag
+            wasCharging = false;  // Reset this flag when firing stops
+            endSoundPlayed = false;
         }
     }
 

@@ -5,7 +5,6 @@
   "type": "MISSILE",
   "mountTypeOverride": "SYNERGY",
   "size": "SMALL",
-  "everyFrameEffect": "data.weapons.scripts.AEG_RustHurricane",
   "turretSprite": "graphics/ships/zero/zero_mouth.png",
   "turretGlowSprite": "graphics/ships/zero/zero_mouth_glow.png",
   "hardpointSprite": "graphics/ships/zero/zero_mouth.png",

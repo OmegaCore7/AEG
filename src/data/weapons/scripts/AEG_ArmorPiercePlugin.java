@@ -22,6 +22,7 @@ public class AEG_ArmorPiercePlugin extends BaseEveryFrameCombatPlugin {
     private static final Map<String, Boolean> DELAYED_EXPLOSION_PROJECTILES = new HashMap<String, Boolean>();
     private static final Map<String, Boolean> CUSTOM_PIERCE_EFFECT_PROJECTILES = new HashMap<String, Boolean>();
     private static final Map<String, Boolean> GRAVITY_PULL_PROJECTILES = new HashMap<String, Boolean>();
+
     // Runtime state
     private final Map<String, CollisionClass> originalCollisionClasses = new HashMap<String, CollisionClass>();
     private final Map<DamagingProjectileAPI, Boolean> initialHitApplied = new HashMap<DamagingProjectileAPI, Boolean>();
