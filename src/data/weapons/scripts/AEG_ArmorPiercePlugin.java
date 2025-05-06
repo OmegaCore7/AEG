@@ -13,7 +13,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-
+//Refactored from Lazywizards's Original Armor Pierce script. Give credit where credits do.
 public class AEG_ArmorPiercePlugin extends BaseEveryFrameCombatPlugin {
     private static final String PIERCE_SOUND = "explosion_flak";
 
@@ -21,7 +21,7 @@ public class AEG_ArmorPiercePlugin extends BaseEveryFrameCombatPlugin {
     private static final Map<String, Boolean> PIERCING_PROJECTILES = new HashMap<String, Boolean>();
     private static final Map<String, Boolean> DELAYED_EXPLOSION_PROJECTILES = new HashMap<String, Boolean>();
     private static final Map<String, Boolean> CUSTOM_PIERCE_EFFECT_PROJECTILES = new HashMap<String, Boolean>();
-
+    private static final Map<String, Boolean> GRAVITY_PULL_PROJECTILES = new HashMap<String, Boolean>();
     // Runtime state
     private final Map<String, CollisionClass> originalCollisionClasses = new HashMap<String, CollisionClass>();
     private final Map<DamagingProjectileAPI, Boolean> initialHitApplied = new HashMap<DamagingProjectileAPI, Boolean>();
@@ -33,9 +33,13 @@ public class AEG_ArmorPiercePlugin extends BaseEveryFrameCombatPlugin {
         PIERCING_PROJECTILES.put("AEG_ironcutter_G_torp", true);
         PIERCING_PROJECTILES.put("Aeg_OmegaBlaster_Shot", true);
         PIERCING_PROJECTILES.put("AEG_4g_brokenmagnum_torp", true);
-
-        DELAYED_EXPLOSION_PROJECTILES.put("AEG_ironcutter_G_torp", true);
+        //Does it pierce Shields?
+        CUSTOM_PIERCE_EFFECT_PROJECTILES.put("AEG_ironcutter_G_torp", true);
         CUSTOM_PIERCE_EFFECT_PROJECTILES.put("Aeg_OmegaBlaster_Shot", true);
+        CUSTOM_PIERCE_EFFECT_PROJECTILES.put("AEG_4g_brokenmagnum_torp", true);
+        //Extra Effects
+        GRAVITY_PULL_PROJECTILES.put("Aeg_OmegaBlaster_Shot", true); // currently only one
+        DELAYED_EXPLOSION_PROJECTILES.put("AEG_ironcutter_G_torp", true);
         DELAYED_EXPLOSION_PROJECTILES.put("Aeg_OmegaBlaster_Shot", true);
     }
 
@@ -81,30 +85,25 @@ public class AEG_ArmorPiercePlugin extends BaseEveryFrameCombatPlugin {
 
             String spec = proj.getProjectileSpecId();
 
-            if (spec.equals("AEG_4g_brokenmagnum_torp")) {
-                applyBrokenMagnumEffect(engine, proj, entity, amount);
-            }
-
             if (!CUSTOM_PIERCE_EFFECT_PROJECTILES.containsKey(spec)
                     && entity.getShield() != null
                     && entity.getShield().isWithinArc(proj.getLocation())) {
                 proj.setCollisionClass(originalCollisionClasses.get(spec));
                 return;
             }
-
             if (!initialHitApplied.containsKey(proj)) {
                 applyInitialDamage(engine, proj, entity);
                 initialHitApplied.put(proj, true);
-
-                if (DELAYED_EXPLOSION_PROJECTILES.containsKey(spec)) {
-                    scheduleDelayedExplosion(engine, proj, entity);
-                }
             }
-
+            if (DELAYED_EXPLOSION_PROJECTILES.containsKey(spec)) {
+                scheduleDelayedExplosion(engine, proj, entity);
+            }
             if (CUSTOM_PIERCE_EFFECT_PROJECTILES.containsKey(spec)) {
                 applyCustomPierceEffect(engine, proj, entity, amount);
             }
-
+            if (spec.equals("AEG_4g_brokenmagnum_torp")) {
+                applyBrokenMagnumEffect(engine, proj, entity, amount);
+            }
             proj.getVelocity().scale(1.0f - (amount * 1.5f));
 
             engine.spawnExplosion(
@@ -161,30 +160,9 @@ public class AEG_ArmorPiercePlugin extends BaseEveryFrameCombatPlugin {
                     proj.getLocation(),
                     entity,
                     10f + rand.nextInt(40),
-                    new Color(255 - rand.nextInt(105),255,50 + rand.nextInt(50),255 - rand.nextInt(75)),
-                    new Color(255 - rand.nextInt(55),255,255 - rand.nextInt(70),255 - rand.nextInt(65))
+                    new Color(255 - rand.nextInt(105), 255, 50 + rand.nextInt(50), 255 - rand.nextInt(75)),
+                    new Color(255 - rand.nextInt(55), 255, 255 - rand.nextInt(70), 255 - rand.nextInt(65))
             );
-        }
-        // === Pull nearby ships towards the projectile ===
-        float pullRadius = 1000f; // Distance within which ships are affected
-        float pullStrength = 250f; // Maximum pull force per second
-
-        List<ShipAPI> nearbyShips = CombatUtils.getShipsWithinRange(proj.getLocation(), pullRadius);
-        for (ShipAPI ship : nearbyShips) {
-            if (ship == proj.getSource()) continue;
-
-            Vector2f direction = Vector2f.sub(proj.getLocation(), ship.getLocation(), null);
-            float distance = direction.length();
-            if (distance <= 1f) continue; // Avoid divide-by-zero
-
-            direction.normalise();
-            float forceFactor = 1f - (distance / pullRadius); // Linear falloff
-            float pullForce = pullStrength * forceFactor * amount; // Frame-scaled force
-
-            Vector2f pull = new Vector2f(direction);
-            pull.scale(pullForce);
-
-            Vector2f.add(ship.getVelocity(), pull, ship.getVelocity());
         }
     }
 
@@ -264,6 +242,7 @@ public class AEG_ArmorPiercePlugin extends BaseEveryFrameCombatPlugin {
         });
 
     }
+
     private void applyBrokenMagnumEffect(final CombatEngineAPI engine, final DamagingProjectileAPI proj, final CombatEntityAPI entity, float amount) {
         // === 1. Strong Knockback ===
         if (entity instanceof ShipAPI) {
@@ -276,19 +255,19 @@ public class AEG_ArmorPiercePlugin extends BaseEveryFrameCombatPlugin {
         // === 2. Spiral Particle Trail ===
         for (int i = 0; i < 4; i++) {
             float angleOffset = (float) Math.random() * 360f;
-            Vector2f offset = MathUtils.getPointOnCircumference(proj.getLocation(), 8f + (float)Math.random() * 4f, proj.getFacing() + angleOffset);
+            Vector2f offset = MathUtils.getPointOnCircumference(proj.getLocation(), 8f + (float) Math.random() * 4f, proj.getFacing() + angleOffset);
             engine.addSmoothParticle(
                     offset,
                     proj.getVelocity(),
                     12f + rand.nextInt(8),
                     1.2f,
                     0.2f,
-                    new Color(50 + rand.nextInt(50),255 ,110 + rand.nextInt(60), 200 + rand.nextInt(55))
+                    new Color(50 + rand.nextInt(50), 255, 110 + rand.nextInt(60), 200 + rand.nextInt(55))
             );
         }
 
         // === 3. Occasional Corkscrew EMP Arc ===
-        if (Math.random() < 0.025f) {
+        if (Math.random() < 0.2f) {
             engine.spawnEmpArcVisual(
                     proj.getLocation(),
                     proj,
@@ -296,7 +275,7 @@ public class AEG_ArmorPiercePlugin extends BaseEveryFrameCombatPlugin {
                     entity,
                     25f + rand.nextInt(10),
                     new Color(255, 110 + rand.nextInt(70), 50 + rand.nextInt(50), 255 - rand.nextInt(135)),
-                    new Color(255, 255  - rand.nextInt(115), 255 - rand.nextInt(65), 180 + rand.nextInt(25))
+                    new Color(255, 255 - rand.nextInt(115), 255 - rand.nextInt(65), 180 + rand.nextInt(25))
             );
         }
 
@@ -359,5 +338,28 @@ public class AEG_ArmorPiercePlugin extends BaseEveryFrameCombatPlugin {
                 }
             }
         });
+    }
+
+    private void applyGravityPullEffect(CombatEngineAPI engine, DamagingProjectileAPI proj, float amount) {
+        float pullRadius = 1000f;
+        float pullStrength = 250f;
+
+        List<ShipAPI> nearbyShips = CombatUtils.getShipsWithinRange(proj.getLocation(), pullRadius);
+        for (ShipAPI ship : nearbyShips) {
+            if (ship == proj.getSource()) continue;
+
+            Vector2f direction = Vector2f.sub(proj.getLocation(), ship.getLocation(), null);
+            float distance = direction.length();
+            if (distance <= 1f) continue;
+
+            direction.normalise();
+            float forceFactor = 1f - (distance / pullRadius);
+            float pullForce = pullStrength * forceFactor * amount;
+
+            Vector2f pull = new Vector2f(direction);
+            pull.scale(pullForce);
+
+            Vector2f.add(ship.getVelocity(), pull, ship.getVelocity());
+        }
     }
 }
