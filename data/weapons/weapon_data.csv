@@ -59,8 +59,8 @@ Gigantic Iron Cutter,AEG_zero_arm_r,,,500000,5000,,5000,5000,9999,45,10,1,0.01,1
 Iron Cutter,AEG_ironcutter_l,,,500000,2500,,1200,,1000,45,10,1,0.25,1,HIGH_EXPLOSIVE,200,,0,2,1,0.25,0,0,0,,,600,1000,1500,1000,,,DO_NOT_AIM,"missile12, strike9, missile_bp, merc, ind, no_drop",,,,Finisher,Fast,Excellent,,,,,,,TRUE,12
 Barrage Photon Beam Core,AEG_photonbeam,,,500000,2500,2500,,200,500,55,4,,,,ENERGY,,1350,3,0.4,12,,,,,,2400,,,,,,,,"beam9, LR, hightech_bp, midline_bp, merc, ind, no_drop",,,,General,,,,,,,,,,
 Barrage Photon Beam Barrage,AEG_photonbarrage,,,100000,2500,,500,75,500,55,,,,,ENERGY,150,,3,0.2,60,0.2,0,10,2,5,,1000,,,,,,"SYSTEM,SHOW_IN_CODEX",,TPC_only,,,General,,,,,,,,,,40
-Chest Inferno,AEG_ChestInferno,,,100000,1500,,200,,3,60,4,200,10			,100,ENERGY,2,,6,0,200,0.05,0,0,0,0,,500,,,,,,,"energy15, SR, omega, restricted, no_drop",,Unknown,,General,,,,,,,,,,
-Rust Hurrecane,AEG_rust,,,500000,1800,,200,200,75,55,10,50,5,1,ENERGY,50,,4,10,50,0.1,0,0.1,1,5,,250,500,30,5000,,,"STRIKE, DO_NOT_AIM","strike20, missile20, omega, restricted, no_drop",,Unknown,,Guided Torpedo,Slow,Excellent,,,,,,,TRUE,
+Chest Inferno,AEG_ChestInferno,,,100000,1500,,200,,3,60,4,200,10			,100,ENERGY,2,,6,0,200,0.1,0,0,0,0,,500,,,,,,,"energy15, SR, omega, restricted, no_drop",,Unknown,,General,,,,,,,,,,
+Rust Hurrecane,AEG_rust,,,500000,1800,,200,200,75,55,10,50,5,1,ENERGY,50,,6,10,50,0.1,0,0.1,1,5,,250,500,30,5000,,,"STRIKE, DO_NOT_AIM","strike20, missile20, omega, restricted, no_drop",,Unknown,,Guided Torpedo,Slow,Excellent,,,,,,,TRUE,
 God ThunderBolt Breaker,AEG_thunderbreaker,,,500000,3000,1400,0,100,0,25,25,0,0,0,ENERGY,0,700,2,0.05,0,0,0,0,0,0,10000,0,0,0,0,0,0,,,,,,General,,,,,,,,,,
 ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,

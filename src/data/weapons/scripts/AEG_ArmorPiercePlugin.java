@@ -3,16 +3,16 @@ package data.weapons.scripts;
 import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.combat.*;
 import com.fs.starfarer.api.loading.MissileSpecAPI;
+import com.fs.starfarer.api.loading.ProjectileSpawnType;
 import org.lazywizard.lazylib.CollisionUtils;
 import org.lazywizard.lazylib.MathUtils;
 import org.lazywizard.lazylib.combat.CombatUtils;
 import org.lwjgl.util.vector.Vector2f;
 
 import java.awt.*;
-import java.util.HashMap;
+import java.util.*;
 import java.util.List;
-import java.util.Map;
-import java.util.Random;
+
 //Refactored from Lazywizards's Original Armor Pierce script. Give credit where credits do.
 public class AEG_ArmorPiercePlugin extends BaseEveryFrameCombatPlugin {
     private static final String PIERCE_SOUND = "explosion_flak";
@@ -22,6 +22,7 @@ public class AEG_ArmorPiercePlugin extends BaseEveryFrameCombatPlugin {
     private static final Map<String, Boolean> DELAYED_EXPLOSION_PROJECTILES = new HashMap<String, Boolean>();
     private static final Map<String, Boolean> CUSTOM_PIERCE_EFFECT_PROJECTILES = new HashMap<String, Boolean>();
     private static final Map<String, Boolean> GRAVITY_PULL_PROJECTILES = new HashMap<String, Boolean>();
+    private static final Map<String, Boolean> PIERCE_EXCEPT_HARDENED_SHIELDS = new HashMap<>();
 
     // Runtime state
     private final Map<String, CollisionClass> originalCollisionClasses = new HashMap<String, CollisionClass>();
@@ -34,12 +35,21 @@ public class AEG_ArmorPiercePlugin extends BaseEveryFrameCombatPlugin {
         PIERCING_PROJECTILES.put("AEG_ironcutter_G_torp", true);
         PIERCING_PROJECTILES.put("Aeg_OmegaBlaster_Shot", true);
         PIERCING_PROJECTILES.put("AEG_4g_brokenmagnum_torp", true);
+        PIERCING_PROJECTILES.put("AEG_rust_torp", true);
+
         //Does it pierce Shields?
         CUSTOM_PIERCE_EFFECT_PROJECTILES.put("AEG_ironcutter_G_torp", true);
         CUSTOM_PIERCE_EFFECT_PROJECTILES.put("Aeg_OmegaBlaster_Shot", true);
         CUSTOM_PIERCE_EFFECT_PROJECTILES.put("AEG_4g_brokenmagnum_torp", true);
+
+
+        // Pierce shields but not Hardened Shields
+        PIERCE_EXCEPT_HARDENED_SHIELDS.put("AEG_rust_torp", true); // example
+
         //Extra Effects
         GRAVITY_PULL_PROJECTILES.put("Aeg_OmegaBlaster_Shot", true); // currently only one
+
+        //Dynamic Delayed Explosion
         DELAYED_EXPLOSION_PROJECTILES.put("AEG_ironcutter_G_torp", true);
         DELAYED_EXPLOSION_PROJECTILES.put("Aeg_OmegaBlaster_Shot", true);
     }
@@ -65,18 +75,56 @@ public class AEG_ArmorPiercePlugin extends BaseEveryFrameCombatPlugin {
             projectileFlightTimes.put(proj, projectileFlightTimes.get(proj) + amount);
 
             proj.setCollisionClass(CollisionClass.NONE);
-
+            if (GRAVITY_PULL_PROJECTILES.containsKey(spec)) {
+                applyGravityPullEffect(engine, proj, amount);
+            }
             handleEntityPierce(proj, engine, amount);
             handleProjectileExpiration(proj, engine);
+        }
+        // Cleanup for projectileFlightTimes
+        Iterator<DamagingProjectileAPI> flightIterator = projectileFlightTimes.keySet().iterator();
+        while (flightIterator.hasNext()) {
+            DamagingProjectileAPI p = flightIterator.next();
+            if (!engine.isEntityInPlay(p)) {
+                flightIterator.remove();
+            }
+        }
+
+// Cleanup for initialHitApplied
+        Iterator<DamagingProjectileAPI> hitIterator = initialHitApplied.keySet().iterator();
+        while (hitIterator.hasNext()) {
+            DamagingProjectileAPI p = hitIterator.next();
+            if (!engine.isEntityInPlay(p)) {
+                hitIterator.remove();
+            }
         }
     }
 
     private void handleEntityPierce(DamagingProjectileAPI proj, CombatEngineAPI engine, float amount) {
-        List targets = CombatUtils.getEntitiesWithinRange(proj.getLocation(), proj.getCollisionRadius() + 5f);
+        List<CombatEntityAPI> targets = CombatUtils.getEntitiesWithinRange(proj.getLocation(), proj.getCollisionRadius());
         targets.remove(proj.getSource());
 
+        for (CombatEntityAPI entity : targets) {
+            if (entity instanceof MissileAPI || entity instanceof DamagingProjectileAPI) {
+                // If projectile is part of the delayed explosion type, remove other projectiles
+                if (DELAYED_EXPLOSION_PROJECTILES.containsKey(proj.getProjectileSpecId())) {
+                    if (entity != proj) {
+                        engine.spawnExplosion(
+                                entity.getLocation(),
+                                entity.getVelocity(),
+                                new Color(255 - rand.nextInt(205), 100 + rand.nextInt(80), 50 + rand.nextInt(100), 180 + rand.nextInt(50)),
+                                5f + rand.nextInt(35),
+                                0.25f
+                        );
+                        engine.removeEntity(entity);
+                    }
+                }
+                continue; // Skip further processing for wiped ordnance
+            }
+        }
+
         for (int i = 0; i < targets.size(); i++) {
-            CombatEntityAPI entity = (CombatEntityAPI) targets.get(i);
+            CombatEntityAPI entity = targets.get(i);
             if (!CollisionUtils.isPointWithinBounds(proj.getLocation(), entity)) continue;
 
             if (entity instanceof ShipAPI) {
@@ -86,25 +134,45 @@ public class AEG_ArmorPiercePlugin extends BaseEveryFrameCombatPlugin {
 
             String spec = proj.getProjectileSpecId();
 
-            if (!CUSTOM_PIERCE_EFFECT_PROJECTILES.containsKey(spec)
-                    && entity.getShield() != null
-                    && entity.getShield().isWithinArc(proj.getLocation())) {
-                proj.setCollisionClass(originalCollisionClasses.get(spec));
-                return;
+            if (entity instanceof ShipAPI) {
+                ShipAPI ship = (ShipAPI) entity;
+                ShieldAPI shield = ship.getShield();
+
+                if (shield != null && shield.isWithinArc(proj.getLocation())) {
+                    boolean hasHardenedShields = ship.getVariant().hasHullMod("hardenedshields");
+
+                    // 1. Check if this projectile should not pierce any shield at all
+                    if (!CUSTOM_PIERCE_EFFECT_PROJECTILES.containsKey(spec)) {
+                        proj.setCollisionClass(originalCollisionClasses.get(spec));
+                        return;
+                    }
+
+                    // 2. Check if this projectile should pierce shields, but *not* Hardened Shields
+                    if (PIERCE_EXCEPT_HARDENED_SHIELDS.containsKey(spec) && hasHardenedShields) {
+                        proj.setCollisionClass(originalCollisionClasses.get(spec));
+                        return;
+                    }
+                }
             }
+
+            // Apply custom effects if applicable
             if (!initialHitApplied.containsKey(proj)) {
                 applyInitialDamage(engine, proj, entity);
                 initialHitApplied.put(proj, true);
             }
+
             if (DELAYED_EXPLOSION_PROJECTILES.containsKey(spec)) {
                 scheduleDelayedExplosion(engine, proj, entity);
             }
+
             if (CUSTOM_PIERCE_EFFECT_PROJECTILES.containsKey(spec)) {
                 applyCustomPierceEffect(engine, proj, entity, amount);
             }
+
             if (spec.equals("AEG_4g_brokenmagnum_torp")) {
                 applyBrokenMagnumEffect(engine, proj, entity, amount);
             }
+
             proj.getVelocity().scale(1.0f - (amount * 1.5f));
 
             engine.spawnExplosion(
@@ -153,16 +221,6 @@ public class AEG_ArmorPiercePlugin extends BaseEveryFrameCombatPlugin {
                     true,
                     true,
                     proj.getSource()
-            );
-
-            engine.spawnEmpArcVisual(
-                    proj.getLocation(),
-                    proj,
-                    proj.getLocation(),
-                    entity,
-                    10f + rand.nextInt(40),
-                    new Color(255 - rand.nextInt(105), 255, 50 + rand.nextInt(50), 255 - rand.nextInt(75)),
-                    new Color(255 - rand.nextInt(55), 255, 255 - rand.nextInt(70), 255 - rand.nextInt(65))
             );
         }
     }
@@ -363,4 +421,5 @@ public class AEG_ArmorPiercePlugin extends BaseEveryFrameCombatPlugin {
             Vector2f.add(ship.getVelocity(), pull, ship.getVelocity());
         }
     }
+
 }
