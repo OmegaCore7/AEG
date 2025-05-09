@@ -4,160 +4,181 @@ import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.combat.*;
 import org.dark.shaders.distortion.DistortionShader;
 import org.dark.shaders.distortion.RippleDistortion;
-import org.dark.shaders.distortion.WaveDistortion;
 import org.lwjgl.util.vector.Vector2f;
 
 import java.awt.*;
 import java.util.Random;
 
-import static java.util.logging.Logger.global;
-
 public class AEG_RustHurricaneChargeEffect implements EveryFrameWeaponEffectPlugin {
+    private float nextSoundInterval = 0.8f;
     private float soundTimer = 0f;
     private float ripplePulseTimer = 0f;
     private int soundStage = 0;
-    private WaveDistortion waveDistortion = null;
-    private boolean started = false;
     private float timer = 0f;
-    private RippleDistortion primaryDistortion = null;
-    private RippleDistortion secondaryDistortion = null;
-    private final float MAX_DURATION = 6f;
-    private Random rand = new Random();
+    private boolean hasFullyCharged = false;
+    private final Random rand = new Random();
+    private final float MAX_CHARGE_DURATION = 6f;
+
     @Override
     public void advance(float amount, CombatEngineAPI engine, WeaponAPI weapon) {
         if (engine.isPaused() || weapon.getChargeLevel() <= 0f) return;
-        Vector2f muzzle = weapon.getFirePoint(0); // muzzle position
-        timer += amount;
-        ripplePulseTimer += amount;
-        if (ripplePulseTimer >= 1.0f) {
-            ripplePulseTimer = 0f;
 
-            WaveDistortion ripple = new WaveDistortion(muzzle, new Vector2f(0, 0));
-            ripple.setSize(200f);
-            ripple.setIntensity(20f);      // sharp, visible effect
-            ripple.setLifetime(0.4f);      // short burst
-            ripple.setArc(0f, 360f);
-            ripple.fadeOutIntensity(0.6f);
-            // No setInvert(), simulate inward with timing/layering
-            DistortionShader.addDistortion(ripple);
-        }
+        Vector2f muzzle = weapon.getFirePoint(0);
+        if (muzzle == null) muzzle = weapon.getLocation();
+
+        timer += amount;
+
         soundTimer += amount;
 
-        if (soundStage == 0 && soundTimer >= 0f) {
-            playChargeSound(weapon, 0.6f); // first, quiet
-            soundStage++;
-        }
-        if (soundStage == 1 && soundTimer >= 2f) {
-            playChargeSound(weapon, 0.8f); // medium
-            soundStage++;
-        }
-        if (soundStage == 2 && soundTimer >= 4f) {
-            playChargeSound(weapon, 1.0f); // full volume
-            soundStage++;
+        if (soundTimer >= nextSoundInterval) {
+            float pitch = 1f + (weapon.getChargeLevel() * 0.5f); // subtle pitch shift
+            float volume = 0.5f + (weapon.getChargeLevel() * 0.5f); // build volume
+
+            playChargeSound(weapon, volume, pitch);
+            soundTimer = 0f;
+
+            // As it charges, sounds get more frequent
+            nextSoundInterval = Math.max(0.1f, 0.8f - weapon.getChargeLevel() * 0.7f);
         }
 
-        if (muzzle == null) {
-            muzzle = weapon.getLocation(); // fallback
-        }
+        // PARTICLES
+        spawnChargingParticles(engine, weapon, muzzle);
 
-        // Cosmic vortex particles — simulating space "suck-in"
-        Vector2f pullVelocity = Vector2f.sub(muzzle, weapon.getLocation(), null);
-        pullVelocity.scale(0.3f);
+        // FULL CHARGE EFFECT
+        if (weapon.getChargeLevel() >= 1f && !hasFullyCharged) {
+            spawnDispersalTransition(engine, muzzle);
+            Global.getSoundPlayer().playSound("realitydisruptor_fire", 1f, 1f, muzzle, weapon.getShip().getVelocity());
+            engine.addHitParticle(muzzle, new Vector2f(), 40f, 1f, 0.4f, new Color(200, 255, 255, 255));
+            hasFullyCharged = true;
+        }
+        // RESET AFTER FIRING
+        if (weapon.getChargeLevel() < 0.05f && hasFullyCharged) {
+            hasFullyCharged = false;
+            timer = 0f;
+            soundTimer = 0f;
+            soundStage = 0;
+        }
+    }
+
+    private void spawnChargingParticles(CombatEngineAPI engine, WeaponAPI weapon, Vector2f muzzle) {
+        // Dark pull particles
         for (int i = 0; i < 6; i++) {
             Vector2f offset = new Vector2f((rand.nextFloat() - 0.5f) * 60f, (rand.nextFloat() - 0.5f) * 60f);
             Vector2f spawn = Vector2f.add(muzzle, offset, null);
-
             Vector2f toMuzzle = Vector2f.sub(muzzle, spawn, null);
             toMuzzle.normalise();
             toMuzzle.scale(40f + rand.nextFloat() * 20f);
 
-            Color particleColor = new Color(50 - rand.nextInt(50), 0, 150 - rand.nextInt(100), 100 + rand.nextInt(100));
-
             engine.addSmoothParticle(
-                    spawn,
-                    toMuzzle,
+                    spawn, toMuzzle,
                     10f + rand.nextFloat() * 5f,
                     1f,
-                    0.5f + rand.nextFloat() * 0.3f,
-                    particleColor
+                    0.6f,
+                    new Color(30 + rand.nextInt(30), 0, 60 + rand.nextInt(60), 150)
             );
         }
 
+        // Subtle core glow with hue shifting
+        float hueShift = (timer * 30f) % 360f;
+        Color pulsingColor = Color.getHSBColor(hueShift / 360f, 1f, 1f);
 
-        // Subtle glow pulse as charge builds
-        float alpha = weapon.getChargeLevel();
         engine.addNebulaParticle(
                 muzzle,
-                new Vector2f((rand.nextFloat() - 0.5f) * 20f, (rand.nextFloat() - 0.5f) * 20f),
-                10f + rand.nextFloat() * 20f,
-                1.5f,
-                0f,
-                0.1f,
-                0.6f,
-                new Color(60, 0, 20, 100),
+                new Vector2f((rand.nextFloat() - 0.5f) * 15f, (rand.nextFloat() - 0.5f) * 15f),
+                15f + rand.nextFloat() * 20f,
+                1.6f,
+                0f, 0.1f, 0.6f,
+                new Color(pulsingColor.getRed(), 0, pulsingColor.getBlue(), 120),
                 true
         );
-        for (int i = 0; i < 3; i++) {
-            Vector2f flickerPos = new Vector2f(
-                    muzzle.x + (float) Math.cos(rand.nextFloat() * 2 * Math.PI) * 35f,
-                    muzzle.y + (float) Math.sin(rand.nextFloat() * 2 * Math.PI) * 35f
-            );
-            engine.addHitParticle(flickerPos, new Vector2f(), 3f, 0.8f, 0.1f, new Color(180 - rand.nextInt(100), 80 + rand.nextInt(80), 255, 180 + rand.nextInt(75)));
-        }
-        if (weapon.getChargeLevel() > 0.1f) {
+
+        // EMP arcs crackling
+        if (rand.nextFloat() < 0.1f) {
             for (int i = 0; i < 2; i++) {
-                engine.addNebulaParticle(
-                        muzzle,
-                        new Vector2f((rand.nextFloat() - 0.5f) * 60f, (rand.nextFloat() - 0.5f) * 60f),
-                        50f + rand.nextFloat() * 60f,
-                        2f + rand.nextFloat(),
-                        0f,
-                        0.2f,
-                        0.8f,
-                        new Color(
-                                20 + rand.nextInt(120),   // red
-                                0,                       // green
-                                60 + rand.nextInt(60),  // blue
-                                100 + rand.nextInt(20)   // alpha
-                        )
+                Vector2f from = new Vector2f(
+                        muzzle.x + (rand.nextFloat() - 0.5f) * 60f,
+                        muzzle.y + (rand.nextFloat() - 0.5f) * 60f
+                );
+                Vector2f to = new Vector2f(
+                        muzzle.x + (rand.nextFloat() - 0.5f) * 60f,
+                        muzzle.y + (rand.nextFloat() - 0.5f) * 60f
+                );
+                engine.spawnEmpArcVisual(
+                        from, weapon.getShip(),   // from location & entity
+                        to, weapon.getShip(),     // to location & entity
+                        2f,                       // thickness
+                        new Color(200 - rand.nextInt(100), 0, 100 - rand.nextInt(100)),   // fringe
+                        new Color(255 - rand.nextInt(75), 0, 150 - rand.nextInt(75))    // core
                 );
             }
+        }
 
+        // Peripheral flickers
+        for (int i = 0; i < 3; i++) {
+            Vector2f flickerPos = new Vector2f(
+                    muzzle.x + (float) Math.cos(rand.nextFloat() * 2 * Math.PI) * 40f,
+                    muzzle.y + (float) Math.sin(rand.nextFloat() * 2 * Math.PI) * 40f
+            );
+            engine.addHitParticle(flickerPos, new Vector2f(), 3f, 0.8f, 0.15f,
+                    new Color(180, 20 + rand.nextInt(40), 60 + rand.nextInt(80), 180));
+        }
+    }
+
+    private void spawnDispersalTransition(CombatEngineAPI engine, Vector2f muzzle) {
+        // Chaotic nebula burst
+        for (int i = 0; i < 12; i++) {
+            Vector2f vel = new Vector2f((rand.nextFloat() - 0.5f) * 200f, (rand.nextFloat() - 0.5f) * 200f);
+            Color riftColor = new Color(80 - rand.nextInt(70), 0, 80 - rand.nextInt(60), 200 - rand.nextInt(50));
             engine.addNebulaParticle(
                     muzzle,
-                    new Vector2f(),
-                    140f,
-                    2.4f,
+                    vel,
+                    60f + rand.nextFloat() * 100f,
+                    2f + rand.nextFloat(),
                     0f,
-                    0.2f + rand.nextInt(2),
-                    1.2f + rand.nextInt(2),
-                    new Color(10, 10, 10, 180),
+                    0.3f,
+                    1.5f,
+                    riftColor,
                     true
             );
         }
-        for (int i = 0; i < 3; i++) {
-            Vector2f ringPos = new Vector2f(
-                    muzzle.x + (float) Math.cos(rand.nextFloat() * 2 * Math.PI) * (50f + rand.nextFloat() * 20f),
-                    muzzle.y + (float) Math.sin(rand.nextFloat() * 2 * Math.PI) * (50f + rand.nextFloat() * 20f)
+
+        // Vortex swirl outward
+        for (int i = 0; i < 10; i++) {
+            float angle = rand.nextFloat() * 360f;
+            float speed = 30f + rand.nextFloat() * 50f;
+            float radians = (float) Math.toRadians(angle);
+            Vector2f vel = new Vector2f(
+                    (float) Math.cos(radians) * speed,
+                    (float) Math.sin(radians) * speed
             );
-            engine.addHitParticle(
-                    ringPos,
-                    new Vector2f(),
-                    6f + rand.nextFloat() * 4f,
-                    1.2f,
-                    0.2f + rand.nextFloat() * 0.2f,
-                    new Color(200, 0, 255, 120 + rand.nextInt(100))
+
+            engine.addSmoothParticle(
+                    muzzle,
+                    vel,
+                    8f + rand.nextFloat() * 10f,
+                    1f,
+                    1.5f,
+                    new Color(150 + rand.nextInt(60), 0, 30 + rand.nextInt(60), 160)
             );
         }
+
+        // Ripple distortion burst
+        RippleDistortion ripple = new RippleDistortion(muzzle, new Vector2f());
+        ripple.setSize(300f);
+        ripple.setIntensity(35f);
+        ripple.setLifetime(0.7f);
+        ripple.fadeOutIntensity(0.5f);
+        DistortionShader.addDistortion(ripple);
     }
-    private void playChargeSound(WeaponAPI weapon, float volume) {
+
+    private void playChargeSound(WeaponAPI weapon, float volume, float pitch) {
         Vector2f muzzle = weapon.getFirePoint(0);
         if (muzzle == null) muzzle = weapon.getLocation();
 
         Global.getSoundPlayer().playSound(
-                "gigacannon_charge", // same sound
-                1f,                  // pitch
-                volume,             // dynamic volume
+                "system_high_energy_focus_activate",
+                pitch,
+                volume,
                 muzzle,
                 weapon.getShip().getVelocity()
         );
