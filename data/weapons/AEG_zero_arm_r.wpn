@@ -4,19 +4,18 @@
   "projectileSpecId": "AEG_ironcutter_G_torp",
   "type": "MISSILE",
   "size": "SMALL",
-  "turretSprite": "graphics/ships/zero/zero_arm_r.png",
-  "turretGlowSprite": "graphics/ships/zero/zero_arm_r_glow.png",
-  "hardpointSprite": "graphics/ships/zero/zero_arm_r.png",
-  "hardpointGlowSprite": "graphics/ships/zero/zero_arm_r_glow.png",
+  "everyFrameEffect": "data.weapons.scripts.AEG_GiantIronCutterEffect",
+  "turretSprite": "graphics/ships/zero/zero_arm_r_00.png",
+  "hardpointSprite": "graphics/ships/zero/zero_arm_r_00.png",
   "glowColor": [
-    255,
-    255,
-    50,
+    250,
+    250,
+    0,
     25
   ],
   "turretOffsets": [
-    78,
-    -10
+    78.5,
+    -3
   ],
   "turretAngleOffsets": [
     0
@@ -30,6 +29,8 @@
   ],
   "barrelMode": "ALTERNATING",
   "animationType": "GLOW_AND_FLASH",
+  "numFrames": 18,
+  "frameRate": 2.5,
   "autocharge": true,
   "muzzleFlashSpec": {
     "length": 100,
