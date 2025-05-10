@@ -29,9 +29,9 @@
   ],
   "barrelMode": "ALTERNATING",
   "animationType": "GLOW_AND_FLASH",
-  "numFrames": 18,
-  "frameRate": 2.5,
-  "autocharge": true,
+  "numFrames": 17,
+  "frameRate": 5.67,
+  #"autocharge": true, #This is a Nuke, you'd better be prepared to obliterate everything if you fire it. Autocharge false by default.
   "muzzleFlashSpec": {
     "length": 100,
     "spread": 100,

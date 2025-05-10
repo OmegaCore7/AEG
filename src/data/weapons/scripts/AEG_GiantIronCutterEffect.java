@@ -4,91 +4,61 @@ import com.fs.starfarer.api.combat.*;
 import com.fs.starfarer.api.util.Misc;
 import org.lwjgl.util.vector.Vector2f;
 
-import java.awt.*;
+import java.awt.Color;
 
 public class AEG_GiantIronCutterEffect implements EveryFrameWeaponEffectPlugin {
-    private boolean charging = false;
-    private boolean fired = false;
-    private float chargeTimer = 0f;
 
-    private static final float TRANSFORM_DURATION = 3f;
-    private static final float TOTAL_CHARGE_TIME = 6f;
-    private static final int TRANSFORM_FRAMES = 16;
+    private int frameIndex = 0;
+    private float firingTimer = 0f;
+    private boolean isFiring = false;
 
-    private float particleTimer = 0f;
-    private static final float PARTICLE_INTERVAL = 0.05f;
-    private static final int PARTICLE_COUNT = 3;
-
-    private int lastFrame = -1;
+    private static final float FIRE_DURATION = 10f;   // Hold frame 16 for 10 seconds
+    private static final int PARTICLE_COUNT = 5;
 
     @Override
     public void advance(float amount, CombatEngineAPI engine, WeaponAPI weapon) {
-        if (engine.isPaused() || weapon == null) return;
+        if (engine.isPaused()) return;
 
-        float cooldown = weapon.getCooldownRemaining();
-        int ammo = weapon.getAmmo();
+        float chargeLevel = weapon.getChargeLevel();
 
-        // Begin charge when weapon enters cooldown
-        if (cooldown > 0 && !charging && !fired) {
-            charging = true;
-            fired = false;
-            chargeTimer = 0f;
-            lastFrame = -1;
-        }
+        // If we're in the firing phase (after full charge), hold frame 16
+        if (isFiring) {
+            firingTimer += amount;
 
-        // CHARGING: 0s–3s → animate frames 0–15
-        if (charging && chargeTimer < TRANSFORM_DURATION) {
-            chargeTimer += amount;
-
-            int frame = Math.min((int)((chargeTimer / TRANSFORM_DURATION) * TRANSFORM_FRAMES), TRANSFORM_FRAMES - 1);
-            if (frame != lastFrame) {
-                weapon.getAnimation().setFrame(frame);
-                lastFrame = frame;
-            }
-
-            handleParticles(amount, engine, weapon);
-        }
-
-        // CHARGE COMPLETE: 3s–6s → hold frame 15
-        if (charging && chargeTimer >= TRANSFORM_DURATION && chargeTimer < TOTAL_CHARGE_TIME && !fired) {
-            if (lastFrame != 15) {
-                weapon.getAnimation().setFrame(15);
-                lastFrame = 15;
-            }
-            handleParticles(amount, engine, weapon);
-        }
-
-        // FIRING: at 6s mark → switch to frame 16
-        if (charging && chargeTimer >= TOTAL_CHARGE_TIME && !fired) {
+            // Stay on frame 16 during the 10s firing/regeneration
             weapon.getAnimation().setFrame(16);
-            lastFrame = 16;
-            fired = true;
-        }
-        // POST-FIRE COOLDOWN & AMMO SPENT: hold frame 17
-        if (fired || cooldown > 0 || weapon.getAmmo() <= 0) {
-            if (lastFrame != 17) {
-                weapon.getAnimation().setFrame(17);
-                lastFrame = 17;
-            }
-            handleParticles(amount, engine, weapon);
-        }
 
-
-        // RESET: once reloaded & ammo restored → frame 0
-        if (fired && cooldown <= 0 && ammo > 0) {
-            weapon.getAnimation().setFrame(0);
-            lastFrame = 0;
-            fired = false;
-            charging = false;
-            chargeTimer = 0f;
-        }
-    }
-
-    private void handleParticles(float amount, CombatEngineAPI engine, WeaponAPI weapon) {
-        particleTimer += amount;
-        if (particleTimer >= PARTICLE_INTERVAL) {
-            particleTimer -= PARTICLE_INTERVAL;
+            // You can optionally spawn particles continuously here
             spawnPhotonParticles(engine, weapon);
+
+            if (firingTimer >= FIRE_DURATION) {
+                // After 10s, return to idle frame
+                weapon.getAnimation().setFrame(0);
+                isFiring = false;
+                firingTimer = 0f;
+            }
+
+            return; // Skip further animation logic during firing phase
+        }
+
+        // Not firing yet: charging phase from frame 0 to 15
+        if (chargeLevel > 0f && chargeLevel < 1f) {
+            frameIndex = (int)(chargeLevel * 15f);
+            weapon.getAnimation().setFrame(frameIndex);
+        }
+
+        // Just hit full charge: begin firing phase
+        else if (chargeLevel == 1f && !isFiring) {
+            isFiring = true;
+            firingTimer = 0f;
+            frameIndex = 16;
+            weapon.getAnimation().setFrame(frameIndex);
+            spawnPhotonParticles(engine, weapon);
+        }
+
+        // Idle / cooldown
+        else if (chargeLevel <= 0f && !isFiring) {
+            weapon.getAnimation().setFrame(0);
         }
     }
 
