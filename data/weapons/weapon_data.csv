@@ -55,7 +55,7 @@ Test Weapon,AEG_testweapon,,,1200,2000,,100,,3,60,10,,,,ENERGY,15,,7,0.2,1,0.5,0
 ,AEG_zero_legs,,,500000,600,1,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 Mazin Impact,AEG_zero_shoulder_l,,,500000,2500,,300,,10,45,10,40,1,10,HIGH_EXPLOSIVE,10,,0,5,40,0.01,0.01,,,,,300,1000,1500,30,,,DO_NOT_AIM,"utility8, missile0, missile_bp, merc, ind, no_drop",,,,General,,,,,,,,,,
 Cross Knife Swarmer PD,AEG_zero_shoulder_r,,,500000,1000,,150,100,15,50,3,80,"1		","10	",HIGH_EXPLOSIVE,10,,0,5,40,0.2,0,0,0,0,,300,100,5,50,,,"ANTI_FTR, DO_NOT_AIM, DO_NOT_CONSERVE","utility8, missile0, missile_bp, merc, ind, no_drop",,,,Anti Small Craft,Fast,Excellent,,,,,,,,10
-Gigantic Iron Cutter,AEG_zero_arm_r,,,500000,5000,,5000,5000,9999,45,10,1,0.01,1,HIGH_EXPLOSIVE,1000,,6		,0.2,1,0.25,0,0,0,,,1000,2000,30,100000,,,DO_NOT_AIM,"missile12, strike9, missile_bp, merc, ind, no_drop",,,,Finisher,Fast,Excellent,,,,,,,TRUE,12
+Gigantic Iron Cutter,AEG_zero_arm_r,,,500000,5000,,5000,5000,9999,45,10,1,0.1,1,HIGH_EXPLOSIVE,1000,,6		,0,,,0,0,0,,,1000,2000,30,100000,,,DO_NOT_AIM,"missile12, strike9, missile_bp, merc, ind, no_drop",,,,Finisher,Fast,Excellent,,,,,,,TRUE,12
 Iron Cutter,AEG_ironcutter_l,,,500000,2500,,1200,,1000,45,10,1,0.25,1,HIGH_EXPLOSIVE,200,,0,2,1,0.25,0,0,0,,,600,1000,1500,1000,,,DO_NOT_AIM,"missile12, strike9, missile_bp, merc, ind, no_drop",,,,Finisher,Fast,Excellent,,,,,,,TRUE,12
 Barrage Photon Beam Core,AEG_photonbeam,,,500000,2500,2500,,200,500,55,4,,,,ENERGY,,1350,3,0.4,12,,,,,,2400,,,,,,,,"beam9, LR, hightech_bp, midline_bp, merc, ind, no_drop",,,,General,,,,,,,,,,
 Barrage Photon Beam Barrage,AEG_photonbarrage,,,100000,2500,,500,75,500,55,,,,,ENERGY,150,,3,0.2,60,0.2,0,10,2,5,,1000,,,,,,"SYSTEM,SHOW_IN_CODEX",,TPC_only,,,General,,,,,,,,,,40
