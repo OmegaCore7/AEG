@@ -7,7 +7,7 @@ import org.lwjgl.util.vector.Vector2f;
 import java.awt.Color;
 
 public class AEG_GiantIronCutterEffect implements EveryFrameWeaponEffectPlugin {
-
+    private final AEG_IronCutterVisuals visuals = new AEG_IronCutterVisuals();
     private int frameIndex = 0;
     private float firingTimer = 0f;
     private boolean isFiring = false;
@@ -45,6 +45,7 @@ public class AEG_GiantIronCutterEffect implements EveryFrameWeaponEffectPlugin {
         if (chargeLevel > 0f && chargeLevel < 1f) {
             frameIndex = (int)(chargeLevel * 15f);
             weapon.getAnimation().setFrame(frameIndex);
+            visuals.update(amount, engine, weapon); // 👈 ADD THIS
         }
 
         // Just hit full charge: begin firing phase
@@ -54,6 +55,7 @@ public class AEG_GiantIronCutterEffect implements EveryFrameWeaponEffectPlugin {
             frameIndex = 16;
             weapon.getAnimation().setFrame(frameIndex);
             spawnPhotonParticles(engine, weapon);
+            visuals.update(amount, engine, weapon); // 👈 AND THIS
         }
 
         // Idle / cooldown
