@@ -1,5 +1,7 @@
 package data.weapons.scripts;
 
+import org.dark.shaders.distortion.RippleDistortion;
+import org.dark.shaders.distortion.DistortionShader;
 import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.combat.*;
 import com.fs.starfarer.api.loading.MissileSpecAPI;
@@ -15,6 +17,11 @@ import java.util.List;
 
 //Refactored from Lazywizards's Original Armor Pierce script. Give credit where credits do.
 public class AEG_ArmorPiercePlugin extends BaseEveryFrameCombatPlugin {
+
+    private final Map<DamagingProjectileAPI, Float> lastRippleTime = new HashMap<>();
+    private static final float RIPPLE_COOLDOWN = 0.2f;
+    // Only these projectiles cause a ripple on ship impact
+    private static final Map<String, Boolean> RIPPLE_ON_HIT_PROJECTILES = new HashMap<>();
     private static final String PIERCE_SOUND = "explosion_flak";
 
     // Projectile behavior maps
@@ -41,7 +48,7 @@ public class AEG_ArmorPiercePlugin extends BaseEveryFrameCombatPlugin {
         CUSTOM_PIERCE_EFFECT_PROJECTILES.put("AEG_ironcutter_G_torp", true);
         CUSTOM_PIERCE_EFFECT_PROJECTILES.put("Aeg_OmegaBlaster_Shot", true);
         CUSTOM_PIERCE_EFFECT_PROJECTILES.put("AEG_4g_brokenmagnum_torp", true);
-
+        CUSTOM_PIERCE_EFFECT_PROJECTILES.put("AEG_rust_torp", true);
 
         // Pierce shields but not Hardened Shields
         PIERCE_EXCEPT_HARDENED_SHIELDS.put("AEG_rust_torp", true); // example
@@ -52,6 +59,8 @@ public class AEG_ArmorPiercePlugin extends BaseEveryFrameCombatPlugin {
         //Dynamic Delayed Explosion
         DELAYED_EXPLOSION_PROJECTILES.put("AEG_ironcutter_G_torp", true);
         DELAYED_EXPLOSION_PROJECTILES.put("Aeg_OmegaBlaster_Shot", true);
+        //RIPPLE Impacts on Hits
+        RIPPLE_ON_HIT_PROJECTILES.put("AEG_ironcutter_G_torp", true);
     }
 
     @Override
@@ -81,6 +90,7 @@ public class AEG_ArmorPiercePlugin extends BaseEveryFrameCombatPlugin {
             handleEntityPierce(proj, engine, amount);
             handleProjectileExpiration(proj, engine);
         }
+
         // Cleanup for projectileFlightTimes
         Iterator<DamagingProjectileAPI> flightIterator = projectileFlightTimes.keySet().iterator();
         while (flightIterator.hasNext()) {
@@ -151,6 +161,28 @@ public class AEG_ArmorPiercePlugin extends BaseEveryFrameCombatPlugin {
                     if (PIERCE_EXCEPT_HARDENED_SHIELDS.containsKey(spec) && hasHardenedShields) {
                         proj.setCollisionClass(originalCollisionClasses.get(spec));
                         return;
+                    }
+                    spec = proj.getProjectileSpecId();
+                    if (RIPPLE_ON_HIT_PROJECTILES.containsKey(spec)) {
+                        float currentTime = engine.getTotalElapsedTime(false);
+                        float lastTime = lastRippleTime.containsKey(proj) ? lastRippleTime.get(proj) : -999f;
+
+                        if (currentTime - lastTime >= RIPPLE_COOLDOWN) {
+                            lastRippleTime.put(proj, currentTime);
+
+                            Vector2f impactPoint = new Vector2f(proj.getLocation());
+
+                            RippleDistortion ripple = new RippleDistortion(impactPoint, entity.getVelocity());
+                            ripple.setSize(300f + (float)Math.random() * 200f);
+                            ripple.setIntensity(60f);
+                            ripple.setLifetime(0.5f);
+                            ripple.fadeOutIntensity(0.3f);
+                            ripple.setArc(0, 360);
+                            DistortionShader.addDistortion(ripple);
+
+                            // Slow the projectile briefly for dramatic effect
+                            proj.getVelocity().scale(0.5f);
+                        }
                     }
                 }
             }

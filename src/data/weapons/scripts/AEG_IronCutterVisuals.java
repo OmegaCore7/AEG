@@ -1,17 +1,19 @@
 package data.weapons.scripts;
 
 import com.fs.starfarer.api.combat.CombatEngineAPI;
+import com.fs.starfarer.api.combat.ShipAPI;
 import com.fs.starfarer.api.combat.WeaponAPI;
 import com.fs.starfarer.api.util.Misc;
 import org.dark.shaders.distortion.DistortionShader;
 import org.dark.shaders.distortion.RippleDistortion;
+import org.dark.shaders.distortion.WaveDistortion;
 import org.lazywizard.lazylib.MathUtils;
 import org.lwjgl.util.vector.Vector2f;
 
 import java.awt.*;
-
+//For the Great Iron Cutter
 public class AEG_IronCutterVisuals {
-
+    // Define nebula parameters
     private static final float RIPPLE_DURATION = 3f;
     private static final float LIGHTNING_INTERVAL = 0.5f;
 
@@ -41,21 +43,19 @@ public class AEG_IronCutterVisuals {
 
         rippleElapsed += amount;
 
-        if (ripple == null || rippleElapsed > RIPPLE_DURATION) {
-            ripple = new RippleDistortion(weapon.getLocation(), new Vector2f());
-            ripple.setSize(50f + 100f * weapon.getChargeLevel());
-            ripple.setIntensity(0.2f + 0.5f * weapon.getChargeLevel());
-            ripple.setLifetime(RIPPLE_DURATION);
-            ripple.fadeInSize(0.3f);
-            ripple.fadeOutIntensity(0.5f);
-            ripple.setFrameRate(60f);
-            ripple.setArc(0f, 360f);
+        if (rippleElapsed >= RIPPLE_DURATION) {
+            Vector2f waveLoc = getOffsetPoint(weapon, 68f, -4f);
+            WaveDistortion wave = new WaveDistortion(waveLoc, new Vector2f());
+            wave.setIntensity(30f + 70f * weapon.getChargeLevel()); // Increase intensity with charge
+            wave.setSize(200f + 300f * weapon.getChargeLevel());    // Increase size with charge
+            wave.setLifetime(0.4f);                                  // Duration remains constant
+            wave.setArc(0f, 360f);                                   // Full circle
+            wave.fadeOutIntensity(0.5f);                             // Smooth fade
+            DistortionShader.addDistortion(wave);
 
-            DistortionShader.addDistortion(ripple);
             rippleElapsed = 0f;
         }
     }
-
 
     private void handleLightning(CombatEngineAPI engine, WeaponAPI weapon, float chargeLevel, float amount) {
         lightningTimer += amount;
@@ -63,47 +63,108 @@ public class AEG_IronCutterVisuals {
         if (lightningTimer >= LIGHTNING_INTERVAL) {
             lightningTimer = 0f;
 
+            // Calculate lightning color based on charge level
             Color lightningColor = new Color(
                     (int)(100 + 155 * chargeLevel), 0, 0,
                     (int)(100 + 155 * chargeLevel)
             );
 
-            Vector2f loc = weapon.getLocation();
-            Vector2f target = Misc.getPointAtRadius(loc, (float)(Math.random() * 50f + 30f));
+            // Determine lightning length and size based on charge level
+            float lightningLength = 10f + 1000f * chargeLevel;
+            float lightningWidth = 20f + 60f * chargeLevel;
 
-            engine.spawnEmpArcVisual(
-                    loc,
-                    weapon.getShip(),
-                    target,
-                    null,
-                    10f ,
-                    lightningColor,
-                    lightningColor
-            );
+            // Generate lightning arcs
+            for (int i = 0; i < 3; i++) {
+                Vector2f loc = getOffsetPoint(weapon, 68f, -4f);
+                Vector2f target = Misc.getPointAtRadius(loc, lightningLength);
+
+                engine.spawnEmpArcVisual(
+                        loc,
+                        weapon.getShip(),
+                        target,
+                        null,
+                        lightningWidth,
+                        lightningColor,
+                        lightningColor
+                );
+
+            }
+            ShipAPI ship = engine.getPlayerShip();
+            // Example: Generating lightning arcs from multiple sources
+            for (WeaponAPI sourceWeapon : ship.getAllWeapons()) {
+                if (sourceWeapon != weapon) {
+                    Vector2f sourceLoc = sourceWeapon.getLocation();
+                    Vector2f targetLoc = getOffsetPoint(weapon, 68f, -4f);
+                    float arcLength = MathUtils.getDistance(sourceLoc, targetLoc);
+                    float arcWidth = Math.min(arcLength / 5f, 20f); // Adjust arc width based on distance
+                    Color arcColor = new Color(255, 50 + MathUtils.getRandom().nextInt(150),50, 255 - MathUtils.getRandom().nextInt(100)); // Photon Energy
+                    engine.spawnEmpArcVisual(sourceLoc, weapon.getShip(), targetLoc, null, arcWidth, arcColor, arcColor);
+                }
+            }
         }
+
     }
 
     private void generateNebula(CombatEngineAPI engine, WeaponAPI weapon, float chargeLevel) {
-        Vector2f loc = weapon.getLocation();
+        Vector2f loc = getOffsetPoint(weapon, 68f, -4f);
 
-        float size = 20f + 80f * chargeLevel - MathUtils.getRandom().nextInt(15);
-        float endSizeMult = 1.5f + 0.5f * chargeLevel;
-        float duration = 1.5f + chargeLevel;
+        // Get weapon's current angle and create a backward wind vector
+        float weaponAngle = weapon.getCurrAngle(); // in degrees
+        float windSpeed = 100f + 300f * chargeLevel;
 
-        engine.addNebulaSmoothParticle(
-                loc,
-                new Vector2f(0f, 0f),
-                size,
-                endSizeMult,
-                0.3f,
-                0.6f,
-                duration,
-                getNebulaColor()
-        );
+        Vector2f windDirection = Misc.getUnitVectorAtDegreeAngle(weaponAngle + 180f);
+        windDirection.scale(windSpeed); // Backward from the blade
+
+        float baseRadiusX = 150f + 300f * chargeLevel;
+        float baseRadiusY = 50f + 500f * chargeLevel;
+
+        for (int i = 0; i < 20; i++) {
+            float angle = (float)(Math.random() * 360f);
+            float x = (float)(Math.cos(Math.toRadians(angle)) * MathUtils.getRandomNumberInRange(0, baseRadiusX));
+            float y = (float)(Math.sin(Math.toRadians(angle)) * MathUtils.getRandomNumberInRange(0, baseRadiusY));
+            Vector2f offset = new Vector2f(x, y);
+
+            // Rotate the offset to match weapon orientation
+            Vector2f rotatedOffset = Misc.rotateAroundOrigin(offset, weaponAngle);
+
+            Vector2f particleLoc = Vector2f.add(loc, rotatedOffset, null);
+
+            // Add a bit of turbulence to the wind
+            Vector2f velocity = new Vector2f(windDirection);
+            velocity.x += MathUtils.getRandomNumberInRange(-30f, 30f);
+            velocity.y += MathUtils.getRandomNumberInRange(-30f, 30f);
+
+            float size = 20f + (float)Math.random() * 40f;
+            float endSizeMult = 1.5f + (float)Math.random();
+            float duration = 1.5f + (float)Math.random() * 1.5f;
+
+            if (Math.random() < 0.5f) {
+                engine.addNebulaSmoothParticle(particleLoc, velocity, size, endSizeMult, 0.3f, 0.6f, duration, getNebulaColor());
+            } else {
+                engine.addNebulaParticle(particleLoc, velocity, size, endSizeMult, 0.3f, 0.6f, duration, getNebulaColor());
+            }
+        }
     }
+
 
     private Color getNebulaColor() {
-        return new Color(255, 50 + MathUtils.getRandom().nextInt(180), 0, 150 + MathUtils.getRandom().nextInt(100)); // Red energy mist
+        int red = 180 + MathUtils.getRandom().nextInt(75);  // 180–255
+        int green = 30 + MathUtils.getRandom().nextInt(100); // 30–130
+        int blue = MathUtils.getRandom().nextInt(60);       // 0–60
+        int alpha = 50 + MathUtils.getRandom().nextInt(205); // 50–255
+        return new Color(red, green, blue, alpha);
     }
+    private Vector2f getOffsetPoint(WeaponAPI weapon, float offsetX, float offsetY) {
+        Vector2f weaponLoc = weapon.getLocation();
+        float angle = weapon.getCurrAngle(); // in degrees
 
+        // Offset vector
+        Vector2f offset = new Vector2f(offsetX, offsetY);
+
+        // Rotate the offset by weapon's angle
+        Vector2f rotated = Misc.rotateAroundOrigin(offset, angle);
+
+        // Final position = weapon location + rotated offset
+        return Vector2f.add(weaponLoc, rotated, null);
+    }
 }

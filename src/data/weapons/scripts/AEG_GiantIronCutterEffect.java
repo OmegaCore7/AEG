@@ -65,7 +65,7 @@ public class AEG_GiantIronCutterEffect implements EveryFrameWeaponEffectPlugin {
     }
 
     private void spawnPhotonParticles(CombatEngineAPI engine, WeaponAPI weapon) {
-        Vector2f loc = weapon.getLocation();
+        Vector2f loc = getOffsetPoint(weapon, 28f, -4f);  // Regen effect location
         Vector2f shipVel = weapon.getShip().getVelocity();
 
         for (int i = 0; i < PARTICLE_COUNT; i++) {
@@ -81,7 +81,7 @@ public class AEG_GiantIronCutterEffect implements EveryFrameWeaponEffectPlugin {
             vel.scale(speed);
             Vector2f.add(vel, shipVel, vel);
 
-            float size = 10f + (float)Math.random() * 20f;
+            float size = 5f + (float)Math.random() * 20f;
             float endSize = size * (1.5f + (float)Math.random());
             float duration = 1.5f + (float)Math.random() * 1f;
 
@@ -107,4 +107,18 @@ public class AEG_GiantIronCutterEffect implements EveryFrameWeaponEffectPlugin {
             return new Color(255, 160 + (int)(Math.random() * 30), 80 + (int)(Math.random() * 50), 170);
         }
     }
+    private Vector2f getOffsetPoint(WeaponAPI weapon, float offsetX, float offsetY) {
+        Vector2f weaponLoc = weapon.getLocation();
+        float angle = weapon.getCurrAngle(); // in degrees
+
+        // Offset vector
+        Vector2f offset = new Vector2f(offsetX, offsetY);
+
+        // Rotate the offset by weapon's angle
+        Vector2f rotated = Misc.rotateAroundOrigin(offset, angle);
+
+        // Final position = weapon location + rotated offset
+        return Vector2f.add(weaponLoc, rotated, null);
+    }
+
 }

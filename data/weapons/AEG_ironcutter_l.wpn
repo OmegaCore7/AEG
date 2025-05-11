@@ -4,6 +4,7 @@
   "projectileSpecId": "AEG_ironcutter_torp",
   "type": "MISSILE",
   "size": "SMALL",
+  "everyFrameEffect": "data.weapons.scripts.AEG_IronCutterLeftEffect",
   "turretSprite": "graphics/weapons/ironcutter_arm_l.png",
   "hardpointSprite": "graphics/weapons/ironcutter_arm_l.png",
   "renderHints": [
