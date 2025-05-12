@@ -71,13 +71,13 @@ public class AEG_ThunderbreakerHover implements EveryFrameWeaponEffectPlugin {
                 Vector2f localEllipsePoint = new Vector2f(scaledX, scaledY);
 
                 // Rotate to match weapon's orientation
-                float weaponAngle = weapon.getShip().getFacing() + weapon.getSlot().getAngle();
-                float weaponAngleRad = (float) Math.toRadians(weaponAngle);
-                float wcos = (float) Math.cos(weaponAngleRad);
-                float wsin = (float) Math.sin(weaponAngleRad);
+                float totalAngle = weapon.getCurrAngle();
+                float totalAngleRad = (float) Math.toRadians(totalAngle);
+                float wcos = (float) Math.cos(totalAngleRad);
+                float wsin = (float) Math.sin(totalAngleRad);
 
-                float rotatedX = localEllipsePoint.x * wcos - localEllipsePoint.y * sin;
-                float rotatedY = localEllipsePoint.x * wsin + localEllipsePoint.y * cos;
+                float rotatedX = localEllipsePoint.x * wcos - localEllipsePoint.y * wsin;
+                float rotatedY = localEllipsePoint.x * wsin + localEllipsePoint.y * wcos;
 
                 Vector2f ellipseWorldPoint = new Vector2f(
                         weapon.getLocation().x + rotatedX,
@@ -145,12 +145,12 @@ public class AEG_ThunderbreakerHover implements EveryFrameWeaponEffectPlugin {
         Vector2f offset = new Vector2f(scaledX, scaledY);
 
 // Rotate offset to match ship facing
-        float shipAngleRad = (float) Math.toRadians(weapon.getShip().getFacing());
-        cos = (float) Math.cos(shipAngleRad);
-        sin = (float) Math.sin(shipAngleRad);
+        float totalAngleRad = (float) Math.toRadians(weapon.getCurrAngle());
+        float wcos = (float) Math.cos(totalAngleRad);
+        float wsin = (float) Math.sin(totalAngleRad);
 
-        float rotatedX = offset.x * cos - offset.y * sin;
-        float rotatedY = offset.x * sin + offset.y * cos;
+        float rotatedX = offset.x * wcos - offset.y * wsin;
+        float rotatedY = offset.x * wsin + offset.y * wcos;
 
 // Final spawn position
         Vector2f spawnLoc = new Vector2f(
