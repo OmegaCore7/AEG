@@ -115,10 +115,10 @@ public class AEG_IronCutterVisuals {
         Vector2f windDirection = Misc.getUnitVectorAtDegreeAngle(weaponAngle + 180f);
         windDirection.scale(windSpeed); // Backward from the blade
 
-        float baseRadiusX = 150f + 300f * chargeLevel;
-        float baseRadiusY = 50f + 500f * chargeLevel;
+        float baseRadiusX = 75f + 500f * chargeLevel; //Length
+        float baseRadiusY = 25f + 800f * chargeLevel; // Width
 
-        for (int i = 0; i < 20; i++) {
+        for (int i = 0; i < 10; i++) {
             float angle = (float)(Math.random() * 360f);
             float x = (float)(Math.cos(Math.toRadians(angle)) * MathUtils.getRandomNumberInRange(0, baseRadiusX));
             float y = (float)(Math.sin(Math.toRadians(angle)) * MathUtils.getRandomNumberInRange(0, baseRadiusY));
