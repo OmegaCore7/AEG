@@ -1,9 +1,7 @@
 package data.weapons.scripts;
 
-import com.fs.starfarer.api.combat.CombatEngineAPI;
-import com.fs.starfarer.api.combat.DamageType;
-import com.fs.starfarer.api.combat.EveryFrameWeaponEffectPlugin;
-import com.fs.starfarer.api.combat.WeaponAPI;
+import com.fs.starfarer.api.Global;
+import com.fs.starfarer.api.combat.*;
 import org.lazywizard.lazylib.MathUtils;
 import org.lwjgl.util.vector.Vector2f;
 import java.awt.Color;
@@ -53,25 +51,66 @@ public class AEG_ThunderbreakerHover implements EveryFrameWeaponEffectPlugin {
         // Handle the passive lightning charging effect
         empInterval.advance(amount);
         if (empInterval.intervalElapsed()) {
-            for (int i = 0; i < weapon.getSpec().getHardpointAngleOffsets().size(); i++) {
-                Vector2f point = weapon.getFirePoint(i);
-                Vector2f randomPoint = new Vector2f(point.x + (float) (Math.random() * 100 - 50), point.y + (float) (Math.random() * 100 - 50));
-                engine.spawnEmpArc(
-                        weapon.getShip(),
-                        randomPoint,              // source point
-                        null,                     // source entity (null = just a visual origin)
-                        weapon.getShip(),         // target entity (or null if not hitting anything)
-                        DamageType.ENERGY,
-                        0f,                       // damage
-                        0f,                       // emp
-                        empArcLength + MathUtils.getRandom().nextInt(800), // max range
-                        "terrain_hyperspace_lightning",                     // sound to play
-                        15 + MathUtils.getRandom().nextInt(75),             // thickness
-                        new Color(255,180 - MathUtils.getRandom().nextInt(130), 0, 255 - MathUtils.getRandom().nextInt(130)),                         // core color
-                        new Color(255, 255 - MathUtils.getRandom().nextInt(50), 200 - MathUtils.getRandom().nextInt(60), 255 - MathUtils.getRandom().nextInt(80))                       // fringe color
+            // Define ellipse dimensions relative to the weapon's slot
+            float spreadForward = 225f;
+            float spreadBackward = 225f;
+            float spreadLeft = 100f;
+            float spreadRight = 45f;
+
+            // Generate random points within the ellipse
+            for (int i = 0; i < 4; i++) {
+                // Random angle within the ellipse
+                float theta = (float) (Math.random() * 2f * Math.PI);
+                float dirX = (float) Math.cos(theta);
+                float dirY = (float) Math.sin(theta);
+
+                // Scale to fit ellipse dimensions
+                float scaledX = dirX >= 0f ? dirX * spreadRight : dirX * spreadLeft;
+                float scaledY = dirY >= 0f ? dirY * spreadForward : dirY * spreadBackward;
+
+                Vector2f localEllipsePoint = new Vector2f(scaledX, scaledY);
+
+                // Rotate to match weapon's orientation
+                float weaponAngle = weapon.getShip().getFacing() + weapon.getSlot().getAngle();
+                float weaponAngleRad = (float) Math.toRadians(weaponAngle);
+                float wcos = (float) Math.cos(weaponAngleRad);
+                float wsin = (float) Math.sin(weaponAngleRad);
+
+                float rotatedX = localEllipsePoint.x * wcos - localEllipsePoint.y * sin;
+                float rotatedY = localEllipsePoint.x * wsin + localEllipsePoint.y * cos;
+
+                Vector2f ellipseWorldPoint = new Vector2f(
+                        weapon.getLocation().x + rotatedX,
+                        weapon.getLocation().y + rotatedY
+                );
+
+                // Generate a point further outward along the same direction (source of arc)
+                float distanceOut = 300f + (float) Math.random() * 200f;
+                Vector2f sourcePoint = new Vector2f(
+                        ellipseWorldPoint.x + dirX * distanceOut,
+                        ellipseWorldPoint.y + dirY * distanceOut
+                );
+
+                // Spawn arc from outer point to the ellipse
+                engine.spawnEmpArcVisual(
+                        sourcePoint,
+                        null,
+                        ellipseWorldPoint,
+                        null,
+                        5 + MathUtils.getRandom().nextInt(75),
+                        new Color(255, 180 - MathUtils.getRandom().nextInt(130), 0, 255 - MathUtils.getRandom().nextInt(130)), // core color
+                        new Color(255, 255 - MathUtils.getRandom().nextInt(50), 200 - MathUtils.getRandom().nextInt(60), 255 - MathUtils.getRandom().nextInt(80)) // fringe color
+                );
+                Global.getSoundPlayer().playSound(
+                        "terrain_hyperspace_lightning", // sound id from sounds.json
+                        1f, // pitch
+                        1f, // volume
+                        ellipseWorldPoint, // where the sound plays
+                        new Vector2f(0f, 0f) // no relative velocity
                 );
             }
         }
+        //Spawn Nebula
         // Configurable ellipse bounds (relative to ship's orientation)
         //Damn SS Flops around x,y from what you see in the editor
         float spreadForward = 225f; // Side
