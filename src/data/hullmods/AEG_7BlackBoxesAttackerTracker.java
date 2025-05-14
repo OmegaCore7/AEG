@@ -21,14 +21,14 @@ public class AEG_7BlackBoxesAttackerTracker implements DamageTakenModifier {
     public String modifyDamageTaken(Object param, CombatEntityAPI target, DamageAPI damage, Vector2f point, boolean shieldHit) {
         if (param instanceof DamagingProjectileAPI) {
             DamagingProjectileAPI proj = (DamagingProjectileAPI) param;
-            if (proj.getSource() instanceof ShipAPI) {
-                lastAttacker = (ShipAPI) proj.getSource();
+            if (proj.getSource() != null) {
+                lastAttacker = proj.getSource();
                 lastDamageTime = Global.getCombatEngine().getTotalElapsedTime(false);
             }
         } else if (param instanceof BeamAPI) {
             BeamAPI beam = (BeamAPI) param;
-            if (beam.getSource() instanceof ShipAPI) {
-                lastAttacker = (ShipAPI) beam.getSource();
+            if (beam.getSource() != null) {
+                lastAttacker = beam.getSource();
                 lastDamageTime = Global.getCombatEngine().getTotalElapsedTime(false);
             }
         }
