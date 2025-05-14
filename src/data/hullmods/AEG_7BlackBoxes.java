@@ -64,7 +64,7 @@ public class AEG_7BlackBoxes extends BaseHullMod {
             ship.getMutableStats().getArmorDamageTakenMult().unmodify("AEG_7BlackBoxes");
         }
 
-        // Last Stand Protocol
+        // Last Stand Protocol (Change this to be area effect delete :) or Last stand that weakens the fleet, otherwise needs a revamp)
         if (!lastStandTriggered &&
                 (ship.getHullLevel() <= 0.05f || ship.getHitpoints() <= ship.getMaxHitpoints() * 0.05f)) {
             Global.getLogger(this.getClass()).info("Last Stand Protocol triggered");
@@ -74,7 +74,7 @@ public class AEG_7BlackBoxes extends BaseHullMod {
             ShipAPI attacker = null;
             if (tracker != null) {
                 float timeSinceHit = Global.getCombatEngine().getTotalElapsedTime(false) - tracker.getLastDamageTime();
-                if (timeSinceHit <= 2f) {
+                if (timeSinceHit <= 5f) {
                     attacker = tracker.getLastAttacker();
                 }
             }

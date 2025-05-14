@@ -12,16 +12,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class AEG_MajinChange extends BaseShipSystemScript {
+    private final List<ShipAPI> affectedEnemies = new ArrayList<>();
     private float arcTimer = 0f;
     private float fogTimer = 0f;
     private final float ARC_INTERVAL = 0.4f; // every 0.4 seconds
-    private final float FOG_INTERVAL = 0.3f; // every 0.3 seconds
-    private static final float MAX_DURATION = 999f; // For visuals
-    private boolean visualActive = false;
+    // every 0.3 seconds
+    // For visuals
     private static final float DOMAIN_RADIUS = 2500f;
     private static final float EXPANSION_SPEED = 500f; // Speed at which the effect expands
-    private static final float HEAL_PERCENTAGE = 0.50f; // Heal 50% of the damage
-    private static final float REFLECT_PERCENTAGE = 0.50f; // Reflect 50% of the damage
     private static final float SPEED_BOOST = 1.5f; // 50% speed boost
     private static final float MANEUVERABILITY_BOOST = 1.5f; // 50% maneuverability boost
     private final AEG_DomainExpansionVisuals visualsHelper = new AEG_DomainExpansionVisuals();
@@ -46,10 +44,6 @@ public class AEG_MajinChange extends BaseShipSystemScript {
                 arcTimer = ARC_INTERVAL;
             }
 
-            // Register projectile blocking once
-            if (!ship.hasListenerOfClass(AEG_RealityMarbleBlocker.class)) {
-                ship.addListener(new AEG_RealityMarbleBlocker(ship, currentRadius));
-            }
             // Gradually increase the radius
             currentRadius = Math.min(DOMAIN_RADIUS, currentRadius + EXPANSION_SPEED * Global.getCombatEngine().getElapsedInLastFrame());
 
@@ -73,9 +67,12 @@ public class AEG_MajinChange extends BaseShipSystemScript {
 
             // Apply debilitating effects to enemy ships within the domain
             for (ShipAPI enemy : getEnemiesWithinRange(ship, currentRadius)) {
-                enemy.getMutableStats().getMaxSpeed().modifyMult(id, 0.5f); // Example debuff
-                enemy.getMutableStats().getWeaponDamageTakenMult().modifyMult(id, 1.5f); // Example debuff
-                enemy.getMutableStats().getFluxDissipation().modifyMult(id, 0.5f); // Additional debuff
+                if (!affectedEnemies.contains(enemy)) {
+                    affectedEnemies.add(enemy);
+                }
+                enemy.getMutableStats().getMaxSpeed().modifyMult(id, 0.5f);
+                enemy.getMutableStats().getWeaponDamageTakenMult().modifyMult(id, 1.5f);
+                enemy.getMutableStats().getFluxDissipation().modifyMult(id, 0.5f);
             }
 
             // Full Power Causality Weapon
@@ -87,10 +84,8 @@ public class AEG_MajinChange extends BaseShipSystemScript {
             deactivate(stats, id);
             currentRadius = 0f; // Reset the radius when the system is deactivated
             //Remove Listeners
-            ship.removeListenerOfClass(AEG_RealityMarbleBlocker.class);
             ship.removeListenerOfClass(AEG_CausalityListener.class);
         }
-
     }
 
     private void restoreArmor(ShipAPI ship, float amount) {
@@ -101,9 +96,8 @@ public class AEG_MajinChange extends BaseShipSystemScript {
         for (int x = 0; x < armor.length; x++) {
             for (int y = 0; y < armor[x].length; y++) {
                 float currentArmor = armor[x][y];
-                if (currentArmor < maxArmor) {
-                    armor[x][y] = Math.min(currentArmor + (amount * maxArmor), maxArmor);
-                }
+                if (currentArmor >= maxArmor) continue; // Skip fully-healed cells
+                armor[x][y] = Math.min(currentArmor + (amount * maxArmor), maxArmor);
             }
         }
     }
@@ -141,5 +135,11 @@ public class AEG_MajinChange extends BaseShipSystemScript {
         if (ship != null && Global.getCombatEngine() != null) {
             visualsHelper.renderDomain(Global.getCombatEngine(), ship, 0f, false);
         }
+        for (ShipAPI enemy : affectedEnemies) {
+            enemy.getMutableStats().getMaxSpeed().unmodify(id);
+            enemy.getMutableStats().getWeaponDamageTakenMult().unmodify(id);
+            enemy.getMutableStats().getFluxDissipation().unmodify(id);
+        }
+        affectedEnemies.clear();
     }
 }

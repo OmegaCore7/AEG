@@ -1,8 +1,10 @@
 package data.shipsystems.scripts;
 
+import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.combat.*;
 import com.fs.starfarer.api.combat.listeners.DamageTakenModifier;
 import org.lazywizard.lazylib.MathUtils;
+import org.lwjgl.util.Color;
 import org.lwjgl.util.vector.Vector2f;
 
 public class AEG_CausalityListener implements DamageTakenModifier {
@@ -23,6 +25,19 @@ public class AEG_CausalityListener implements DamageTakenModifier {
 
         float hullLevel = ship.getHullLevel();
         if (hullLevel <= 0.20f) {
+            engine.addFloatingText(ship.getLocation(), "Causality Defense!", 24f, java.awt.Color.MAGENTA, ship, 1f, 1f);
+
+            engine.spawnEmpArcVisual(
+                    null, null,
+                    ship.getLocation(), ship,
+                    5f + MathUtils.getRandom().nextInt(15), // thickness
+                    new java.awt.Color(255, 150 - MathUtils.getRandom().nextInt(65), 50 - MathUtils.getRandom().nextInt(50), 255 - MathUtils.getRandom().nextInt(85)), // fringe color
+                    new java.awt.Color(255, 200 - MathUtils.getRandom().nextInt(65), 100 - MathUtils.getRandom().nextInt(65), 255 - MathUtils.getRandom().nextInt(65)) // core color
+
+            );
+
+// Optional: Play a unique sound
+            Global.getSoundPlayer().playSound("system_phase_cloak_activate", 1f, 1f, ship.getLocation(), ship.getVelocity());
             float damageAmount = damage.getDamage();
             float healAmount = damageAmount * HEAL_PERCENTAGE;
             float reflectAmount = damageAmount * REFLECT_PERCENTAGE;
