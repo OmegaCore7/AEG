@@ -3,7 +3,12 @@ package data.hullmods;
 import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.combat.*;
 import com.fs.starfarer.api.util.IntervalUtil;
+import org.lazywizard.lazylib.MathUtils;
 import org.lwjgl.util.vector.Vector2f;
+
+import java.awt.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class AEG_7BlackBoxes extends BaseHullMod {
 
@@ -67,29 +72,16 @@ public class AEG_7BlackBoxes extends BaseHullMod {
         // Last Stand Protocol (Change this to be area effect delete :) or Last stand that weakens the fleet, otherwise needs a revamp)
         if (!lastStandTriggered &&
                 (ship.getHullLevel() <= 0.05f || ship.getHitpoints() <= ship.getMaxHitpoints() * 0.05f)) {
+
             Global.getLogger(this.getClass()).info("Last Stand Protocol triggered");
             ship.setHitpoints(ship.getMaxHitpoints() * 0.25f);
 
-            AEG_7BlackBoxesAttackerTracker tracker = (AEG_7BlackBoxesAttackerTracker) ship.getCustomData().get("AEG_7_AttackerTracker");
-            ShipAPI attacker = null;
-            if (tracker != null) {
-                float timeSinceHit = Global.getCombatEngine().getTotalElapsedTime(false) - tracker.getLastDamageTime();
-                if (timeSinceHit <= 5f) {
-                    attacker = tracker.getLastAttacker();
-                }
-            }
-
-            if (attacker != null) {
-                Global.getLogger(this.getClass()).info("Attacker found: " + attacker.getName());
-                dealFatalDamage(attacker);
-            } else {
-                Global.getLogger(this.getClass()).info("No attacker found");
-            }
+            // Begin AOE effect
+            triggerLastStandAOE(ship);
 
             lastStandTriggered = true;
             damageReductionActive = true;
             damageReductionTimer.advance(0); // Reset timer
-
         }
 
         // Damage Reduction
@@ -115,6 +107,63 @@ public class AEG_7BlackBoxes extends BaseHullMod {
         }
     }
 
+    private void triggerLastStandAOE(ShipAPI ship) {
+        CombatEngineAPI engine = Global.getCombatEngine();
+        if (engine == null) return;
+
+        float AOE_RADIUS = 1200f;
+        float DAMAGE_PERCENT = 0.75f;
+        int MAX_TARGETS = 5;
+
+        Vector2f center = ship.getLocation();
+        List<ShipAPI> potentialTargets = new ArrayList<>();
+
+        for (ShipAPI enemy : engine.getShips()) {
+            if (enemy.getOwner() == ship.getOwner() || !enemy.isAlive() || enemy.isFighter()) continue;
+
+            float dist = MathUtils.getDistance(enemy, center);
+            if (dist <= AOE_RADIUS) {
+                // Apply slow + flux overload
+                enemy.getMutableStats().getMaxSpeed().modifyMult("AEG_LS_Slow", 0.1f);
+                enemy.getMutableStats().getAcceleration().modifyMult("AEG_LS_Slow", 0.05f);
+                enemy.getFluxTracker().setCurrFlux(enemy.getFluxTracker().getMaxFlux() * 0.99f);
+
+                potentialTargets.add(enemy);
+            }
+        }
+
+        // Sort by priority: Capital > Cruiser > Destroyer
+        java.util.Collections.sort(potentialTargets, new java.util.Comparator<ShipAPI>() {
+            @Override
+            public int compare(ShipAPI a, ShipAPI b) {
+                int tierA = getHullSizePriority(a.getHullSize());
+                int tierB = getHullSizePriority(b.getHullSize());
+                return Integer.valueOf(tierA).compareTo(tierB);
+            }
+        });
+
+        for (int i = 0; i < Math.min(MAX_TARGETS, potentialTargets.size()); i++) {
+            ShipAPI target = potentialTargets.get(i);
+            float damageAmount = target.getMaxHitpoints() * DAMAGE_PERCENT;
+
+            Vector2f loc = target.getLocation();
+            engine.applyDamage(target, loc, damageAmount / 2, DamageType.HIGH_EXPLOSIVE, 0f, true, false, ship);
+            engine.applyDamage(target, loc, damageAmount / 2, DamageType.KINETIC, 0f, false, false, ship);
+        }
+
+        // Optional: Simulate explosion FX at center
+        engine.spawnExplosion(center, ship.getVelocity(), new Color(255, 50, 50, 255), 200f, 2f);
+        engine.addFloatingText(center, "LAST STAND ENGAGED", 32f, Color.RED, ship, 2f, 2f);
+    }
+    private int getHullSizePriority(ShipAPI.HullSize size) {
+        switch (size) {
+            case CAPITAL_SHIP: return 0;
+            case CRUISER: return 1;
+            case DESTROYER: return 2;
+            case FRIGATE: return 3;
+            default: return 4;
+        }
+    }
     private ShipAPI findAttackingShip(ShipAPI ship) {
         CombatEngineAPI engine = Global.getCombatEngine();
         if (engine == null) return null;
