@@ -37,7 +37,7 @@ public class AEG_CausalityListener implements DamageTakenModifier {
         }
 
         float hullLevel = ship.getHullLevel();
-        if (hullLevel <= 0.20f) {
+        if (hullLevel <= 0.50f) {
             engine.addFloatingText(ship.getLocation(), "Causality Defense!", 24f, java.awt.Color.MAGENTA, ship, 1f, 1f);
             if (lastAttacker != null &&
                     lastAttacker.getLocation() != null &&

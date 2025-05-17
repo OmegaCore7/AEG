@@ -3,15 +3,20 @@ package data.hullmods;
 import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.combat.*;
 import com.fs.starfarer.api.util.IntervalUtil;
+import org.dark.shaders.distortion.DistortionAPI;
+import org.dark.shaders.distortion.DistortionShader;
+import org.dark.shaders.distortion.WaveDistortion;
 import org.lazywizard.lazylib.MathUtils;
 import org.lwjgl.util.vector.Vector2f;
 
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 public class AEG_7BlackBoxes extends BaseHullMod {
-
+    private final IntervalUtil lastStandCooldownTimer = new IntervalUtil(60f, 60f); // 1-minute cooldown
     private static final float REGENERATION_RATE = 0.01f;
     private static final float ASSIMILATION_DAMAGE_CONVERSION = 0.05f;
     private static final float STRENGTHENING_MULT = 1.05f;
@@ -69,19 +74,25 @@ public class AEG_7BlackBoxes extends BaseHullMod {
             ship.getMutableStats().getArmorDamageTakenMult().unmodify("AEG_7BlackBoxes");
         }
 
-        // Last Stand Protocol (Change this to be area effect delete :) or Last stand that weakens the fleet, otherwise needs a revamp)
-        if (!lastStandTriggered &&
-                (ship.getHullLevel() <= 0.05f || ship.getHitpoints() <= ship.getMaxHitpoints() * 0.05f)) {
+        // Last Stand Protocol logic - trigger once every minute
+        lastStandCooldownTimer.advance(amount); // Advance the cooldown timer
 
+// Trigger Last Stand Protocol if health is below 5% and cooldown has passed, or trigger it immediately the first time
+        if ((ship.getHullLevel() <= 0.05f || ship.getHitpoints() <= ship.getMaxHitpoints() * 0.05f)
+                && (!lastStandTriggered || lastStandCooldownTimer.intervalElapsed())) {
+
+            // Trigger Last Stand Protocol immediately if conditions are met
             Global.getLogger(this.getClass()).info("Last Stand Protocol triggered");
+
+            // Heal the ship to 25% health (after last stand activation)
             ship.setHitpoints(ship.getMaxHitpoints() * 0.25f);
 
             // Begin AOE effect
             triggerLastStandAOE(ship);
 
-            lastStandTriggered = true;
-            damageReductionActive = true;
-            damageReductionTimer.advance(0); // Reset timer
+            // Reset the cooldown timer to prevent immediate reactivation
+            lastStandCooldownTimer.advance(0); // Reset timer
+            lastStandTriggered = true;  // Set the flag to true after the first activation
         }
 
         // Damage Reduction
@@ -98,24 +109,15 @@ public class AEG_7BlackBoxes extends BaseHullMod {
             ship.getMutableStats().getArmorDamageTakenMult().unmodify("AEG_7BlackBoxes_DamageReduction");
         }
     }
-
-    private void dealFatalDamage(ShipAPI attacker) {
-        CombatEngineAPI engine = Global.getCombatEngine();
-        if (engine != null) {
-            Vector2f location = attacker.getLocation();
-            engine.applyDamage(attacker, location, attacker.getMaxHitpoints(), DamageType.HIGH_EXPLOSIVE, 0f, true, false, null);
-        }
-    }
-
     private void triggerLastStandAOE(ShipAPI ship) {
         CombatEngineAPI engine = Global.getCombatEngine();
         if (engine == null) return;
 
-        float AOE_RADIUS = 1200f;
-        float DAMAGE_PERCENT = 0.75f;
-        int MAX_TARGETS = 5;
+        float AOE_RADIUS = 2500f;
+        float DAMAGE_PERCENT = 0.90f;
+        int MAX_TARGETS = 20;
 
-        Vector2f center = ship.getLocation();
+        final Vector2f center = ship.getLocation();
         List<ShipAPI> potentialTargets = new ArrayList<>();
 
         for (ShipAPI enemy : engine.getShips()) {
@@ -123,38 +125,82 @@ public class AEG_7BlackBoxes extends BaseHullMod {
 
             float dist = MathUtils.getDistance(enemy, center);
             if (dist <= AOE_RADIUS) {
-                // Apply slow + flux overload
-                enemy.getMutableStats().getMaxSpeed().modifyMult("AEG_LS_Slow", 0.1f);
-                enemy.getMutableStats().getAcceleration().modifyMult("AEG_LS_Slow", 0.05f);
-                enemy.getFluxTracker().setCurrFlux(enemy.getFluxTracker().getMaxFlux() * 0.99f);
-
                 potentialTargets.add(enemy);
             }
         }
 
-        // Sort by priority: Capital > Cruiser > Destroyer
+        // Sort by priority and distance
         java.util.Collections.sort(potentialTargets, new java.util.Comparator<ShipAPI>() {
             @Override
             public int compare(ShipAPI a, ShipAPI b) {
-                int tierA = getHullSizePriority(a.getHullSize());
-                int tierB = getHullSizePriority(b.getHullSize());
-                return Integer.valueOf(tierA).compareTo(tierB);
+                int priorityA = getHullSizePriority(a.getHullSize());
+                int priorityB = getHullSizePriority(b.getHullSize());
+                if (priorityA != priorityB) {
+                    return Integer.valueOf(priorityA).compareTo(priorityB);
+                }
+                float distA = MathUtils.getDistance(a, center);
+                float distB = MathUtils.getDistance(b, center);
+                return Float.compare(distA, distB);
             }
         });
 
         for (int i = 0; i < Math.min(MAX_TARGETS, potentialTargets.size()); i++) {
             ShipAPI target = potentialTargets.get(i);
-            float damageAmount = target.getMaxHitpoints() * DAMAGE_PERCENT;
-
             Vector2f loc = target.getLocation();
-            engine.applyDamage(target, loc, damageAmount / 2, DamageType.HIGH_EXPLOSIVE, 0f, true, false, ship);
-            engine.applyDamage(target, loc, damageAmount / 2, DamageType.KINETIC, 0f, false, false, ship);
+
+            if (i == 0) {
+                // First target: lethal damage
+                engine.applyDamage(target, loc, target.getMaxHitpoints() * 2f, DamageType.HIGH_EXPLOSIVE, 0f, true, false, ship);
+                engine.addSwirlyNebulaParticle(loc, new Vector2f(), 150f, 0.5f, 0.2f, 0.8f, 1.5f, new Color(255, 50, 50, 255), true);
+
+                // Create WaveDistortion at target location
+                WaveDistortion wave = new WaveDistortion(loc, new Vector2f());
+                wave.setIntensity(30f);        // Shock strength
+                wave.setSize(200f);            // Radius of ripple
+                wave.setLifetime(0.4f);        // Duration of the distortion effect
+                wave.setArc(0f, 360f);         // Full circle wave
+                wave.fadeOutIntensity(0.5f);   // Smooth fade-out
+
+                // Apply distortion effect
+                DistortionShader.addDistortion(wave);
+
+                engine.addFloatingText(loc, "TARGET TERMINATED", 24f, Color.RED, target, 1f, 2f);
+            } else {
+                // Others: crippling damage
+                float damageAmount = target.getMaxHitpoints() * DAMAGE_PERCENT;
+
+                engine.applyDamage(target, loc, damageAmount / 2, DamageType.HIGH_EXPLOSIVE, 0f, true, false, ship);
+                engine.applyDamage(target, loc, damageAmount / 2, DamageType.KINETIC, 0f, false, false, ship);
+                //Add Debilitating Slow
+                target.getMutableStats().getMaxSpeed().modifyMult("AEG_LS_Slow", 0.1f);
+                target.getMutableStats().getAcceleration().modifyMult("AEG_LS_Slow", 0.05f);
+                //Jack target ship flux to 99 percent it's Max
+                target.getFluxTracker().setCurrFlux(target.getFluxTracker().getMaxFlux() * 0.99f);
+                // Force an overload for 3 seconds
+                target.getFluxTracker().forceOverload(3f);
+
+                engine.addSwirlyNebulaParticle(loc, new Vector2f(), 100f, 0.5f, 0.2f, 0.8f, 1.5f, new Color(255, 150, 50, 200), true);
+            }
         }
 
-        // Optional: Simulate explosion FX at center
-        engine.spawnExplosion(center, ship.getVelocity(), new Color(255, 50, 50, 255), 200f, 2f);
-        engine.addFloatingText(center, "LAST STAND ENGAGED", 32f, Color.RED, ship, 2f, 2f);
+        // Center explosion FX
+        engine.addSwirlyNebulaParticle(center, new Vector2f(), 200f, 0.5f, 0.2f, 0.8f, 1.5f, new Color(255, 200, 100, 255), true);
+
+        // Create WaveDistortion at the center location
+        WaveDistortion centerWave = new WaveDistortion(center, new Vector2f());
+        centerWave.setIntensity(50f);        // Shock strength
+        centerWave.setSize(300f);            // Radius of ripple
+        centerWave.setLifetime(0.6f);        // Duration of the distortion effect
+        centerWave.setArc(0f, 360f);         // Full circle wave
+        centerWave.fadeOutIntensity(0.5f);   // Smooth fade-out
+
+        // Apply distortion effect at the center
+        DistortionShader.addDistortion(centerWave);
+
+        engine.addFloatingText(center, "CAUSALITY WEAPON ENGAGED", 32f, Color.RED, ship, 2f, 2f);
     }
+
+
     private int getHullSizePriority(ShipAPI.HullSize size) {
         switch (size) {
             case CAPITAL_SHIP: return 0;
@@ -164,32 +210,10 @@ public class AEG_7BlackBoxes extends BaseHullMod {
             default: return 4;
         }
     }
-    private ShipAPI findAttackingShip(ShipAPI ship) {
-        CombatEngineAPI engine = Global.getCombatEngine();
-        if (engine == null) return null;
-
-        for (ShipAPI enemy : engine.getShips()) {
-            if (enemy.getOwner() != ship.getOwner() && enemy.isAlive() && !enemy.isFighter()) {
-                // Additional logic to determine if this enemy is the one that last attacked the ship
-                // This is a placeholder and needs to be replaced with actual logic
-                return enemy;
-            }
-        }
-        return null;
-    }
-
+    //Make sure Last stand cool-down resets each combat so it won't fail to trigger next combat.
     @Override
     public void applyEffectsBeforeShipCreation(ShipAPI.HullSize hullSize, MutableShipStatsAPI stats, String id) {
-        // Apply any effects that need to be set before the ship is created
-    }
-
-    @Override
-    public void applyEffectsAfterShipCreation(ShipAPI ship, String id) {
-        if (ship.getCustomData().get("AEG_7_AttackerTracker") == null) {
-            AEG_7BlackBoxesAttackerTracker tracker = new AEG_7BlackBoxesAttackerTracker();
-            ship.addListener(tracker);
-            ship.setCustomData("AEG_7_AttackerTracker", tracker);
-        }
+        lastStandCooldownTimer.forceIntervalElapsed(); // Ensures Last Stand is ready at combat start
     }
 
     @Override
