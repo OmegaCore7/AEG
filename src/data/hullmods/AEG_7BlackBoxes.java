@@ -3,6 +3,7 @@ package data.hullmods;
 import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.combat.*;
 import com.fs.starfarer.api.util.IntervalUtil;
+import com.fs.starfarer.renderers.JitterRenderer;
 import org.dark.shaders.distortion.DistortionShader;
 import org.dark.shaders.distortion.WaveDistortion;
 import org.lazywizard.lazylib.MathUtils;
@@ -28,40 +29,71 @@ public class AEG_7BlackBoxes extends BaseHullMod {
     private final IntervalUtil damageReductionTimer = new IntervalUtil(DAMAGE_REDUCTION_DURATION, DAMAGE_REDUCTION_DURATION);
     private boolean lastStandTriggered = false; // Flag to track if Last Stand Protocol has been triggered
     private boolean damageReductionActive = false; // Flag to track if damage reduction is active
-
-
+    // Declare jitter variables
+    private boolean justEvadedDamage = false;
     @Override
     public void advanceInCombat(ShipAPI ship, float amount) {
+        if (!ship.isAlive() || ship.isHulk() || ship.isPiece()) {
+            unapplyStrengthening(ship.getMutableStats());
+            return;
+        }
+
         if (ship == null) return;
 
-        // Continuous Regeneration
+        // Black Box 1 Continuous Regeneration
         if (ship.getHullLevel() < 1.0f) {
             float newHitpoints = ship.getHitpoints() + (REGENERATION_RATE * ship.getMaxHitpoints() * amount);
             ship.setHitpoints(Math.min(newHitpoints, ship.getMaxHitpoints()));
         }
 
-        // Assimilation
-        ship.getMutableStats().getEnergyWeaponDamageMult().modifyMult("AEG_7BlackBoxes", 1 + ASSIMILATION_DAMAGE_CONVERSION);
-        ship.getMutableStats().getHardFluxDissipationFraction().modifyFlat("AEG_7BlackBoxes", ASSIMILATION_DAMAGE_CONVERSION);
+        // Black Box 2 Assimilation
+        applyAssimilation(ship.getMutableStats());
 
-        // Strengthening
-        ship.getMutableStats().getBallisticWeaponDamageMult().modifyMult("AEG_7BlackBoxes", STRENGTHENING_MULT);
-        ship.getMutableStats().getEnergyWeaponDamageMult().modifyMult("AEG_7BlackBoxes", STRENGTHENING_MULT);
-        ship.getMutableStats().getMissileWeaponDamageMult().modifyMult("AEG_7BlackBoxes", STRENGTHENING_MULT);
-        ship.getMutableStats().getMaxSpeed().modifyMult("AEG_7BlackBoxes", STRENGTHENING_MULT);
-        ship.getMutableStats().getAcceleration().modifyMult("AEG_7BlackBoxes", STRENGTHENING_MULT);
-        ship.getMutableStats().getDeceleration().modifyMult("AEG_7BlackBoxes", STRENGTHENING_MULT);
-        ship.getMutableStats().getTurnAcceleration().modifyMult("AEG_7BlackBoxes", STRENGTHENING_MULT);
-        ship.getMutableStats().getMaxTurnRate().modifyMult("AEG_7BlackBoxes", STRENGTHENING_MULT);
+        // Black Box 3 Strengthening
+        applyStrengthening(ship.getMutableStats());
 
-        // Dimensional Prediction
+        // Black Box 4 Dimensional Prediction
         if (Math.random() < PREDICTION_EVASION_CHANCE) {
             ship.getMutableStats().getHullDamageTakenMult().modifyMult("AEG_7BlackBoxes", 0f);
             ship.getMutableStats().getArmorDamageTakenMult().modifyMult("AEG_7BlackBoxes", 0f);
+            justEvadedDamage = true;
         }
         ship.getMutableStats().getSensorStrength().modifyFlat("AEG_7BlackBoxes", SENSOR_RANGE_BOOST);
+        if (justEvadedDamage) {
+            // Reset flag immediately
+            justEvadedDamage = false;
 
-        // Adaptive Defense
+            // Sway effect (move ship slightly to the side)
+            float swayAngle = ship.getFacing() + (Math.random() > 0.5 ? 90f : -90f); // left or right
+            float swayAmount = 20f; // how much to sway
+            float swayX = (float) Math.cos(Math.toRadians(swayAngle)) * swayAmount;
+            float swayY = (float) Math.sin(Math.toRadians(swayAngle)) * swayAmount;
+
+            ship.getLocation().x += swayX;
+            ship.getLocation().y += swayY;
+
+            // Add jitter on top
+            ship.setJitter(
+                    ship,
+                    new Color(255, 200 - MathUtils.getRandom().nextInt(100), 0),
+                    0.75f,
+                    6,
+                    0f,
+                    60f
+            );
+        }
+        // Apply Afterimage Effect
+        ship.setJitter(
+                ship,             // The ship itself as the source
+                new Color(255, 200 - MathUtils.getRandom().nextInt(100), 0), // Red color
+                0.5f + MathUtils.getRandom().nextInt(2),             // Medium intensity
+                5 + MathUtils.getRandom().nextInt(2),                // 5 jitter copies
+                0f,               // No minimum range
+                100f              // Maximum range of 100 units
+        );
+
+
+        // Black Box 5 Adaptive Defense
         adaptiveDefenseTimer.advance(amount);
         if (adaptiveDefenseTimer.intervalElapsed()) {
             ship.getMutableStats().getHullDamageTakenMult().modifyMult("AEG_7BlackBoxes", ADAPTIVE_DEFENSE_REDUCTION);
@@ -70,11 +102,11 @@ public class AEG_7BlackBoxes extends BaseHullMod {
             ship.getMutableStats().getHullDamageTakenMult().unmodify("AEG_7BlackBoxes");
             ship.getMutableStats().getArmorDamageTakenMult().unmodify("AEG_7BlackBoxes");
         }
-
+        // Black Box 6 Causality Weapon (Black Box 7 is the System)
         // Last Stand Protocol logic - trigger once every minute
         lastStandCooldownTimer.advance(amount); // Advance the cooldown timer
 
-// Trigger Last Stand Protocol if health is below 10% and cooldown has passed, or trigger it immediately the first time
+        // Trigger Last Stand Protocol if health is below 10% and cooldown has passed, or trigger it immediately the first time
         if ((ship.getHullLevel() <= 0.10f || ship.getHitpoints() <= ship.getMaxHitpoints() * 0.05f)
                 && (!lastStandTriggered || lastStandCooldownTimer.intervalElapsed())) {
             // Trigger Last Stand Protocol immediately if conditions are met
@@ -229,6 +261,51 @@ public class AEG_7BlackBoxes extends BaseHullMod {
             case FRIGATE: return 3;
             default: return 4;
         }
+    }
+//Black Box Strengthening Helper
+    private void applyStrengthening(MutableShipStatsAPI stats) {
+        String id = "AEG_7BlackBoxes";
+
+        if (!stats.getBallisticWeaponDamageMult().getMultMods().containsKey(id)) {
+            stats.getBallisticWeaponDamageMult().modifyMult(id, STRENGTHENING_MULT);
+            stats.getEnergyWeaponDamageMult().modifyMult(id, STRENGTHENING_MULT);
+            stats.getMissileWeaponDamageMult().modifyMult(id, STRENGTHENING_MULT);
+
+            stats.getMaxSpeed().modifyMult(id, STRENGTHENING_MULT);
+            stats.getAcceleration().modifyMult(id, STRENGTHENING_MULT);
+            stats.getDeceleration().modifyMult(id, STRENGTHENING_MULT);
+            stats.getTurnAcceleration().modifyMult(id, STRENGTHENING_MULT);
+            stats.getMaxTurnRate().modifyMult(id, STRENGTHENING_MULT);
+        }
+    }
+    //Black Box Strengthening Remover Helper
+    private void unapplyStrengthening(MutableShipStatsAPI stats) {
+        String id = "AEG_7BlackBoxes";
+
+        stats.getBallisticWeaponDamageMult().unmodify(id);
+        stats.getEnergyWeaponDamageMult().unmodify(id);
+        stats.getMissileWeaponDamageMult().unmodify(id);
+
+        stats.getMaxSpeed().unmodify(id);
+        stats.getAcceleration().unmodify(id);
+        stats.getDeceleration().unmodify(id);
+        stats.getTurnAcceleration().unmodify(id);
+        stats.getMaxTurnRate().unmodify(id);
+    }
+    //BlackBox Assimilation Apply Helper
+    private void applyAssimilation(MutableShipStatsAPI stats) {
+        String id = "AEG_7BlackBoxes_Assimilation";
+
+        if (!stats.getEnergyWeaponDamageMult().getMultMods().containsKey(id)) {
+            stats.getEnergyWeaponDamageMult().modifyMult(id, 1 + ASSIMILATION_DAMAGE_CONVERSION);
+            stats.getHardFluxDissipationFraction().modifyFlat(id, ASSIMILATION_DAMAGE_CONVERSION);
+        }
+    }
+    //BlackBox Assimilation Remover Helper
+    private void unapplyAssimilation(MutableShipStatsAPI stats) {
+        String id = "AEG_7BlackBoxes_Assimilation";
+        stats.getEnergyWeaponDamageMult().unmodify(id);
+        stats.getHardFluxDissipationFraction().unmodify(id);
     }
     // Define a color palette inspired by Mazinger Z's energy effects
     Color[] energyColors = {
