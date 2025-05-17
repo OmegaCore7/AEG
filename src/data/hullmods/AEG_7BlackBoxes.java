@@ -3,7 +3,6 @@ package data.hullmods;
 import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.combat.*;
 import com.fs.starfarer.api.util.IntervalUtil;
-import org.dark.shaders.distortion.DistortionAPI;
 import org.dark.shaders.distortion.DistortionShader;
 import org.dark.shaders.distortion.WaveDistortion;
 import org.lazywizard.lazylib.MathUtils;
@@ -11,8 +10,6 @@ import org.lwjgl.util.vector.Vector2f;
 
 import java.awt.*;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 public class AEG_7BlackBoxes extends BaseHullMod {
@@ -77,15 +74,14 @@ public class AEG_7BlackBoxes extends BaseHullMod {
         // Last Stand Protocol logic - trigger once every minute
         lastStandCooldownTimer.advance(amount); // Advance the cooldown timer
 
-// Trigger Last Stand Protocol if health is below 5% and cooldown has passed, or trigger it immediately the first time
-        if ((ship.getHullLevel() <= 0.05f || ship.getHitpoints() <= ship.getMaxHitpoints() * 0.05f)
+// Trigger Last Stand Protocol if health is below 10% and cooldown has passed, or trigger it immediately the first time
+        if ((ship.getHullLevel() <= 0.10f || ship.getHitpoints() <= ship.getMaxHitpoints() * 0.05f)
                 && (!lastStandTriggered || lastStandCooldownTimer.intervalElapsed())) {
-
             // Trigger Last Stand Protocol immediately if conditions are met
             Global.getLogger(this.getClass()).info("Last Stand Protocol triggered");
 
             // Heal the ship to 25% health (after last stand activation)
-            ship.setHitpoints(ship.getMaxHitpoints() * 0.25f);
+            ship.setHitpoints(ship.getMaxHitpoints() * 0.30f);
 
             // Begin AOE effect
             triggerLastStandAOE(ship);
@@ -116,7 +112,31 @@ public class AEG_7BlackBoxes extends BaseHullMod {
         float AOE_RADIUS = 2500f;
         float DAMAGE_PERCENT = 0.90f;
         int MAX_TARGETS = 20;
+// Define the radius and number of particles
+        float radius = 2500f;
+        int numParticles = 50;
+// Spawn particles
+        // Spawn particles
+        for (int i = 0; i < numParticles; i++) {
+            // Random angle and distance
+            float angle = (float) Math.random() * 360f;
+            float distance = (float) Math.random() * radius;
 
+            // Calculate position
+            float x = ship.getLocation().x + distance * (float) Math.cos(Math.toRadians(angle));
+            float y = ship.getLocation().y + distance * (float) Math.sin(Math.toRadians(angle));
+
+            // Velocity vector pointing outward
+            Vector2f velocity = new Vector2f((float) Math.cos(Math.toRadians(angle)), (float) Math.sin(Math.toRadians(angle)));
+            velocity.scale(50f); // Adjust speed as necessary
+
+            // Particle size and color
+            float size = 100f + (float) Math.random() * 100f; // Random size between 100 and 200
+            Color color = getRandomEnergyColor(); // Get a random energy color
+
+            // Add swirl particle
+            engine.addSwirlyNebulaParticle(new Vector2f(x, y), velocity, size, 0.5f, 0.2f, 0.8f, 1.5f, color, true);
+        }
         final Vector2f center = ship.getLocation();
         List<ShipAPI> potentialTargets = new ArrayList<>();
 
@@ -184,7 +204,7 @@ public class AEG_7BlackBoxes extends BaseHullMod {
         }
 
         // Center explosion FX
-        engine.addSwirlyNebulaParticle(center, new Vector2f(), 200f, 0.5f, 0.2f, 0.8f, 1.5f, new Color(255, 200, 100, 255), true);
+        engine.addSwirlyNebulaParticle(center, new Vector2f(), 400f, 0.5f, 0.2f, 0.8f, 1.5f, new Color(255, 200, 100, 255), true);
 
         // Create WaveDistortion at the center location
         WaveDistortion centerWave = new WaveDistortion(center, new Vector2f());
@@ -210,10 +230,32 @@ public class AEG_7BlackBoxes extends BaseHullMod {
             default: return 4;
         }
     }
+    // Define a color palette inspired by Mazinger Z's energy effects
+    Color[] energyColors = {
+            new Color(255, 50, 50), // Red
+            new Color(255, 100, 50), // Orange
+            new Color(255, 150, 50), // Yellow
+            new Color(255, 200, 50), // Orange Yellow
+            new Color(255, 255, 50), // Light Yellow
+            new Color(200, 255, 50)  // Light Green
+    };
+
+    // Function to get a random energy color
+    public Color getRandomEnergyColor() {
+        return energyColors[(int) (Math.random() * energyColors.length)];
+    }
+    // Function to generate a gradient color effect
+    public Color getGradientColor(float progress) {
+        int index = (int) (progress * (energyColors.length - 1));
+        return energyColors[index];
+    }
+
     //Make sure Last stand cool-down resets each combat so it won't fail to trigger next combat.
     @Override
     public void applyEffectsBeforeShipCreation(ShipAPI.HullSize hullSize, MutableShipStatsAPI stats, String id) {
-        lastStandCooldownTimer.forceIntervalElapsed(); // Ensures Last Stand is ready at combat start
+        // Ensure Last Stand is ready at the start of each combat session
+        lastStandCooldownTimer.forceIntervalElapsed(); // Reset the cooldown timer
+        lastStandTriggered = false;  // Reset the flag, allowing Last Stand to trigger again
     }
 
     @Override
