@@ -2,8 +2,8 @@ package data.hullmods;
 
 import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.combat.*;
+import com.fs.starfarer.api.combat.listeners.DamageTakenModifier;
 import com.fs.starfarer.api.util.IntervalUtil;
-import com.fs.starfarer.renderers.JitterRenderer;
 import org.dark.shaders.distortion.DistortionShader;
 import org.dark.shaders.distortion.WaveDistortion;
 import org.lazywizard.lazylib.MathUtils;
@@ -14,12 +14,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class AEG_7BlackBoxes extends BaseHullMod {
+    private final java.util.Map<ShipAPI, EvasionTracker> evasionMap = new java.util.WeakHashMap<>();
     private final IntervalUtil lastStandCooldownTimer = new IntervalUtil(60f, 60f); // 1-minute cooldown
     private static final float REGENERATION_RATE = 0.01f;
     private static final float ASSIMILATION_DAMAGE_CONVERSION = 0.05f;
     private static final float STRENGTHENING_MULT = 1.05f;
     private static final float PREDICTION_EVASION_CHANCE = 0.1f;
-    private static final float SENSOR_RANGE_BOOST = 200f;
     private static final float ADAPTIVE_DEFENSE_DURATION = 10f; // Reduced from 20f
     private static final float ADAPTIVE_DEFENSE_REDUCTION = 0.1f; // Reduced from 0.75f
     private static final float ADAPTIVE_DEFENSE_COOLDOWN = 5f; // Added cooldown
@@ -32,13 +32,13 @@ public class AEG_7BlackBoxes extends BaseHullMod {
     // Declare jitter variables
     private boolean justEvadedDamage = false;
     @Override
-    public void advanceInCombat(ShipAPI ship, float amount) {
-        if (!ship.isAlive() || ship.isHulk() || ship.isPiece()) {
+    public void advanceInCombat(final ShipAPI ship, float amount) {
+        if (ship == null || !ship.isAlive() || ship.isHulk() || ship.isPiece()) {
             unapplyStrengthening(ship.getMutableStats());
+            unapplyAssimilation(ship.getMutableStats());
+            unapplyAdaptiveDefense(ship.getMutableStats());
             return;
         }
-
-        if (ship == null) return;
 
         // Black Box 1 Continuous Regeneration
         if (ship.getHullLevel() < 1.0f) {
@@ -53,55 +53,46 @@ public class AEG_7BlackBoxes extends BaseHullMod {
         applyStrengthening(ship.getMutableStats());
 
         // Black Box 4 Dimensional Prediction
-        if (Math.random() < PREDICTION_EVASION_CHANCE) {
-            ship.getMutableStats().getHullDamageTakenMult().modifyMult("AEG_7BlackBoxes", 0f);
-            ship.getMutableStats().getArmorDamageTakenMult().modifyMult("AEG_7BlackBoxes", 0f);
-            justEvadedDamage = true;
+        // Only add the damage listener once
+        if (ship.getCustomData().get("AEG_7BlackBoxes_EvasionListener") == null) {
+            ship.setCustomData("AEG_7BlackBoxes_EvasionListener", true);
+            ship.addListener(new DamageTakenModifier() {
+                @Override
+                public String modifyDamageTaken(Object param, CombatEntityAPI target, DamageAPI damage, Vector2f point, boolean shieldHit) {
+                    if (target instanceof ShipAPI && target == ship && Math.random() < PREDICTION_EVASION_CHANCE) {
+                        damage.getModifier().modifyMult("AEG_7BlackBoxes", 0f); // Negate the damage
+                        triggerEvasionEffect(ship); // Visual + sway
+                        return "AEG_7BlackBoxes";
+                    }
+                    return null;
+                }
+            });
         }
-        ship.getMutableStats().getSensorStrength().modifyFlat("AEG_7BlackBoxes", SENSOR_RANGE_BOOST);
-        if (justEvadedDamage) {
-            // Reset flag immediately
-            justEvadedDamage = false;
+        // Improved sway
+        if (evasionMap.containsKey(ship)) {
+            EvasionTracker tracker = evasionMap.get(ship);
+            tracker.timeElapsed += amount;
 
-            // Sway effect (move ship slightly to the side)
-            float swayAngle = ship.getFacing() + (Math.random() > 0.5 ? 90f : -90f); // left or right
-            float swayAmount = 20f; // how much to sway
-            float swayX = (float) Math.cos(Math.toRadians(swayAngle)) * swayAmount;
-            float swayY = (float) Math.sin(Math.toRadians(swayAngle)) * swayAmount;
+            if (!tracker.reversed && tracker.timeElapsed >= tracker.delay) {
+                // Apply reverse sway with gentler force
+                Vector2f reverse = new Vector2f(tracker.direction);
+                reverse.scale(-0.5f); // Half strength
+                Vector2f.add(ship.getVelocity(), reverse, ship.getVelocity());
+                tracker.reversed = true;
+            }
 
-            ship.getLocation().x += swayX;
-            ship.getLocation().y += swayY;
-
-            // Add jitter on top
-            ship.setJitter(
-                    ship,
-                    new Color(255, 200 - MathUtils.getRandom().nextInt(100), 0),
-                    0.75f,
-                    6,
-                    0f,
-                    60f
-            );
+            if (tracker.timeElapsed > 1f) {
+                evasionMap.remove(ship);
+            }
         }
-        // Apply Afterimage Effect
-        ship.setJitter(
-                ship,             // The ship itself as the source
-                new Color(255, 200 - MathUtils.getRandom().nextInt(100), 0), // Red color
-                0.5f + MathUtils.getRandom().nextInt(2),             // Medium intensity
-                5 + MathUtils.getRandom().nextInt(2),                // 5 jitter copies
-                0f,               // No minimum range
-                100f              // Maximum range of 100 units
-        );
-
 
         // Black Box 5 Adaptive Defense
-        adaptiveDefenseTimer.advance(amount);
         if (adaptiveDefenseTimer.intervalElapsed()) {
-            ship.getMutableStats().getHullDamageTakenMult().modifyMult("AEG_7BlackBoxes", ADAPTIVE_DEFENSE_REDUCTION);
-            ship.getMutableStats().getArmorDamageTakenMult().modifyMult("AEG_7BlackBoxes", ADAPTIVE_DEFENSE_REDUCTION);
+            applyAdaptiveDefense(ship.getMutableStats());
         } else {
-            ship.getMutableStats().getHullDamageTakenMult().unmodify("AEG_7BlackBoxes");
-            ship.getMutableStats().getArmorDamageTakenMult().unmodify("AEG_7BlackBoxes");
+            unapplyAdaptiveDefense(ship.getMutableStats());
         }
+
         // Black Box 6 Causality Weapon (Black Box 7 is the System)
         // Last Stand Protocol logic - trigger once every minute
         lastStandCooldownTimer.advance(amount); // Advance the cooldown timer
@@ -306,6 +297,59 @@ public class AEG_7BlackBoxes extends BaseHullMod {
         String id = "AEG_7BlackBoxes_Assimilation";
         stats.getEnergyWeaponDamageMult().unmodify(id);
         stats.getHardFluxDissipationFraction().unmodify(id);
+    }
+    private void applyAdaptiveDefense(MutableShipStatsAPI stats) {
+        String id = "AEG_7BlackBoxes_AdaptiveDefense";
+        stats.getHullDamageTakenMult().modifyMult(id, ADAPTIVE_DEFENSE_REDUCTION);
+        stats.getArmorDamageTakenMult().modifyMult(id, ADAPTIVE_DEFENSE_REDUCTION);
+    }
+
+    private void unapplyAdaptiveDefense(MutableShipStatsAPI stats) {
+        String id = "AEG_7BlackBoxes_AdaptiveDefense";
+        stats.getHullDamageTakenMult().unmodify(id);
+        stats.getArmorDamageTakenMult().unmodify(id);
+    }
+
+    //Dimensional Prediction Evasion Helper
+    private void triggerEvasionEffect(final ShipAPI ship) {
+        CombatEngineAPI engine = Global.getCombatEngine();
+
+        // Visual jitter
+        ship.setJitter(
+                ship,
+                new Color(255, 200 - MathUtils.getRandom().nextInt(100), 0),
+                0.5f + MathUtils.getRandom().nextFloat(),
+                5 + MathUtils.getRandom().nextInt(2),
+                0f,
+                100f
+        );
+
+        // Calculate sway direction (perpendicular to facing)
+        float swayAngle = ship.getFacing() + (Math.random() > 0.5 ? 90f : -90f);
+        Vector2f sway = MathUtils.getPointOnCircumference(null, 200f, swayAngle); // Initial burst
+
+        // Apply dodge burst
+        Vector2f.add(ship.getVelocity(), sway, ship.getVelocity());
+
+        // Store for reverse sway in ~0.3 seconds
+        evasionMap.put(ship, new EvasionTracker(sway, 0.3f));
+
+        engine.addFloatingText(ship.getLocation(), "Dimensional Prediction!", 16f, Color.YELLOW, ship, 0.5f, 1.0f);
+    }
+
+    //Evasion Tracker helper for Smooth Sway
+    private static class EvasionTracker {
+        Vector2f direction;
+        float delay;
+        float timeElapsed;
+        boolean reversed;
+
+        public EvasionTracker(Vector2f direction, float delay) {
+            this.direction = direction;
+            this.delay = delay;
+            this.timeElapsed = 0f;
+            this.reversed = false;
+        }
     }
     // Define a color palette inspired by Mazinger Z's energy effects
     Color[] energyColors = {
