@@ -10,39 +10,27 @@
   "hardpointSprite": "graphics/ships/zero/zero_scrander.png",
   "hardpointGlowSprite": "graphics/ships/zero/zero_scrander.png",
   "glowColor": [
-      255,
-      150,
-      0,
-      255
-    ],
-    "turretOffsets": [
-      17,
-      2,
-      17,
-      -2,
-      17,
-      -1,
-      17,
-      1,
-      17,
-      0
-    ],
-    "turretAngleOffsets": [
-      -0,
-      0,
-      -0,
-      0,
-      0
-    ],
-    "hardpointOffsets": [
-      34,
-      0
-    ],
-    "hardpointAngleOffsets": [
-      0
-    ],
-    "barrelMode": "ALTERNATING",
-    "autocharge": true,
-    "animationType": "GLOW",
-    "fireSoundTwo": "rifttorpedo_fire"
-  }
+    255,
+    255,
+    0,
+    255
+  ],
+  "turretOffsets": [
+    0,
+    0
+  ],
+  "turretAngleOffsets": [
+    -0
+  ],
+  "hardpointOffsets": [
+    34,
+    0
+  ],
+  "hardpointAngleOffsets": [
+    0
+  ],
+  "barrelMode": "ALTERNATING",
+  "animationType": "GLOW",
+  "autocharge": true,
+  "fireSoundTwo": "rifttorpedo_fire"
+}
