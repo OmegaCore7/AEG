@@ -9,12 +9,12 @@ import org.lazywizard.lazylib.VectorUtils;
 import org.lwjgl.util.vector.Vector2f;
 
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.List;
 
 public class AEG_ReturnZeroOnHitEffect implements OnHitEffectPlugin {
     private static final float DURATION = 20f;
     private static final float BLACK_HOLE_RADIUS = 3000f;
-    private static final float INNER_RING_RADIUS = 200f;
     private static final float PULL_STRENGTH = 300f;
 
     @Override
@@ -29,6 +29,10 @@ public class AEG_ReturnZeroOnHitEffect implements OnHitEffectPlugin {
         private float elapsed = 0f;
         private boolean explosionOccurred = false;
 
+        // 🔄 New: List to track orbiting orbs
+        private final List<OrbitalParticle> orbitals = new ArrayList<>();
+        private boolean initialized = false;
+
         public BlackHoleEffectPlugin(Vector2f loc) {
             this.location = new Vector2f(loc);
         }
@@ -38,6 +42,7 @@ public class AEG_ReturnZeroOnHitEffect implements OnHitEffectPlugin {
         @Override public void renderInUICoords(ViewportAPI viewport) {}
         @Override public void processInputPreCoreControls(float amount, List<InputEventAPI> events) {}
 
+
         @Override
         public void advance(float amount, List<InputEventAPI> events) {
             CombatEngineAPI engine = Global.getCombatEngine();
@@ -45,29 +50,109 @@ public class AEG_ReturnZeroOnHitEffect implements OnHitEffectPlugin {
 
             elapsed += amount;
 
-            // Apply pull to ships
+            if (!initialized) {
+                spawnOrbitingParticles();
+                initialized = true;
+            }
+
             applyBlackHolePull(engine);
 
-            // Standard rotating rings
+            // Core glow effect
+            spawnNucleusGlow(engine);
+
+            // Rotating elliptical rings
             createEllipticalGradientRing(engine, location, 200f, 251, elapsed, (float)(Math.PI/5), 0f, 1.0f, false);
             createEllipticalGradientRing(engine, location, 180f, 251, elapsed, (float)(Math.PI/6), (float)Math.PI/4f, 0.8f, false);
-
-            // Perpendicular elliptical rings (simulate rotation in different plane)
             createEllipticalGradientRing(engine, location, 160f, 251, elapsed, (float)(Math.PI/7), (float)Math.PI/2f, 0.6f, true);
             createEllipticalGradientRing(engine, location, 220f, 251, elapsed, (float)(Math.PI/8), (float)(3 * Math.PI / 4f), 0.5f, true);
 
-            // Trigger explosion after full duration
+            // 🔄 Update orbiting orbs
+            for (OrbitalParticle orb : orbitals) {
+                orb.advance(elapsed, engine, location);
+            }
+
             if (elapsed >= DURATION && !explosionOccurred) {
                 triggerExplosion(engine, location);
                 explosionOccurred = true;
             }
 
-            // Remove plugin shortly after explosion
             if (elapsed >= DURATION + 1f) {
                 engine.removePlugin(this);
             }
         }
 
+        private void spawnOrbitingParticles() {
+            for (int i = 0; i < 6; i++) {
+                float angleOffset = (float) (Math.random() * Math.PI * 2f);
+                Color[] palette = {
+                        new Color(255, 255, 200),
+                        new Color(255, 60, 60),
+                        new Color(255, 180, 50),
+                        new Color(255, 100, 0)
+                };
+                Color color = palette[i % palette.length];
+                orbitals.add(new OrbitalParticle(angleOffset, color));
+            }
+        }
+
+        private void spawnNucleusGlow(CombatEngineAPI engine) {
+            // Core white center
+            engine.addNebulaParticle(location, new Vector2f(), 50f, 2f, 0f, 0.3f, 1f, new Color(255 - MathUtils.getRandom().nextInt(50), 150 - MathUtils.getRandom().nextInt(50),50 - MathUtils.getRandom().nextInt(50), 255 - MathUtils.getRandom().nextInt(50)));
+            // Orange glow halo
+            engine.addNebulaParticle(location, new Vector2f(), 75f, 2f, 0f, 0.3f, 1f, new Color(150 - MathUtils.getRandom().nextInt(50), 100 - MathUtils.getRandom().nextInt(50),0, 255 - MathUtils.getRandom().nextInt(50)));
+            // Blue glow halo
+            engine.addNebulaParticle(location, new Vector2f(), 100f, 2f, 0f, 0.3f, 1f, new Color(100 - MathUtils.getRandom().nextInt(50), 50 - MathUtils.getRandom().nextInt(50), 0, 200 - MathUtils.getRandom().nextInt(50)));
+        }
+
+        // 🔄 Orbital particle class for orbiting orbs
+        public class OrbitalParticle {
+            float baseAngle;
+            Color baseColor;
+            float speedMultiplier;
+
+            public OrbitalParticle(float angle, Color color) {
+                this.baseAngle = angle;
+                this.baseColor = color;
+                this.speedMultiplier = 1f + (float) Math.random() * 0.5f; // Between 1.0 and 1.5
+            }
+
+            void advance(float elapsedTime, CombatEngineAPI engine, Vector2f center) {
+                float radius = 180f + 20f * (float)Math.sin(elapsedTime * 1.5f * speedMultiplier + baseAngle);
+                float speed = 1f;
+                float angle = baseAngle + elapsedTime * speed;
+                float pulse = 0.5f + 0.5f * (float)Math.sin(elapsedTime * 3f + baseAngle);
+
+                float x = center.x + radius * (float)Math.cos(angle);
+                float y = center.y + radius * (float)Math.sin(angle);
+
+                float size = 40f + 50f * pulse;
+                float brightness = 0.8f + 0.7f * pulse;
+
+                Color pulseColor = new Color(
+                        Math.min(255, (int)(baseColor.getRed() * brightness)),
+                        Math.min(255, (int)(baseColor.getGreen() * brightness)),
+                        Math.min(255, (int)(baseColor.getBlue() * brightness)),
+                        255
+                );
+
+                Vector2f pos = new Vector2f(x, y);
+
+                engine.addHitParticle(pos, new Vector2f(), size, 1f, 0.1f, pulseColor);
+
+                if (Math.random() < 0.3f) {
+                    engine.addNebulaParticle(
+                            pos,
+                            MathUtils.getRandomPointInCircle(null, 20f),
+                            size * 0.8f, // was 0.6f
+                            1.5f,
+                            0f,
+                            0.1f,
+                            0.4f,
+                            new Color(255 - MathUtils.getRandom().nextInt(75), 100 - MathUtils.getRandom().nextInt(75), 80 - MathUtils.getRandom().nextInt(75),150 - MathUtils.getRandom().nextInt(75))
+                    );
+                }
+            }
+        }
         private void applyBlackHolePull(CombatEngineAPI engine) {
             for (CombatEntityAPI entity : engine.getShips()) {
                 if (entity instanceof ShipAPI && entity != engine.getPlayerShip()) {
