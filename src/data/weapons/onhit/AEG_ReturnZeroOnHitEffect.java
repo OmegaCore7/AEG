@@ -4,42 +4,22 @@ import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.combat.*;
 import com.fs.starfarer.api.combat.listeners.ApplyDamageResultAPI;
 import com.fs.starfarer.api.input.InputEventAPI;
-import com.fs.starfarer.api.util.Misc;
 import org.lazywizard.lazylib.MathUtils;
 import org.lazywizard.lazylib.VectorUtils;
 import org.lwjgl.util.vector.Vector2f;
 
 import java.awt.*;
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Random;
 
 public class AEG_ReturnZeroOnHitEffect implements OnHitEffectPlugin {
     private static final float DURATION = 20f;
-    private static final float DAMAGE_REDUCTION = 0.01f; // 99% damage reduction
-    private static final float BLACK_HOLE_RADIUS = 2500f;
-    private static final float RING_RADIUS = 205f;
+    private static final float BLACK_HOLE_RADIUS = 3000f;
     private static final float INNER_RING_RADIUS = 200f;
     private static final float PULL_STRENGTH = 300f;
-    private static final Color RING_COLOR = new Color(185, 0, 255); // Bright magenta
-    private static final Color INNER_RING_COLOR = new Color(255, 140, 0); // Gradient orange
-    private static final Color EXPLOSION_COLOR = new Color(105, 255, 105); // White with green fringe
-    private static final Color EXPLOSION_FRINGE_COLOR = new Color(25, 153, 25);
-    private static final Random RANDOM = new Random();
-
-    private static Vector2f blackHolePosition;
-    private static boolean isActive = false;
-    private static boolean explosionOccurred = false;
-    private static float elapsedTime = 0f;
-    private static final float BLACKHOLE_DURATION = 3.0f;
-    private static final float PULL_RADIUS = 5000f;
-
 
     @Override
     public void onHit(DamagingProjectileAPI projectile, CombatEntityAPI target,
                       Vector2f point, boolean shieldHit, ApplyDamageResultAPI damageResult, CombatEngineAPI engine) {
-
         engine.addPlugin(new BlackHoleEffectPlugin(point));
     }
 
@@ -47,198 +27,163 @@ public class AEG_ReturnZeroOnHitEffect implements OnHitEffectPlugin {
 
         private final Vector2f location;
         private float elapsed = 0f;
-        private final List<Ring> rings = new ArrayList<>();
+        private boolean explosionOccurred = false;
 
         public BlackHoleEffectPlugin(Vector2f loc) {
             this.location = new Vector2f(loc);
-            blackHolePosition = new Vector2f(loc);
-            isActive = true;
-            explosionOccurred = false;
         }
+
         @Override public void init(CombatEngineAPI engine) {}
         @Override public void renderInWorldCoords(ViewportAPI viewport) {}
         @Override public void renderInUICoords(ViewportAPI viewport) {}
+        @Override public void processInputPreCoreControls(float amount, List<InputEventAPI> events) {}
+
         @Override
         public void advance(float amount, List<InputEventAPI> events) {
-            if (Global.getCombatEngine().isPaused()) return;
+            CombatEngineAPI engine = Global.getCombatEngine();
+            if (engine == null || engine.isPaused()) return;
 
             elapsed += amount;
-            elapsedTime += amount;
 
-            // Pull ships in
-            applyBlackHolePull();
+            // Apply pull to ships
+            applyBlackHolePull(engine);
 
-            // Draw ring particles and effects
-            applyVisualEffects(Global.getCombatEngine().getPlayerShip());
+            // Standard rotating rings
+            createEllipticalGradientRing(engine, location, 200f, 251, elapsed, (float)(Math.PI/5), 0f, 1.0f, false);
+            createEllipticalGradientRing(engine, location, 180f, 251, elapsed, (float)(Math.PI/6), (float)Math.PI/4f, 0.8f, false);
 
-            // Add sucked-in particles spiraling inward
-            createBlackHoleParticles();
+            // Perpendicular elliptical rings (simulate rotation in different plane)
+            createEllipticalGradientRing(engine, location, 160f, 251, elapsed, (float)(Math.PI/7), (float)Math.PI/2f, 0.6f, true);
+            createEllipticalGradientRing(engine, location, 220f, 251, elapsed, (float)(Math.PI/8), (float)(3 * Math.PI / 4f), 0.5f, true);
 
-            // Optional: trigger final explosion near end of duration
-            if (elapsed >= BLACKHOLE_DURATION && !explosionOccurred) {
-                endEffect(Global.getCombatEngine().getPlayerShip(), "AEG_BlackHole_Explosion");
+            // Trigger explosion after full duration
+            if (elapsed >= DURATION && !explosionOccurred) {
+                triggerExplosion(engine, location);
                 explosionOccurred = true;
             }
 
-            // Fade out and remove plugin
-            if (elapsed >= BLACKHOLE_DURATION + 1f) {
-                Global.getCombatEngine().removePlugin(this);
-            }
-
-            // Create rings
-            rings.add(new Ring(elapsed, location));
-            renderRings();
-        }
-
-
-        private static class Ring {
-            final float creationTime;
-            final Vector2f location;
-
-            Ring(float time, Vector2f loc) {
-                creationTime = time;
-                location = new Vector2f(loc);
-            }
-        }
-        private static void applyVisualEffects(ShipAPI ship) {
-            if (blackHolePosition == null) {
-                return; // Ensure blackHolePosition is not null
-            }
-
-            CombatEngineAPI engine = Global.getCombatEngine();
-            if (engine != null) {
-                // Add central ring effect
-                engine.addHitParticle(blackHolePosition, new Vector2f(), RING_RADIUS, 1f, DURATION, RING_COLOR);
-                // Add inner ring effect
-                engine.addHitParticle(blackHolePosition, new Vector2f(), INNER_RING_RADIUS, 1f, DURATION, INNER_RING_COLOR);
-
-                // Create the wavy magenta ring
-                createWavyParticleRing(engine, blackHolePosition, RING_RADIUS, 258, RING_COLOR);
-
-                // Create the thicker gradient orange ring
-                createGradientParticleRing(engine, blackHolePosition, INNER_RING_RADIUS, 251);
+            // Remove plugin shortly after explosion
+            if (elapsed >= DURATION + 1f) {
+                engine.removePlugin(this);
             }
         }
 
-        private static void createWavyParticleRing(CombatEngineAPI engine, Vector2f center, float radius, int particleCount, Color color) {
-            for (int i = 0; i < particleCount; i++) {
-                float angle = (float) (i * 2 * Math.PI / particleCount);
-                float noise = (RANDOM.nextFloat() - 0.5f) * 10f; // Add some noise for wavy effect
-                float x = center.x + (radius + noise) * (float) Math.cos(angle);
-                float y = center.y + (radius + noise) * (float) Math.sin(angle);
-                engine.addHitParticle(new Vector2f(x, y), new Vector2f(0, 0), 5f, 1f, DURATION, color);
-            }
-        }
-
-        private static void createGradientParticleRing(CombatEngineAPI engine, Vector2f center, float radius, int particleCount) {
-            for (int i = 0; i < particleCount; i++) {
-                float angle = (float) (i * 2 * Math.PI / particleCount);
-                float x = center.x + radius * (float) Math.cos(angle);
-                float y = center.y + radius * (float) Math.sin(angle);
-                Color color = getGradientColor(i, particleCount);
-                engine.addHitParticle(new Vector2f(x, y), new Vector2f(0, 0), 10f, 1f, DURATION, color); // Increased size to 10f
-            }
-        }
-
-        private static Color getGradientColor(int index, int total) {
-            float ratio = (float) index / total;
-            int red = (int) (255 * ratio + 255 * (1 - ratio));
-            int green = (int) (165 * ratio + 69 * (1 - ratio));
-            int blue = (int) (0 * ratio + 0 * (1 - ratio));
-            return new Color(red, green, blue);
-        }
-
-        private static void applyBlackHolePull() {
-            CombatEngineAPI engine = Global.getCombatEngine();
-            if (engine == null || blackHolePosition == null) {
-                return; // Ensure engine and blackHolePosition are not null
-            }
-
+        private void applyBlackHolePull(CombatEngineAPI engine) {
             for (CombatEntityAPI entity : engine.getShips()) {
                 if (entity instanceof ShipAPI && entity != engine.getPlayerShip()) {
-                    float distance = MathUtils.getDistance(entity, blackHolePosition);
+                    float distance = MathUtils.getDistance(entity, location);
                     if (distance <= BLACK_HOLE_RADIUS) {
-                        Vector2f pullVector = VectorUtils.getDirectionalVector(entity.getLocation(), blackHolePosition);
+                        Vector2f pull = VectorUtils.getDirectionalVector(entity.getLocation(), location);
                         float strength = (1f - distance / BLACK_HOLE_RADIUS) * PULL_STRENGTH;
-                        pullVector.scale(strength);
-                        Vector2f.add(entity.getVelocity(), pullVector, entity.getVelocity());
+                        pull.scale(strength);
+                        Vector2f.add(entity.getVelocity(), pull, entity.getVelocity());
                     }
                 }
             }
         }
-        private static void createBlackHoleParticles() {
-            CombatEngineAPI engine = Global.getCombatEngine();
-            if (engine == null || blackHolePosition == null) {
-                return; // Ensure engine and blackHolePosition are not null
-            }
 
-            for (int i = 0; i < 10; i++) { // Increase particle frequency
-                Vector2f particlePos = MathUtils.getRandomPointInCircle(blackHolePosition, BLACK_HOLE_RADIUS);
-                Vector2f particleVel = Vector2f.sub(blackHolePosition, particlePos, null);
-                particleVel.scale(0.05f); // Slow down the particles
-                float size = 20f + (float) Math.random() * 10f; // Increase particle size
-                float transparency = 0.5f + (float) Math.random() * 0.5f; // Random transparency
-                engine.addHitParticle(particlePos, particleVel, size, transparency, 1f, RING_COLOR);
-
-                // Add smoke effect with variance
-                if (Math.random() < 0.5) {
-                    Vector2f smokePos = MathUtils.getRandomPointInCircle(particlePos, 10f); // Add variance to smoke position
-                    Color smokeColor = new Color(50, 50, 50, (int) (transparency * 255));
-                    engine.addSmokeParticle(smokePos, particleVel, size * 1.5f, transparency, 1f, smokeColor);
-                }
-
-                // Ensure particles stop at the ring
-                if (MathUtils.getDistance(particlePos, blackHolePosition) <= RING_RADIUS) {
-                    particleVel.set(0, 0);
-                }
+        private void createGradientRing(CombatEngineAPI engine, Vector2f center, float radius, int count) {
+            for (int i = 0; i < count; i++) {
+                float angle = (float) (i * 2 * Math.PI / count);
+                float x = center.x + radius * (float) Math.cos(angle);
+                float y = center.y + radius * (float) Math.sin(angle);
+                Color color = getOrangeGradientColor(i, count);
+                engine.addHitParticle(new Vector2f(x, y), new Vector2f(), 10f, 1f, DURATION, color);
             }
         }
 
-        private static void endEffect(ShipAPI ship, String id) {
-            isActive = false;
-              // Create final explosion
-            CombatEngineAPI engine = Global.getCombatEngine();
-            if (engine != null && blackHolePosition != null) {
-                engine.spawnExplosion(blackHolePosition, new Vector2f(), EXPLOSION_COLOR, 2500f, 1f);
-                engine.addHitParticle(blackHolePosition, new Vector2f(), 3000, 1f, 1f, EXPLOSION_FRINGE_COLOR);
-                //Explosion Sound
-                Global.getSoundPlayer().playSound("explosion_large", 1f, 1f, blackHolePosition, new Vector2f());
-
-                // Add shockwave effect
-                engine.addNebulaParticle(blackHolePosition, new Vector2f(), 3500f, 1.5f, 0.1f, 0.3f, 1f, EXPLOSION_COLOR);
-
-                // Deal 10,000 high explosive damage to all entities except the player ship
-                for (ShipAPI s : engine.getShips()) {
-                    if (s != null && s != ship) {
-                        engine.applyDamage(s, blackHolePosition, 10000f, DamageType.HIGH_EXPLOSIVE, 5000f, true, false, ship);
-                    }
-                }
-                // Reset the 11-second timer
-                elapsedTime = 0f;
-            }
+        private Color getOrangeGradientColor(int index, int total) {
+            float ratio = (float) index / total;
+            int red = (int) (255 * (1 - ratio) + 255 * ratio);
+            int green = (int) (140 * (1 - ratio) + 69 * ratio);
+            return new Color(red, green, 0);
         }
-        private void renderRings() {
-            Iterator<Ring> iter = rings.iterator();
-            while (iter.hasNext()) {
-                Ring ring = iter.next();
-                float progress = (elapsed - ring.creationTime) / BLACKHOLE_DURATION;
-                if (progress > 1f) {
-                    iter.remove();
-                    continue;
-                }
 
-                float size = 100f + progress * 400f;
-                float alpha = 1f - progress;
-                Color color = new Color(
-                        RING_COLOR.getRed(), RING_COLOR.getGreen(), RING_COLOR.getBlue(),
-                        (int)(alpha * RING_COLOR.getAlpha())
+        private void triggerExplosion(CombatEngineAPI engine, Vector2f center) {
+            // Mazinger Zero photon colors
+            Color coreWhite = new Color(255, 255, 200);
+            Color photonRed = new Color(255, 60, 60);
+            Color photonGold = new Color(255, 180, 50);
+            Color photonMagenta = new Color(255, 100, 0);
+
+            // Multiple smaller explosions around center to build up the effect
+            for (int i = 0; i < 12; i++) {
+                Vector2f offset = MathUtils.getRandomPointInCircle(center, 600f);
+                Vector2f velocity = MathUtils.getRandomPointInCircle(null, 100f);
+                float size = 200f + (float) Math.random() * 150f;
+                Color color = (i % 2 == 0) ? photonGold : photonRed;
+                engine.spawnExplosion(offset, velocity, color, size, 0.6f);
+                engine.addHitParticle(offset, velocity, size * 0.6f, 1f, 0.5f, photonRed);
+            }
+
+            // Pulsing nebula shockwaves for depth and energy flow
+            for (int i = 0; i < 3; i++) {
+                float delay = i * 0.2f;
+                float size = 1000f + i * 1000f;
+                float duration = 0.7f + i * 0.1f;
+                engine.addNebulaParticle(
+                        center,
+                        new Vector2f(),
+                        size,
+                        1.5f,
+                        delay,   // delay before particle appears
+                        0.3f,    // ramp-up duration
+                        duration,
+                        photonMagenta
                 );
-                Global.getCombatEngine().addSmoothParticle(ring.location, new Vector2f(), size, 1f, 0.05f, color);
+            }
+
+            // The final big bright core explosion
+            engine.spawnExplosion(center, new Vector2f(), coreWhite, 2500f, 1.2f);
+            engine.addHitParticle(center, new Vector2f(), 3000f, 1f, 1f, photonGold);
+
+            // Play explosion sound
+            Global.getSoundPlayer().playSound("terrain_hyperspace_lightning", 1f, 1f, center, new Vector2f());
+
+            // Deal heavy damage to all ships except player inside the explosion radius
+            ShipAPI player = engine.getPlayerShip();
+            for (ShipAPI ship : engine.getShips()) {
+                if (ship != null && ship != player && MathUtils.getDistance(ship, center) < 2500f) {
+                    engine.applyDamage(ship, center, 10000f, DamageType.HIGH_EXPLOSIVE, 5000f, true, false, player);
+                }
             }
         }
-        @Override
-        public void processInputPreCoreControls(float amount, List<InputEventAPI> events) {
-            // No input processing needed for this effect
+        private void createEllipticalGradientRing(CombatEngineAPI engine, Vector2f center, float baseRadius, int count,
+                                                  float elapsedTime, float rotationSpeed, float angleOffset, float brightness,
+                                                  boolean verticalEllipse) {
+            float ellipseFactor = 0.6f + 0.4f * (float) Math.sin(elapsedTime * 2); // oscillates between 0.2 and 1.0
+            float angle = elapsedTime * rotationSpeed + angleOffset;
+
+            for (int i = 0; i < count; i++) {
+                float theta = (float) (i * 2 * Math.PI / count);
+                float sin = (float) Math.sin(theta);
+                float cos = (float) Math.cos(theta);
+
+                // Apply ellipse transformation
+                float x = baseRadius * cos;
+                float y = baseRadius * sin;
+
+                if (verticalEllipse) {
+                    y *= ellipseFactor;
+                } else {
+                    x *= ellipseFactor;
+                }
+
+                // Rotate the entire shape
+                float rotX = x * (float) Math.cos(angle) - y * (float) Math.sin(angle);
+                float rotY = x * (float) Math.sin(angle) + y * (float) Math.cos(angle);
+
+                Vector2f pos = new Vector2f(center.x + rotX, center.y + rotY);
+                Color color = getOrangeGradientColor(i, count);
+                color = new Color(
+                        Math.min(255, (int)(color.getRed() * brightness)),
+                        Math.min(255, (int)(color.getGreen() * brightness)),
+                        color.getBlue()
+                );
+
+                engine.addHitParticle(pos, new Vector2f(), 10f, 1f, 0.1f, color);
+            }
         }
+
     }
 }
