@@ -9,7 +9,7 @@ import org.lazywizard.lazylib.VectorUtils;
 import org.lwjgl.util.vector.Vector2f;
 
 import java.awt.*;
-import java.util.ArrayList;
+import java.util.*;
 import java.util.List;
 
 public class AEG_ReturnZeroOnHitEffect implements OnHitEffectPlugin {
@@ -54,8 +54,12 @@ public class AEG_ReturnZeroOnHitEffect implements OnHitEffectPlugin {
                 spawnOrbitingParticles();
                 initialized = true;
             }
-
-            applyBlackHolePull(engine);
+            if (elapsed < 12f) {
+                fireGodThunderboltBreaker(engine);
+            }
+            if (elapsed >= 12f) {
+                applyBlackHolePull(engine);
+            }
 
             // Core glow effect
             spawnNucleusGlow(engine);
@@ -162,6 +166,7 @@ public class AEG_ReturnZeroOnHitEffect implements OnHitEffectPlugin {
                         float strength = (1f - distance / BLACK_HOLE_RADIUS) * PULL_STRENGTH;
                         pull.scale(strength);
                         Vector2f.add(entity.getVelocity(), pull, entity.getVelocity());
+
                     }
                 }
             }
@@ -228,8 +233,8 @@ public class AEG_ReturnZeroOnHitEffect implements OnHitEffectPlugin {
             // Deal heavy damage to all ships except player inside the explosion radius
             ShipAPI player = engine.getPlayerShip();
             for (ShipAPI ship : engine.getShips()) {
-                if (ship != null && ship != player && MathUtils.getDistance(ship, center) < 2500f) {
-                    engine.applyDamage(ship, center, 10000f, DamageType.HIGH_EXPLOSIVE, 5000f, true, false, player);
+                if (ship != null && ship != player && MathUtils.getDistance(ship, center) < 3000f) {
+                    engine.applyDamage(ship, center, 99999f, DamageType.HIGH_EXPLOSIVE, 9999f, true, false, player);
                 }
             }
         }
@@ -270,5 +275,154 @@ public class AEG_ReturnZeroOnHitEffect implements OnHitEffectPlugin {
             }
         }
 
+        //THUNDERBOLT BREAKER METHOD
+        private final float boltInterval = 1f;
+        private float boltTimer = 0f;
+
+        private void fireGodThunderboltBreaker(CombatEngineAPI engine) {
+            boltTimer += engine.getElapsedInLastFrame();
+            if (boltTimer < boltInterval) return;
+            boltTimer = 0f;
+
+            ShipAPI player = engine.getPlayerShip();
+            List<ShipAPI> enemies = new ArrayList<>();
+            for (ShipAPI ship : engine.getShips()) {
+                if (ship != null && ship.isAlive() && ship.getOwner() != player.getOwner()) {
+                    enemies.add(ship);
+                }
+            }
+
+            if (enemies.isEmpty()) return;
+
+            // Sort enemies by size for initial target selection
+            Collections.sort(enemies, new Comparator<ShipAPI>() {
+                @Override
+                public int compare(ShipAPI a, ShipAPI b) {
+                    return Float.compare(b.getCollisionRadius(), a.getCollisionRadius());
+                }
+            });
+            ShipAPI currentTarget = enemies.get(0);
+            if (currentTarget == null || !currentTarget.isAlive()) return;
+
+            Vector2f sourcePoint = location;
+            ShipAPI source = null;
+
+            // Core values
+            float damage = 700f;
+            float emp = 1200f;
+            float range = 1500f;
+            int maxChains = 5;
+            float rangeReduction = 0.75f;
+            float damageReduction = 0.85f;
+
+            Set<ShipAPI> struck = new HashSet<ShipAPI>();;
+            int bounce = 0;
+
+            Color[] pulseColors = {
+                    new Color(255, 255, 180),
+                    new Color(255, 180, 60),
+                    new Color(255, 100, 0),
+                    new Color(255, 75, 0),
+                    new Color(255, 0, 0)
+            };
+
+            while (currentTarget != null && bounce < maxChains) {
+                struck.add(currentTarget);
+
+                // EMP arc visual
+                Color core = pulseColors[Math.min(bounce, pulseColors.length - 1)];
+                Color fringe = new Color(core.getRed(), Math.max(0, core.getGreen() - 40), Math.max(0, core.getBlue() - 40));
+
+                if (bounce == 0) {
+                    // Big initial trunk - simulate a thick bolt
+                    for (int i = 0; i < 10; i++) {
+                        Vector2f randomizedSource = MathUtils.getRandomPointInCircle(sourcePoint, 30f);
+                        engine.spawnEmpArc(
+                                source,
+                                randomizedSource,
+                                currentTarget,
+                                currentTarget,
+                                DamageType.ENERGY,
+                                damage, emp, 100000f,
+                                "tachyon_lance_emp_impact", // punchier sound
+                                40f,                        // thicker
+                                fringe,
+                                core
+                        );
+                    }
+
+                    // Big flash and explosion at the target point
+                    engine.spawnExplosion(currentTarget.getLocation(), new Vector2f(), core, 300f, 1f);
+                    engine.addHitParticle(currentTarget.getLocation(), new Vector2f(), 250f, 1.5f, 0.3f, core);
+                    engine.addNebulaParticle(currentTarget.getLocation(), new Vector2f(), 200f, 1.5f, 0.1f, 0.3f, 0.6f, fringe);
+                    Global.getSoundPlayer().playSound("tachyon_lance_emp_impact", 1.2f, 1.3f, currentTarget.getLocation(), new Vector2f());
+                } else {
+                    engine.spawnEmpArc(
+                            source,
+                            sourcePoint,
+                            currentTarget,
+                            currentTarget,
+                            DamageType.ENERGY,
+                            damage, emp, 100000f,
+                            "terrain_hyperspace_lightning",
+                            20f + 5f * bounce,
+                            fringe,
+                            core
+                    );
+                }
+
+                // Particle blast at target
+                engine.addHitParticle(
+                        currentTarget.getLocation(),
+                        new Vector2f(),
+                        150f + bounce * 20f,
+                        1.2f,
+                        0.2f,
+                        core
+                );
+
+                // Small burst at midpoint for flavor
+                Vector2f mid = MathUtils.getMidpoint(sourcePoint, currentTarget.getLocation());
+                engine.spawnExplosion(mid, new Vector2f(), fringe, 100f, 0.3f);
+
+                // Add nebula trace to arc
+                engine.addNebulaParticle(mid, new Vector2f(), 80f, 1.5f, 0.2f, 0.4f, 0.8f, core);
+
+                // Update source point
+                source = currentTarget;
+                sourcePoint = currentTarget.getLocation();
+
+                // Decrease values for next bounce
+                damage *= damageReduction;
+                emp *= damageReduction;
+                range *= rangeReduction;
+
+                // Find next target
+                ShipAPI next = null;
+                float closest = Float.MAX_VALUE;
+
+                for (ShipAPI potential : enemies) {
+                    if (!potential.isAlive() || struck.contains(potential)) continue;
+                    if (potential.getPhaseCloak() != null && potential.getPhaseCloak().isActive()) continue;
+                    if (potential.getShield() != null && potential.getShield().isOn() &&
+                            potential.getShield().isWithinArc(currentTarget.getLocation())) continue;
+
+                    float dist = MathUtils.getDistance(currentTarget, potential);
+                    if (dist <= range && dist < closest) {
+                        next = potential;
+                        closest = dist;
+                    }
+                }
+
+                currentTarget = next;
+                bounce++;
+            }
+
+            // Final flash effect at last target
+            if (sourcePoint != null) {
+                engine.spawnExplosion(sourcePoint, new Vector2f(), new Color(255, 240, 100), 300f, 0.5f);
+                Global.getSoundPlayer().playSound("terrain_hyperspace_lightning", 1f, 1.2f, sourcePoint, new Vector2f());
+            }
+        }
     }
 }
