@@ -308,9 +308,9 @@ public class AEG_ReturnZeroOnHitEffect implements OnHitEffectPlugin {
             ShipAPI source = null;
 
             // Core values
-            float damage = 700f;
+            float damage = 800f;
             float emp = 1200f;
-            float range = 1500f;
+            float range = 2000f;
             int maxChains = 5;
             float rangeReduction = 0.75f;
             float damageReduction = 0.85f;
