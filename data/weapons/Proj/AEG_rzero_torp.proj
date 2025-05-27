@@ -4,9 +4,9 @@
 	"missileType":"MISSILE",
 	"onHitEffect":"data.weapons.onhit.AEG_ReturnZeroOnHitEffect",
 	"sprite":"graphics/missiles/rift_torpedo.png",
-	"size":[14,16],	
-	"center":[7,8],
-	"collisionRadius":10,
+	"size":[56,64],
+	"center":[28,32],
+	"collisionRadius":60,
 	"collisionClass":"MISSILE_NO_FF",
 	"explosionColor":[255,90,110,255],  # purely visual, will get a white additively blended core on top of this color
 	"explosionRadius":250, # purely visual
@@ -31,8 +31,8 @@
 	"flameoutTime":0.2, # total time from flameout to full fadeout
 	"noEngineGlowTime":0.2, # time spent without the engine glow being rendered
 	"fadeTime":0.2, # fadeout duration			
-	"glowColor":[255,100,100,75],
-	"glowRadius":125,
+	"glowColor":[255,240,50,150],
+	"glowRadius":200,
 	"passThroughMissiles":true,
 	"passThroughFighters":true,
 	"applyOnHitEffectWhenPassThrough":false,
@@ -46,21 +46,21 @@
 				    "style":"CUSTOM",
 					"styleSpec":{
 						"mode":"QUAD_STRIP", # PARTICLES or QUAD_STRIP, determines which params are used
-						"engineColor":[255,100,100,0],
+						"engineColor":[255,120,20,100],
 						"glowSizeMult":2.5,
-						"glowAlternateColor":[255,0,10,255],
+						"glowAlternateColor":[255,25,5,255],
 						"contrailDuration":2,
 						"contrailWidthMult":1.5,
-						"contrailWidthAddedFractionAtEnd":1,  # can be negative. makes trail spread out/narrow at the end
-						"contrailMinSeg":5, # min segment length, in pixels
+						"contrailWidthAddedFractionAtEnd":-0.6,  # can be negative. makes trail spread out/narrow at the end
+						"contrailMinSeg":3, # min segment length, in pixels
 						"contrailMaxSpeedMult":0f,
-						"contrailAngularVelocityMult":0.5f,
+						"contrailAngularVelocityMult":1.2f,
 						"contrailSpawnDistMult":0f, # how far away from engine it starts
 						"contrailColor":[255,90,110,50],
 						"type":"GLOW" # GLOW or SMOKE; additive or regular blend mode
 					},
-				    "width":10.0,
-				    "length":50.0,
+				    "width":50.0,
+				    "length":70.0,
 				    "angle":180.0}],
 }
 			

@@ -52,6 +52,7 @@ public class AEG_7BlackBoxes extends BaseHullMod {
         // Black Box 3 Strengthening
         applyStrengthening(ship.getMutableStats());
 
+
         // Black Box 4 Dimensional Prediction
         // Only add the damage listener once
         if (ship.getCustomData().get("AEG_7BlackBoxes_EvasionListener") == null) {
@@ -73,18 +74,31 @@ public class AEG_7BlackBoxes extends BaseHullMod {
             EvasionTracker tracker = evasionMap.get(ship);
             tracker.timeElapsed += amount;
 
-            if (!tracker.reversed && tracker.timeElapsed >= tracker.delay) {
-                // Apply reverse sway with gentler force
-                Vector2f reverse = new Vector2f(tracker.direction);
-                reverse.scale(-0.5f); // Half strength
-                Vector2f.add(ship.getVelocity(), reverse, ship.getVelocity());
-                tracker.reversed = true;
+            if (!tracker.returning && tracker.timeElapsed >= tracker.delay) {
+                tracker.returning = true;
+                tracker.timeElapsed = 0f; // Reset timer for return phase
             }
 
-            if (tracker.timeElapsed > 1f) {
-                evasionMap.remove(ship);
+            if (tracker.returning) {
+                float progress = tracker.timeElapsed / tracker.returnDuration;
+                progress = Math.min(progress, 1f);
+
+                // LERP back to original position
+                Vector2f current = ship.getLocation();
+                float x = current.x + (tracker.startPosition.x - current.x) * progress;
+                float y = current.y + (tracker.startPosition.y - current.y) * progress;
+                ship.getLocation().set(x, y);
+
+                // Interpolate back to original facing
+                float restoredAngle = currentAngleLerp(ship.getFacing(), ship.getFacing() - tracker.angularOffset, progress);
+                ship.setFacing(restoredAngle);
+
+                if (progress >= 1f) {
+                    evasionMap.remove(ship);
+                }
             }
         }
+
 
         // Black Box 5 Adaptive Defense
         if (adaptiveDefenseTimer.intervalElapsed()) {
@@ -326,30 +340,42 @@ public class AEG_7BlackBoxes extends BaseHullMod {
 
         // Calculate sway direction (perpendicular to facing)
         float swayAngle = ship.getFacing() + (Math.random() > 0.5 ? 90f : -90f);
-        Vector2f sway = MathUtils.getPointOnCircumference(null, 200f, swayAngle); // Initial burst
+        Vector2f offset = MathUtils.getPointOnCircumference(null, 40f, swayAngle);
 
-        // Apply dodge burst
-        Vector2f.add(ship.getVelocity(), sway, ship.getVelocity());
+        // Teleport slightly instead of adding velocity
+        Vector2f newPos = Vector2f.add(ship.getLocation(), offset, new Vector2f());
+        ship.getLocation().set(newPos.x, newPos.y);
 
-        // Store for reverse sway in ~0.3 seconds
-        evasionMap.put(ship, new EvasionTracker(sway, 0.3f));
+        // Optional slight facing change
+        float angleOffset = (Math.random() > 0.5f ? 1 : -1) * 5f; // ±5 degrees
+        ship.setFacing(ship.getFacing() + angleOffset);
+
+        // Track it so we can return to normal later
+        evasionMap.put(ship, new EvasionTracker(offset, ship.getLocation(), angleOffset));
 
         engine.addFloatingText(ship.getLocation(), "Dimensional Prediction!", 16f, Color.YELLOW, ship, 0.5f, 1.0f);
     }
 
     //Evasion Tracker helper for Smooth Sway
     private static class EvasionTracker {
-        Vector2f direction;
-        float delay;
-        float timeElapsed;
-        boolean reversed;
+        Vector2f direction;         // Initial dodge direction
+        Vector2f startPosition;     // Where the dodge began
+        float angularOffset;        // Facing offset to return
+        float timeElapsed = 0f;
+        float delay = 0.3f;         // Time before reverse starts
+        float returnDuration = 0.3f; // Time to return to position
+        boolean returning = false;
 
-        public EvasionTracker(Vector2f direction, float delay) {
+        public EvasionTracker(Vector2f direction, Vector2f currentPos, float angularOffset) {
             this.direction = direction;
-            this.delay = delay;
-            this.timeElapsed = 0f;
-            this.reversed = false;
+            this.startPosition = new Vector2f(currentPos);
+            this.angularOffset = angularOffset;
         }
+    }
+    //Evasion Helper Method
+    private float currentAngleLerp(float from, float to, float progress) {
+        float shortest = ((((to - from) % 360) + 540) % 360) - 180;
+        return from + shortest * progress;
     }
     // Define a color palette inspired by Mazinger Z's energy effects
     Color[] energyColors = {

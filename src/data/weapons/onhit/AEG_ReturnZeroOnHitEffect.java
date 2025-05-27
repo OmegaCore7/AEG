@@ -310,7 +310,7 @@ public class AEG_ReturnZeroOnHitEffect implements OnHitEffectPlugin {
             // Core values
             float damage = 800f;
             float emp = 1200f;
-            float range = 2000f;
+            float range = 3000f;
             int maxChains = 5;
             float rangeReduction = 0.75f;
             float damageReduction = 0.85f;

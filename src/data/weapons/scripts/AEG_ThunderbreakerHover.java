@@ -8,7 +8,7 @@ import java.awt.Color;
 import com.fs.starfarer.api.util.IntervalUtil;
 
 public class AEG_ThunderbreakerHover implements EveryFrameWeaponEffectPlugin {
-
+    boolean isChargingUp = false; // add this to your weapon script as a field
     private float time = 0f;
     private static final float SWAY_AMPLITUDE = 10f; // Adjust as needed for left-right sway
     private static final float SWAY_FREQUENCY = 2f;  // Adjust as needed for left-right sway
@@ -25,6 +25,14 @@ public class AEG_ThunderbreakerHover implements EveryFrameWeaponEffectPlugin {
     @Override
     public void advance(float amount, CombatEngineAPI engine, WeaponAPI weapon) {
         if (weapon.getShip() == null) return;
+
+        if (!isChargingUp && weapon.getChargeLevel() > 0.1f) {
+            isChargingUp = true;
+            Global.getCombatEngine().addPlugin(new AEG_ReturnZeroChargeUpPlugin(weapon));
+        }
+        if (weapon.getChargeLevel() <= 0f) {
+            isChargingUp = false;
+        }
 
         if (originalLocation == null) {
             originalLocation = new Vector2f(weapon.getSlot().getLocation());
