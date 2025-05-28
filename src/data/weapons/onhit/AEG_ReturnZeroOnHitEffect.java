@@ -66,6 +66,7 @@ public class AEG_ReturnZeroOnHitEffect implements OnHitEffectPlugin {
                 initialized = true;
             }
             if (elapsed < 12f) {
+                applyRadiantBurn(engine);
                 fireGodThunderboltBreaker(engine);
             }
             if (elapsed >= 12f) {
@@ -298,7 +299,7 @@ public class AEG_ReturnZeroOnHitEffect implements OnHitEffectPlugin {
             boltTimer = 0f;
 
             ShipAPI player = engine.getPlayerShip();
-            List<ShipAPI> enemies = new ArrayList<ShipAPI>();
+            List<ShipAPI> enemies = new ArrayList<>();
             for (ShipAPI ship : engine.getShips()) {
                 if (ship != null && ship.isAlive() && ship.getOwner() != player.getOwner()) {
                     enemies.add(ship);
@@ -307,35 +308,23 @@ public class AEG_ReturnZeroOnHitEffect implements OnHitEffectPlugin {
 
             if (enemies.isEmpty()) return;
 
-            // Sort by size to prioritize larger initial target
-            Collections.sort(enemies, new Comparator<ShipAPI>() {
-                @Override
-                public int compare(ShipAPI a, ShipAPI b) {
-                    return Float.compare(b.getCollisionRadius(), a.getCollisionRadius());
-                }
-            });
-
+            enemies.sort((a, b) -> Float.compare(b.getCollisionRadius(), a.getCollisionRadius()));
             ShipAPI initialTarget = enemies.get(0);
             if (initialTarget == null || !initialTarget.isAlive()) return;
 
-            // Configuration
-            float damage = 1000f;
-            float emp = 1200f;
-            float range = 3000f;
+            // CONFIGURATION
+            float baseDamage = 1000f;
+            float baseEmp = 1200f;
+            float baseRange = 3000f;
             int maxChains = 5;
             float rangeReduction = 0.65f;
             float damageReduction = 0.5f;
 
-            Color[] pulseColors = {
-                    new Color(255, 255, 180),
-                    new Color(255, 180, 60),
-                    new Color(255, 100, 0),
-                    new Color(255, 75, 0),
-                    new Color(255, 0, 0)
-            };
+            Color startColor = new Color(255, 255, 180); // Bright yellow-white
+            Color endColor = new Color(255, 0, 0);       // Deep red
 
-            // Step 1: Build bounce target chain
-            List<ShipAPI> bounceTargets = new ArrayList<ShipAPI>();
+            // BOUNCE LOGIC
+            List<ShipAPI> bounceTargets = new ArrayList<>();
             bounceTargets.add(initialTarget);
 
             for (int i = 1; i < maxChains; i++) {
@@ -344,100 +333,266 @@ public class AEG_ReturnZeroOnHitEffect implements OnHitEffectPlugin {
                 float closest = Float.MAX_VALUE;
 
                 for (ShipAPI potential : enemies) {
-                    if (!potential.isAlive()) continue;
-                    if (potential.getPhaseCloak() != null && potential.getPhaseCloak().isActive()) continue;
-                    if (bounceTargets.contains(potential)) continue;
+                    if (!potential.isAlive() || potential.getPhaseCloak() != null && potential.getPhaseCloak().isActive() || bounceTargets.contains(potential))
+                        continue;
 
                     float dist = MathUtils.getDistance(lastTarget, potential);
-                    if (dist <= range && dist < closest) {
+                    if (dist <= baseRange && dist < closest) {
                         next = potential;
                         closest = dist;
                     }
                 }
 
                 if (next == null) {
-                    // Reuse a prior valid target to reach full bounce count
                     next = bounceTargets.get(i % bounceTargets.size());
                 }
 
                 bounceTargets.add(next);
             }
 
-            // Step 2: Accumulate damage per target
-            Map<ShipAPI, Float> damageMap = new HashMap<ShipAPI, Float>();
-            Map<ShipAPI, Float> empMap = new HashMap<ShipAPI, Float>();
-            Vector2f sourcePoint = location;
-            ShipAPI source = null;
+            // ACCUMULATE DAMAGE
+            Map<ShipAPI, Float> damageMap = new HashMap<>();
+            Map<ShipAPI, Float> empMap = new HashMap<>();
 
+            Vector2f sourcePoint = location;
             for (int i = 0; i < bounceTargets.size(); i++) {
                 ShipAPI target = bounceTargets.get(i);
                 if (target == null || !target.isAlive()) continue;
 
-                float thisDamage = damage * (float) Math.pow(damageReduction, i);
-                float thisEmp = emp * (float) Math.pow(damageReduction, i);
-                float thisRange = range * (float) Math.pow(rangeReduction, i);
+                float t = i / (float) (maxChains - 1); // Ratio for interpolation
+                Color core = interpolateColor(startColor, endColor, t);
+                Color fringe = interpolateColor(startColor, endColor, t);
 
-                Float existingDamage = damageMap.get(target);
-                if (existingDamage == null) existingDamage = 0f;
-                damageMap.put(target, existingDamage + thisDamage);
+                float thisDamage = baseDamage * (float) Math.pow(damageReduction, i);
+                float thisEmp = baseEmp * (float) Math.pow(damageReduction, i);
+                float arcSize = 60f * (1f - t * 0.7f);  // Tighten width with bounce
+                float explosionSize = 100f * (1f - t * 0.6f); // Smaller flash size
 
-                Float existingEmp = empMap.get(target);
-                if (existingEmp == null) existingEmp = 0f;
-                empMap.put(target, existingEmp + thisEmp);
+                // Add to maps
+                damageMap.merge(target, thisDamage, Float::sum);
+                empMap.merge(target, thisEmp, Float::sum);
 
-                Color core = pulseColors[Math.min(i, pulseColors.length - 1)];
-                Color fringe = new Color(core.getRed(), Math.max(0, core.getGreen() - 40), Math.max(0, core.getBlue() - 40));
-
+                // SPAWN ARC (VISUAL ONLY — no shield hit)
                 for (int j = 0; j < 20; j++) {
                     Vector2f randomizedSource = MathUtils.getRandomPointInCircle(sourcePoint, 30f);
-                    engine.spawnEmpArc(
-                            source,
+                    engine.spawnEmpArcPierceShields(
+                            null,
                             randomizedSource,
                             target,
                             target,
                             DamageType.ENERGY,
-                            0f, // visuals only
-                            0f,
-                            100000f, // Calculated through other means)
-                            "tachyon_lance_emp_impact",
+                            0f, 0f,
+                            100000f,
+                            "tachyon_lance_emp_impact",  // Or a custom sound
                             40f + MathUtils.getRandom().nextInt(60),
                             fringe,
                             core
                     );
                 }
+                addCrackleEffects(engine, target.getLocation(), target, core, fringe);
 
                 Vector2f mid = MathUtils.getMidpoint(sourcePoint, target.getLocation());
-                engine.spawnExplosion(mid, new Vector2f(), fringe, 100f, 0.3f);
-                engine.addNebulaParticle(mid, new Vector2f(), 80f, 1.5f, 0.2f, 0.4f, 0.8f, core);
+                engine.spawnExplosion(mid, new Vector2f(), fringe, explosionSize, 0.3f);
+                engine.addNebulaParticle(mid, new Vector2f(), explosionSize * 0.8f, 1.5f, 0.2f, 0.4f, 0.8f, core);
 
                 Global.getSoundPlayer().playSound("realitydisruptor_emp_impact", 1f, 1.1f, target.getLocation(), new Vector2f());
-
-                source = target;
-                sourcePoint = target.getLocation();
+                sourcePoint = target.getLocation(); // Move source point to this target
             }
 
-            // Step 3: Apply total accumulated damage
+            // APPLY TOTAL DAMAGE
             for (Map.Entry<ShipAPI, Float> entry : damageMap.entrySet()) {
                 ShipAPI target = entry.getKey();
-                float totalDamage = entry.getValue();
-                Float totalEmp = empMap.get(target);
-                if (totalEmp == null) totalEmp = 0f;
+                float dmg = entry.getValue();
+                float emp = empMap.getOrDefault(target, 0f);
 
                 engine.applyDamage(
                         target,
                         target.getLocation(),
-                        totalDamage,
+                        dmg,
                         DamageType.ENERGY,
-                        totalEmp,
-                        false,
-                        false,
+                        emp,
+                        true,
+                        true,
                         player
                 );
             }
 
-            engine.spawnExplosion(sourcePoint, new Vector2f(), new Color(255, 240 - MathUtils.getRandom().nextInt(90), 100), 300f - MathUtils.getRandom().nextInt(100), 0.5f + MathUtils.getRandom().nextInt() * 1f);
+            engine.spawnExplosion(sourcePoint, new Vector2f(), new Color(255, 180, 100), 300f, 0.6f);
             Global.getSoundPlayer().playSound("terrain_hyperspace_lightning", 1f, 1.2f, sourcePoint, new Vector2f());
         }
 
+        // Helper to interpolate colors smoothly
+        private Color interpolateColor(Color start, Color end, float t) {
+            int r = (int) (start.getRed() + (end.getRed() - start.getRed()) * t);
+            int g = (int) (start.getGreen() + (end.getGreen() - start.getGreen()) * t);
+            int b = (int) (start.getBlue() + (end.getBlue() - start.getBlue()) * t);
+            return new Color(Math.min(255, r), Math.min(255, g), Math.min(255, b));
+        }
+        private void addCrackleEffects(CombatEngineAPI engine, Vector2f position, ShipAPI target, Color core, Color fringe) {
+            // Electric sparks
+            for (int i = 0; i < 4; i++) {
+                Vector2f dir = MathUtils.getRandomPointInCircle(null, 80f);
+                Vector2f sparkPos = Vector2f.add(new Vector2f(position), dir, null);
+                engine.addHitParticle(sparkPos, dir, (float) (20f + Math.random() * 30f), 1f, 0.2f, core);
+            }
+
+            // Mini EMP arcs around the target
+            for (int i = 0; i < 2; i++) {
+                Vector2f arcPoint = MathUtils.getRandomPointInCircle(position, 100f);
+                engine.spawnEmpArcPierceShields(
+                        null,
+                        position,
+                        target,
+                        target,
+                        DamageType.ENERGY,
+                        25f, 50f,
+                        10000f,
+                        "tachyon_lance_emp_impact",
+                        25f - MathUtils.getRandom().nextInt(15),
+                        fringe,
+                        core
+                );
+            }
+
+            // Nebula pulse
+            engine.addNebulaParticle(
+                    position,
+                    MathUtils.getRandomPointInCircle(null, 20f),
+                    40f + (float)Math.random() * 60f,
+                    1.5f,
+                    0f,
+                    0.1f,
+                    0.4f,
+                    fringe
+            );
+
+            // Jitter on target (brief and strong)
+            if (target != null) {
+                target.setJitter("lightning_crackle_id", core, 1f, 3, 0f, 10f);
+            }
+        }
+
+        private void applyRadiantBurn(CombatEngineAPI engine) {
+            for (ShipAPI ship : engine.getShips()) {
+                if (ship == null || !ship.isAlive() || ship.getOwner() == engine.getPlayerShip().getOwner()) continue;
+
+                float distance = MathUtils.getDistance(ship.getLocation(), location);
+                if (distance > BLACK_HOLE_RADIUS) continue;
+
+                float distanceFactor = 1f - (distance / BLACK_HOLE_RADIUS);
+                float intensity = (float) Math.pow(distanceFactor, 2f); // 0 to 1^2
+                    // Calculate armor percent remaining
+                ArmorGridAPI grid = ship.getArmorGrid();
+                float maxArmor = grid.getMaxArmorInCell() * grid.getGrid().length * grid.getGrid()[0].length;
+                float currentArmor = 0f;
+
+                for (int x = 0; x < grid.getGrid().length; x++) {
+                    for (int y = 0; y < grid.getGrid()[0].length; y++) {
+                        currentArmor += grid.getArmorValue(x, y);
+                    }
+                }
+
+                float armorPercent = currentArmor / maxArmor;
+
+                // Apply DOT only if armor is below 50%
+                if (armorPercent < 0.5f) {
+                    float armorFactor = 1f - armorPercent; // 0.5 to 1.0 range
+                    float scaledDamage = 50f * armorFactor * distanceFactor * engine.getElapsedInLastFrame();
+                    engine.applyDamage(ship, ship.getLocation(), scaledDamage, DamageType.ENERGY, 0f, false, false, null);
+                }
+                // Vector from ship to sun
+                Vector2f toSun = VectorUtils.getDirectionalVector(ship.getLocation(), location);
+
+                int gridWidth = grid.getGrid().length;
+                int gridHeight = grid.getGrid()[0].length;
+
+                Vector2f shipLoc = ship.getLocation();
+                Vector2f sunVec = Vector2f.sub(location, shipLoc, null);
+                sunVec.normalise();
+
+                for (int x = 0; x < gridWidth; x++) {
+                    for (int y = 0; y < gridHeight; y++) {
+                        float armor = grid.getArmorValue(x, y);
+                        if (armor <= 0f) continue;
+
+                        Vector2f cellWorldLoc = grid.getLocation(x, y);
+                        Vector2f toCell = Vector2f.sub(cellWorldLoc, location, null);
+                        float cellDistance = toCell.length();
+
+                        if (cellDistance > BLACK_HOLE_RADIUS) continue;
+
+                        // Angle between sun and armor cell
+                        Vector2f armorVec = VectorUtils.getDirectionalVector(cellWorldLoc, location);
+                        float angleToSun = VectorUtils.getAngle(new Vector2f(0f, 0f), armorVec);
+                        float facingToSun = Math.abs(MathUtils.getShortestRotation(ship.getFacing(), angleToSun));
+
+                        // Ignore armor on the front side (not exposed)
+                        if (facingToSun < 90f) continue;
+
+                        // Damage scales with distance and angle
+                        float cellFactor = intensity * (facingToSun / 180f);
+                        float damagePerSecond = 200f; // base rate per cell
+                        float damage = damagePerSecond * cellFactor * engine.getElapsedInLastFrame();
+
+                        grid.setArmorValue(x, y, Math.max(0f, armor - damage));
+
+                        // Burn mark particle on outer edge cells
+                        if (cellFactor > 0.1f && isEdgeCell(grid, x, y)) {
+                            // Only draw flame if the burn is noticeable
+                            engine.addNebulaParticle(
+                                    cellWorldLoc,
+                                    MathUtils.getRandomPointInCircle(null, 10f),
+                                    15f + 25f * cellFactor,
+                                    1.5f,
+                                    0f,
+                                    0.1f,
+                                    0.3f,
+                                    new Color(255, 100 + (int)(Math.random() * 100), 0, (int)(200 * cellFactor))
+                            );
+                        }
+                    }
+                }
+
+                // Jitter & visual FX
+                float jitterIntensity = 2f + 3f * distanceFactor; // up to 5 jitter intensity
+                ship.setJitter("sun_burn_effect", new Color(255, 140, 0, 75), distanceFactor, 5, 0f, jitterIntensity);
+                // Sound FX
+                Global.getSoundPlayer().playSound(
+                        "explosion_flak",  // or "flamer" or custom
+                        1f,
+                        0.8f + 0.4f * distanceFactor,
+                        ship.getLocation(),
+                        ship.getVelocity()
+                );
+                if (distanceFactor > 0.8f) {
+                    engine.addFloatingText(ship.getLocation(), "SYSTEM MELTDOWN!", 32f, Color.RED, ship, 0.5f, 1f);
+                } else if (distanceFactor > 0.5f) {
+                    engine.addFloatingText(ship.getLocation(), "Critical Overheat", 24f, Color.ORANGE, ship, 0.5f, 1f);
+                } else if (distanceFactor > 0.2f) {
+                    engine.addFloatingText(ship.getLocation(), "Hull Integrity Compromised", 20f, Color.YELLOW, ship, 0.5f, 1f);
+                }
+            }
+
+        }
+        private boolean isEdgeCell(ArmorGridAPI grid, int x, int y) {
+            int w = grid.getGrid().length;
+            int h = grid.getGrid()[0].length;
+
+            for (int dx = -1; dx <= 1; dx++) {
+                for (int dy = -1; dy <= 1; dy++) {
+                    if (dx == 0 && dy == 0) continue;
+
+                    int nx = x + dx;
+                    int ny = y + dy;
+
+                    if (nx < 0 || nx >= w || ny < 0 || ny >= h) return true;
+
+                    if (grid.getArmorValue(nx, ny) <= 0f) return true;
+                }
+            }
+
+            return false;
+        }
     }
+
 }
