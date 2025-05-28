@@ -320,8 +320,8 @@ public class AEG_ReturnZeroOnHitEffect implements OnHitEffectPlugin {
             float rangeReduction = 0.65f;
             float damageReduction = 0.5f;
 
-            Color startColor = new Color(255, 255, 180); // Bright yellow-white
-            Color endColor = new Color(255, 0, 0);       // Deep red
+            Color startColor = new Color(255, 255, 125); // Bright yellow-white
+            Color endColor = new Color(255, 30, 0);       // orangish red
 
             // BOUNCE LOGIC
             List<ShipAPI> bounceTargets = new ArrayList<>();
@@ -373,7 +373,7 @@ public class AEG_ReturnZeroOnHitEffect implements OnHitEffectPlugin {
                 empMap.merge(target, thisEmp, Float::sum);
 
                 // SPAWN ARC (VISUAL ONLY — no shield hit)
-                for (int j = 0; j < 20; j++) {
+                for (int j = 0; j < 10; j++) {
                     Vector2f randomizedSource = MathUtils.getRandomPointInCircle(sourcePoint, 30f);
                     engine.spawnEmpArcPierceShields(
                             null,
@@ -417,7 +417,7 @@ public class AEG_ReturnZeroOnHitEffect implements OnHitEffectPlugin {
                 );
             }
 
-            engine.spawnExplosion(sourcePoint, new Vector2f(), new Color(255, 180, 100), 300f, 0.6f);
+            engine.spawnExplosion(sourcePoint, new Vector2f(), new Color(255, 131, 0), 300f, 0.3f);
             Global.getSoundPlayer().playSound("terrain_hyperspace_lightning", 1f, 1.2f, sourcePoint, new Vector2f());
         }
 
@@ -433,7 +433,7 @@ public class AEG_ReturnZeroOnHitEffect implements OnHitEffectPlugin {
             for (int i = 0; i < 4; i++) {
                 Vector2f dir = MathUtils.getRandomPointInCircle(null, 80f);
                 Vector2f sparkPos = Vector2f.add(new Vector2f(position), dir, null);
-                engine.addHitParticle(sparkPos, dir, (float) (20f + Math.random() * 30f), 1f, 0.2f, core);
+                engine.addHitParticle(sparkPos, dir, (float) (20f + Math.random() * 30f), 1f + MathUtils.getRandom().nextInt(2), 0.2f + MathUtils.getRandom().nextInt(1), core);
             }
 
             // Mini EMP arcs around the target
@@ -554,8 +554,8 @@ public class AEG_ReturnZeroOnHitEffect implements OnHitEffectPlugin {
                 }
 
                 // Jitter & visual FX
-                float jitterIntensity = 2f + 3f * distanceFactor; // up to 5 jitter intensity
-                ship.setJitter("sun_burn_effect", new Color(255, 140, 0, 75), distanceFactor, 5, 0f, jitterIntensity);
+                float jitterIntensity = 1f + 4f * distanceFactor; // up to 5 jitter intensity
+                ship.setJitter("sun_burn_effect", new Color(255, 140, 0, 75), distanceFactor, 5, jitterIntensity, jitterIntensity);
                 // Sound FX
                 Global.getSoundPlayer().playSound(
                         "explosion_flak",  // or "flamer" or custom
