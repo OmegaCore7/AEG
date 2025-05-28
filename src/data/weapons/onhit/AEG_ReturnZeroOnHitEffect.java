@@ -406,10 +406,6 @@ public class AEG_ReturnZeroOnHitEffect implements OnHitEffectPlugin {
                     );
                 }
 
-                engine.spawnExplosion(target.getLocation(), new Vector2f(), core, 300f, 1f);
-                engine.addHitParticle(target.getLocation(), new Vector2f(), 250f, 1.5f, 0.3f, core);
-                engine.addNebulaParticle(target.getLocation(), new Vector2f(), 200f, 1.5f, 0.1f, 0.3f, 0.6f, fringe);
-
                 Vector2f mid = MathUtils.getMidpoint(sourcePoint, target.getLocation());
                 engine.spawnExplosion(mid, new Vector2f(), fringe, 100f, 0.3f);
                 engine.addNebulaParticle(mid, new Vector2f(), 80f, 1.5f, 0.2f, 0.4f, 0.8f, core);

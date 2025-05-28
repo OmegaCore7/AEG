@@ -8,12 +8,15 @@ import org.dark.shaders.distortion.DistortionShader;
 import org.dark.shaders.distortion.WaveDistortion;
 import org.lazywizard.lazylib.MathUtils;
 import org.lwjgl.util.vector.Vector2f;
-
+import java.util.Map;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
 public class AEG_7BlackBoxes extends BaseHullMod {
+    private final java.util.Map<ShipAPI, Float> evasionEffectCooldown = new java.util.WeakHashMap<>();
+    private static final float PREDICTION_EFFECT_COOLDOWN = 5f; // Adjust as needed
+
     private final java.util.Map<ShipAPI, EvasionTracker> evasionMap = new java.util.WeakHashMap<>();
     private final IntervalUtil lastStandCooldownTimer = new IntervalUtil(60f, 60f); // 1-minute cooldown
     private static final float REGENERATION_RATE = 0.01f;
@@ -33,10 +36,14 @@ public class AEG_7BlackBoxes extends BaseHullMod {
     private boolean justEvadedDamage = false;
     @Override
     public void advanceInCombat(final ShipAPI ship, float amount) {
+
+        updateCooldown(evasionEffectCooldown, ship, amount);
+
         if (ship == null || !ship.isAlive() || ship.isHulk() || ship.isPiece()) {
             unapplyStrengthening(ship.getMutableStats());
             unapplyAssimilation(ship.getMutableStats());
             unapplyAdaptiveDefense(ship.getMutableStats());
+            // Cooldown timer update for evasion effect
             return;
         }
 
@@ -62,7 +69,16 @@ public class AEG_7BlackBoxes extends BaseHullMod {
                 public String modifyDamageTaken(Object param, CombatEntityAPI target, DamageAPI damage, Vector2f point, boolean shieldHit) {
                     if (target instanceof ShipAPI && target == ship && Math.random() < PREDICTION_EVASION_CHANCE) {
                         damage.getModifier().modifyMult("AEG_7BlackBoxes", 0f); // Negate the damage
-                        triggerEvasionEffect(ship); // Visual + sway
+
+                        // Always trigger jitter
+                        triggerJitterOnly(ship);
+
+                        // Only trigger sway+teleport if cooldown expired
+                        if (!evasionEffectCooldown.containsKey(ship)) {
+                            triggerSwayEffect(ship);
+                            evasionEffectCooldown.put(ship, PREDICTION_EFFECT_COOLDOWN);
+                        }
+
                         return "AEG_7BlackBoxes";
                     }
                     return null;
@@ -112,7 +128,7 @@ public class AEG_7BlackBoxes extends BaseHullMod {
         lastStandCooldownTimer.advance(amount); // Advance the cooldown timer
 
         // Trigger Last Stand Protocol if health is below 10% and cooldown has passed, or trigger it immediately the first time
-        if ((ship.getHullLevel() <= 0.10f || ship.getHitpoints() <= ship.getMaxHitpoints() * 0.05f)
+        if ((ship.getHullLevel() <= 0.10f || ship.getHitpoints() <= ship.getMaxHitpoints() * 0.10f)
                 && (!lastStandTriggered || lastStandCooldownTimer.intervalElapsed())) {
             // Trigger Last Stand Protocol immediately if conditions are met
             Global.getLogger(this.getClass()).info("Last Stand Protocol triggered");
@@ -122,6 +138,10 @@ public class AEG_7BlackBoxes extends BaseHullMod {
 
             // Begin AOE effect
             triggerLastStandAOE(ship);
+
+            // ✅ Activate damage reduction
+            damageReductionActive = true;
+            damageReductionTimer.forceIntervalElapsed(); // Reset and start the timer
 
             // Reset the cooldown timer to prevent immediate reactivation
             lastStandCooldownTimer.advance(0); // Reset timer
@@ -325,10 +345,7 @@ public class AEG_7BlackBoxes extends BaseHullMod {
     }
 
     //Dimensional Prediction Evasion Helper
-    private void triggerEvasionEffect(final ShipAPI ship) {
-        CombatEngineAPI engine = Global.getCombatEngine();
-
-        // Visual jitter
+    private void triggerJitterOnly(ShipAPI ship) {
         ship.setJitter(
                 ship,
                 new Color(255, 200 - MathUtils.getRandom().nextInt(100), 0),
@@ -337,23 +354,19 @@ public class AEG_7BlackBoxes extends BaseHullMod {
                 0f,
                 100f
         );
-
-        // Calculate sway direction (perpendicular to facing)
+        Global.getCombatEngine().addFloatingText(ship.getLocation(), "Dimensional Prediction!", 16f, Color.YELLOW, ship, 0.5f, 1.0f);
+    }
+    private void triggerSwayEffect(final ShipAPI ship) {
         float swayAngle = ship.getFacing() + (Math.random() > 0.5 ? 90f : -90f);
         Vector2f offset = MathUtils.getPointOnCircumference(null, 40f, swayAngle);
-
-        // Teleport slightly instead of adding velocity
         Vector2f newPos = Vector2f.add(ship.getLocation(), offset, new Vector2f());
+
         ship.getLocation().set(newPos.x, newPos.y);
 
-        // Optional slight facing change
-        float angleOffset = (Math.random() > 0.5f ? 1 : -1) * 5f; // ±5 degrees
+        float angleOffset = (Math.random() > 0.5f ? 1 : -1) * 5f;
         ship.setFacing(ship.getFacing() + angleOffset);
 
-        // Track it so we can return to normal later
         evasionMap.put(ship, new EvasionTracker(offset, ship.getLocation(), angleOffset));
-
-        engine.addFloatingText(ship.getLocation(), "Dimensional Prediction!", 16f, Color.YELLOW, ship, 0.5f, 1.0f);
     }
 
     //Evasion Tracker helper for Smooth Sway
@@ -377,6 +390,17 @@ public class AEG_7BlackBoxes extends BaseHullMod {
         float shortest = ((((to - from) % 360) + 540) % 360) - 180;
         return from + shortest * progress;
     }
+    //Evasion Cooldown for FLicker and sway
+    private void updateCooldown(Map<ShipAPI, Float> map, ShipAPI ship, float amount) {
+        if (map.containsKey(ship)) {
+            float newTime = map.get(ship) - amount;
+            if (newTime <= 0f) {
+                map.remove(ship);
+            } else {
+                map.put(ship, newTime);
+            }
+        }
+    }
     // Define a color palette inspired by Mazinger Z's energy effects
     Color[] energyColors = {
             new Color(255, 50, 50), // Red
@@ -393,7 +417,7 @@ public class AEG_7BlackBoxes extends BaseHullMod {
     }
     // Function to generate a gradient color effect
     public Color getGradientColor(float progress) {
-        int index = (int) (progress * (energyColors.length - 1));
+        int index = Math.max(0, Math.min(energyColors.length - 1, (int)(progress * (energyColors.length - 1))));
         return energyColors[index];
     }
 
