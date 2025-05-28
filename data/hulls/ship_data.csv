@@ -32,7 +32,7 @@ CCX Blaster Drone,AEG_rmdrone2,CCX Mech Seconadary Drone,Unknown,highenergyfocus
 ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 #Mazinger Zero,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-Anomaly 000: Zero,AEG_zero,Super Robot,Unknown,AEG_MajinChange,35,20000,1800,25000,31250,1250,370,4,170,99,99,99,99,3000,NONE,,,,,,,1,2,3000,0,0,60,10,50000000,25,20,9999,0.1,60,5,SHIP_WITH_MODULES,,,,,,,,,,,,,,
+Anomaly 000: Zero,AEG_zero,Super Robot,Unknown,AEG_MajinChange,35,20000,1800,25000,31250,1250,370,2,250,125,125,125,125,3000,NONE,,,,,,,1,2,3000,0,0,60,10,50000000,25,20,9999,0.1,60,5,SHIP_WITH_MODULES,,,,,,,,,,,,,,
 #Gurren Lagann,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 Spiral Warrior,AEG_gurrenl,Experimental Strike Mecha,Astral Guardians,AEG_GDBreaker,15,8000,1250,10000,18000,900,145,,75,160,99,85,65,1200,PHASE,phasecloak,,,,0.05,0.05,1,100,120,150,3,50,8,250000,25,20,1000,0.01,35,10,,,,,,,,rare_bp,,0.5,2,3,,406,
 #LSSJ Broly,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,

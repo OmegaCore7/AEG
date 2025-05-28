@@ -556,20 +556,35 @@ public class AEG_ReturnZeroOnHitEffect implements OnHitEffectPlugin {
                 // Jitter & visual FX
                 float jitterIntensity = 1f + 4f * distanceFactor; // up to 5 jitter intensity
                 ship.setJitter("sun_burn_effect", new Color(255, 140, 0, 75), distanceFactor, 5, jitterIntensity, jitterIntensity);
-                // Sound FX
-                Global.getSoundPlayer().playSound(
-                        "explosion_flak",  // or "flamer" or custom
-                        1f,
-                        0.8f + 0.4f * distanceFactor,
-                        ship.getLocation(),
-                        ship.getVelocity()
-                );
+
+                // Sound FX and Text
                 if (distanceFactor > 0.8f) {
                     engine.addFloatingText(ship.getLocation(), "SYSTEM MELTDOWN!", 32f, Color.RED, ship, 0.5f, 1f);
+                    Global.getSoundPlayer().playSound(
+                            "cryoflamer_hit_heavy",  // or "flamer" or custom
+                            1f,
+                            0.6f + 0.4f * distanceFactor,
+                            ship.getLocation(),
+                            ship.getVelocity()
+                    );
                 } else if (distanceFactor > 0.5f) {
                     engine.addFloatingText(ship.getLocation(), "Critical Overheat", 24f, Color.ORANGE, ship, 0.5f, 1f);
+                    Global.getSoundPlayer().playSound(
+                            "cryoflamer_hit_solid",  // or "flamer" or custom
+                            1f,
+                            0.4f + 0.4f * distanceFactor,
+                            ship.getLocation(),
+                            ship.getVelocity()
+                    );
                 } else if (distanceFactor > 0.2f) {
                     engine.addFloatingText(ship.getLocation(), "Hull Integrity Compromised", 20f, Color.YELLOW, ship, 0.5f, 1f);
+                    Global.getSoundPlayer().playSound(
+                            "cryoflamer_hit_light",  // or "flamer" or custom
+                            1f,
+                            0.2f + 0.4f * distanceFactor,
+                            ship.getLocation(),
+                            ship.getVelocity()
+                    );
                 }
             }
 

@@ -300,7 +300,7 @@ public class AEG_ArmorPiercePlugin extends BaseEveryFrameCombatPlugin {
 
     private void scheduleDelayedExplosion(final CombatEngineAPI engine, final DamagingProjectileAPI proj, final CombatEntityAPI entity) {
         Global.getCombatEngine().addPlugin(new BaseEveryFrameCombatPlugin() {
-            private float timer = 2f;
+            private float timer = 1.5f;
 
             @Override
             public void advance(float amount, List events) {
@@ -308,17 +308,58 @@ public class AEG_ArmorPiercePlugin extends BaseEveryFrameCombatPlugin {
 
                 timer -= amount;
                 if (timer <= 0f) {
+                    Vector2f loc = new Vector2f(entity.getLocation());
+                    Vector2f vel = entity.getVelocity();
+
+                    // === Determine explosion scale based on entity size ===
+                    float baseRadius = proj.getCollisionRadius() * 3f;
+                    float sizeMod = getSizeMultiplier(entity); // fighter < frigate < cruiser < capital
+                    float explosionRadius = baseRadius * sizeMod;
+                    float explosionDuration = 0.8f + (sizeMod * 0.4f);
+
+                    // === Main explosion ===
                     engine.spawnExplosion(
-                            entity.getLocation(),
-                            entity.getVelocity(),
-                            Color.ORANGE,
-                            proj.getCollisionRadius() * 3f,
-                            1f
+                            loc,
+                            vel,
+                            new Color(255, 150, 40, 255),
+                            explosionRadius,
+                            explosionDuration
                     );
 
+                    // === Layered explosion particles ===
+                    for (int i = 0; i < 12; i++) {
+                        Vector2f particleVel = MathUtils.getPointOnCircumference(null,
+                                50f + (float)Math.random() * 100f * sizeMod,
+                                (float)Math.random() * 360f);
+                        engine.addSmoothParticle(
+                                loc,
+                                particleVel,
+                                12f + (float)Math.random() * 10f * sizeMod,
+                                1.5f,
+                                0.6f + (float)Math.random() * 0.6f,
+                                pickExplosionColor()
+                        );
+                    }
+
+                    // === Optional debris chunks ===
+                    for (int i = 0; i < 4 + rand.nextInt(3); i++) {
+                        Vector2f chunkVel = MathUtils.getPointOnCircumference(null,
+                                80f + rand.nextFloat() * 100f * sizeMod,
+                                rand.nextFloat() * 360f);
+                        engine.addSmoothParticle(
+                                loc,
+                                chunkVel,
+                                6f + rand.nextFloat() * 8f,
+                                1.0f,
+                                1.1f,
+                                new Color(140 + rand.nextInt(80), 100 + rand.nextInt(60), 60 + rand.nextInt(40), 200)
+                        );
+                    }
+
+                    // === Damage Application ===
                     engine.applyDamage(
                             entity,
-                            entity.getLocation(),
+                            loc,
                             proj.getDamageAmount(),
                             proj.getDamageType(),
                             proj.getEmpAmount(),
@@ -330,8 +371,29 @@ public class AEG_ArmorPiercePlugin extends BaseEveryFrameCombatPlugin {
                     engine.removePlugin(this);
                 }
             }
-        });
 
+            private float getSizeMultiplier(CombatEntityAPI entity) {
+                if (entity instanceof ShipAPI) {
+                    ShipAPI ship = (ShipAPI) entity;
+                    switch (ship.getHullSize()) {
+                        case FIGHTER: return 0.2f;
+                        case FRIGATE: return 0.4f;
+                        case DESTROYER: return 0.6f;
+                        case CRUISER: return 0.8f;
+                        case CAPITAL_SHIP: return 1f;
+                    }
+                }
+                return 1.0f;
+            }
+
+            private Color pickExplosionColor() {
+                int r = 220 + rand.nextInt(35);  // Slight variation in red/orange
+                int g = 80 + rand.nextInt(60);
+                int b = 30 + rand.nextInt(30);
+                int a = 200 + rand.nextInt(55);
+                return new Color(r, g, b, a);
+            }
+        });
     }
 
     private void applyBrokenMagnumEffect(final CombatEngineAPI engine, final DamagingProjectileAPI proj, final CombatEntityAPI entity, float amount) {

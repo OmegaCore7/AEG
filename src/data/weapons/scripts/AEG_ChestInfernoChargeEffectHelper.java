@@ -116,7 +116,9 @@ public class AEG_ChestInfernoChargeEffectHelper {
                         ARC_CORE_COLOR,
                         ARC_FRINGE_COLOR
                 );
-                Global.getSoundPlayer().playSound("terrain_hyperspace_lightning", 1f, 1f, weaponLoc, shipVel);
+                if (Math.random() < 0.1) {
+                    Global.getSoundPlayer().playSound("terrain_hyperspace_lightning", 1f, 1f, weaponLoc, shipVel);  // This block runs approximately 10% of the time
+                }
             }
 
             // === Nebula wisps ===
@@ -174,7 +176,6 @@ public class AEG_ChestInfernoChargeEffectHelper {
             if (chargeTime >= MAX_CHARGE_DURATION && !hasFired) {
                 hasFired = true;
                 chargeComplete = true;  // Set charge complete flag
-                Global.getSoundPlayer().playSound("system_emp_emitter_impact", 1f, 1f, weaponLoc, shipVel);
                 engine.spawnExplosion(weaponLoc, shipVel, FLASH_COLOR, EXPLOSION_RADIUS, EXPLOSION_DURATION);
                 engine.spawnEmpArcVisual(
                         weaponLoc,

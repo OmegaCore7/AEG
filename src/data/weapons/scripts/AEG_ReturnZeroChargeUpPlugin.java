@@ -11,12 +11,16 @@ import java.awt.*;
 import java.util.List;
 
 public class AEG_ReturnZeroChargeUpPlugin implements EveryFrameCombatPlugin {
+    private ShipAPI ship;
+    private boolean wasVenting = false;
+    private boolean wasOverloaded = false;
     private final WeaponAPI weapon;
     private float elapsed = 0f;
     private boolean[] stagesTriggered = new boolean[4];
     private final IntervalUtil arcInterval = new IntervalUtil(0.1f, 0.2f); // add this at the top
     public AEG_ReturnZeroChargeUpPlugin(WeaponAPI weapon) {
         this.weapon = weapon;
+        this.ship = weapon.getShip();
     }
 
     @Override public void init(CombatEngineAPI engine) {}
@@ -26,6 +30,7 @@ public class AEG_ReturnZeroChargeUpPlugin implements EveryFrameCombatPlugin {
 
     @Override
     public void advance(float amount, List<InputEventAPI> events) {
+
         CombatEngineAPI engine = Global.getCombatEngine();
         if (engine.isPaused()) return;
 
@@ -33,6 +38,20 @@ public class AEG_ReturnZeroChargeUpPlugin implements EveryFrameCombatPlugin {
             engine.removePlugin(this);
             return;
         }
+// Check for new vent/overload state
+        boolean venting = ship.getFluxTracker().isVenting();
+        boolean overloaded = ship.getFluxTracker().isOverloaded();
+        boolean justStartedVenting = venting && !wasVenting;
+        boolean justStartedOverloaded = overloaded && !wasOverloaded;
+
+        wasVenting = venting;
+        wasOverloaded = overloaded;
+
+        if (justStartedVenting || justStartedOverloaded) {
+            abortCharge(engine);
+            return;
+        }
+
 
         Vector2f center = weapon.getLocation(); // dynamically updated every frame
         ShipAPI owner = weapon.getShip();
@@ -140,6 +159,22 @@ public class AEG_ReturnZeroChargeUpPlugin implements EveryFrameCombatPlugin {
         }
     }
 
+    //Charge interrupted or aborted helper
+    private void abortCharge(CombatEngineAPI engine) {
+        Vector2f center = weapon.getLocation();
+        Global.getSoundPlayer().playSound("system_burn_drive_deactivate", 1f, 1.2f, center, new Vector2f());
+        engine.addFloatingText(center, "CHARGE-UP ABORTED!", 32f, Color.RED, weapon.getShip(), 0.5f, 1f);
+        engine.addHitParticle(center, new Vector2f(), 100f, 1f, 0.75f, new Color(255, 50, 50, 200));
+
+        for (int i = 0; i < 4; i++) {
+            Vector2f target = MathUtils.getRandomPointInCircle(center, 200f);
+            engine.spawnEmpArcVisual(center, null, target, null, 25f,
+                    new Color(255, 100, 0, 200),
+                    new Color(255, 180, 60, 180));
+        }
+
+        engine.removePlugin(this);
+    }
     private void spawnRotatingNebula(CombatEngineAPI engine, Vector2f center, float time, float radius, float chance, Color baseColor) {
         if (Math.random() > chance) return;
 
