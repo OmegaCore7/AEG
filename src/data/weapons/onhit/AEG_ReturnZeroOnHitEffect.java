@@ -37,10 +37,21 @@ public class AEG_ReturnZeroOnHitEffect implements OnHitEffectPlugin {
             this.location = new Vector2f(loc);
         }
 
-        @Override public void init(CombatEngineAPI engine) {}
-        @Override public void renderInWorldCoords(ViewportAPI viewport) {}
-        @Override public void renderInUICoords(ViewportAPI viewport) {}
-        @Override public void processInputPreCoreControls(float amount, List<InputEventAPI> events) {}
+        @Override
+        public void init(CombatEngineAPI engine) {
+        }
+
+        @Override
+        public void renderInWorldCoords(ViewportAPI viewport) {
+        }
+
+        @Override
+        public void renderInUICoords(ViewportAPI viewport) {
+        }
+
+        @Override
+        public void processInputPreCoreControls(float amount, List<InputEventAPI> events) {
+        }
 
 
         @Override
@@ -65,10 +76,10 @@ public class AEG_ReturnZeroOnHitEffect implements OnHitEffectPlugin {
             spawnNucleusGlow(engine);
 
             // Rotating elliptical rings
-            createEllipticalGradientRing(engine, location, 200f, 251, elapsed, (float)(Math.PI/5), 0f, 1.0f, false);
-            createEllipticalGradientRing(engine, location, 180f, 251, elapsed, (float)(Math.PI/6), (float)Math.PI/4f, 0.8f, false);
-            createEllipticalGradientRing(engine, location, 160f, 251, elapsed, (float)(Math.PI/7), (float)Math.PI/2f, 0.6f, true);
-            createEllipticalGradientRing(engine, location, 220f, 251, elapsed, (float)(Math.PI/8), (float)(3 * Math.PI / 4f), 0.5f, true);
+            createEllipticalGradientRing(engine, location, 200f, 251, elapsed, (float) (Math.PI / 5), 0f, 1.0f, false);
+            createEllipticalGradientRing(engine, location, 180f, 251, elapsed, (float) (Math.PI / 6), (float) Math.PI / 4f, 0.8f, false);
+            createEllipticalGradientRing(engine, location, 160f, 251, elapsed, (float) (Math.PI / 7), (float) Math.PI / 2f, 0.6f, true);
+            createEllipticalGradientRing(engine, location, 220f, 251, elapsed, (float) (Math.PI / 8), (float) (3 * Math.PI / 4f), 0.5f, true);
 
             // 🔄 Update orbiting orbs
             for (OrbitalParticle orb : orbitals) {
@@ -101,9 +112,9 @@ public class AEG_ReturnZeroOnHitEffect implements OnHitEffectPlugin {
 
         private void spawnNucleusGlow(CombatEngineAPI engine) {
             // Core white center
-            engine.addNebulaParticle(location, new Vector2f(), 50f, 2f, 0f, 0.3f, 1f, new Color(255 - MathUtils.getRandom().nextInt(50), 150 - MathUtils.getRandom().nextInt(50),50 - MathUtils.getRandom().nextInt(50), 255 - MathUtils.getRandom().nextInt(50)));
+            engine.addNebulaParticle(location, new Vector2f(), 50f, 2f, 0f, 0.3f, 1f, new Color(255 - MathUtils.getRandom().nextInt(50), 150 - MathUtils.getRandom().nextInt(50), 50 - MathUtils.getRandom().nextInt(50), 255 - MathUtils.getRandom().nextInt(50)));
             // Orange glow halo
-            engine.addNebulaParticle(location, new Vector2f(), 75f, 2f, 0f, 0.3f, 1f, new Color(150 - MathUtils.getRandom().nextInt(50), 100 - MathUtils.getRandom().nextInt(50),0, 255 - MathUtils.getRandom().nextInt(50)));
+            engine.addNebulaParticle(location, new Vector2f(), 75f, 2f, 0f, 0.3f, 1f, new Color(150 - MathUtils.getRandom().nextInt(50), 100 - MathUtils.getRandom().nextInt(50), 0, 255 - MathUtils.getRandom().nextInt(50)));
             // Blue glow halo
             engine.addNebulaParticle(location, new Vector2f(), 100f, 2f, 0f, 0.3f, 1f, new Color(100 - MathUtils.getRandom().nextInt(50), 50 - MathUtils.getRandom().nextInt(50), 0, 200 - MathUtils.getRandom().nextInt(50)));
         }
@@ -121,21 +132,21 @@ public class AEG_ReturnZeroOnHitEffect implements OnHitEffectPlugin {
             }
 
             void advance(float elapsedTime, CombatEngineAPI engine, Vector2f center) {
-                float radius = 180f + 20f * (float)Math.sin(elapsedTime * 1.5f * speedMultiplier + baseAngle);
+                float radius = 180f + 20f * (float) Math.sin(elapsedTime * 1.5f * speedMultiplier + baseAngle);
                 float speed = 1f;
                 float angle = baseAngle + elapsedTime * speed;
-                float pulse = 0.5f + 0.5f * (float)Math.sin(elapsedTime * 3f + baseAngle);
+                float pulse = 0.5f + 0.5f * (float) Math.sin(elapsedTime * 3f + baseAngle);
 
-                float x = center.x + radius * (float)Math.cos(angle);
-                float y = center.y + radius * (float)Math.sin(angle);
+                float x = center.x + radius * (float) Math.cos(angle);
+                float y = center.y + radius * (float) Math.sin(angle);
 
                 float size = 40f + 50f * pulse;
                 float brightness = 0.8f + 0.7f * pulse;
 
                 Color pulseColor = new Color(
-                        Math.min(255, (int)(baseColor.getRed() * brightness)),
-                        Math.min(255, (int)(baseColor.getGreen() * brightness)),
-                        Math.min(255, (int)(baseColor.getBlue() * brightness)),
+                        Math.min(255, (int) (baseColor.getRed() * brightness)),
+                        Math.min(255, (int) (baseColor.getGreen() * brightness)),
+                        Math.min(255, (int) (baseColor.getBlue() * brightness)),
                         255
                 );
 
@@ -152,11 +163,12 @@ public class AEG_ReturnZeroOnHitEffect implements OnHitEffectPlugin {
                             0f,
                             0.1f,
                             0.4f,
-                            new Color(255 - MathUtils.getRandom().nextInt(75), 100 - MathUtils.getRandom().nextInt(75), 80 - MathUtils.getRandom().nextInt(75),150 - MathUtils.getRandom().nextInt(75))
+                            new Color(255 - MathUtils.getRandom().nextInt(75), 100 - MathUtils.getRandom().nextInt(75), 80 - MathUtils.getRandom().nextInt(75), 150 - MathUtils.getRandom().nextInt(75))
                     );
                 }
             }
         }
+
         private void applyBlackHolePull(CombatEngineAPI engine) {
             for (CombatEntityAPI entity : engine.getShips()) {
                 if (entity instanceof ShipAPI && entity != engine.getPlayerShip()) {
@@ -238,6 +250,7 @@ public class AEG_ReturnZeroOnHitEffect implements OnHitEffectPlugin {
                 }
             }
         }
+
         private void createEllipticalGradientRing(CombatEngineAPI engine, Vector2f center, float baseRadius, int count,
                                                   float elapsedTime, float rotationSpeed, float angleOffset, float brightness,
                                                   boolean verticalEllipse) {
@@ -266,8 +279,8 @@ public class AEG_ReturnZeroOnHitEffect implements OnHitEffectPlugin {
                 Vector2f pos = new Vector2f(center.x + rotX, center.y + rotY);
                 Color color = getOrangeGradientColor(i, count);
                 color = new Color(
-                        Math.min(255, (int)(color.getRed() * brightness)),
-                        Math.min(255, (int)(color.getGreen() * brightness)),
+                        Math.min(255, (int) (color.getRed() * brightness)),
+                        Math.min(255, (int) (color.getGreen() * brightness)),
                         color.getBlue()
                 );
 
@@ -285,7 +298,7 @@ public class AEG_ReturnZeroOnHitEffect implements OnHitEffectPlugin {
             boltTimer = 0f;
 
             ShipAPI player = engine.getPlayerShip();
-            List<ShipAPI> enemies = new ArrayList<>();
+            List<ShipAPI> enemies = new ArrayList<ShipAPI>();
             for (ShipAPI ship : engine.getShips()) {
                 if (ship != null && ship.isAlive() && ship.getOwner() != player.getOwner()) {
                     enemies.add(ship);
@@ -294,29 +307,24 @@ public class AEG_ReturnZeroOnHitEffect implements OnHitEffectPlugin {
 
             if (enemies.isEmpty()) return;
 
-            // Sort enemies by size for initial target selection
+            // Sort by size to prioritize larger initial target
             Collections.sort(enemies, new Comparator<ShipAPI>() {
                 @Override
                 public int compare(ShipAPI a, ShipAPI b) {
                     return Float.compare(b.getCollisionRadius(), a.getCollisionRadius());
                 }
             });
-            ShipAPI currentTarget = enemies.get(0);
-            if (currentTarget == null || !currentTarget.isAlive()) return;
 
-            Vector2f sourcePoint = location;
-            ShipAPI source = null;
+            ShipAPI initialTarget = enemies.get(0);
+            if (initialTarget == null || !initialTarget.isAlive()) return;
 
-            // Core values
-            float damage = 800f;
+            // Configuration
+            float damage = 1000f;
             float emp = 1200f;
             float range = 3000f;
             int maxChains = 5;
-            float rangeReduction = 0.75f;
-            float damageReduction = 0.85f;
-
-            Set<ShipAPI> struck = new HashSet<ShipAPI>();;
-            int bounce = 0;
+            float rangeReduction = 0.65f;
+            float damageReduction = 0.5f;
 
             Color[] pulseColors = {
                     new Color(255, 255, 180),
@@ -326,103 +334,114 @@ public class AEG_ReturnZeroOnHitEffect implements OnHitEffectPlugin {
                     new Color(255, 0, 0)
             };
 
-            while (currentTarget != null && bounce < maxChains) {
-                struck.add(currentTarget);
+            // Step 1: Build bounce target chain
+            List<ShipAPI> bounceTargets = new ArrayList<ShipAPI>();
+            bounceTargets.add(initialTarget);
 
-                // EMP arc visual
-                Color core = pulseColors[Math.min(bounce, pulseColors.length - 1)];
-                Color fringe = new Color(core.getRed(), Math.max(0, core.getGreen() - 40), Math.max(0, core.getBlue() - 40));
-
-                if (bounce == 0) {
-                    // Big initial trunk - simulate a thick bolt
-                    for (int i = 0; i < 10; i++) {
-                        Vector2f randomizedSource = MathUtils.getRandomPointInCircle(sourcePoint, 30f);
-                        engine.spawnEmpArc(
-                                source,
-                                randomizedSource,
-                                currentTarget,
-                                currentTarget,
-                                DamageType.ENERGY,
-                                damage, emp, 100000f,
-                                "tachyon_lance_emp_impact", // punchier sound
-                                40f,                        // thicker
-                                fringe,
-                                core
-                        );
-                    }
-
-                    // Big flash and explosion at the target point
-                    engine.spawnExplosion(currentTarget.getLocation(), new Vector2f(), core, 300f, 1f);
-                    engine.addHitParticle(currentTarget.getLocation(), new Vector2f(), 250f, 1.5f, 0.3f, core);
-                    engine.addNebulaParticle(currentTarget.getLocation(), new Vector2f(), 200f, 1.5f, 0.1f, 0.3f, 0.6f, fringe);
-                    Global.getSoundPlayer().playSound("tachyon_lance_emp_impact", 1.2f, 1.3f, currentTarget.getLocation(), new Vector2f());
-                } else {
-                    engine.spawnEmpArc(
-                            source,
-                            sourcePoint,
-                            currentTarget,
-                            currentTarget,
-                            DamageType.ENERGY,
-                            damage, emp, 100000f,
-                            "terrain_hyperspace_lightning",
-                            20f + 5f * bounce,
-                            fringe,
-                            core
-                    );
-                }
-
-                // Particle blast at target
-                engine.addHitParticle(
-                        currentTarget.getLocation(),
-                        new Vector2f(),
-                        150f + bounce * 20f,
-                        1.2f,
-                        0.2f,
-                        core
-                );
-
-                // Small burst at midpoint for flavor
-                Vector2f mid = MathUtils.getMidpoint(sourcePoint, currentTarget.getLocation());
-                engine.spawnExplosion(mid, new Vector2f(), fringe, 100f, 0.3f);
-
-                // Add nebula trace to arc
-                engine.addNebulaParticle(mid, new Vector2f(), 80f, 1.5f, 0.2f, 0.4f, 0.8f, core);
-
-                // Update source point
-                source = currentTarget;
-                sourcePoint = currentTarget.getLocation();
-
-                // Decrease values for next bounce
-                damage *= damageReduction;
-                emp *= damageReduction;
-                range *= rangeReduction;
-
-                // Find next target
+            for (int i = 1; i < maxChains; i++) {
+                ShipAPI lastTarget = bounceTargets.get(bounceTargets.size() - 1);
                 ShipAPI next = null;
                 float closest = Float.MAX_VALUE;
 
                 for (ShipAPI potential : enemies) {
-                    if (!potential.isAlive() || struck.contains(potential)) continue;
+                    if (!potential.isAlive()) continue;
                     if (potential.getPhaseCloak() != null && potential.getPhaseCloak().isActive()) continue;
-                    if (potential.getShield() != null && potential.getShield().isOn() &&
-                            potential.getShield().isWithinArc(currentTarget.getLocation())) continue;
+                    if (bounceTargets.contains(potential)) continue;
 
-                    float dist = MathUtils.getDistance(currentTarget, potential);
+                    float dist = MathUtils.getDistance(lastTarget, potential);
                     if (dist <= range && dist < closest) {
                         next = potential;
                         closest = dist;
                     }
                 }
 
-                currentTarget = next;
-                bounce++;
+                if (next == null) {
+                    // Reuse a prior valid target to reach full bounce count
+                    next = bounceTargets.get(i % bounceTargets.size());
+                }
+
+                bounceTargets.add(next);
             }
 
-            // Final flash effect at last target
-            if (sourcePoint != null) {
-                engine.spawnExplosion(sourcePoint, new Vector2f(), new Color(255, 240, 100), 300f, 0.5f);
-                Global.getSoundPlayer().playSound("terrain_hyperspace_lightning", 1f, 1.2f, sourcePoint, new Vector2f());
+            // Step 2: Accumulate damage per target
+            Map<ShipAPI, Float> damageMap = new HashMap<ShipAPI, Float>();
+            Map<ShipAPI, Float> empMap = new HashMap<ShipAPI, Float>();
+            Vector2f sourcePoint = location;
+            ShipAPI source = null;
+
+            for (int i = 0; i < bounceTargets.size(); i++) {
+                ShipAPI target = bounceTargets.get(i);
+                if (target == null || !target.isAlive()) continue;
+
+                float thisDamage = damage * (float) Math.pow(damageReduction, i);
+                float thisEmp = emp * (float) Math.pow(damageReduction, i);
+                float thisRange = range * (float) Math.pow(rangeReduction, i);
+
+                Float existingDamage = damageMap.get(target);
+                if (existingDamage == null) existingDamage = 0f;
+                damageMap.put(target, existingDamage + thisDamage);
+
+                Float existingEmp = empMap.get(target);
+                if (existingEmp == null) existingEmp = 0f;
+                empMap.put(target, existingEmp + thisEmp);
+
+                Color core = pulseColors[Math.min(i, pulseColors.length - 1)];
+                Color fringe = new Color(core.getRed(), Math.max(0, core.getGreen() - 40), Math.max(0, core.getBlue() - 40));
+
+                for (int j = 0; j < 20; j++) {
+                    Vector2f randomizedSource = MathUtils.getRandomPointInCircle(sourcePoint, 30f);
+                    engine.spawnEmpArc(
+                            source,
+                            randomizedSource,
+                            target,
+                            target,
+                            DamageType.ENERGY,
+                            0f, // visuals only
+                            0f,
+                            100000f, // Calculated through other means)
+                            "tachyon_lance_emp_impact",
+                            40f + MathUtils.getRandom().nextInt(60),
+                            fringe,
+                            core
+                    );
+                }
+
+                engine.spawnExplosion(target.getLocation(), new Vector2f(), core, 300f, 1f);
+                engine.addHitParticle(target.getLocation(), new Vector2f(), 250f, 1.5f, 0.3f, core);
+                engine.addNebulaParticle(target.getLocation(), new Vector2f(), 200f, 1.5f, 0.1f, 0.3f, 0.6f, fringe);
+
+                Vector2f mid = MathUtils.getMidpoint(sourcePoint, target.getLocation());
+                engine.spawnExplosion(mid, new Vector2f(), fringe, 100f, 0.3f);
+                engine.addNebulaParticle(mid, new Vector2f(), 80f, 1.5f, 0.2f, 0.4f, 0.8f, core);
+
+                Global.getSoundPlayer().playSound("realitydisruptor_emp_impact", 1f, 1.1f, target.getLocation(), new Vector2f());
+
+                source = target;
+                sourcePoint = target.getLocation();
             }
+
+            // Step 3: Apply total accumulated damage
+            for (Map.Entry<ShipAPI, Float> entry : damageMap.entrySet()) {
+                ShipAPI target = entry.getKey();
+                float totalDamage = entry.getValue();
+                Float totalEmp = empMap.get(target);
+                if (totalEmp == null) totalEmp = 0f;
+
+                engine.applyDamage(
+                        target,
+                        target.getLocation(),
+                        totalDamage,
+                        DamageType.ENERGY,
+                        totalEmp,
+                        false,
+                        false,
+                        player
+                );
+            }
+
+            engine.spawnExplosion(sourcePoint, new Vector2f(), new Color(255, 240 - MathUtils.getRandom().nextInt(90), 100), 300f - MathUtils.getRandom().nextInt(100), 0.5f + MathUtils.getRandom().nextInt() * 1f);
+            Global.getSoundPlayer().playSound("terrain_hyperspace_lightning", 1f, 1.2f, sourcePoint, new Vector2f());
         }
+
     }
 }
