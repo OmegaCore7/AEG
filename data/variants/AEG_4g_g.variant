@@ -27,13 +27,6 @@
       "autofire": false,
       "mode": "ALTERNATING",
       "weapons": {
-        "WS0008": "AEG_4g_right_willknife"
-      }
-    },
-    {
-      "autofire": false,
-      "mode": "ALTERNATING",
-      "weapons": {
         "WS0010": "AEG_4g_left_protectshade"
       }
     },
@@ -45,11 +38,17 @@
       }
     },
     {
+      "autofire": false,
+      "mode": "ALTERNATING",
+      "weapons": {
+        "WS0009": "AEG_4g_left_boltingdriver"
+      }
+    },
+    {
       "autofire": true,
       "mode": "ALTERNATING",
       "weapons": {
         "WS0005": "AEG_4g_head",
-        "WS0009": "AEG_4g_left_boltingdriver",
         "WS0019": "AEG_4g_rightkneedrill"
       }
     },
