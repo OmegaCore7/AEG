@@ -2,16 +2,15 @@ package data.weapons.scripts;
 
 import com.fs.starfarer.api.AnimationAPI;
 import com.fs.starfarer.api.combat.*;
-import com.fs.starfarer.api.util.IntervalUtil;
+import com.fs.starfarer.api.combat.listeners.ApplyDamageResultAPI;
 import com.fs.starfarer.api.graphics.SpriteAPI;
-import org.magiclib.util.MagicAnim;
-import java.awt.Color;
+import com.fs.starfarer.api.util.IntervalUtil;
 import org.lazywizard.lazylib.MathUtils;
 import org.lazywizard.lazylib.VectorUtils;
 import org.lwjgl.util.vector.Vector2f;
-import com.fs.starfarer.api.util.Misc;
-import org.magiclib.util.MagicFakeBeam;
-import com.fs.starfarer.api.combat.listeners.ApplyDamageResultAPI;
+import org.magiclib.util.MagicAnim;
+
+import java.awt.*;
 
 public class AEG_4g_right_willknifeEffect implements EveryFrameWeaponEffectPlugin, OnFireEffectPlugin, OnHitEffectPlugin {
 
