@@ -13,29 +13,41 @@ import java.awt.*;
 
 public class AEG_4G_GoldionModePlugin extends BaseHullMod {
 
+    // Tracks whether the key combo was down last frame to prevent repeat activations
+    private boolean wasKeyPressedLastFrame = false;
+
     @Override
     public void advanceInCombat(ShipAPI ship, float amount) {
+        if (!ship.isAlive()) return;
+
+        // Only care about player ship
+        ShipAPI player = Global.getCombatEngine().getPlayerShip();
+        if (ship != player) return;
+
+        // Setup listener if not already added
         if (!ship.hasListenerOfClass(HealthThresholdListener.class)) {
             HealthThresholdListener listener = new HealthThresholdListener(ship);
             ship.addListener(listener);
             ship.getCustomData().put("goldion_aura_listener", listener);
         }
 
-        Object obj = ship.getCustomData().get("goldion_aura_listener");
-        if (obj != null && obj instanceof HealthThresholdListener) {
-            HealthThresholdListener listener = (HealthThresholdListener) obj;
-            // Check key combo: Shift + W + S
-            boolean shiftDown = Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) || Keyboard.isKeyDown(Keyboard.KEY_RSHIFT);
-            boolean wDown = Keyboard.isKeyDown(Keyboard.KEY_W);
+        HealthThresholdListener listener = (HealthThresholdListener) ship.getCustomData().get("goldion_aura_listener");
 
-            if (shiftDown && wDown) {
-                listener.tryActivateGoldionMode();
-            }
+        // Detect input (Shift + W), only trigger on key press edge
+        boolean shiftDown = Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) || Keyboard.isKeyDown(Keyboard.KEY_RSHIFT);
+        boolean wDown = Keyboard.isKeyDown(Keyboard.KEY_W);
+        boolean keyComboDown = shiftDown && wDown;
 
-            listener.advance(amount);
+        if (keyComboDown && !wasKeyPressedLastFrame) {
+            listener.tryActivateGoldionMode();
         }
+
+        wasKeyPressedLastFrame = keyComboDown;
+
+        listener.advance(amount);
     }
 
+    // -- Listener that handles Goldion behavior --
     private static class HealthThresholdListener implements DamageListener {
         private final ShipAPI ship;
 
@@ -50,10 +62,9 @@ public class AEG_4G_GoldionModePlugin extends BaseHullMod {
             this.ship = ship;
         }
 
-        // Remove health-based activation, no longer needed
         @Override
         public void reportDamageApplied(Object source, CombatEntityAPI target, ApplyDamageResultAPI result) {
-            // No-op or empty now
+            // No-op
         }
 
         public void tryActivateGoldionMode() {
@@ -67,7 +78,7 @@ public class AEG_4G_GoldionModePlugin extends BaseHullMod {
 
             goldionTimer += amount;
 
-            applyAuraEffects();        // Nullify projectiles
+            applyAuraEffects();        // Remove projectiles
             applyCrusherChargeFX();    // Charging visuals
 
             if (goldionTimer >= CRUSHER_IMPACT_TIME && !crusherFired) {
@@ -85,7 +96,7 @@ public class AEG_4G_GoldionModePlugin extends BaseHullMod {
             goldionTimer = 0f;
             crusherFired = false;
 
-            // Aura visual (vent colors)
+            // Visual effects
             ship.setVentFringeColor(new Color(255, 223, 70, 200));
             ship.setVentCoreColor(new Color(255, 190, 0, 180));
             ship.setJitter(ship, new Color(255, 215, 0, 75), 1f, 3, 10f, 20f);
@@ -107,7 +118,6 @@ public class AEG_4G_GoldionModePlugin extends BaseHullMod {
             goldionActive = false;
             ship.setVentFringeColor(null);
             ship.setVentCoreColor(null);
-            // Optionally remove status or cleanup listeners here
         }
 
         private void applyAuraEffects() {
@@ -155,7 +165,7 @@ public class AEG_4G_GoldionModePlugin extends BaseHullMod {
                 if (enemy.isAlive() && enemy.getOwner() != ship.getOwner()) {
                     float dist = MathUtils.getDistance(ship, enemy);
                     if (dist < 600f) {
-                        float damage = 1500f * (1f - dist / 600f); // falloff
+                        float damage = 1500f * (1f - dist / 600f);
                         Global.getCombatEngine().applyDamage(enemy, enemy.getLocation(), damage,
                                 DamageType.HIGH_EXPLOSIVE, 0f, false, false, ship);
                     }
@@ -167,7 +177,7 @@ public class AEG_4G_GoldionModePlugin extends BaseHullMod {
                     "Goldion Crusher", "Impact!", false
             );
 
-            ship.setJitter(ship, new Color(255, 255, 255, 255), 2f, 8, 20f, 40f);
+            ship.setJitter(ship, new Color(255, 255, 150, 255), 2f, 8, 20f, 40f);
         }
     }
 
