@@ -11,12 +11,10 @@
   "turretGlowSprite": "graphics/ships/4g/4g_willknife_armr_glow.png",
   "hardpointSprite": "graphics/ships/4g/4g_willknife_armr_00.png",
   "showDamageWhenDecorative": true,
-    "numFrames": 2,
-    "frameRate": 1,
   "glowColor": [
-    0,
     255,
-    100,
+    150,
+    0,
     255
   ],
   "hitGlowRadius": 10,
@@ -34,17 +32,19 @@
   "hardpointAngleOffsets": [
     0
   ],
+  "numFrames": 2,
+  "frameRate": 1,
   "beamFireOnlyOnFullCharge": true,
   "fringeColor": [
-    50,
     255,
-    100,
+    150,
+    50,
     255
   ],
   "coreColor": [
-    200,
     255,
     200,
+    150,
     255
   ],
   "width": 30,
