@@ -21,7 +21,6 @@
     "hardened_subsystems",
     "missile_reload",
     "do_not_fire_through",
-    "armaa_advancedoptics",
     "heavyarmor"
   ],
   "builtInWeapons": {
