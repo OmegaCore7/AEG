@@ -45,7 +45,7 @@
     255
   ],
   "width": 200,
-  "textureType": LASER,
+  "textureType": ROUGH,
   "textureScrollSpeed": 292,
   "pixelsPerTexel": 10,
   "pierceSet": [
