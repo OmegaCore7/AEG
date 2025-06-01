@@ -4,9 +4,17 @@ import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.combat.*;
 import org.lazywizard.lazylib.MathUtils;
 import org.magiclib.util.MagicAnim;
+import org.lwjgl.input.Keyboard;
+import org.dark.shaders.distortion.DistortionShader;
+import org.dark.shaders.distortion.WaveDistortion;
+import org.lwjgl.util.vector.Vector2f;
 
+import java.awt.Color;
 public class AEG_4g_GoldionCrusherEffect implements EveryFrameWeaponEffectPlugin {
-
+    private static final Color IMPACT_COLOR = new Color(255, 80, 0, 255);
+    private static final float IMPACT_RADIUS = 500f;
+    private static final float HAMMER_LENGTH = 800f;
+    private boolean hasSwung = false;
     private enum HammerState { IDLE, WINDUP, HOLD, SWING }
     private HammerState hammerState = HammerState.IDLE;
     private float swingTimer = 0f;
@@ -97,6 +105,9 @@ public class AEG_4g_GoldionCrusherEffect implements EveryFrameWeaponEffectPlugin
 
         if (weapon.getChargeLevel() >= 0.25f && weapon.getChargeLevel() < 0.25f + amount) {
             isPaused = true;
+            // Store Shift key status at firing moment
+            boolean shiftPressed = Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) || Keyboard.isKeyDown(Keyboard.KEY_RSHIFT);
+            weapon.getShip().setCustomData("AEG_goldion_shiftFired", shiftPressed);
         }
 
         // Handle charging logic
@@ -111,13 +122,20 @@ public class AEG_4g_GoldionCrusherEffect implements EveryFrameWeaponEffectPlugin
 
     }
     private void animateSwing(float amount) {
+        boolean shiftHeld = false;
+        if (ship.getCustomData().containsKey("AEG_goldion_shiftFired")) {
+            shiftHeld = (Boolean) ship.getCustomData().get("AEG_goldion_shiftFired");
+        }
+
         float global = ship.getFacing();
         float aim = MathUtils.getShortestRotation(global, weapon.getCurrAngle());
 
-        // Separate anticipation (windup) and follow-through (swing)
+        // Common values
         float sineA = MagicAnim.smoothNormalizeRange(chargeLevel, 0.25f, 1f);
         float sinceG = MagicAnim.smoothNormalizeRange(chargeLevel, 0.0f, 0.25f) * reverse;
 
+        // ====== CRUSHER MODE: SHIFT NOT HELD ======
+        if (!shiftHeld) {
         // Adjust swing direction correction
         if (chargeLevel > 0.33f && sinceG > 0) {
             reverse -= amount + 0.08f;
@@ -177,5 +195,22 @@ public class AEG_4g_GoldionCrusherEffect implements EveryFrameWeaponEffectPlugin
         if (hGlow != null && head != null) {
             hGlow.setCurrAngle(head.getCurrAngle());
         }
+        // Trigger FX once at swing peak
+        if (chargeLevel >= 1f && !hasSwung) {
+            hasSwung = true;
+
+            // Calculate hammer tip position based on ship location, hammer length, and current weapon angle
+            Vector2f tip = MathUtils.getPointOnCircumference(ship.getLocation(), HAMMER_LENGTH, weapon.getCurrAngle());
+            Vector2f vel = ship.getVelocity();
+        }
+        }else{
+        }
+
+        // Reset for next swing cycle
+        if (chargeLevel < 1f) {
+            hasSwung = false;
+        }
     }
+
 }
+

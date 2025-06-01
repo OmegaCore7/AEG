@@ -47,7 +47,7 @@
     150,
     255
   ],
-  "width": 30,
+  "width": 300,
   "textureType": [
     "graphics/fx/beamfringed.png",
     "graphics/fx/beamcorec.png"
