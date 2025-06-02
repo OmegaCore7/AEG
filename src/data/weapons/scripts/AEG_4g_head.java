@@ -11,17 +11,16 @@ import java.util.Random;
 
 public class AEG_4g_head implements EveryFrameWeaponEffectPlugin {
 
-    private static final int NUM_FRAMES = 11;
-    private static final int LOOP_START_FRAME = 5;
+    private static final int NUM_FRAMES = 20;
+    private static final int LOOP_START_FRAME = 00;
     private float elapsed = 0;
     private int currentFrame = 0;
-    private boolean initialCycleComplete = false;
     private boolean overloadCycleComplete = false;
     private boolean particlesActive = true;
     private float particleRestartTimer = 0;
     private static final float BASE_FRAME_DURATION = 4.0f / NUM_FRAMES;
     private static final float MAX_FRAME_DURATION = 0.75f / (NUM_FRAMES - LOOP_START_FRAME);
-    private Random random = new Random();
+    private final Random random = new Random();
     private float chargeUpTime = 0;
     private static final float CHARGE_UP_DURATION = 4.0f;
     private static final float PARTICLE_DELAY = 2.0f;
@@ -77,30 +76,21 @@ public class AEG_4g_head implements EveryFrameWeaponEffectPlugin {
                     currentFrame = (currentFrame - 1 + NUM_FRAMES) % NUM_FRAMES;
                     if (currentFrame == 0) {
                         overloadCycleComplete = true;
-                        currentFrame = 0;  // Hold on frame 1
-                        particlesActive = false;  // Stop particles during overload and venting
+                        particlesActive = false;
                     }
                 }
             } else {
                 if (overloadCycleComplete) {
                     currentFrame = (currentFrame + 1) % NUM_FRAMES;
-                    if (currentFrame == NUM_FRAMES - 1) {
+                    if (currentFrame == 0) {
                         overloadCycleComplete = false;
-                        initialCycleComplete = false;
-                        particleRestartTimer = 0;  // Reset particle restart timer
+                        particleRestartTimer = 0;
                     }
                 } else {
-                    if (!initialCycleComplete) {
-                        currentFrame = (currentFrame + 1) % NUM_FRAMES;
-                        if (currentFrame == 0) {
-                            initialCycleComplete = true;
-                            currentFrame = LOOP_START_FRAME;
-                        }
-                    } else {
-                        currentFrame = LOOP_START_FRAME + (currentFrame - LOOP_START_FRAME + 1) % (NUM_FRAMES - LOOP_START_FRAME);
-                    }
+                    currentFrame = (currentFrame + 1) % NUM_FRAMES;
                 }
             }
+
             weapon.getAnimation().setFrame(currentFrame);
             elapsed -= frameDuration;
         }
@@ -113,7 +103,7 @@ public class AEG_4g_head implements EveryFrameWeaponEffectPlugin {
         if (!particlesActive) {
             particleRestartTimer += amount;
             if (particleRestartTimer >= 2.0f) {
-                particlesActive = true;  // Restart particles after 2 seconds
+                particlesActive = true;
             }
             return;
         }
@@ -129,7 +119,7 @@ public class AEG_4g_head implements EveryFrameWeaponEffectPlugin {
             float angle = weapon.getCurrAngle() + 180f + angleOffset;
             float speed = 50f + random.nextFloat() * 50f;
             float size = 5f + random.nextFloat() * 5f;
-            float duration = 1f + random.nextFloat() * 1f;
+            float duration = 1f + random.nextFloat();
 
             Vector2f randomOffset = new Vector2f(random.nextFloat() * SPAWN_RADIUS * 2 - SPAWN_RADIUS, random.nextFloat() * SPAWN_RADIUS * 2 - SPAWN_RADIUS);
             Vector2f.add(spawnLocation, randomOffset, spawnLocation);
