@@ -34,6 +34,7 @@
   "numFrames": 8,
   "frameRate": 8,
   "beamFireOnlyOnFullCharge": true,
+  "autocharge": true,
   "fringeColor": [
     255,
     150,
