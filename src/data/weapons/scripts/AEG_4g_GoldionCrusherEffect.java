@@ -77,6 +77,13 @@ public class AEG_4g_GoldionCrusherEffect implements EveryFrameWeaponEffectPlugin
         if (ship.getSelectedGroupAPI() == null || ship.getSelectedGroupAPI().getActiveWeapon() != weapon) {
             return;
         }
+
+        // === FIX: Declare shiftHeld early so it can be used anywhere ===
+        boolean shiftHeld = false;
+        if (ship != null && ship.getCustomData().containsKey("AEG_goldion_shiftFired")) {
+            shiftHeld = (Boolean) ship.getCustomData().get("AEG_goldion_shiftFired");
+        }
+
         animateSwing(amount);
         // === Animation frame control based on state ===
         if (ship != null && ship.getSelectedGroupAPI() != null) {
@@ -84,12 +91,29 @@ public class AEG_4g_GoldionCrusherEffect implements EveryFrameWeaponEffectPlugin
             boolean isIdle = chargeLevel <= 0f;
             boolean isFiring = weapon.isFiring();
 
-            if (isSelected && isIdle) {
-                weapon.getAnimation().setFrame(1); // Idle but selected
-            } else if (isFiring) {
-                weapon.getAnimation().setFrame(1); // Charging/firing
-            } else if (!isSelected) {
-                weapon.getAnimation().setFrame(0); // Not selected
+            if (!shiftHeld) {
+                // Crusher Mode: Keep using existing logic
+                if (isSelected && isIdle) {
+                    weapon.getAnimation().setFrame(1);
+                } else if (isFiring) {
+                    weapon.getAnimation().setFrame(1);
+                } else {
+                    weapon.getAnimation().setFrame(0);
+                }
+            } else {
+                // Finger Mode
+                if (isFiring) {
+                    int frame = 1 + Math.round(chargeLevel * 6f); // 1 to 7
+                    weapon.getAnimation().setFrame(Math.min(frame, 7));
+                } else if (chargeLevel == 1f) {
+                    weapon.getAnimation().setFrame(7); // Hold peak during firing
+                } else if (chargeLevel < 1f && hammerCharge > 0f) {
+                    // Animate back down: calculate reverse animation frame from 7 to 1
+                    int frame = 1 + Math.round((1f - chargeLevel) * 6f);
+                    weapon.getAnimation().setFrame(Math.max(1, frame));
+                } else {
+                    weapon.getAnimation().setFrame(1); // Reset to idle
+                }
             }
         }
         if (Global.getCombatEngine().isPaused()) return;
@@ -123,9 +147,6 @@ public class AEG_4g_GoldionCrusherEffect implements EveryFrameWeaponEffectPlugin
     }
     private void animateSwing(float amount) {
         boolean shiftHeld = false;
-        if (ship.getCustomData().containsKey("AEG_goldion_shiftFired")) {
-            shiftHeld = (Boolean) ship.getCustomData().get("AEG_goldion_shiftFired");
-        }
 
         float global = ship.getFacing();
         float aim = MathUtils.getShortestRotation(global, weapon.getCurrAngle());
