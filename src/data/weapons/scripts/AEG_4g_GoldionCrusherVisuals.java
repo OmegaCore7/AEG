@@ -4,7 +4,6 @@ import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.combat.*;
 import org.dark.shaders.distortion.DistortionShader;
 import org.dark.shaders.distortion.WaveDistortion;
-import org.lazywizard.lazylib.MathUtils;
 import org.lwjgl.util.vector.Vector2f;
 
 import java.awt.*;
@@ -28,14 +27,7 @@ public class AEG_4g_GoldionCrusherVisuals implements BeamEffectPlugin {
         float angle = weapon.getCurrAngle();
         float charge = weapon.getChargeLevel();
 
-        // Read shift key state stored by the weapon effect
-        boolean shiftWasHeld = false;
-        if (ship.getCustomData().containsKey("AEG_goldion_shiftFired")) {
-            shiftWasHeld = (Boolean) ship.getCustomData().get("AEG_goldion_shiftFired");
-        }
-
         // === Crusher Mode (Shift NOT held): Hide beam and trigger AoE ===
-        if (!shiftWasHeld) {
             beam.setWidth(0f); // Beam is invisible in Crusher mode
 
             // No FX, no AOE, no visuals for now
@@ -44,22 +36,13 @@ public class AEG_4g_GoldionCrusherVisuals implements BeamEffectPlugin {
             }
 
             return;
-        }
+
 
         // === Goldion Finger Mode (Shift held): Normal beam behavior ===
-        if (charge > 0f) {
-
-        }
 
 // Trigger FX when beam hits something (avoid spamming)
-        if (beam.getDamageTarget() instanceof ShipAPI && beam.getBrightness() > 0.5f && fxCooldown <= 0f) {
-            fxCooldown = 0.1f; // FX rate limit
-            triggerImpactFX(engine, beam, ship, beam.getWidth());
-        }
+        // FX rate limit
 
-        if (!weapon.isFiring()) {
-            hasFired = false;
-        }
     }
     private void triggerImpactFX(CombatEngineAPI engine, BeamAPI beam, ShipAPI ship, float beamWidth) {
         Vector2f beamEnd = beam.getTo();

@@ -182,7 +182,7 @@ public class AEG_4g_GoldionCrusherEffect implements EveryFrameWeaponEffectPlugin
 
             if (isClamped) {
                 // Raise the arm when it hits forward limit to simulate "extension"
-                armR.getSprite().setCenterY(originalRArmPos - 6f);  // visually up
+                armR.getSprite().setCenterY(originalRArmPos - 10f);  // visually up
             } else {
                 // Normal swing animation
                 armR.getSprite().setCenterY(originalRArmPos + (8 * sineA) - (8 * sinceG));
@@ -200,7 +200,8 @@ public class AEG_4g_GoldionCrusherEffect implements EveryFrameWeaponEffectPlugin
                     + MathUtils.getShortestRotation(torso.getCurrAngle(), armR.getCurrAngle()) * 0.6f);
         }
         if (wGlow != null) {
-            wGlow.setCurrAngle(weapon.getCurrAngle());
+            wGlow.setCurrAngle(pauldronR.getCurrAngle());
+
         }
         // Head glow tracking
         if (hGlow != null && head != null) {
