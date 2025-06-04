@@ -78,11 +78,6 @@ public class AEG_4g_GoldionCrusherEffect implements EveryFrameWeaponEffectPlugin
             return;
         }
 
-        // === FIX: Declare shiftHeld early so it can be used anywhere ===
-        boolean shiftHeld = false;
-        if (ship != null && ship.getCustomData().containsKey("AEG_goldion_shiftFired")) {
-            shiftHeld = (Boolean) ship.getCustomData().get("AEG_goldion_shiftFired");
-        }
 
         animateSwing(amount);
         // === Animation frame control based on state ===
@@ -91,7 +86,6 @@ public class AEG_4g_GoldionCrusherEffect implements EveryFrameWeaponEffectPlugin
             boolean isIdle = chargeLevel <= 0f;
             boolean isFiring = weapon.isFiring();
 
-            if (!shiftHeld) {
                 // Crusher Mode: Keep using existing logic
                 if (isSelected && isIdle) {
                     weapon.getAnimation().setFrame(1);
@@ -100,22 +94,8 @@ public class AEG_4g_GoldionCrusherEffect implements EveryFrameWeaponEffectPlugin
                 } else {
                     weapon.getAnimation().setFrame(0);
                 }
-            } else {
-                // Finger Mode
-                if (isFiring) {
-                    int frame = 1 + Math.round(chargeLevel * 6f); // 1 to 7
-                    weapon.getAnimation().setFrame(Math.min(frame, 7));
-                } else if (chargeLevel == 1f) {
-                    weapon.getAnimation().setFrame(7); // Hold peak during firing
-                } else if (chargeLevel < 1f && hammerCharge > 0f) {
-                    // Animate back down: calculate reverse animation frame from 7 to 1
-                    int frame = 1 + Math.round((1f - chargeLevel) * 6f);
-                    weapon.getAnimation().setFrame(Math.max(1, frame));
-                } else {
-                    weapon.getAnimation().setFrame(1); // Reset to idle
-                }
             }
-        }
+
         if (Global.getCombatEngine().isPaused()) return;
 
         if (isPaused) {
@@ -146,7 +126,7 @@ public class AEG_4g_GoldionCrusherEffect implements EveryFrameWeaponEffectPlugin
 
     }
     private void animateSwing(float amount) {
-        boolean shiftHeld = false;
+
 
         float global = ship.getFacing();
         float aim = MathUtils.getShortestRotation(global, weapon.getCurrAngle());
@@ -155,8 +135,7 @@ public class AEG_4g_GoldionCrusherEffect implements EveryFrameWeaponEffectPlugin
         float sineA = MagicAnim.smoothNormalizeRange(chargeLevel, 0.25f, 1f);
         float sinceG = MagicAnim.smoothNormalizeRange(chargeLevel, 0.0f, 0.25f) * reverse;
 
-        // ====== CRUSHER MODE: SHIFT NOT HELD ======
-        if (!shiftHeld) {
+
         // Adjust swing direction correction
         if (chargeLevel > 0.33f && sinceG > 0) {
             reverse -= amount + 0.08f;
@@ -179,27 +158,38 @@ public class AEG_4g_GoldionCrusherEffect implements EveryFrameWeaponEffectPlugin
             armR.getSprite().setCenterY(originalRArmPos + (8 * sineA) - (8 * sinceG));
         }
 
-        // Torso rotation for swing motion
-        if (torso != null) {
-            torso.setCurrAngle(global - (sineA * TORSO_OFFSET) + (sinceG * TORSO_OFFSET) + aim * 0.3f);
-        }
+            // Step 1: Torso rotation for swing motion
+            if (torso != null) {
+                torso.setCurrAngle(global - (sineA * TORSO_OFFSET) + (sinceG * TORSO_OFFSET) + aim * 0.3f);
+            }
 
-        // Weapon (hammer) angle swing logic
-        if (weapon != null) {
-            weapon.setCurrAngle(weapon.getCurrAngle()
-                    + (sineA * (TORSO_OFFSET / 7) * 0.7f)
-                    - (sinceG * TORSO_OFFSET * 0.5f));
-        }
+            // Step 2: Pauldron follows torso
+            if (pauldronR != null && torso != null) {
+                pauldronR.setCurrAngle(torso.getCurrAngle() + (TORSO_OFFSET * 0.3f * sineA)); // Example multiplier
+            }
 
-        // Sync arm and shoulder
+            // Step 3: Arm follows pauldron, with offset if desired
         if (armR != null && pauldronR != null) {
-            armR.setCurrAngle(pauldronR.getCurrAngle());
+            float desiredArmAngle = pauldronR.getCurrAngle();
+
+            float minAngle = global - 90f;
+            float maxAngle = global + 10f;
+
+            float clampedArmAngle = clampAngle(desiredArmAngle, minAngle, maxAngle);
+
+            boolean isClamped = clampedArmAngle != desiredArmAngle;
+            armR.setCurrAngle(clampedArmAngle);
+
+            if (isClamped) {
+                // Raise the arm when it hits forward limit to simulate "extension"
+                armR.getSprite().setCenterY(originalRArmPos - 6f);  // visually up
+            } else {
+                // Normal swing animation
+                armR.getSprite().setCenterY(originalRArmPos + (8 * sineA) - (8 * sinceG));
+            }
         }
-        if (pauldronR != null && torso != null && armR != null) {
-            pauldronR.setCurrAngle(torso.getCurrAngle()
-                    + MathUtils.getShortestRotation(torso.getCurrAngle(), armR.getCurrAngle()) * 0.6f);
-        }
-        // Left arm animation
+
+         // Left arm animation
         if (armL != null) {
             armL.setCurrAngle(global - ((aim + LEFT_ARM_OFFSET) * sineA) - ((overlap + aim * 0.25f) * (1 - sineA)));
         }
@@ -224,13 +214,45 @@ public class AEG_4g_GoldionCrusherEffect implements EveryFrameWeaponEffectPlugin
             Vector2f tip = MathUtils.getPointOnCircumference(ship.getLocation(), HAMMER_LENGTH, weapon.getCurrAngle());
             Vector2f vel = ship.getVelocity();
         }
-        }else{
-        }
 
         // Reset for next swing cycle
         if (chargeLevel < 1f) {
             hasSwung = false;
         }
+    }
+    private float clampAngle(float angle, float min, float max) {
+        angle = normalizeAngle(angle);
+        min = normalizeAngle(min);
+        max = normalizeAngle(max);
+
+        // If min <= max, clamp straightforwardly
+        if (min <= max) {
+            if (angle < min) return min;
+            if (angle > max) return max;
+            return angle;
+        } else {
+            // If min > max, it means the range crosses 0° (e.g., min=350, max=10)
+            if (angle > max && angle < min) {
+                // Clamp to whichever is closer
+                float distToMin = shortestRotationDistance(angle, min);
+                float distToMax = shortestRotationDistance(angle, max);
+                return (distToMin < distToMax) ? min : max;
+            }
+            return angle;
+        }
+    }
+
+    private float normalizeAngle(float angle) {
+        angle = angle % 360f;
+        if (angle < 0) angle += 360f;
+        return angle;
+    }
+
+    private float shortestRotationDistance(float from, float to) {
+        float diff = to - from;
+        if (diff > 180) diff -= 360;
+        if (diff < -180) diff += 360;
+        return Math.abs(diff);
     }
 
 }
