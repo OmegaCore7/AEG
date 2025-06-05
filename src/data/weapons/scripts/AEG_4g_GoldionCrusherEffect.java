@@ -11,6 +11,14 @@ import org.lwjgl.util.vector.Vector2f;
 
 import java.awt.Color;
 public class AEG_4g_GoldionCrusherEffect implements EveryFrameWeaponEffectPlugin {
+    //Hammer Render
+    private static final Color NEBULA_COLOR = new Color(255, 100, 0, 100);
+    private static final Color GLOW_COLOR = new Color(255, 180, 60, 255);
+    private static final float HAMMER_WIDTH = 300f;
+    private static final float HAMMER_HEIGHT = 600f;
+    private static final int NEBULA_PARTICLES = 50;
+    private static final int GLOW_ORBS = 10;
+    //Animation
     private static final Color IMPACT_COLOR = new Color(255, 80, 0, 255);
     private static final float IMPACT_RADIUS = 500f;
     private static final float HAMMER_LENGTH = 800f;
@@ -76,6 +84,17 @@ public class AEG_4g_GoldionCrusherEffect implements EveryFrameWeaponEffectPlugin
         // Prevent animation unless selected
         if (ship.getSelectedGroupAPI() == null || ship.getSelectedGroupAPI().getActiveWeapon() != weapon) {
             return;
+        }
+
+        if (!Global.getCombatEngine().isPaused() &&
+                ship.getSelectedGroupAPI() != null &&
+                ship.getSelectedGroupAPI().getActiveWeapon() == weapon) {
+
+            // Use weapon location as base (or fireOffset if needed)
+            Vector2f origin = weapon.getLocation();
+            float angle = weapon.getCurrAngle();  // includes ship facing + mouse aim
+
+            renderHammer(engine, weapon, chargeLevel);
         }
 
 
@@ -249,5 +268,70 @@ public class AEG_4g_GoldionCrusherEffect implements EveryFrameWeaponEffectPlugin
         return Math.abs(diff);
     }
 
-}
+
+
+
+     //save for now - This looks a spear Changed the name from renderHammer to keep around
+        public static void renderHammer(CombatEngineAPI engine, WeaponAPI weapon, float swingProgress) {
+            Vector2f fireOffset = weapon.getFirePoint(0);
+            if (fireOffset == null) return;
+
+            Vector2f worldOffset = weapon.getLocation();
+            worldOffset = fireOffset != null ? fireOffset : worldOffset;
+
+            float angle = weapon.getCurrAngle();
+            float swingDistance = swingProgress * HAMMER_HEIGHT;
+
+            // Calculate hammerhead position and size based on swing
+            Vector2f hammerPosition = MathUtils.getPointOnCircumference(worldOffset, swingDistance, angle);
+            float hammerHeight = HAMMER_HEIGHT * Math.max(0.5f, 1f - swingProgress);
+            float hammerWidth = HAMMER_WIDTH; // stays constant
+
+            // Render nebula particles inside the hammerhead
+            renderNebula(engine, hammerPosition, angle, hammerWidth, hammerHeight);
+
+            // Render glow orbs inside the hammerhead
+            renderGlowOrbs(engine, hammerPosition, angle, hammerWidth, hammerHeight);
+
+            // Render the glowing rectangular hammerhead
+            renderHammerhead(engine, hammerPosition, angle, hammerWidth, hammerHeight);
+        }
+
+        private static void renderNebula(CombatEngineAPI engine, Vector2f position, float angle, float width, float height) {
+            for (int i = 0; i < NEBULA_PARTICLES; i++) {
+                float xOffset = (float) Math.random() * width - width / 2;
+                float yOffset = (float) Math.random() * height - height / 2;
+                Vector2f offset = new Vector2f();
+                Vector2f point = MathUtils.getPointOnCircumference(offset, yOffset, angle);
+                point = MathUtils.getPointOnCircumference(point, xOffset, angle + 90f);
+                Vector2f particlePosition = Vector2f.add(position, point, null);
+                engine.addSwirlyNebulaParticle(particlePosition, new Vector2f(), 20f, 1.5f, 0.5f, 0.8f, 1.0f, NEBULA_COLOR, false);
+            }
+        }
+
+        private static void renderGlowOrbs(CombatEngineAPI engine, Vector2f position, float angle, float width, float height) {
+            for (int i = 0; i < GLOW_ORBS; i++) {
+                float xOffset = (float) Math.random() * width - width / 2;
+                float yOffset = (float) Math.random() * height - height / 2;
+                Vector2f offset = new Vector2f();
+                Vector2f point = MathUtils.getPointOnCircumference(offset, yOffset, angle);
+                point = MathUtils.getPointOnCircumference(point, xOffset, angle + 90f);
+                Vector2f orbPosition = Vector2f.add(position, point, null);
+                engine.addSmoothParticle(orbPosition, new Vector2f(), 10f, 1.0f, 0.5f, GLOW_COLOR);
+            }
+        }
+        private static void renderHammerhead(CombatEngineAPI engine, Vector2f position, float angle, float width, float height) {
+            for (float i = -0.5f; i <= 0.5f; i += 0.25f) {
+                Vector2f verticalOffset = MathUtils.getPointOnCircumference(new Vector2f(), i * height, angle);
+
+                Vector2f centerLine = Vector2f.add(position, verticalOffset, null);
+
+                Vector2f edgeL = MathUtils.getPointOnCircumference(centerLine, -width / 2, angle + 90f);
+                Vector2f edgeR = MathUtils.getPointOnCircumference(centerLine, width / 2, angle + 90f);
+
+                engine.addSmoothParticle(edgeL, new Vector2f(), 10f, 1.0f, 0.5f, GLOW_COLOR);
+                engine.addSmoothParticle(edgeR, new Vector2f(), 10f, 1.0f, 0.5f, GLOW_COLOR);
+            }
+        }
+    }
 
