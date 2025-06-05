@@ -107,13 +107,6 @@ public class AEG_4g_GoldionCrusherEffect implements EveryFrameWeaponEffectPlugin
             return;
         }
 
-        if (weapon.getChargeLevel() >= 0.25f && weapon.getChargeLevel() < 0.25f + amount) {
-            isPaused = true;
-            // Store Shift key status at firing moment
-            boolean shiftPressed = Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) || Keyboard.isKeyDown(Keyboard.KEY_RSHIFT);
-            weapon.getShip().setCustomData("AEG_goldion_shiftFired", shiftPressed);
-        }
-
         // Handle charging logic
         if (weapon.isFiring()) {
             hammerCharge += amount;
