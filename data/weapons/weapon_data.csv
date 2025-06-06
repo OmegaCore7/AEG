@@ -103,7 +103,7 @@ Core Main Cannon,AEG_core_decogun,,,500000,600,1,,,,,,,,,,,,,,,,,,,,,,,,,,,,no_d
 ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 #Genesic GaoGaiGar,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-Goldion Crusher	,AEG_4g_right_willknife,,,,1000,5000,,0,999,80,,,,,ENERGY,,2500,4	,0.33,0.6,,,,,,1000000,,,,,"SYSTEM,DANGEROUS,FIRE_WHEN_INEFFICIENT,PD_ALSO,PD","no_drop, no_sell, no_drop_salvage, doNotModify",,no_drop,,Strike,,,,,"%s: Deals full damage immediately on contact, slightly pushing the user back.",The Sanctioned Action Is To Cut,,,TRUE,999,,
+Goldion Crusher	,AEG_4g_right_willknife,,,,1000,5000,,0,999,80,,,,,ENERGY,,2500,0.33	,0.33,4,,,,,,1000000,,,,,"SYSTEM,DANGEROUS,FIRE_WHEN_INEFFICIENT,PD_ALSO,PD","no_drop, no_sell, no_drop_salvage, doNotModify",,no_drop,,Strike,,,,,"%s: Deals full damage immediately on contact, slightly pushing the user back.",The Sanctioned Action Is To Cut,,,TRUE,999,,
 Broken Magnum,AEG_4g_right_brokenmagnum,,,500000,1500,,50,250,,80,,1,0.1,1,HIGH_EXPLOSIVE,750,,"0.33		",0.33,1,,,,,,,500,1000,30,1500,,,,no_drop,,Strike,,,,,,,,,,,,
 Right Fist of Destruction,AEG_4g_right_punch,,,500000,44,3000,,,20,80,,,,,HIGH_EXPLOSIVE,,,0.33,0.33,0.6,,,,,,,,,,,,,,no_drop,,,,,,,,,,,,,,
 Critical Laser,AEG_4g_head,,,,1500,300,,150,15,80,,,,,ENERGY,,225,,,,,,,,,1000000,,,,,,,,no_drop,,,,,,,,,,,,,,

@@ -8,6 +8,7 @@
   "collisionClass": "RAY",
   "collisionClassByFighter": "RAY_FIGHTER",
   "turretSprite": "graphics/ships/4g/4g_willknife_armr_00.png",
+  "turretGlowSprite": "graphics/ships/4g/4g_willknife_armr_glow.png",
   "hardpointSprite": "graphics/ships/4g/4g_willknife_armr_00.png",
   "showDamageWhenDecorative": true,
   "glowColor": [
@@ -31,10 +32,9 @@
   "hardpointAngleOffsets": [
     0
   ],
-  "numFrames": 2,
-  "frameRate": 1,
+  "numFrames": 9,
+  "frameRate": 4.5,
   "beamFireOnlyOnFullCharge": true,
-  "autocharge": true,
   "fringeColor": [
     255,
     150,

@@ -28,7 +28,7 @@ public class AEG_4g_GoldionCrusherVisuals implements BeamEffectPlugin {
         float charge = weapon.getChargeLevel();
 
         // === Crusher Mode
-            beam.setWidth(0f); // Beam is invisible in Crusher mode
+            //beam.setWidth(0f); // Beam is invisible in Crusher mode
 
             // No FX, no AOE, no visuals for now
             if (!weapon.isFiring()) {
