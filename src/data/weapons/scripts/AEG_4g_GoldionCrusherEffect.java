@@ -11,20 +11,25 @@ import org.lwjgl.util.vector.Vector2f;
 
 import java.awt.Color;
 public class AEG_4g_GoldionCrusherEffect implements EveryFrameWeaponEffectPlugin {
+
     //Hammer Render
-    private static final Color NEBULA_COLOR = new Color(255, 100, 0, 100);
-    private static final Color GLOW_COLOR = new Color(255, 180, 60, 255);
-    private static final float HAMMER_WIDTH = 300f;
-    private static final float HAMMER_HEIGHT = 600f;
-    private static final int NEBULA_PARTICLES = 50;
-    private static final int GLOW_ORBS = 10;
+
+    private static final Color NEBULA_COLOR = new Color(255, 160, 50, 200); // intense orange-gold
+    private static final Color GLOW_COLOR = new Color(255, 240, 180, 255); // golden-white
+    private static final Color IMPACT_COLOR = new Color(255, 90, 0, 255); // fiery orange-red
+    private static final Color CORE_GLOW = new Color(255, 255, 255, 255); // blinding white core flash
+    private static final Color ALT_ENERGY = new Color(180, 100, 255, 180); // purple-pink arc lightning
+    private static final float HAMMER_WIDTH = 1000f;
+    private static final float HAMMER_HEIGHT = 1500f;
+    private static final int NEBULA_PARTICLES = 60;
+    private static final int GLOW_ORBS = 50;
     //Animation
-    private static final Color IMPACT_COLOR = new Color(255, 80, 0, 255);
-    private static final float IMPACT_RADIUS = 500f;
-    private static final float HAMMER_LENGTH = 800f;
+    private static final float IMPACT_RADIUS = 2000f;
+    private static final float HAMMER_LENGTH = 0f;
     private boolean hasSwung = false;
-    private enum HammerState { IDLE, WINDUP, HOLD, SWING }
+    private enum HammerState { IDLE, WINDUP, HOLD, PAUSE, SWING, RECOVER }
     private HammerState hammerState = HammerState.IDLE;
+    private float stateTimer = 0f;
     private float swingTimer = 0f;
     private boolean initialized = false;
     private WeaponAPI weapon;
@@ -98,7 +103,8 @@ public class AEG_4g_GoldionCrusherEffect implements EveryFrameWeaponEffectPlugin
         }
 
 
-        animateSwing(amount);
+        animateSwing(engine, amount);
+
         // === Animation frame control based on state ===
         if (ship != null && ship.getSelectedGroupAPI() != null) {
             boolean isSelected = ship.getSelectedGroupAPI().getActiveWeapon() == weapon;
@@ -127,17 +133,62 @@ public class AEG_4g_GoldionCrusherEffect implements EveryFrameWeaponEffectPlugin
         }
 
         // Handle charging logic
-        if (weapon.isFiring()) {
-            hammerCharge += amount;
-            chargeLevel = Math.min(hammerCharge / maxChargeTime, 1f);
-        } else {
-            hammerCharge = 0f;
-            chargeLevel = 0f;
-            reverse = 1f;
+        switch (hammerState) {
+            case IDLE:
+                if (weapon.isFiring()) {
+                    hammerState = HammerState.WINDUP;
+                    stateTimer = 0f;
+                    hammerCharge = 0f;
+                }
+                break;
+
+            case WINDUP:
+                hammerCharge += amount;
+                chargeLevel = Math.min(hammerCharge / maxChargeTime, 1f);
+                stateTimer += amount;
+                if (chargeLevel >= 1f) {
+                    hammerState = HammerState.PAUSE;
+                    Global.getCombatEngine().getTimeMult().modifyMult("goldion_pause", 0.05f);
+                    isPaused = true;
+                    pauseTimer = 0f;
+                }
+                break;
+
+            case PAUSE:
+                pauseTimer += amount;
+                if (pauseTimer >= PAUSE_DURATION) {
+                    Global.getCombatEngine().getTimeMult().unmodify("goldion_pause");
+                    hammerState = HammerState.SWING;
+                    stateTimer = 0f;
+                }
+                break;
+
+            case SWING:
+                stateTimer += amount;
+                chargeLevel = 1f; // keep peak visual
+                if (!hasSwung) {
+                    doGoldionImpactFX(engine);
+                    hasSwung = true;
+                }
+                if (stateTimer >= 0.25f) {
+                    hammerState = HammerState.RECOVER;
+                    stateTimer = 0f;
+                }
+                break;
+
+            case RECOVER:
+                chargeLevel -= amount * 1.33f;
+                if (chargeLevel <= 0f) {
+                    chargeLevel = 0f;
+                    hammerCharge = 0f;
+                    hasSwung = false;
+                    hammerState = HammerState.IDLE;
+                }
+                break;
         }
 
     }
-    private void animateSwing(float amount) {
+    private void animateSwing(CombatEngineAPI engine, float amount){
 
 
         float global = ship.getFacing();
@@ -222,10 +273,16 @@ public class AEG_4g_GoldionCrusherEffect implements EveryFrameWeaponEffectPlugin
         // Trigger FX once at swing peak
         if (chargeLevel >= 1f && !hasSwung) {
             hasSwung = true;
+            Vector2f tip = MathUtils.getPointOnCircumference(ship.getLocation(), 100f, weapon.getCurrAngle());
+            WaveDistortion wave = new WaveDistortion(tip, ship.getVelocity());
+            wave.setSize(300f);
+            wave.setIntensity(50f);
+            wave.setLifetime(1.5f);
+            wave.flip(true);
+            DistortionShader.addDistortion(wave);
 
-            // Calculate hammer tip position based on ship location, hammer length, and current weapon angle
-            Vector2f tip = MathUtils.getPointOnCircumference(ship.getLocation(), HAMMER_LENGTH, weapon.getCurrAngle());
-            Vector2f vel = ship.getVelocity();
+            engine.spawnExplosion(tip, ship.getVelocity(), CORE_GLOW, 300f, 1.25f);
+            engine.spawnExplosion(tip, ship.getVelocity(), ALT_ENERGY, 150f, 1f);
         }
 
         // Reset for next swing cycle
@@ -272,7 +329,7 @@ public class AEG_4g_GoldionCrusherEffect implements EveryFrameWeaponEffectPlugin
 
 
      //save for now - This looks a spear Changed the name from renderHammer to keep around
-        public static void renderHammer(CombatEngineAPI engine, WeaponAPI weapon, float swingProgress) {
+     private void renderHammer(CombatEngineAPI engine, WeaponAPI weapon, float swingProgress) {
             Vector2f fireOffset = weapon.getFirePoint(0);
             if (fireOffset == null) return;
 
@@ -280,15 +337,15 @@ public class AEG_4g_GoldionCrusherEffect implements EveryFrameWeaponEffectPlugin
             worldOffset = fireOffset != null ? fireOffset : worldOffset;
 
             float angle = weapon.getCurrAngle();
-            float swingDistance = swingProgress * HAMMER_HEIGHT;
+            float swingDistance = 200f + (float) Math.pow(swingProgress, 1.5f) * 400f;
 
             // Calculate hammerhead position and size based on swing
             Vector2f hammerPosition = MathUtils.getPointOnCircumference(worldOffset, swingDistance, angle);
-            float hammerHeight = HAMMER_HEIGHT * Math.max(0.5f, 1f - swingProgress);
+            float hammerHeight = HAMMER_HEIGHT * Math.max(0.75f, 1f - swingProgress);
             float hammerWidth = HAMMER_WIDTH; // stays constant
 
             // Render nebula particles inside the hammerhead
-            renderNebula(engine, hammerPosition, angle, hammerWidth, hammerHeight);
+           renderNebula(engine, hammerPosition, angle, hammerWidth, hammerHeight);
 
             // Render glow orbs inside the hammerhead
             renderGlowOrbs(engine, hammerPosition, angle, hammerWidth, hammerHeight);
@@ -333,5 +390,23 @@ public class AEG_4g_GoldionCrusherEffect implements EveryFrameWeaponEffectPlugin
                 engine.addSmoothParticle(edgeR, new Vector2f(), 10f, 1.0f, 0.5f, GLOW_COLOR);
             }
         }
+    private void doGoldionImpactFX(CombatEngineAPI engine) {
+        Vector2f tip = MathUtils.getPointOnCircumference(ship.getLocation(), 100f, weapon.getCurrAngle());
+
+        // Distortion wave
+        WaveDistortion wave = new WaveDistortion(tip, ship.getVelocity());
+        wave.setSize(400f);
+        wave.setIntensity(70f);
+        wave.setLifetime(1.25f);
+        wave.flip(true);
+        DistortionShader.addDistortion(wave);
+
+        // Flash + explosions
+        engine.spawnExplosion(tip, ship.getVelocity(), CORE_GLOW, 400f, 1.0f);
+        engine.spawnExplosion(tip, ship.getVelocity(), IMPACT_COLOR, 250f, 0.75f);
+        engine.spawnExplosion(tip, ship.getVelocity(), ALT_ENERGY, 150f, 1.0f);
+
+        Global.getSoundPlayer().playSound("explosion_large", 1.0f, 1.5f, tip, ship.getVelocity());
+    }
     }
 
