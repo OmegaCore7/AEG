@@ -5,16 +5,19 @@ import com.fs.starfarer.api.combat.BaseHullMod;
 import com.fs.starfarer.api.combat.CombatEngineAPI;
 import com.fs.starfarer.api.combat.ShipAPI;
 import org.lazywizard.lazylib.MathUtils;
+import org.lwjgl.input.Keyboard;
 import org.lwjgl.util.vector.Vector2f;
+import org.magiclib.util.MagicRender;
 
 import java.awt.*;
 
 public class AEG_4g_GoldeonArmor extends BaseHullMod {
-
+    private static final String GOLDION_ACTIVE_KEY = "goldion_active";
     private static final String GAUGE_KEY = "goldion_gauge";
     private static final float MAX_GAUGE = 100f;
     private static final float GAIN_PER_SECOND = 10f;
-
+    private static final float GOLDION_DURATION = 20f;
+    private static final String GOLDION_TIMER_KEY = "goldion_timer";
     private final Color GOLD_MAIN = new Color(255, 215, 0, 255);
     private final Color GOLD_LIGHT = new Color(255, 230, 150, 180);
     private final Color GOLD_PARTICLE = new Color(255, 240, 130, 220);
@@ -42,63 +45,122 @@ public class AEG_4g_GoldeonArmor extends BaseHullMod {
             // Show gauge above the ship
             drawGaugeBar(ship, gauge / MAX_GAUGE);
         }
+        // Check if the golden effect is active
+        boolean isActive = ship.getCustomData().get(GOLDION_ACTIVE_KEY) instanceof Boolean &&
+                (Boolean) ship.getCustomData().get(GOLDION_ACTIVE_KEY);
+        Float timer = (Float) ship.getCustomData().get(GOLDION_TIMER_KEY); // <- Make sure this is defined
+        Float gauge = (Float) ship.getCustomData().get(GAUGE_KEY);
+        if (gauge == null) gauge = 0f;
 
-        // Engine color override
-        ship.getEngineController().fadeToOtherColor(this, GOLD_MAIN, GOLD_LIGHT, 1f, 1f);
+        // Only allow activation if gauge is full and system is not on cooldown
+        boolean canActivate = gauge >= MAX_GAUGE && !Boolean.TRUE.equals(ship.getCustomData().get(GOLDION_ACTIVE_KEY));
 
-        // Jitter Over — glowing gold shimmer on top
-        ship.setJitter(this, GOLD_MAIN, 1.0f, 5, 10f, 20f);
-
-        // Jitter Under — glowing echo afterimages
-        ship.setJitterUnder(this, GOLD_LIGHT, 0.9f, 7, 12f, 24f);
-
-        // Shield visuals override
-        if (ship.getShield() != null) {
-            ship.getShield().setInnerColor(GOLD_LIGHT);
-            ship.getShield().setRingColor(GOLD_MAIN);
+        // Check for Shift + X key press
+        if (canActivate && (Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) || Keyboard.isKeyDown(Keyboard.KEY_RSHIFT))
+                && Keyboard.isKeyDown(Keyboard.KEY_X)) {
+            ship.setCustomData(GOLDION_ACTIVE_KEY, true);
+            ship.setCustomData(GOLDION_TIMER_KEY, GOLDION_DURATION);
+            ship.setCustomData(GAUGE_KEY, 0f); // Reset the gauge
+            for (int i = 0; i < 20; i++) {
+                Vector2f burstVel = MathUtils.getPoint(new Vector2f(), MathUtils.getRandomNumberInRange(50f, 200f), (float)Math.random() * 360f);
+                engine.addSmoothParticle(
+                        ship.getLocation(),
+                        burstVel,
+                        MathUtils.getRandomNumberInRange(12f, 25f),
+                        1.5f,
+                        1.2f,
+                        new Color(GOLD_PARTICLE.getRed(), GOLD_PARTICLE.getGreen(), GOLD_PARTICLE.getBlue(), 255)
+                );
+            }
         }
+        //Logic for Activating Goldion Mode
+        if (isActive) {
+            if (timer == null) timer = GOLDION_DURATION;
+            timer -= amount;
 
-        // Vent color override
-        ship.setVentCoreColor(GOLD_MAIN);
-        ship.setVentFringeColor(GOLD_LIGHT);
+            if (timer > 0f) {
+                // Apply all the golden visuals here
 
-        // Golden radiant particles (constant visual motion)
-        spawnRadiantParticles(ship, engine);
+                ship.getEngineController().fadeToOtherColor(this, GOLD_MAIN, GOLD_LIGHT, 1f, 1f);
+                ship.getEngineController().extendFlame(this, 1.5f, 1f, 1.3f);
+                ship.setJitter(this, GOLD_MAIN, 1.0f, 1 + MathUtils.getRandom().nextInt(4), 2f, 5f);
+                ship.setJitterUnder(this, GOLD_LIGHT, 1f, 3, 0f, 20f);
+
+                if (ship.getShield() != null) {
+                    ship.getShield().setInnerColor(GOLD_LIGHT);
+                    ship.getShield().setRingColor(GOLD_MAIN);
+                }
+
+                ship.setVentCoreColor(GOLD_MAIN);
+                ship.setVentFringeColor(GOLD_LIGHT);
+                spawnRadiantParticles(ship, engine);
+            } else {
+                ship.setCustomData(GOLDION_ACTIVE_KEY, false);
+            }
+
+            ship.setCustomData(GOLDION_TIMER_KEY, timer);
+        }
     }
-
     private void spawnRadiantParticles(ShipAPI ship, CombatEngineAPI engine) {
         Vector2f loc = ship.getLocation();
 
-        for (int i = 0; i < 4; i++) {
-            Vector2f vel = MathUtils.getPoint(new Vector2f(), MathUtils.getRandomNumberInRange(20f, 80f), (float) Math.random() * 360f);
-            float size = MathUtils.getRandomNumberInRange(6f, 16f);
-            float alpha = MathUtils.getRandomNumberInRange(0.4f, 1f);
-            float dur = MathUtils.getRandomNumberInRange(0.6f, 1.4f);
+        for (int i = 0; i < 8; i++) {
+            float angle = (float) Math.random() * 360f;
+            float speed = MathUtils.getRandomNumberInRange(40f, 120f);
+            Vector2f vel = MathUtils.getPoint(new Vector2f(), speed, angle);
+
+            float size = MathUtils.getRandomNumberInRange(8f, 18f);
+            float alpha = MathUtils.getRandomNumberInRange(0.5f, 1f);
+            float dur = MathUtils.getRandomNumberInRange(0.7f, 1.5f);
+
+            Color particleColor = new Color(
+                    GOLD_PARTICLE.getRed(),
+                    GOLD_PARTICLE.getGreen(),
+                    GOLD_PARTICLE.getBlue(),
+                    (int)(alpha * 255f)
+            );
 
             engine.addNebulaParticle(
                     loc,
                     vel,
                     size,
-                    1.5f,
-                    0.1f,
-                    0.3f,
+                    1.8f,   // intensity multiplier
+                    0.1f,   // ramp-up time
+                    0.3f,   // ramp-down time
                     dur,
-                    new Color(255, 240, 150, (int)(alpha * 255f))
+                    particleColor
             );
         }
     }
 
     private void drawGaugeBar(ShipAPI ship, float progress) {
-        Vector2f loc = ship.getLocation();
-        float width = 50f;
-        float height = 6f;
+        float width = 60f;
+        float height = 8f;
 
-        Vector2f barStart = new Vector2f(loc.x - width / 2f, loc.y + ship.getCollisionRadius() + 10f);
+        Vector2f barLoc = new Vector2f(
+                ship.getLocation().x - width / 2f,
+                ship.getLocation().y + ship.getCollisionRadius() + 10f
+        );
 
-        Color bg = new Color(30, 30, 30, 150);
-        Color fg = new Color(255, 215, 0, 220);
+        Color bg = new Color(30, 30, 30, 180);
+        Color fg = new Color(255, 215, 0, 230);
 
-        Global.getCombatEngine().addSmoothParticle(barStart, new Vector2f(), width, 1f, 0.05f, bg);
-        Global.getCombatEngine().addSmoothParticle(barStart, new Vector2f(), width * progress, 1.2f, 0.1f, fg);
+        MagicRender.singleframe(
+                Global.getSettings().getSprite("graphics/icons/hullsys/placeholder.png"), // Placeholder sprite
+                barLoc,
+                new Vector2f(width, height),
+                0f,
+                bg,
+                true
+        );
+
+        MagicRender.singleframe(
+                Global.getSettings().getSprite("graphics/icons/hullsys/placeholder.png"),
+                barLoc,
+                new Vector2f(width * progress, height),
+                0f,
+                fg,
+                true
+        );
     }
 }
