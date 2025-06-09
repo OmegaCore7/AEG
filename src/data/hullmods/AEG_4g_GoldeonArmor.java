@@ -1,22 +1,22 @@
 package data.hullmods;
 
 import com.fs.starfarer.api.Global;
-import com.fs.starfarer.api.combat.BaseHullMod;
-import com.fs.starfarer.api.combat.CombatEngineAPI;
-import com.fs.starfarer.api.combat.ShipAPI;
+import com.fs.starfarer.api.combat.*;
 import org.lazywizard.lazylib.MathUtils;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.util.vector.Vector2f;
 import org.magiclib.util.MagicUI;
 
 import java.awt.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class AEG_4g_GoldeonArmor extends BaseHullMod {
     private final String id = "goldion_armor_boost";
     private static final String GOLDION_ACTIVE_KEY = "goldion_active";
     private static final String GAUGE_KEY = "goldion_gauge";
     private static final float MAX_GAUGE = 100f;
-    private static final float GAIN_PER_SECOND = 10f;
+    private static final float GAIN_PER_SECOND = 1f;
     private static final float GOLDION_DURATION = 20f;
     private static final String GOLDION_TIMER_KEY = "goldion_timer";
     private final Color GOLD_MAIN = new Color(255, 215, 0, 255);
@@ -30,6 +30,7 @@ public class AEG_4g_GoldeonArmor extends BaseHullMod {
     public void advanceInCombat(ShipAPI ship, float amount) {
         if (ship == null || !ship.isAlive()) return;
 
+
         CombatEngineAPI engine = Global.getCombatEngine();
 
         // Gauge logic
@@ -37,7 +38,17 @@ public class AEG_4g_GoldeonArmor extends BaseHullMod {
             Float gauge = (Float) ship.getCustomData().get(GAUGE_KEY);
             if (gauge == null) gauge = 0f;
 
-            gauge += GAIN_PER_SECOND * amount;
+            // Calculate the player's health percentage (0 to 1)
+            float healthPercentage = ship.getHitpoints() / ship.getMaxHitpoints();
+
+            // Calculate the dynamic fill rate based on health percentage
+            // The closer the health is to 0, the faster the gauge fills.
+            float healthFactor = (1f - healthPercentage) / (1f - 0.2f);  // The 0.2f corresponds to 20% health
+            float dynamicGainRate = GAIN_PER_SECOND + healthFactor * (GAIN_PER_SECOND * 9);  // Fill faster at lower health
+
+            gauge += dynamicGainRate * amount;
+
+            // Ensure the gauge doesn't exceed the max
             if (gauge >= MAX_GAUGE) {
                 gauge = MAX_GAUGE; // Don't reset unless activated
             }
@@ -46,6 +57,7 @@ public class AEG_4g_GoldeonArmor extends BaseHullMod {
             // Show gauge above the ship
             drawGaugeHUD(ship, gauge / MAX_GAUGE);
         }
+
         // Check if the golden effect is active
         boolean isActive = ship.getCustomData().get(GOLDION_ACTIVE_KEY) instanceof Boolean &&
                 (Boolean) ship.getCustomData().get(GOLDION_ACTIVE_KEY);
@@ -63,7 +75,7 @@ public class AEG_4g_GoldeonArmor extends BaseHullMod {
             ship.setCustomData(GOLDION_TIMER_KEY, GOLDION_DURATION);
             ship.setCustomData(GAUGE_KEY, 0f); // Reset the gauge
             for (int i = 0; i < 20; i++) {
-                Vector2f burstVel = MathUtils.getPoint(new Vector2f(), MathUtils.getRandomNumberInRange(50f, 200f), (float)Math.random() * 360f);
+                Vector2f burstVel = MathUtils.getPoint(new Vector2f(), MathUtils.getRandomNumberInRange(50f, 200f), (float) Math.random() * 360f);
                 engine.addSmoothParticle(
                         ship.getLocation(),
                         burstVel,
@@ -71,10 +83,13 @@ public class AEG_4g_GoldeonArmor extends BaseHullMod {
                         1.5f,
                         1.2f,
                         new Color(GOLD_PARTICLE.getRed(), GOLD_PARTICLE.getGreen(), GOLD_PARTICLE.getBlue(), 255)
+
                 );
+
             }
         }
-        //Logic for Activating Goldion Mode
+
+        // Logic for Activating Goldion Mode
         if (isActive) {
             if (timer == null) timer = GOLDION_DURATION;
             timer -= amount;
@@ -83,16 +98,24 @@ public class AEG_4g_GoldeonArmor extends BaseHullMod {
             boolean boostApplied = Boolean.TRUE.equals(ship.getCustomData().get(BOOST_APPLIED_KEY));
 
             if (timer > 0f) {
+                // Call the dissolve function to remove nearby projectiles and missiles
+                dissolveProjectilesAndMissiles(ship, engine);
+
                 // Visual effects
                 ship.getEngineController().fadeToOtherColor(this, GOLD_MAIN, GOLD_LIGHT, 1f, 1f);
                 ship.getEngineController().extendFlame(this, 1.5f, 1f, 1.3f);
                 ship.setJitter(this, GOLD_MAIN, 1.0f, 1 + MathUtils.getRandom().nextInt(4), 2f, 5f);
                 ship.setJitterUnder(this, GOLD_LIGHT, 1f, 3, 0f, 20f);
-
+                // Apply custom shield settings during Goldion Armor mode
                 if (ship.getShield() != null) {
+                    // Set the shield's absorption rate to 100% for energy damage
+                    ship.getMutableStats().getShieldAbsorptionMult().modifyFlat(id, 100f);  // Makes shield absorb 100% energy damage
                     ship.getShield().setInnerColor(GOLD_LIGHT);
                     ship.getShield().setRingColor(GOLD_MAIN);
                 }
+
+
+
 
                 ship.setVentCoreColor(GOLD_MAIN);
                 ship.setVentFringeColor(GOLD_LIGHT);
@@ -125,13 +148,21 @@ public class AEG_4g_GoldeonArmor extends BaseHullMod {
                 ship.getMutableStats().getDeceleration().unmodifyFlat(id);
                 ship.getMutableStats().getTurnAcceleration().unmodifyFlat(id);
                 ship.getMutableStats().getMaxTurnRate().unmodifyFlat(id);
+                if (ship.getShield() != null) {
+                    // Reset shield colors to default
+                    ship.getShield().setInnerColor(new Color(255, 175, 100, 255));  // Default shield inner color (for example)
+                    ship.getShield().setRingColor(new Color(255, 125, 50, 255));  // Default ring color (for example)
+                    ship.getMutableStats().getShieldAbsorptionMult().unmodify(id);  // Reset absorption to normal
+                }
                 ship.setCustomData(GOLDION_ACTIVE_KEY, false);
                 ship.setCustomData(BOOST_APPLIED_KEY, false);
+
             }
 
             ship.setCustomData(GOLDION_TIMER_KEY, timer);
         }
     }
+
     private void spawnRadiantParticles(ShipAPI ship, CombatEngineAPI engine) {
         Vector2f loc = ship.getLocation();
 
@@ -148,7 +179,7 @@ public class AEG_4g_GoldeonArmor extends BaseHullMod {
                     GOLD_PARTICLE.getRed(),
                     GOLD_PARTICLE.getGreen(),
                     GOLD_PARTICLE.getBlue(),
-                    (int)(alpha * 255f)
+                    (int) (alpha * 255f)
             );
 
             engine.addNebulaParticle(
@@ -178,6 +209,94 @@ public class AEG_4g_GoldeonArmor extends BaseHullMod {
                     "GOLDION ARMOR MODE",
                     "",
                     true
+            );
+        }
+    }
+    private void dissolveProjectilesAndMissiles(ShipAPI ship, CombatEngineAPI engine) {
+        // Get all projectiles and missiles within a certain range of the ship (450f)
+        float dissolveRadius = 450f;
+
+        // Separate lists for projectiles and missiles
+        List<DamagingProjectileAPI> projectilesInRange = new ArrayList<>();
+        List<MissileAPI> missilesInRange = new ArrayList<>();
+
+        // Loop through all projectiles
+        for (DamagingProjectileAPI projectile : engine.getProjectiles()) {
+            if (MathUtils.getDistance(projectile.getLocation(), ship.getLocation()) <= dissolveRadius) {
+                projectilesInRange.add(projectile);
+            }
+        }
+
+        // Loop through all missiles
+        for (MissileAPI missile : engine.getMissiles()) {
+            if (MathUtils.getDistance(missile.getLocation(), ship.getLocation()) <= dissolveRadius) {
+                missilesInRange.add(missile);
+            }
+        }
+
+        // Dissolve projectiles
+        for (DamagingProjectileAPI projectile : projectilesInRange) {
+            dissolveProjectile(ship, projectile, engine);
+        }
+
+        // Dissolve missiles
+        for (MissileAPI missile : missilesInRange) {
+            dissolveMissile(ship, missile, engine);
+        }
+    }
+
+    // Function to dissolve a projectile
+    private void dissolveProjectile(ShipAPI ship, DamagingProjectileAPI projectile, CombatEngineAPI engine) {
+        // Randomize when the projectile gets dissolved (before or after the 450f mark)
+        float distanceToShip = MathUtils.getDistance(projectile.getLocation(), ship.getLocation());
+        if (MathUtils.getRandom().nextFloat() < (distanceToShip / 450f)) {
+            engine.removeEntity(projectile);  // Remove the projectile
+            generateDissolvingParticles(projectile.getLocation(), engine);  // Create particle effects
+        }
+    }
+
+    // Function to dissolve a missile
+    private void dissolveMissile(ShipAPI ship, MissileAPI missile, CombatEngineAPI engine) {
+        // Randomize when the missile gets dissolved (before or after the 450f mark)
+        float distanceToShip = MathUtils.getDistance(missile.getLocation(), ship.getLocation());
+        if (MathUtils.getRandom().nextFloat() < (distanceToShip / 450f)) {
+            engine.removeEntity(missile);  // Remove the missile
+            generateDissolvingParticles(missile.getLocation(), engine);  // Create particle effects
+        }
+    }
+
+
+    private void generateDissolvingParticles(Vector2f location, CombatEngineAPI engine) {
+        // Create a random number of particles at the specified location
+        int particleCount = MathUtils.getRandom().nextInt(10, 30); // Random particle count
+        for (int i = 0; i < particleCount; i++) {
+            float angle = MathUtils.getRandom().nextFloat() * 360f;
+            float speed = MathUtils.getRandomNumberInRange(50f, 150f);
+            Vector2f velocity = MathUtils.getPoint(location, speed, angle);
+
+            // Randomize size, alpha, and intensity for the organic effect
+            float size = MathUtils.getRandomNumberInRange(5f, 15f); // Random size
+            float alpha = MathUtils.getRandomNumberInRange(0.3f, 0.8f); // Random alpha
+            float intensity = MathUtils.getRandomNumberInRange(1f, 2f); // Random intensity
+
+            // Use a yellow/golden color to match the Goldion theme, but randomize the brightness
+            Color color = new Color(
+                    MathUtils.getRandomNumberInRange(200, 255),
+                    MathUtils.getRandomNumberInRange(180, 220),
+                    MathUtils.getRandomNumberInRange(100, 150),
+                    (int) (alpha * 255)
+            );
+
+            // Add the particle effect
+            engine.addNebulaParticle(
+                    location,            // Position of the particle
+                    velocity,            // Speed and direction of the particle
+                    size,                // Size of the particle
+                    intensity,           // Intensity of the particle
+                    0.2f,                // Ramp-up time
+                    0.5f,                // Ramp-down time
+                    MathUtils.getRandomNumberInRange(0.5f, 1.2f),  // Duration of particle effect
+                    color                // Color of the particle
             );
         }
     }
