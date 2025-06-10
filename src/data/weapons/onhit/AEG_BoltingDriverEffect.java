@@ -52,18 +52,6 @@ public class AEG_BoltingDriverEffect implements OnHitEffectPlugin {
                         return;
                     }
 
-                    // Create expanding ring and nebula effects along the circumference
-                    float radius = 700f * (timer / 20f); // starts large, shrinks to 0
-                    for (int i = 0; i < 4; i++) {
-                        float angle = (float) (Math.random() * 2 * Math.PI);
-                        Vector2f nebulaPoint = new Vector2f(
-                                point.x + radius * (float) Math.cos(angle),
-                                point.y + radius * (float) Math.sin(angle)
-                        );
-                        float nebulaSize = 25f + (float) (Math.random() * 50f);
-                        engine.addNebulaParticle(nebulaPoint, new Vector2f(), nebulaSize, 1, 0.5f, 0.5f, .05f, Misc.getHighlightColor());
-                    }
-
                     ShipAPI ship = null;
                     final Vector2f ringLocation = new Vector2f(point);
 

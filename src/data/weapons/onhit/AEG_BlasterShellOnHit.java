@@ -1,6 +1,5 @@
 package data.weapons.onhit;
 
-import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.combat.*;
 import com.fs.starfarer.api.combat.listeners.ApplyDamageResultAPI;
 import data.weapons.helper.AEG_TargetingQuadtreeHelper;

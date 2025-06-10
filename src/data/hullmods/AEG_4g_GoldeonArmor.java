@@ -14,12 +14,12 @@ import java.util.List;
 public class AEG_4g_GoldeonArmor extends BaseHullMod {
 
     private static final String DISSOLVE_CD_KEY = "goldion_dissolve_cd";  //Performance boost for dissolve mechanic
-    private static final float DISSOLVE_INTERVAL = 0.2f;  //Performance boost for dissolve mechanic
+    private static final float DISSOLVE_INTERVAL = 0.5f;  //Performance boost for dissolve mechanic
     private final String id = "goldion_armor_boost";
     private static final String GOLDION_ACTIVE_KEY = "goldion_active";
     private static final String GAUGE_KEY = "goldion_gauge";
     private static final float MAX_GAUGE = 100f;
-    private static final float GAIN_PER_SECOND = 1f;
+    private static final float GAIN_PER_SECOND = 20f;
     private static final float GOLDION_DURATION = 20f;
     private static final String GOLDION_TIMER_KEY = "goldion_timer";
     private final Color GOLD_MAIN = new Color(255, 215, 0, 255);
@@ -113,7 +113,7 @@ public class AEG_4g_GoldeonArmor extends BaseHullMod {
                 ship.getEngineController().fadeToOtherColor(this, GOLD_MAIN, GOLD_LIGHT, 1f, 1f);
                 ship.getEngineController().extendFlame(this, 1.5f, 1f, 1.3f);
                 ship.setJitter(this, GOLD_MAIN, 1.0f, 1 + MathUtils.getRandom().nextInt(4), 2f, 5f);
-                ship.setJitterUnder(this, GOLD_LIGHT, 1f, 3, 0f, 20f);
+                ship.setJitterUnder(this, GOLD_LIGHT, 0.5f, 10, 10f, 25f);
                 // Apply custom shield settings during Goldion Armor mode
                 if (ship.getShield() != null) {
                     // Set the shield's absorption rate to 100% for energy damage
@@ -166,7 +166,9 @@ public class AEG_4g_GoldeonArmor extends BaseHullMod {
                 ship.setCustomData(BOOST_APPLIED_KEY, false);
 
             }
+            //Cleanup
             ship.setCustomData(GAUGE_KEY, 0f);
+            ship.setCustomData(DISSOLVE_CD_KEY, 0f);
             ship.setCustomData(GOLDION_TIMER_KEY, timer);
         }
     }
@@ -221,8 +223,8 @@ public class AEG_4g_GoldeonArmor extends BaseHullMod {
         }
     }
     private void dissolveProjectilesAndMissiles(ShipAPI ship, CombatEngineAPI engine) {
-        // Get all projectiles and missiles within a certain range of the ship (450f)
-        float dissolveRadius = 450f;
+        // Get all projectiles and missiles within a certain range of the ship (250f)
+        float dissolveRadius = 250f;
 
         // Separate lists for projectiles and missiles
         List<DamagingProjectileAPI> projectilesInRange = new ArrayList<>();
@@ -255,9 +257,9 @@ public class AEG_4g_GoldeonArmor extends BaseHullMod {
 
     // Function to dissolve a projectile
     private void dissolveProjectile(ShipAPI ship, DamagingProjectileAPI projectile, CombatEngineAPI engine) {
-        // Randomize when the projectile gets dissolved (before or after the 450f mark)
+        // Randomize when the projectile gets dissolved (before or after the 250f mark)
         float distanceToShip = MathUtils.getDistance(projectile.getLocation(), ship.getLocation());
-        if (MathUtils.getRandom().nextFloat() < (distanceToShip / 450f)) {
+        if (MathUtils.getRandom().nextFloat() < (distanceToShip / 250f)) {
             engine.removeEntity(projectile);  // Remove the projectile
             generateDissolvingParticles(projectile.getLocation(), engine);  // Create particle effects
         }
@@ -265,9 +267,9 @@ public class AEG_4g_GoldeonArmor extends BaseHullMod {
 
     // Function to dissolve a missile
     private void dissolveMissile(ShipAPI ship, MissileAPI missile, CombatEngineAPI engine) {
-        // Randomize when the missile gets dissolved (before or after the 450f mark)
+        // Randomize when the missile gets dissolved (before or after the 250f mark)
         float distanceToShip = MathUtils.getDistance(missile.getLocation(), ship.getLocation());
-        if (MathUtils.getRandom().nextFloat() < (distanceToShip / 450f)) {
+        if (MathUtils.getRandom().nextFloat() < (distanceToShip / 250f)) {
             engine.removeEntity(missile);  // Remove the missile
             generateDissolvingParticles(missile.getLocation(), engine);  // Create particle effects
         }
@@ -275,36 +277,33 @@ public class AEG_4g_GoldeonArmor extends BaseHullMod {
 
 
     private void generateDissolvingParticles(Vector2f location, CombatEngineAPI engine) {
-        // Create a random number of particles at the specified location
-        int particleCount = MathUtils.getRandom().nextInt(10, 30); // Random particle count
+        // Flash effect (optional, but adds punch)
+        Color flashColor = new Color(255, 220, 100, 255);
+        engine.spawnExplosion(location, new Vector2f(), flashColor, 20f, 0.2f);
+        int particleCount = MathUtils.getRandom().nextInt(4, 10); // Fewer particles for less clutter
         for (int i = 0; i < particleCount; i++) {
             float angle = MathUtils.getRandom().nextFloat() * 360f;
-            float speed = MathUtils.getRandomNumberInRange(50f, 150f);
-            Vector2f velocity = MathUtils.getPoint(location, speed, angle);
+            float speed = MathUtils.getRandomNumberInRange(20f, 60f); // Quick zip
+            Vector2f velocity = MathUtils.getPoint(new Vector2f(), speed, angle);
 
-            // Randomize size, alpha, and intensity for the organic effect
-            float size = MathUtils.getRandomNumberInRange(5f, 15f); // Random size
-            float alpha = MathUtils.getRandomNumberInRange(0.3f, 0.8f); // Random alpha
-            float intensity = MathUtils.getRandomNumberInRange(1f, 2f); // Random intensity
+            float size = MathUtils.getRandomNumberInRange(5f, 10f); // Compact
+            float duration = MathUtils.getRandomNumberInRange(0.25f, 0.5f); // Short-lived
+            float intensity = 1.8f;
 
-            // Use a yellow/golden color to match the Goldion theme, but randomize the brightness
             Color color = new Color(
-                    MathUtils.getRandomNumberInRange(200, 255),
-                    MathUtils.getRandomNumberInRange(180, 220),
-                    MathUtils.getRandomNumberInRange(100, 150),
-                    (int) (alpha * 255)
+                    255,
+                    MathUtils.getRandomNumberInRange(200, 230),
+                    100 + MathUtils.getRandom().nextInt(50),
+                    200 + MathUtils.getRandom().nextInt(55)
             );
 
-            // Add the particle effect
-            engine.addNebulaParticle(
-                    location,            // Position of the particle
-                    velocity,            // Speed and direction of the particle
-                    size,                // Size of the particle
-                    intensity,           // Intensity of the particle
-                    0.2f,                // Ramp-up time
-                    0.5f,                // Ramp-down time
-                    MathUtils.getRandomNumberInRange(0.5f, 1.2f),  // Duration of particle effect
-                    color                // Color of the particle
+            engine.addSmoothParticle(
+                    location,
+                    velocity,
+                    size,
+                    intensity,
+                    duration,
+                    color
             );
         }
     }

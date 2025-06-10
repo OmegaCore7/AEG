@@ -85,21 +85,20 @@ public class AEG_4g_right_brokenmagnumEffect implements EveryFrameWeaponEffectPl
         ShipAPI ship = weapon.getShip();
 
         // Check if Goldion Mode is active
-        boolean isGoldionActive = ship.getCustomData().get("goldion_active") instanceof Boolean &&
-                (Boolean) ship.getCustomData().get("goldion_active");
+        boolean isGoldionActive = Boolean.TRUE.equals(ship.getCustomData().get("goldion_active"));
+        if (!isGoldionActive) return;
 
-        if (!isGoldionActive) {
-            return; // Don't spawn orbs unless Goldion Mode is active
-        }
-
-        // Spawn 3 golden orbs
-        for (int i = 0; i < 3; i++) {
+        // Spawn 20 golden orbs in a multi-helix formation
+        int orbCount = 20;
+        for (int i = 0; i < orbCount; i++) {
             float angleOffset = MathUtils.getRandomNumberInRange(-20f, 20f);
             float angle = weapon.getCurrAngle() + angleOffset;
             Vector2f spawnLoc = MathUtils.getPoint(weapon.getLocation(), 40f, angle);
 
-            // Spawn the orb by adding a plugin
-            engine.addPlugin(new AEG_4g_right_bm_energyorbs(ship, spawnLoc, angle, engine));
+            // Calculate unique spiral phase for this orb
+            float spiralPhase = (float) ((Math.PI * 2f) * ((float)i / orbCount)); // spread evenly in spiral
+
+            engine.addPlugin(new AEG_4g_right_bm_energyorbs(ship, spawnLoc, angle, engine, spiralPhase));
         }
     }
 

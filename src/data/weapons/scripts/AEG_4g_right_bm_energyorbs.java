@@ -2,72 +2,86 @@ package data.weapons.scripts;
 
 import com.fs.starfarer.api.combat.*;
 import com.fs.starfarer.api.input.InputEventAPI;
-import org.lwjgl.util.vector.Vector2f;
 import org.lazywizard.lazylib.MathUtils;
+import org.lwjgl.util.vector.Vector2f;
 
 import java.awt.*;
 import java.util.List;
 
 public class AEG_4g_right_bm_energyorbs implements EveryFrameCombatPlugin {
-
     private final ShipAPI source;
-    private final Vector2f location;
     private final CombatEngineAPI engine;
-    private final Vector2f velocity;
-    private float angle;
+
+    private final float SPEED = 350f;
+    private final float MAX_DURATION = 10f;
+    private final float DAMAGE = 1000f;
+    private final float EXPLOSION_RADIUS = 100f; // Wider for visual impact
+
     private float timer = 0f;
     private boolean exploded = false;
 
-    private final float SPEED = 150f;
-    private final float MAX_DURATION = 3.5f;
-    private final float EXPLOSION_RADIUS = 60f;
-    private final float DAMAGE = 200f;
+    // Spiral motion parameters
+    private final float spiralRadius = 75f;
+    private final float spiralSpeed = 6f;
+    private final float spiralPhase;
 
-    public AEG_4g_right_bm_energyorbs(ShipAPI source, Vector2f spawnLoc, float angle, CombatEngineAPI engine) {
+    private final Vector2f corePosition;
+    private final Vector2f coreVelocity;
+    private final Vector2f location = new Vector2f();
+
+    public AEG_4g_right_bm_energyorbs(ShipAPI source, Vector2f spawnLoc, float angle, CombatEngineAPI engine, float spiralPhase) {
         this.source = source;
-        this.location = new Vector2f(spawnLoc);
-        this.angle = angle;
-        this.velocity = MathUtils.getPoint(new Vector2f(), SPEED, angle);
         this.engine = engine;
+        this.spiralPhase = spiralPhase;
+
+        this.corePosition = new Vector2f(spawnLoc);
+        this.coreVelocity = MathUtils.getPoint(new Vector2f(), SPEED, angle);
     }
 
     @Override
     public void advance(float amount, List<InputEventAPI> events) {
         if (engine.isPaused() || exploded || source == null || !source.isAlive()) return;
-        ShipAPI ship = source;
 
-        boolean isGoldionActive = ship.getCustomData().get("goldion_active") instanceof Boolean
-                && (Boolean) ship.getCustomData().get("goldion_active");
+        boolean isGoldionActive = Boolean.TRUE.equals(source.getCustomData().get("goldion_active"));
+        if (!isGoldionActive) return;
 
-        if (!isGoldionActive) {
-            // Goldion mode NOT active, skip all orb logic (no animation, no spawn)
-            return;
-        }
         timer += amount;
         if (timer >= MAX_DURATION) {
             explode();
             return;
         }
 
-        CombatEntityAPI target = getNearestEnemy(engine, source, location, 1000f);
+        // Move the core forward
+        Vector2f forwardStep = new Vector2f(coreVelocity);
+        forwardStep.scale(amount);
+        Vector2f.add(corePosition, forwardStep, corePosition);
+
+        // Calculate spiral offset
+        float spiralAngle = spiralSpeed * timer + spiralPhase;
+        float offsetX = (float) Math.cos(spiralAngle) * spiralRadius;
+        float offsetY = (float) Math.sin(spiralAngle) * spiralRadius;
+
+        Vector2f velocityDir = new Vector2f(coreVelocity);
+        velocityDir.normalise();
+        Vector2f perpendicular = new Vector2f(-velocityDir.y, velocityDir.x);
+
+        Vector2f spiralOffset = new Vector2f(perpendicular);
+        spiralOffset.scale(offsetX);
+
+        Vector2f forwardOffset = new Vector2f(velocityDir);
+        forwardOffset.scale(offsetY);
+
+        Vector2f.add(corePosition, spiralOffset, location);
+        Vector2f.add(location, forwardOffset, location);
+
+        // Check for impact with enemies
+        CombatEntityAPI target = getNearestEnemy(engine, source, location, EXPLOSION_RADIUS);
         if (target != null) {
-            Vector2f toTarget = Vector2f.sub(target.getLocation(), location, null);
-            toTarget.normalise();
-            toTarget.scale(SPEED);
-            velocity.set(toTarget);
-        }
-
-        // Move the orb
-        Vector2f.add(location, (Vector2f) new Vector2f(velocity).scale(amount), location);
-
-        // Check for proximity hit
-        if (target != null && MathUtils.getDistance(location, target.getLocation()) <= EXPLOSION_RADIUS) {
             explode(target);
         }
 
-        // Trail effect
-        engine.addSmoothParticle(location, new Vector2f(), 15f, 1.2f, 0.3f,
-                new Color(255, 230, 100, 200));
+        // === VISUAL EFFECTS ===
+        renderEffects();
     }
 
     private void explode() {
@@ -84,37 +98,62 @@ public class AEG_4g_right_bm_energyorbs implements EveryFrameCombatPlugin {
                 location,
                 DAMAGE,
                 DamageType.ENERGY,
-                0f,
-                false,
-                false,
+                50f,
+                true,
+                true,
                 source
         );
         engine.removePlugin(this);
     }
 
     private void spawnExplosionFX() {
-        engine.spawnExplosion(location, velocity, new Color(255, 215, 50), 50f, 0.5f);
-        for (int i = 0; i < 12; i++) {
-            Vector2f randVel = MathUtils.getRandomPointInCircle(null, 100f);
+        engine.spawnExplosion(location, new Vector2f(), new Color(255, 235, 80), 150f, 1.5f);
+        engine.addSmoothParticle(location, new Vector2f(), 200f, 1.8f, 1.2f, new Color(255, 255, 200, 255));
+        engine.addHitParticle(location, new Vector2f(), 120f, 1f, 0.5f, Color.white);
+
+        for (int i = 0; i < 24; i++) {
+            Vector2f randVel = MathUtils.getRandomPointInCircle(null, 300f);
             engine.addNebulaParticle(
                     location,
                     randVel,
-                    MathUtils.getRandomNumberInRange(10f, 20f),
-                    1.8f,
+                    MathUtils.getRandomNumberInRange(20f, 40f),
+                    2f,
                     0.1f,
-                    0.4f,
-                    0.7f,
-                    new Color(255, 240, 130, 220)
+                    0.3f,
+                    MathUtils.getRandomNumberInRange(1.5f, 3f),
+                    new Color(255, 240, 130, 200)
             );
         }
     }
+
+    private void renderEffects() {
+        engine.addSmoothParticle(
+                location,
+                new Vector2f(),
+                25f + MathUtils.getRandom().nextInt(40),
+                1.2f,
+                0.3f,
+                new Color(255, 230, MathUtils.getRandom().nextInt(100), 220)
+        );
+
+        engine.addNebulaParticle(
+                location,
+                new Vector2f(),
+                MathUtils.getRandomNumberInRange(10f, 20f),
+                1.6f,
+                0.2f,
+                0.4f,
+                MathUtils.getRandomNumberInRange(2f, 3f),
+                new Color(255, 240, 120, 160)
+        );
+    }
+
     private CombatEntityAPI getNearestEnemy(CombatEngineAPI engine, ShipAPI source, Vector2f loc, float range) {
         CombatEntityAPI nearest = null;
         float nearestDist = Float.MAX_VALUE;
 
         for (ShipAPI ship : engine.getShips()) {
             if (ship == source || ship.getOwner() == source.getOwner() || !ship.isAlive()) continue;
-
             float dist = MathUtils.getDistance(loc, ship.getLocation());
             if (dist < nearestDist && dist <= range) {
                 nearest = ship;
@@ -124,22 +163,16 @@ public class AEG_4g_right_bm_energyorbs implements EveryFrameCombatPlugin {
 
         return nearest;
     }
-    @Override
-    public void processInputPreCoreControls(float amount, List<InputEventAPI> events) {
-        // no input handling needed
-    }
 
     @Override
-    public void renderInWorldCoords(ViewportAPI viewport) {
-        // no custom rendering needed
-    }
+    public void processInputPreCoreControls(float amount, List<InputEventAPI> events) {}
 
     @Override
-    public void renderInUICoords(ViewportAPI viewport) {
-        // no UI rendering needed
-    }
+    public void renderInWorldCoords(ViewportAPI viewport) {}
+
     @Override
-    public void init(CombatEngineAPI engine) {
-        // Already handled via constructor, or can be ignored.
-    }
+    public void renderInUICoords(ViewportAPI viewport) {}
+
+    @Override
+    public void init(CombatEngineAPI engine) {}
 }
