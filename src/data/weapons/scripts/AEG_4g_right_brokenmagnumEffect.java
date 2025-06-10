@@ -89,17 +89,7 @@ public class AEG_4g_right_brokenmagnumEffect implements EveryFrameWeaponEffectPl
         if (!isGoldionActive) return;
 
         // Spawn 20 golden orbs in a multi-helix formation
-        int orbCount = 20;
-        for (int i = 0; i < orbCount; i++) {
-            float angleOffset = MathUtils.getRandomNumberInRange(-20f, 20f);
-            float angle = weapon.getCurrAngle() + angleOffset;
-            Vector2f spawnLoc = MathUtils.getPoint(weapon.getLocation(), 40f, angle);
-
-            // Calculate unique spiral phase for this orb
-            float spiralPhase = (float) ((Math.PI * 2f) * ((float)i / orbCount)); // spread evenly in spiral
-
-            engine.addPlugin(new AEG_4g_right_bm_energyorbs(ship, spawnLoc, angle, engine, spiralPhase));
-        }
+        engine.addPlugin(new AEG_4g_right_helixBall(ship, weapon.getLocation(), weapon.getCurrAngle(), engine));
     }
 
 }
