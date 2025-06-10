@@ -12,6 +12,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class AEG_4g_GoldeonArmor extends BaseHullMod {
+
+    private static final String DISSOLVE_CD_KEY = "goldion_dissolve_cd";  //Performance boost for dissolve mechanic
+    private static final float DISSOLVE_INTERVAL = 0.2f;  //Performance boost for dissolve mechanic
     private final String id = "goldion_armor_boost";
     private static final String GOLDION_ACTIVE_KEY = "goldion_active";
     private static final String GAUGE_KEY = "goldion_gauge";
@@ -35,8 +38,7 @@ public class AEG_4g_GoldeonArmor extends BaseHullMod {
 
         // Gauge logic
         if (!ship.getSystem().isActive()) {
-            Float gauge = (Float) ship.getCustomData().get(GAUGE_KEY);
-            if (gauge == null) gauge = 0f;
+            float gauge = getGauge(ship);
 
             // Calculate the player's health percentage (0 to 1)
             float healthPercentage = ship.getHitpoints() / ship.getMaxHitpoints();
@@ -62,8 +64,7 @@ public class AEG_4g_GoldeonArmor extends BaseHullMod {
         boolean isActive = ship.getCustomData().get(GOLDION_ACTIVE_KEY) instanceof Boolean &&
                 (Boolean) ship.getCustomData().get(GOLDION_ACTIVE_KEY);
         Float timer = (Float) ship.getCustomData().get(GOLDION_TIMER_KEY); // <- Make sure this is defined
-        Float gauge = (Float) ship.getCustomData().get(GAUGE_KEY);
-        if (gauge == null) gauge = 0f;
+        float gauge = getGauge(ship);
 
         // Only allow activation if gauge is full and system is not on cooldown
         boolean canActivate = gauge >= MAX_GAUGE && !Boolean.TRUE.equals(ship.getCustomData().get(GOLDION_ACTIVE_KEY));
@@ -75,7 +76,7 @@ public class AEG_4g_GoldeonArmor extends BaseHullMod {
             ship.setCustomData(GOLDION_TIMER_KEY, GOLDION_DURATION);
             ship.setCustomData(GAUGE_KEY, 0f); // Reset the gauge
             for (int i = 0; i < 20; i++) {
-                Vector2f burstVel = MathUtils.getPoint(new Vector2f(), MathUtils.getRandomNumberInRange(50f, 200f), (float) Math.random() * 360f);
+                Vector2f burstVel = MathUtils.getPoint(new Vector2f(), MathUtils.getRandomNumberInRange(50f, 200f), (float) MathUtils.getRandom().nextFloat() * 360f);
                 engine.addSmoothParticle(
                         ship.getLocation(),
                         burstVel,
@@ -98,8 +99,15 @@ public class AEG_4g_GoldeonArmor extends BaseHullMod {
             boolean boostApplied = Boolean.TRUE.equals(ship.getCustomData().get(BOOST_APPLIED_KEY));
 
             if (timer > 0f) {
-                // Call the dissolve function to remove nearby projectiles and missiles
-                dissolveProjectilesAndMissiles(ship, engine);
+                // Call the dissolve function to remove nearby projectiles and missiles (Cooldown for performance)
+                Float cd = (Float) ship.getCustomData().get(DISSOLVE_CD_KEY);
+                if (cd == null) cd = 0f;
+                cd -= amount;
+                if (cd <= 0f) {
+                    dissolveProjectilesAndMissiles(ship, engine);
+                    cd = DISSOLVE_INTERVAL;
+                }
+                ship.setCustomData(DISSOLVE_CD_KEY, cd);
 
                 // Visual effects
                 ship.getEngineController().fadeToOtherColor(this, GOLD_MAIN, GOLD_LIGHT, 1f, 1f);
@@ -109,7 +117,7 @@ public class AEG_4g_GoldeonArmor extends BaseHullMod {
                 // Apply custom shield settings during Goldion Armor mode
                 if (ship.getShield() != null) {
                     // Set the shield's absorption rate to 100% for energy damage
-                    ship.getMutableStats().getShieldAbsorptionMult().modifyFlat(id, 100f);  // Makes shield absorb 100% energy damage
+                    ship.getMutableStats().getShieldDamageTakenMult().modifyMult(id, 0f);  // 100% absorption
                     ship.getShield().setInnerColor(GOLD_LIGHT);
                     ship.getShield().setRingColor(GOLD_MAIN);
                 }
@@ -152,13 +160,13 @@ public class AEG_4g_GoldeonArmor extends BaseHullMod {
                     // Reset shield colors to default
                     ship.getShield().setInnerColor(new Color(255, 175, 100, 255));  // Default shield inner color (for example)
                     ship.getShield().setRingColor(new Color(255, 125, 50, 255));  // Default ring color (for example)
-                    ship.getMutableStats().getShieldAbsorptionMult().unmodify(id);  // Reset absorption to normal
+                    ship.getMutableStats().getShieldDamageTakenMult().unmodify(id); // Reset absorption back to normal
                 }
                 ship.setCustomData(GOLDION_ACTIVE_KEY, false);
                 ship.setCustomData(BOOST_APPLIED_KEY, false);
 
             }
-
+            ship.setCustomData(GAUGE_KEY, 0f);
             ship.setCustomData(GOLDION_TIMER_KEY, timer);
         }
     }
@@ -167,7 +175,7 @@ public class AEG_4g_GoldeonArmor extends BaseHullMod {
         Vector2f loc = ship.getLocation();
 
         for (int i = 0; i < 8; i++) {
-            float angle = (float) Math.random() * 360f;
+            float angle = (float) MathUtils.getRandom().nextFloat() * 360f;
             float speed = MathUtils.getRandomNumberInRange(40f, 120f);
             Vector2f vel = MathUtils.getPoint(new Vector2f(), speed, angle);
 
@@ -299,5 +307,9 @@ public class AEG_4g_GoldeonArmor extends BaseHullMod {
                     color                // Color of the particle
             );
         }
+    }
+    private float getGauge(ShipAPI ship) {
+        Object data = ship.getCustomData().get(GAUGE_KEY);
+        return (data instanceof Float) ? (Float) data : 0f;
     }
 }
