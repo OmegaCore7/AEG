@@ -1,10 +1,8 @@
 package data.weapons.scripts;
 
-import com.fs.starfarer.api.AnimationAPI;
 import com.fs.starfarer.api.combat.*;
 import org.lazywizard.lazylib.MathUtils;
 import org.lwjgl.util.vector.Vector2f;
-
 public class AEG_4g_right_brokenmagnumEffect implements EveryFrameWeaponEffectPlugin, OnFireEffectPlugin {
 
     private boolean runOnce = false;
@@ -82,7 +80,27 @@ public class AEG_4g_right_brokenmagnumEffect implements EveryFrameWeaponEffectPl
 
     @Override
     public void onFire(DamagingProjectileAPI projectile, WeaponAPI weapon, CombatEngineAPI engine) {
-        // Switch to frame 01 when the weapon fires
         weapon.getAnimation().setFrame(1);
+
+        ShipAPI ship = weapon.getShip();
+
+        // Check if Goldion Mode is active
+        boolean isGoldionActive = ship.getCustomData().get("goldion_active") instanceof Boolean &&
+                (Boolean) ship.getCustomData().get("goldion_active");
+
+        if (!isGoldionActive) {
+            return; // Don't spawn orbs unless Goldion Mode is active
+        }
+
+        // Spawn 3 golden orbs
+        for (int i = 0; i < 3; i++) {
+            float angleOffset = MathUtils.getRandomNumberInRange(-20f, 20f);
+            float angle = weapon.getCurrAngle() + angleOffset;
+            Vector2f spawnLoc = MathUtils.getPoint(weapon.getLocation(), 40f, angle);
+
+            // Spawn the orb by adding a plugin
+            engine.addPlugin(new AEG_4g_right_bm_energyorbs(ship, spawnLoc, angle, engine));
+        }
     }
+
 }
