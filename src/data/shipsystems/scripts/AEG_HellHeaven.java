@@ -79,14 +79,14 @@ public class AEG_HellHeaven extends BaseShipSystemScript {
                         }
 
                         // Create green nebula ring
-                        for (int i = 0; i < 5; i++) {
+                        for (int i = 0; i < 4; i++) {
                             float angle = (float) (Math.random() * 2 * Math.PI);
                             Vector2f nebulaPoint = new Vector2f(
                                     location.x + radius * (float) Math.cos(angle),
                                     location.y + radius * (float) Math.sin(angle)
                             );
-                            float nebulaSize = 50f + (float)(Math.random() * 100f);
-                            Global.getCombatEngine().addNebulaParticle(nebulaPoint, new Vector2f(), nebulaSize, 1, 0.5f, 0.5f, 1f, NEBULA_COLOR);
+                            float nebulaSize = 30f + (float)(Math.random() * 70f);
+                            Global.getCombatEngine().addNebulaParticle(nebulaPoint, new Vector2f(), nebulaSize, 1, 0.5f, 0.5f, 1f, new Color(MathUtils.getRandom().nextInt(50),255 - MathUtils.getRandom().nextInt(105),100 - MathUtils.getRandom().nextInt(50),255 - MathUtils.getRandom().nextInt(105)));
                         }
 
                         // Create small lightning effects every 1 to 2 seconds
@@ -216,51 +216,51 @@ public class AEG_HellHeaven extends BaseShipSystemScript {
         }
 
     private void reflectProjectilesAndMissiles(ShipAPI ship) {
-        for (DamagingProjectileAPI projectile : Global.getCombatEngine().getProjectiles()) {
-            if (projectile.getOwner() != ship.getOwner() && MathUtils.getDistance(ship, projectile) < RADIUS) {
-                // Reflect projectiles
-                projectile.setOwner(ship.getOwner());
-                projectile.setFacing(projectile.getFacing() + 180f);
+        CombatEngineAPI engine = Global.getCombatEngine();
 
-                // Check for collision with enemy ships
-                for (ShipAPI enemy : Global.getCombatEngine().getShips()) {
-                    if (enemy.getOwner() != ship.getOwner() && enemy.isAlive() && MathUtils.getDistance(projectile, enemy) < projectile.getCollisionRadius()) {
-                        Global.getCombatEngine().removeEntity(projectile);
-                        Global.getCombatEngine().spawnExplosion(
-                                projectile.getLocation(),
-                                new Vector2f(),
-                                new Color(255, 180, 50), // Color of the explosion
-                                projectile.getDamageAmount(),
-                                0.25f // Smaller explosion for projectiles
-                        );
-                        break;
-                    }
-                }
+        List<DamagingProjectileAPI> projectiles = engine.getProjectiles();
+        for (DamagingProjectileAPI proj : projectiles) {
+            if (proj.getOwner() == ship.getOwner()) continue;
+            if (MathUtils.getDistance(ship, proj) > RADIUS) continue;
+
+            proj.setOwner(ship.getOwner());
+            proj.setFacing(proj.getFacing() + 180f);
+
+            ShipAPI closest = getNearestEnemyShip(ship);
+            if (closest != null && MathUtils.getDistance(proj, closest) < proj.getCollisionRadius()) {
+                engine.removeEntity(proj);
+                engine.spawnExplosion(
+                        proj.getLocation(),
+                        new Vector2f(),
+                        new Color(255, 180, 50),
+                        proj.getDamageAmount(),
+                        0.25f
+                );
             }
         }
-        for (MissileAPI missile : Global.getCombatEngine().getMissiles()) {
-            if (missile.getOwner() != ship.getOwner() && MathUtils.getDistance(ship, missile) < RADIUS) {
-                // Reflect missiles
-                missile.setOwner(ship.getOwner());
-                missile.setFacing(missile.getFacing() + 180f);
 
-                // Check for collision with enemy ships
-                for (ShipAPI enemy : Global.getCombatEngine().getShips()) {
-                    if (enemy.getOwner() != ship.getOwner() && enemy.isAlive() && MathUtils.getDistance(missile, enemy) < missile.getCollisionRadius()) {
-                        Global.getCombatEngine().removeEntity(missile);
-                        Global.getCombatEngine().spawnExplosion(
-                                missile.getLocation(),
-                                new Vector2f(),
-                                new Color(255, 225, 50), // Color of the explosion
-                                missile.getDamageAmount(),
-                                1.10f // Larger explosion for missiles
-                        );
-                        break;
-                    }
-                }
+        List<MissileAPI> missiles = engine.getMissiles();
+        for (MissileAPI missile : missiles) {
+            if (missile.getOwner() == ship.getOwner()) continue;
+            if (MathUtils.getDistance(ship, missile) > RADIUS) continue;
+
+            missile.setOwner(ship.getOwner());
+            missile.setFacing(missile.getFacing() + 180f);
+
+            ShipAPI closest = getNearestEnemyShip(ship);
+            if (closest != null && MathUtils.getDistance(missile, closest) < missile.getCollisionRadius()) {
+                engine.removeEntity(missile);
+                engine.spawnExplosion(
+                        missile.getLocation(),
+                        new Vector2f(),
+                        new Color(255, 225, 50),
+                        missile.getDamageAmount(),
+                        1.10f
+                );
             }
         }
     }
+
     private void applyFieldDamage(ShipAPI ship, float amount) {
         for (ShipAPI enemy : Global.getCombatEngine().getShips()) {
             if (enemy.getOwner() != ship.getOwner() && MathUtils.getDistance(ship, enemy) < RADIUS) {
@@ -313,6 +313,21 @@ public class AEG_HellHeaven extends BaseShipSystemScript {
                 ship.getLocation().x + relative.x * cos - relative.y * sin,
                 ship.getLocation().y + relative.x * sin + relative.y * cos
         );
+    }
+    private ShipAPI getNearestEnemyShip(ShipAPI ship) {
+        ShipAPI closest = null;
+        float closestDistance = Float.MAX_VALUE;
+
+        for (ShipAPI other : Global.getCombatEngine().getShips()) {
+            if (other.isAlive() && other.getOwner() != ship.getOwner()) {
+                float dist = MathUtils.getDistance(ship, other);
+                if (dist < closestDistance) {
+                    closestDistance = dist;
+                    closest = other;
+                }
+            }
+        }
+        return closest;
     }
     @Override
     public StatusData getStatusData(int index, State state, float effectLevel) {

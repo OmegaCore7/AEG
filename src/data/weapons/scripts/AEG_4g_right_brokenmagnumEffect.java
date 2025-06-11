@@ -2,14 +2,13 @@ package data.weapons.scripts;
 
 import com.fs.starfarer.api.combat.*;
 import org.lazywizard.lazylib.MathUtils;
-import org.lwjgl.util.vector.Vector2f;
 public class AEG_4g_right_brokenmagnumEffect implements EveryFrameWeaponEffectPlugin, OnFireEffectPlugin {
 
     private boolean runOnce = false;
     private ShipAPI ship;
     private WeaponAPI torso, shoulderR, armR;
     private float originalRArmPos = 0f;
-    private final float TORSO_OFFSET = -45, RIGHT_ARM_OFFSET = -25;
+    private final float TORSO_OFFSET = -45;
 
     public void init() {
         runOnce = true;
@@ -91,5 +90,4 @@ public class AEG_4g_right_brokenmagnumEffect implements EveryFrameWeaponEffectPl
         // Spawn Golden Blast
         engine.addPlugin(new AEG_4g_right_helixBall(ship, weapon.getLocation(), weapon.getCurrAngle(), engine));
     }
-
 }

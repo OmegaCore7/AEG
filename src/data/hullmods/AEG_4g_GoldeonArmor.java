@@ -31,8 +31,17 @@ public class AEG_4g_GoldeonArmor extends BaseHullMod {
 
     @Override
     public void advanceInCombat(ShipAPI ship, float amount) {
-        if (ship == null || !ship.isAlive()) return;
 
+        if (ship == null || !ship.isAlive()) return;
+        // Defensive cleanup for memory safety if ship is dead or hulked
+        if (!ship.isAlive() || ship.isHulk()) {
+            ship.removeCustomData(GOLDION_ACTIVE_KEY);
+            ship.removeCustomData(BOOST_APPLIED_KEY);
+            ship.removeCustomData(GAUGE_KEY);
+            ship.removeCustomData(DISSOLVE_CD_KEY);
+            ship.removeCustomData(GOLDION_TIMER_KEY);
+            return;
+        }
 
         CombatEngineAPI engine = Global.getCombatEngine();
 
@@ -54,7 +63,10 @@ public class AEG_4g_GoldeonArmor extends BaseHullMod {
             if (gauge >= MAX_GAUGE) {
                 gauge = MAX_GAUGE; // Don't reset unless activated
             }
-            ship.setCustomData(GAUGE_KEY, gauge);
+
+            if (gauge != getGauge(ship)) {
+                ship.setCustomData(GAUGE_KEY, gauge);
+            }
 
             // Show gauge above the ship
             drawGaugeHUD(ship, gauge / MAX_GAUGE);
@@ -162,14 +174,14 @@ public class AEG_4g_GoldeonArmor extends BaseHullMod {
                     ship.getShield().setRingColor(new Color(255, 125, 50, 255));  // Default ring color (for example)
                     ship.getMutableStats().getShieldDamageTakenMult().unmodify(id); // Reset absorption back to normal
                 }
-                ship.setCustomData(GOLDION_ACTIVE_KEY, false);
-                ship.setCustomData(BOOST_APPLIED_KEY, false);
+            ship.setCustomData(GOLDION_ACTIVE_KEY, false);
+            ship.setCustomData(BOOST_APPLIED_KEY, false);
 
-            }
-            //Cleanup
-            ship.setCustomData(GAUGE_KEY, 0f);
-            ship.setCustomData(DISSOLVE_CD_KEY, 0f);
-            ship.setCustomData(GOLDION_TIMER_KEY, timer);
+        }
+        //Cleanup
+        ship.setCustomData(GAUGE_KEY, 0f);
+        ship.setCustomData(DISSOLVE_CD_KEY, 0f);
+        ship.setCustomData(GOLDION_TIMER_KEY, timer);
         }
     }
 
