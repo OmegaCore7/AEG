@@ -47,7 +47,7 @@ public class AEG_4g_HHImpact extends BaseShipSystemScript {
                     if (target.getOwner() == ship.getOwner() || !target.isAlive()) continue;
 
                     if (isPointInsideBounds(fistPoint, target)) {
-                        Global.getCombatEngine().addFloatingText(fistPoint, "IMPACT!", 24f, Color.ORANGE, ship, 0.5f, 0.5f);
+                        Global.getCombatEngine().addFloatingText(fistPoint, "IMPACT!", 24f, Color.ORANGE, ship, 0.8f, 0.5f);
 
                         // Impact sparks and smoke
                         spawnImpactParticles(fistPoint);
@@ -74,7 +74,7 @@ public class AEG_4g_HHImpact extends BaseShipSystemScript {
                                     if (timer >= BUILDUP_DURATION) {
 
                                         // Spawn explosion Chunks
-                                        spawnExplosionChunks(center, 5); // 20 chunks, tweak as needed
+                                        spawnExplosionChunks(center, 5); // 5 chunks, tweak as needed
 
                                         // Final damage
                                         if (target.isAlive()) {
@@ -108,8 +108,12 @@ public class AEG_4g_HHImpact extends BaseShipSystemScript {
                 }
             }
 
-            private boolean isPointInsideBounds(Vector2f point, ShipAPI target) {
-                return MathUtils.getDistance(point, target.getLocation()) <= target.getCollisionRadius();
+            boolean isPointInsideBounds(Vector2f point, ShipAPI target) {
+                float collisionRadius = target.getCollisionRadius();
+                float bufferPercent = 0.15f;  // 15% buffer to exclude shields
+                float adjustedRadius = collisionRadius * (1f - bufferPercent);
+                if (adjustedRadius < 0f) adjustedRadius = 0f;  // Safety check
+                return MathUtils.getDistance(point, target.getLocation()) <= adjustedRadius;
             }
         });
     }
@@ -151,7 +155,7 @@ public class AEG_4g_HHImpact extends BaseShipSystemScript {
         }
     }
     private void spawnImpactParticles(Vector2f location) {
-        int numParticles = Math.min(5, random.nextInt(8) + 3);  // Randomize but cap at 5-10 particles
+        int numParticles = 5 + random.nextInt(6); // 5 to 10 inclusive
         for (int i = 0; i < numParticles; i++) {
             float angle = random.nextFloat() * 360f;
             float speed = 50f + random.nextFloat() * 100f;
