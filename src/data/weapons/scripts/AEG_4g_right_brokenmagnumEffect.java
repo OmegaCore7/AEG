@@ -88,7 +88,7 @@ public class AEG_4g_right_brokenmagnumEffect implements EveryFrameWeaponEffectPl
         boolean isGoldionActive = Boolean.TRUE.equals(ship.getCustomData().get("goldion_active"));
         if (!isGoldionActive) return;
 
-        // Spawn 20 golden orbs in a multi-helix formation
+        // Spawn Golden Blast
         engine.addPlugin(new AEG_4g_right_helixBall(ship, weapon.getLocation(), weapon.getCurrAngle(), engine));
     }
 
