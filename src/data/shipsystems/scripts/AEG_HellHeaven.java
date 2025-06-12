@@ -66,9 +66,9 @@ public class AEG_HellHeaven extends BaseShipSystemScript {
                         }
 
                         // Ensure ringPoints is populated correctly
-                        if (ringPoints.isEmpty() || radius != RADIUS) {
+                        int numPoints = 24;
+                        if (ringPoints.isEmpty() || radius != RADIUS || ringPoints.size() != numPoints) {
                             ringPoints.clear();
-                            int numPoints = 24; // Number of points along the circumference
                             for (int i = 0; i < numPoints; i++) {
                                 float angle = (float) (i * 2 * Math.PI / numPoints);
                                 ringPoints.add(new Vector2f(
@@ -76,9 +76,11 @@ public class AEG_HellHeaven extends BaseShipSystemScript {
                                         location.y + radius * (float) Math.sin(angle)
                                 ));
                             }
+                            leftIndex = 0;
+                            rightIndex = ringPoints.size() / 2;
                         }
 
-                        // Create green nebula ring
+// Create green nebula ring
                         for (int i = 0; i < 4; i++) {
                             float angle = (float) (Math.random() * 2 * Math.PI);
                             Vector2f nebulaPoint = new Vector2f(
@@ -86,31 +88,88 @@ public class AEG_HellHeaven extends BaseShipSystemScript {
                                     location.y + radius * (float) Math.sin(angle)
                             );
                             float nebulaSize = 40f + (float)(Math.random() * 80f);
-                            Global.getCombatEngine().addNebulaParticle(nebulaPoint, new Vector2f(), nebulaSize, 1, 0.5f, 0.5f, 1f, new Color(MathUtils.getRandom().nextInt(50),255 - MathUtils.getRandom().nextInt(105),100 - MathUtils.getRandom().nextInt(50),255 - MathUtils.getRandom().nextInt(105)));
+                            Global.getCombatEngine().addNebulaParticle(
+                                    nebulaPoint,
+                                    new Vector2f(),
+                                    nebulaSize,
+                                    1,
+                                    0.5f,
+                                    0.5f,
+                                    1f,
+                                    new Color(
+                                            MathUtils.getRandom().nextInt(50),
+                                            255 - MathUtils.getRandom().nextInt(105),
+                                            100 - MathUtils.getRandom().nextInt(50),
+                                            255 - MathUtils.getRandom().nextInt(105)
+                                    )
+                            );
                         }
 
-                        // Create small lightning effects every 1 to 2 seconds
+                        int size = ringPoints.size();
+
+                        // Shared function to safely get a lightning arc between points
+                        Runnable spawnArcBetweenPoints = () -> {
+                            Vector2f startPoint = ringPoints.get(leftIndex % size);
+                            Vector2f endPoint = ringPoints.get(rightIndex % size);
+                            if (startPoint != null && endPoint != null) {
+                                float width = 10f + (float)(Math.random() * 20f); // Shared width logic
+                                Global.getCombatEngine().spawnEmpArc(
+                                        ship,
+                                        startPoint,
+                                        ship,
+                                        ship,
+                                        DamageType.ENERGY,
+                                        0,
+                                        0,
+                                        850f,
+                                        null,
+                                        width,
+                                        NEBULA_COLOR,
+                                        new Color(200, 255, 200, 255 - MathUtils.getRandom().nextInt(55))
+                                );
+                            }
+                            leftIndex = (leftIndex + 1) % size;
+                            rightIndex = (rightIndex + 1) % size;
+                        };
+
+                        // Small lightning every 1–2 seconds
                         if (smallLightningInterval.intervalElapsed() && timer > chargeUpTime) {
-                            Vector2f startPoint = ringPoints.get(leftIndex);
-                            Vector2f endPoint = ringPoints.get(rightIndex);
-                            if (startPoint != null && endPoint != null) {
-                                float width = 10f + (float)(Math.random() * 20f); // Random width
-                                Global.getCombatEngine().spawnEmpArc(ship, startPoint, ship, ship, DamageType.ENERGY, 0, 0, 850f, null, width, NEBULA_COLOR, new Color(200,255,200,255 - MathUtils.getRandom().nextInt(55)));
-                            }
-                            leftIndex = (leftIndex + 1) % 15;
-                            rightIndex = 15 + ((rightIndex + 1) % 15);
+                            spawnArcBetweenPoints.run();
                         }
 
-                        // Create large lightning bolt every 4 seconds
+                        // Large lightning every 4 seconds
                         if (largeLightningInterval.intervalElapsed() && timer > chargeUpTime) {
-                            Vector2f startPoint = ringPoints.get(leftIndex);
-                            Vector2f endPoint = ringPoints.get(rightIndex);
+                            Vector2f startPoint = ringPoints.get(leftIndex % size);
+                            Vector2f endPoint = ringPoints.get(rightIndex % size);
                             if (startPoint != null && endPoint != null) {
-                                float width = 40f + (float)(Math.random() * 20f); // Random width
-                                Global.getCombatEngine().spawnEmpArc(ship, startPoint, ship, ship, DamageType.ENERGY, 0, 0, 900f, "terrain_hyperspace_lightning", width, new Color(0,255 - MathUtils.getRandom().nextInt(25),100 - MathUtils.getRandom().nextInt(35),255 - MathUtils.getRandom().nextInt(55)), new Color(200 - MathUtils.getRandom().nextInt(35),255,200 - MathUtils.getRandom().nextInt(25),255 - MathUtils.getRandom().nextInt(25)));
+                                float width = 40f + (float)(Math.random() * 20f); // Bigger width for large arc
+                                Global.getCombatEngine().spawnEmpArc(
+                                        ship,
+                                        startPoint,
+                                        ship,
+                                        ship,
+                                        DamageType.ENERGY,
+                                        0,
+                                        0,
+                                        900f,
+                                        "terrain_hyperspace_lightning",
+                                        width,
+                                        new Color(
+                                                0,
+                                                255 - MathUtils.getRandom().nextInt(25),
+                                                100 - MathUtils.getRandom().nextInt(35),
+                                                255 - MathUtils.getRandom().nextInt(55)
+                                        ),
+                                        new Color(
+                                                200 - MathUtils.getRandom().nextInt(35),
+                                                255,
+                                                200 - MathUtils.getRandom().nextInt(25),
+                                                255 - MathUtils.getRandom().nextInt(25)
+                                        )
+                                );
                             }
-                            leftIndex = (leftIndex + 1) % 15;
-                            rightIndex = 15 + ((rightIndex + 1) % 15);
+                            leftIndex = (leftIndex + 1) % size;
+                            rightIndex = (rightIndex + 1) % size;
                         }
 
                         // Reflect projectiles and missiles
