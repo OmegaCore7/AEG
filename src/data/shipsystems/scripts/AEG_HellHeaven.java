@@ -68,7 +68,7 @@ public class AEG_HellHeaven extends BaseShipSystemScript {
                         // Ensure ringPoints is populated correctly
                         if (ringPoints.isEmpty() || radius != RADIUS) {
                             ringPoints.clear();
-                            int numPoints = 30; // Number of points along the circumference
+                            int numPoints = 24; // Number of points along the circumference
                             for (int i = 0; i < numPoints; i++) {
                                 float angle = (float) (i * 2 * Math.PI / numPoints);
                                 ringPoints.add(new Vector2f(
@@ -85,7 +85,7 @@ public class AEG_HellHeaven extends BaseShipSystemScript {
                                     location.x + radius * (float) Math.cos(angle),
                                     location.y + radius * (float) Math.sin(angle)
                             );
-                            float nebulaSize = 30f + (float)(Math.random() * 70f);
+                            float nebulaSize = 40f + (float)(Math.random() * 80f);
                             Global.getCombatEngine().addNebulaParticle(nebulaPoint, new Vector2f(), nebulaSize, 1, 0.5f, 0.5f, 1f, new Color(MathUtils.getRandom().nextInt(50),255 - MathUtils.getRandom().nextInt(105),100 - MathUtils.getRandom().nextInt(50),255 - MathUtils.getRandom().nextInt(105)));
                         }
 
@@ -95,8 +95,7 @@ public class AEG_HellHeaven extends BaseShipSystemScript {
                             Vector2f endPoint = ringPoints.get(rightIndex);
                             if (startPoint != null && endPoint != null) {
                                 float width = 10f + (float)(Math.random() * 20f); // Random width
-                                float transparency = 0.5f + (float)(Math.random() * 0.5f); // Random transparency
-                                Global.getCombatEngine().spawnEmpArc(ship, startPoint, ship, ship, DamageType.ENERGY, 0, 0, 1100f, null, width, NEBULA_COLOR, new Color(200,255,200,255));
+                                Global.getCombatEngine().spawnEmpArc(ship, startPoint, ship, ship, DamageType.ENERGY, 0, 0, 850f, null, width, NEBULA_COLOR, new Color(200,255,200,255 - MathUtils.getRandom().nextInt(55)));
                             }
                             leftIndex = (leftIndex + 1) % 15;
                             rightIndex = 15 + ((rightIndex + 1) % 15);
@@ -108,8 +107,7 @@ public class AEG_HellHeaven extends BaseShipSystemScript {
                             Vector2f endPoint = ringPoints.get(rightIndex);
                             if (startPoint != null && endPoint != null) {
                                 float width = 40f + (float)(Math.random() * 20f); // Random width
-                                float transparency = 0.5f + (float)(Math.random() * 0.5f); // Random transparency
-                                Global.getCombatEngine().spawnEmpArc(ship, startPoint, ship, ship, DamageType.ENERGY, 0, 0, 1100f, null, width, NEBULA_COLOR, new Color(200,255,200,255));
+                                Global.getCombatEngine().spawnEmpArc(ship, startPoint, ship, ship, DamageType.ENERGY, 0, 0, 900f, "terrain_hyperspace_lightning", width, new Color(0,255 - MathUtils.getRandom().nextInt(25),100 - MathUtils.getRandom().nextInt(35),255 - MathUtils.getRandom().nextInt(55)), new Color(200 - MathUtils.getRandom().nextInt(35),255,200 - MathUtils.getRandom().nextInt(25),255 - MathUtils.getRandom().nextInt(25)));
                             }
                             leftIndex = (leftIndex + 1) % 15;
                             rightIndex = 15 + ((rightIndex + 1) % 15);
@@ -117,9 +115,6 @@ public class AEG_HellHeaven extends BaseShipSystemScript {
 
                         // Reflect projectiles and missiles
                         reflectProjectilesAndMissiles(ship);
-
-                        // Apply damage to other ships within the field
-                        applyFieldDamage(ship, amount);
 
                         // Apply slowing and flux overload to enemy ships within the field
                         applySlowingAndFluxOverload(ship, amount);
@@ -261,15 +256,6 @@ public class AEG_HellHeaven extends BaseShipSystemScript {
         }
     }
 
-    private void applyFieldDamage(ShipAPI ship, float amount) {
-        for (ShipAPI enemy : Global.getCombatEngine().getShips()) {
-            if (enemy.getOwner() != ship.getOwner() && MathUtils.getDistance(ship, enemy) < RADIUS) {
-                // Apply damage to enemy ships within the field
-                Global.getCombatEngine().applyDamage(enemy, enemy.getLocation(), 50f * amount, DamageType.FRAGMENTATION, 0f, false, false, ship);
-                Global.getCombatEngine().applyDamage(enemy, enemy.getLocation(), 50f * amount, DamageType.HIGH_EXPLOSIVE, 0f, false, false, ship);
-            }
-        }
-    }
     private void applySlowingAndFluxOverload(ShipAPI ship, float amount) {
         for (ShipAPI enemy : Global.getCombatEngine().getShips()) {
             if (enemy.getOwner() != ship.getOwner() && MathUtils.getDistance(ship, enemy) < RADIUS) {
