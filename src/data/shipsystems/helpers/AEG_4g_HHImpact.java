@@ -8,6 +8,7 @@ import com.fs.starfarer.api.combat.ShipAPI;
 import com.fs.starfarer.api.impl.combat.BaseShipSystemScript;
 import com.fs.starfarer.api.input.InputEventAPI;
 import com.fs.starfarer.api.util.Misc;
+import com.fs.starfarer.combat.entities.Ship;
 import org.dark.shaders.distortion.DistortionShader;
 import org.dark.shaders.distortion.WaveDistortion;
 import org.lazywizard.lazylib.MathUtils;
@@ -18,6 +19,7 @@ import java.util.List;
 import java.util.Random;
 
 public class AEG_4g_HHImpact extends BaseShipSystemScript {
+
 
     private static final float SPEED_THRESHOLD = 230f;
     public static final float HIGH_SPEED_THRESHOLD = 539f;
@@ -31,6 +33,9 @@ public class AEG_4g_HHImpact extends BaseShipSystemScript {
     public void apply(MutableShipStatsAPI stats, final String id, State state, float effectLevel) {
         final ShipAPI ship = (ShipAPI) stats.getEntity();
         if (ship == null || state != State.ACTIVE) return;
+
+        // GOLDION MODE CHECK - ADD HERE
+        final boolean goldionActive = Boolean.TRUE.equals(ship.getCustomData().get("goldion_active"));
 
         Global.getCombatEngine().addPlugin(new BaseEveryFrameCombatPlugin() {
 
@@ -47,65 +52,80 @@ public class AEG_4g_HHImpact extends BaseShipSystemScript {
                     if (target.getOwner() == ship.getOwner() || !target.isAlive()) continue;
 
                     if (isPointInsideBounds(fistPoint, target)) {
-                        Global.getCombatEngine().addFloatingText(fistPoint, "IMPACT!", 24f, Color.ORANGE, ship, 0.8f, 0.5f);
 
-                        // Impact sparks and smoke
-                        spawnImpactParticles(fistPoint);
-                        spawnArmorSmoke(fistPoint);
+                        //Goldion Mode Not Active
+                        if (!goldionActive) {
+                            // DEFAULT SYSTEM MODE BEHAVIOR
+                            Global.getCombatEngine().addFloatingText(fistPoint, "IMPACT!", 24f, Color.ORANGE, ship, 0.8f, 0.5f);
 
-                        if (ship.getVelocity().length() > HIGH_SPEED_THRESHOLD && !explosionTriggered) {
-                            explosionTriggered = true;
-                            // Increase break apart chance
-                            target.getMutableStats().getBreakProb().modifyFlat(id, 1.0f); // Set to 100%
+                            // Impact sparks and smoke
+                            spawnImpactParticles(fistPoint);
+                            spawnArmorSmoke(fistPoint);
 
-                            Global.getCombatEngine().addPlugin(new BaseEveryFrameCombatPlugin() {
-                                float timer = 0f;
-                                final Vector2f center = target.getLocation();
+                            if (ship.getVelocity().length() > HIGH_SPEED_THRESHOLD && !explosionTriggered) {
+                                explosionTriggered = true;
+                                // Increase break apart chance
+                                target.getMutableStats().getBreakProb().modifyFlat(id, 1.0f); // Set to 100%
 
-                                @Override
-                                public void advance(float amount, List<InputEventAPI> events) {
-                                    if (!target.isAlive()) {
-                                        Global.getCombatEngine().removePlugin(this);
-                                        return;
-                                    }
+                                Global.getCombatEngine().addPlugin(new BaseEveryFrameCombatPlugin() {
+                                    float timer = 0f;
+                                    final Vector2f center = target.getLocation();
 
-                                    timer += amount;
-
-                                    if (timer >= BUILDUP_DURATION) {
-
-                                        // Spawn explosion Chunks
-                                        spawnExplosionChunks(center, 5); // 5 chunks, tweak as needed
-
-                                        // Final damage
-                                        if (target.isAlive()) {
-                                            Global.getCombatEngine().applyDamage(target, center, 8000f, DamageType.HIGH_EXPLOSIVE, 1000f, true, true, ship);
+                                    @Override
+                                    public void advance(float amount, List<InputEventAPI> events) {
+                                        if (!target.isAlive()) {
+                                            Global.getCombatEngine().removePlugin(this);
+                                            return;
                                         }
 
-                                        // Spawn explosion Chunks
-                                        spawnExplosionChunks(center, 20); // 20 chunks, tweak as needed
+                                        timer += amount;
 
-                                        // 360° shockwave distortion ripple
-                                        WaveDistortion ripple = new WaveDistortion();
-                                        ripple.setLocation(center);
-                                        ripple.setSize(350f);
-                                        ripple.setIntensity(25f);
-                                        ripple.setArc(0, 360);
-                                        ripple.fadeInIntensity(0.1f);
-                                        ripple.fadeOutIntensity(0.5f);
-                                        ripple.setLifetime(0.7f);
-                                        ripple.setAutoFadeIntensityTime(0.1f);
-                                        DistortionShader.addDistortion(ripple);
+                                        if (timer >= BUILDUP_DURATION) {
 
-                                        Global.getCombatEngine().removePlugin(this);
+                                            // Spawn explosion Chunks
+                                            spawnExplosionChunks(center, 5); // 5 chunks, tweak as needed
 
+                                            // Final damage
+                                            if (target.isAlive()) {
+                                                Global.getCombatEngine().applyDamage(target, center, 8000f, DamageType.HIGH_EXPLOSIVE, 1000f, true, true, ship);
+                                            }
+
+                                            // Spawn explosion Chunks
+                                            spawnExplosionChunks(center, 20); // 20 chunks, tweak as needed
+
+                                            // 360° shockwave distortion ripple
+                                            WaveDistortion ripple = new WaveDistortion();
+                                            ripple.setLocation(center);
+                                            ripple.setSize(350f);
+                                            ripple.setIntensity(25f);
+                                            ripple.setArc(0, 360);
+                                            ripple.fadeInIntensity(0.1f);
+                                            ripple.fadeOutIntensity(0.5f);
+                                            ripple.setLifetime(0.7f);
+                                            ripple.setAutoFadeIntensityTime(0.1f);
+                                            DistortionShader.addDistortion(ripple);
+
+                                            Global.getCombatEngine().removePlugin(this);
+
+                                        }
                                     }
-                                }
-                            });
+                                });
+                            }
+
+                            lastImpactTime = currentTime;
                         }
+                    } else {
+                        // GOLDION MODE BEHAVIOR - ADD HERE
+                        Global.getCombatEngine().addFloatingText(fistPoint, "GOLDION IMPACT!", 30f, new Color(255, 215, 0), ship, 1f, 0.6f);
+
+                        // Extra radiant effects
+                        spawnGoldionImpactParticles(fistPoint, ship);
+                        // Optional extra: apply EMP arc, burn effect, or a temporary debuff
+                        // Optional: Add custom shader glow or a flare burst
 
                         lastImpactTime = currentTime;
                     }
-                }
+                  }
             }
 
             boolean isPointInsideBounds(Vector2f point, ShipAPI target) {
@@ -168,6 +188,61 @@ public class AEG_4g_HHImpact extends BaseShipSystemScript {
             Global.getCombatEngine().addHitParticle(point, velocity, 5f + random.nextFloat() * 12f, 1.5f, 1.6f + random.nextFloat() * 1.9f, new Color(255, 160, 80, 225));
             Global.getCombatEngine().addHitParticle(point, velocity, 11f + random.nextFloat() * 18f, 1f, 1.7f + random.nextFloat() * 2f, new Color(100, 100, 100, 100));
         }
+    }
+    private void spawnGoldionImpactParticles(Vector2f location, ShipAPI ship) {
+        int numParticles = 8 + random.nextInt(6); // 8 to 13 particles
+        for (int i = 0; i < numParticles; i++) {
+            float angle = random.nextFloat() * 360f;
+            float speed = 75f + random.nextFloat() * 150f;
+            Vector2f velocity = (Vector2f) Misc.getUnitVectorAtDegreeAngle(angle).scale(speed);
+            Vector2f point = new Vector2f(
+                    location.x + 10f * (float) Math.cos(Math.toRadians(angle)),
+                    location.y + 10f * (float) Math.sin(Math.toRadians(angle))
+            );
+
+            Global.getCombatEngine().addHitParticle(point, velocity,
+                    10f + random.nextFloat() * 10f,
+                    2f,
+                    1.2f + random.nextFloat() * 1.5f,
+                    new Color(255, 255, 150 + random.nextInt(100), 255));
+
+            if (random.nextFloat() < 0.4f) {
+                Global.getCombatEngine().addHitParticle(point, velocity,
+                        15f + random.nextFloat() * 20f,
+                        1.5f + random.nextFloat() * 2f,
+                        0.8f + random.nextFloat() * 1.0f,
+                        new Color(255, 215, 0, 200));
+            }
+        }
+
+        // Decorative random EMP arcs
+        int numArcs = 3 + random.nextInt(4); // 3 to 6
+        for (int i = 0; i < numArcs; i++) {
+            float angle = random.nextFloat() * 360f;
+            float distance = 100f + random.nextFloat() * 200f;
+            Vector2f targetPoint = MathUtils.getPoint(location, distance, angle);
+            Color arcColor = new Color(255, 255, 100 + random.nextInt(100), 100 + random.nextInt(155));
+
+            Global.getCombatEngine().spawnEmpArcVisual(
+                    null,
+                    location,
+                    null,
+                    targetPoint,
+                    arcColor,
+                    arcColor
+            );
+        }
+
+        // Add ripple distortion
+        WaveDistortion ripple = new WaveDistortion();
+        ripple.setLocation(location);
+        ripple.setSize(100f + random.nextFloat() * 50f);
+        ripple.setIntensity(10f);
+        ripple.setArc(0, 360);
+        ripple.fadeInIntensity(0.05f);
+        ripple.fadeOutIntensity(0.3f);
+        ripple.setLifetime(0.4f);
+        DistortionShader.addDistortion(ripple);
     }
 
     private void spawnArmorSmoke(Vector2f center) {
