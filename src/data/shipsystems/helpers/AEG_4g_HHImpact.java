@@ -342,7 +342,7 @@ public class AEG_4g_HHImpact extends BaseShipSystemScript {
                 Vector2f dir = (Vector2f) Misc.getUnitVectorAtDegreeAngle(angle).scale(speed);
                 Color gold = new Color(255, 215 + random.nextInt(40), 50 + random.nextInt(80), 255);
 
-                engine.addHitParticle(location, dir, 20f + random.nextFloat() * 40f, 2f, 2f + random.nextFloat() * 1f, gold);
+                engine.addHitParticle(location, dir, 20f + random.nextFloat() * 40f, 2f, 2f + random.nextFloat() * 1.5f, gold);
             }
 
             // 3. Massive screen ripple
