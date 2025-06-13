@@ -210,7 +210,6 @@ public class AEG_HellHeaven extends BaseShipSystemScript {
                 // Reduce damage received by 99%
                 stats.getHullDamageTakenMult().modifyMult(id, 0.01f);
                 stats.getArmorDamageTakenMult().modifyMult(id, 0.01f);
-                stats.getShieldDamageTakenMult().modifyMult(id, 0.01f);
             }
         } else {
             if (effectActive) {
@@ -266,7 +265,6 @@ public class AEG_HellHeaven extends BaseShipSystemScript {
 
             stats.getHullDamageTakenMult().unmodify(id);
             stats.getArmorDamageTakenMult().unmodify(id);
-            stats.getShieldDamageTakenMult().unmodify(id);
         }
 
     private void reflectProjectilesAndMissiles(ShipAPI ship) {
