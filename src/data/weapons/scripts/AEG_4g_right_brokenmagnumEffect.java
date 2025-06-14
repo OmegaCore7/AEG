@@ -88,6 +88,8 @@ public class AEG_4g_right_brokenmagnumEffect implements EveryFrameWeaponEffectPl
         if (!isGoldionActive) return;
 
         // Spawn Golden Blast
-        engine.addPlugin(new AEG_4g_right_helixBall(ship, weapon.getLocation(), weapon.getCurrAngle(), engine));
+        int someValue = 1; // or whatever is appropriate for your use case
+        engine.addPlugin(new AEG_4g_right_helixBall(ship, weapon.getLocation(), weapon.getCurrAngle(), engine, ship.getId().hashCode()));
+
     }
 }

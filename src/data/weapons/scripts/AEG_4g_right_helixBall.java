@@ -33,20 +33,14 @@ public class AEG_4g_right_helixBall implements EveryFrameCombatPlugin {
     private final Vector2f corePosition;
     private Vector2f coreVelocity;
 
-    public AEG_4g_right_helixBall(ShipAPI source, Vector2f spawnLoc, float angle, CombatEngineAPI engine) {
-        this.source = source;
-        this.engine = engine;
-
-        this.corePosition = new Vector2f(spawnLoc);
-        this.coreVelocity = MathUtils.getPoint(new Vector2f(), SPEED, angle);
-    }
 
     @Override
     public void advance(float amount, List<InputEventAPI> events) {
         if (engine.isPaused() || exploded || source == null || !source.isAlive()) return;
 
         boolean isGoldionActive = Boolean.TRUE.equals(source.getCustomData().get("goldion_active"));
-        if (!isGoldionActive) return;
+        boolean infusionActive = engine.getCustomData().containsKey("goldion_infusion_" + source.getId());
+        if (!isGoldionActive && !infusionActive) return;
 
         timer += amount;
         if (timer >= MAX_DURATION) {
@@ -223,15 +217,25 @@ public class AEG_4g_right_helixBall implements EveryFrameCombatPlugin {
         float nearestDist = Float.MAX_VALUE;
 
         for (ShipAPI ship : engine.getShips()) {
-            if (ship == source || ship.getOwner() == source.getOwner() || !ship.isAlive()) continue;
+            if (!ship.isAlive()) continue;
+            if (ship == source) continue; // skip the infused ship itself
+            if (ship.getOwner() == playerOwnerId) continue; // skip player's allies
             float dist = MathUtils.getDistance(loc, ship.getLocation());
             if (dist < nearestDist && dist <= range) {
                 nearest = ship;
                 nearestDist = dist;
             }
         }
-
         return nearest;
+    }
+    private final int playerOwnerId;
+
+    public AEG_4g_right_helixBall(ShipAPI source, Vector2f spawnLoc, float angle, CombatEngineAPI engine, int playerOwnerId) {
+        this.source = source;
+        this.engine = engine;
+        this.playerOwnerId = playerOwnerId;
+        this.corePosition = new Vector2f(spawnLoc);
+        this.coreVelocity = MathUtils.getPoint(new Vector2f(), SPEED, angle);
     }
 
 

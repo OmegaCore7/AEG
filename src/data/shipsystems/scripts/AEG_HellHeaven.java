@@ -5,8 +5,10 @@ import com.fs.starfarer.api.combat.*;
 import com.fs.starfarer.api.impl.combat.BaseShipSystemScript;
 import com.fs.starfarer.api.input.InputEventAPI;
 import com.fs.starfarer.api.util.IntervalUtil;
+import data.shipsystems.helpers.AEG_4g_HHGoldionBreaker;
 import data.shipsystems.helpers.AEG_4g_HHImpact;
 import org.lazywizard.lazylib.MathUtils;
+import org.lwjgl.input.Keyboard;
 import org.lwjgl.util.vector.Vector2f;
 
 import java.awt.*;
@@ -185,6 +187,13 @@ public class AEG_HellHeaven extends BaseShipSystemScript {
                         // Integrate the helper script for impact effects
                         AEG_4g_HHImpact impactHelper = new AEG_4g_HHImpact();
                         impactHelper.apply(stats, id, state, effectLevel);
+
+                        //Integrate the helper script for Goldion Breaker Trigger
+                        boolean goldionModeActive = Boolean.TRUE.equals(ship.getCustomData().get("goldion_active"));
+
+                        if (goldionModeActive && Keyboard.isKeyDown(Keyboard.KEY_W) && (Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) || Keyboard.isKeyDown(Keyboard.KEY_RSHIFT))) {
+                            AEG_4g_HHGoldionBreaker.execute(ship);
+                        }
 
                         // Gradually increase player ship flux while system is active
                         if (ship == Global.getCombatEngine().getPlayerShip()) {
