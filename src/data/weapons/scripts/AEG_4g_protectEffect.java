@@ -2,14 +2,24 @@ package data.weapons.scripts;
 
 import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.combat.*;
+import com.fs.starfarer.api.graphics.SpriteAPI;
 import com.fs.starfarer.api.util.IntervalUtil;
 import org.lazywizard.lazylib.MathUtils;
 import org.lwjgl.util.vector.Vector2f;
+import org.magiclib.util.MagicRender;
 
 import java.awt.Color;
 
 public class AEG_4g_protectEffect implements EveryFrameWeaponEffectPlugin {
-
+    //Fake Mini Gun Beam Generation Parameters
+    private boolean goldionModeActive = false;
+    private boolean goldionFiring = false;
+    private float timeSinceLastShot = 0f;
+    private float firingInterval = 0.2f; // start slow
+    private float firingRampRate = 0.005f; // how fast it speeds up
+    private float minFiringInterval = 0.03f; // fastest possible
+    private int beamShotsFired = 0;
+    private static final int MAX_BEAMS = 100;
     private int frameIndex = 0;
     private float frameDuration = 0.1f; // Duration for each frame
     private float timeSinceLastFrame = 0f;
@@ -28,7 +38,11 @@ public class AEG_4g_protectEffect implements EveryFrameWeaponEffectPlugin {
         if (engine.isPaused()) {
             return;
         }
+        ShipAPI ship = weapon.getShip();
+        if (ship == null || weapon == null) return;
 
+// Check if Goldion Armor is active
+        goldionModeActive = Boolean.TRUE.equals(ship.getCustomData().get("goldion_active"));
         float chargeLevel = weapon.getChargeLevel();
         timeSinceLastFrame += amount;
 
@@ -36,12 +50,33 @@ public class AEG_4g_protectEffect implements EveryFrameWeaponEffectPlugin {
         boolean isSelected = weapon == weapon.getShip().getSelectedGroupAPI().getActiveWeapon();
         boolean isActive = weapon.isFiring() || chargeLevel > 0;
 
+
         // Switch to frame 5 when the weapon is not selected and not active
         if (!isSelected && !isActive) {
             weapon.getAnimation().setFrame(5);
             return;  // Skip the rest of the logic as we already set the frame
         }
-        boolean goldionMode = Boolean.TRUE.equals(weapon.getShip().getCustomData().get("goldion_active"));
+
+        if (goldionModeActive && weapon.isFiring()) {
+            goldionFiring = true;
+            timeSinceLastShot += amount;
+
+            if (beamShotsFired < MAX_BEAMS && timeSinceLastShot >= firingInterval) {
+                fireMinigunBeam(ship, weapon);
+                beamShotsFired++;
+                timeSinceLastShot = 0f;
+
+                // Ramp up the firing speed
+                firingInterval = Math.max(minFiringInterval, firingInterval - firingRampRate);
+            }
+
+        } else {
+            // Reset when not firing or mode ends
+            goldionFiring = false;
+            timeSinceLastShot = 0f;
+            firingInterval = 0.2f;
+            beamShotsFired = 0;
+        }
         if (timeSinceLastFrame >= frameDuration) {
             timeSinceLastFrame = 0f;
 
@@ -49,11 +84,10 @@ public class AEG_4g_protectEffect implements EveryFrameWeaponEffectPlugin {
                 // Charge up phase
                 chargingUp = true;
                 frameIndex = Math.min((int) (chargeLevel * 5), 4);
-                //Firing Phase
             } else if (chargeLevel == 1) {
+                // Firing phase
                 frameIndex = 4;
-
-                if (!goldionMode && !shieldActive) {
+                if (!shieldActive) {
                     activateShield(weapon.getShip());
                     shieldActive = true;
                     activationTime = 0f;
@@ -69,41 +103,26 @@ public class AEG_4g_protectEffect implements EveryFrameWeaponEffectPlugin {
             weapon.getAnimation().setFrame(frameIndex);
         }
 
-        if (weapon.isFiring() && weapon.getShip().getSelectedGroupAPI().getActiveWeapon() == weapon) {
-            if (goldionMode) {
-                fireGoldionSpears(weapon.getShip(), weapon, amount);
-                // Optional: deactivate shield if previously active
-                if (shieldActive) {
-                    deactivateShield(weapon.getShip());
-                    shieldActive = false;
+        if (shieldActive && weapon.isFiring() && weapon.getShip().getSelectedGroupAPI().getActiveWeapon() == weapon) {
+            activationTime += amount;
+            if (activationTime > 10f) {
+                fluxIncreaseInterval.advance(amount);
+                if (fluxIncreaseInterval.intervalElapsed()) {
+                    fluxMultiplier = Math.min(fluxMultiplier + 0.2f, 2f);
+                    weapon.getShip().getFluxTracker().increaseFlux(weapon.getFluxCostToFire() * fluxMultiplier, true);
                 }
-            } else {
-                // Defensive behavior
-                if (!shieldActive) {
-                    activateShield(weapon.getShip());
-                    shieldActive = true;
-                    activationTime = 0f;
-                    fluxMultiplier = 1f;
-                }
-
-                activationTime += amount;
-                if (activationTime > 10f) {
-                    fluxIncreaseInterval.advance(amount);
-                    if (fluxIncreaseInterval.intervalElapsed()) {
-                        fluxMultiplier = Math.min(fluxMultiplier + 0.2f, 2f);
-                        weapon.getShip().getFluxTracker().increaseFlux(weapon.getFluxCostToFire() * fluxMultiplier, true);
-                    }
-                }
-
-                applyAoEDamage(weapon.getShip(), amount);
-                reflectProjectilesAndMissiles(weapon.getShip());
-                reduceIncomingBeamDamage(weapon.getShip());
             }
+
+            // Apply AoE damage to nearby enemy ships
+            applyAoEDamage(weapon.getShip(), amount);
+
+            // Reflect projectiles and missiles
+            reflectProjectilesAndMissiles(weapon.getShip());
+
+            // Reduce incoming beam damage
+            reduceIncomingBeamDamage(weapon.getShip());
         } else {
-            if (shieldActive) {
-                deactivateShield(weapon.getShip());
-                shieldActive = false;
-            }
+            deactivateShield(weapon.getShip());
         }
     }
 
@@ -190,59 +209,79 @@ public class AEG_4g_protectEffect implements EveryFrameWeaponEffectPlugin {
             }
         }
     }
-    private IntervalUtil spearInterval = new IntervalUtil(0.2f, 0.2f);  // Starts slow
-    private float spearRampTimer = 0f;
-
-    private void fireGoldionSpears(ShipAPI ship, WeaponAPI weapon, float amount) {
+    private void fireMinigunBeam(ShipAPI ship, WeaponAPI weapon) {
         CombatEngineAPI engine = Global.getCombatEngine();
-        Vector2f weaponLoc = weapon.getLocation();
+
+        Vector2f firePoint = weapon.getLocation();
         float angle = weapon.getCurrAngle();
+        float spread = MathUtils.getRandomNumberInRange(-4f, 4f); // wider spread for chaotic beam storm
+        float facing = angle + spread;
 
-        spearRampTimer += amount;
-        spearInterval.advance(amount);
+        // Length and direction of the beam
+        float beamLength = 600f;
+        Vector2f beamDir = MathUtils.getPointOnCircumference(null, beamLength, facing);
+        Vector2f beamTarget = Vector2f.add(firePoint, beamDir, null);
 
-        // Ramp up fire rate
-        float decay = Math.min(spearRampTimer / 5f, 1f);  // Up to 5s to reach max rate
-        float interval = 0.2f - (0.15f * decay);
-        spearInterval.setInterval(interval, interval);
+        // Damage applied in a line (single point for now)
+        applyBeamDamageAlongPath(ship, firePoint, beamTarget, 100f);
 
-        if (spearInterval.intervalElapsed()) {
-            // Calculate spear direction
-            Vector2f dir = new Vector2f((float) Math.cos(Math.toRadians(angle)), (float) Math.sin(Math.toRadians(angle)));
-            Vector2f speed = new Vector2f(dir);
-            speed.scale(300f + decay * 500f);  // Ramp up speed
+        // Visual beam flash - very fast fade
+        engine.addHitParticle(
+                firePoint,
+                new Vector2f(),
+                80f,
+                1.0f,
+                0.05f,
+                new Color(255, 180, 80, 255)
+        );
 
-            // Optional: add curve or flicker
-            float spread = (1f - decay) * 10f;  // Less wobble at full ramp
-            angle += MathUtils.getRandomNumberInRange(-spread, spread);
-            dir = MathUtils.getPointOnCircumference(null, 1f, angle);
-            Vector2f newSpeed = new Vector2f(dir);
-            newSpeed.scale(300f + decay * 500f);
+        // Flash at the beam tip
+        engine.spawnExplosion(
+                beamTarget,
+                new Vector2f(),
+                new Color(255, 100, 30, 200),
+                40f,
+                0.2f
+        );
 
-            Vector2f spawnLoc = MathUtils.getPointOnCircumference(weaponLoc, 10f, angle);
+        // Optional: lingering glow trail
+        MagicRender.battlespace(
+                Global.getSettings().getSprite("fx", "beam_light_400"),
+                Vector2f.add(firePoint, beamDir, null),
+                new Vector2f(),
+                new Vector2f(200f, 40f),
+                new Vector2f(250f, 60f),
+                angle,
+                0f,
+                new Color(255, 200, 80, 180),
+                true,
+                0.05f,
+                0f,
+                0.2f
+        );
 
-            // Main particle spear
-            engine.addSmoothParticle(spawnLoc, newSpeed, 12f, 1.8f, 0.5f,
-                    new Color(255, 225, 100, 255));
-            engine.addNebulaParticle(spawnLoc, newSpeed, 18f, 2.0f, 0.1f, 0.2f, 0.6f,
-                    new Color(255, 255, 180, 200));
+        // Optional: play sound
+        Global.getSoundPlayer().playSound("tachyon_lance_emp_impact", 1f, 0.6f, firePoint, ship.getVelocity());
+    }
+    private void applyBeamDamageAlongPath(ShipAPI ship, Vector2f from, Vector2f to, float damageAmount) {
+        CombatEngineAPI engine = Global.getCombatEngine();
 
-            // EMP Spark every 5th shot
-            if ((int) (spearRampTimer * 10) % 5 == 0) {
-                Vector2f empLoc = MathUtils.getRandomPointInCircle(spawnLoc, 30f);
-                engine.spawnEmpArcVisual(empLoc, ship, empLoc, null, 10f,
-                        new Color(255, 255, 100), new Color(255, 180, 50));
+        for (ShipAPI target : engine.getShips()) {
+            if (target.getOwner() != ship.getOwner() && target.isAlive()) {
+                // Beam hits if close to line
+                if (MathUtils.getDistance(target.getLocation(), to) < 75f) {
+                    engine.applyDamage(
+                            target,
+                            target.getLocation(),
+                            damageAmount,
+                            DamageType.ENERGY,
+                            0f,
+                            false,
+                            false,
+                            ship
+                    );
+                }
             }
-
-            // Impact sparkle at random for visual feedback
-            if (Math.random() < 0.2) {
-                engine.addHitParticle(spawnLoc, newSpeed, 10f, 1.5f, 0.25f,
-                        new Color(255, 230, 130));
-            }
-        }
-        if (!weapon.isFiring()) {
-            spearRampTimer = 0f;
         }
     }
-
 }
