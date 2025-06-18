@@ -47,10 +47,6 @@ public class AEG_4g_helixSpear implements EveryFrameCombatPlugin {
     public void advance(float amount, List<InputEventAPI> events) {
         if (engine.isPaused() || exploded || source == null || !source.isAlive()) return;
 
-        boolean isGoldionActive = Boolean.TRUE.equals(source.getCustomData().get("goldion_active"));
-        boolean infusionActive = engine.getCustomData().containsKey("goldion_infusion_" + source.getId());
-        if (!isGoldionActive && !infusionActive) return;
-
         timer += amount;
         if (timer >= MAX_DURATION) {
             explode();
