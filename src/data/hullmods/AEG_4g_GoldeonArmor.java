@@ -84,9 +84,20 @@ public class AEG_4g_GoldeonArmor extends BaseHullMod {
         // Check for Shift + X key press
         if (canActivate && (Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) || Keyboard.isKeyDown(Keyboard.KEY_RSHIFT))
                 && Keyboard.isKeyDown(Keyboard.KEY_X)) {
+
             ship.setCustomData(GOLDION_ACTIVE_KEY, true);
-            ship.setCustomData(GOLDION_TIMER_KEY, GOLDION_DURATION);
+
+            // Duration scaling based on health (same logic as gauge fill)
+            float healthPercentage = ship.getHitpoints() / ship.getMaxHitpoints();
+            float healthFactor = (1f - healthPercentage) / (1f - 0.2f); // Scale from 0% at 100% HP to 100% at 20% HP
+            healthFactor = Math.max(0f, Math.min(1f, healthFactor)); // Clamp for safety
+
+            float bonusDuration = 10f; // You can tweak this as needed
+            float scaledDuration = GOLDION_DURATION + bonusDuration * healthFactor;
+
+            ship.setCustomData(GOLDION_TIMER_KEY, scaledDuration);
             ship.setCustomData(GAUGE_KEY, 0f); // Reset the gauge
+
             for (int i = 0; i < 20; i++) {
                 Vector2f burstVel = MathUtils.getPoint(new Vector2f(), MathUtils.getRandomNumberInRange(50f, 200f), (float) MathUtils.getRandom().nextFloat() * 360f);
                 engine.addSmoothParticle(
@@ -96,11 +107,10 @@ public class AEG_4g_GoldeonArmor extends BaseHullMod {
                         1.5f,
                         1.2f,
                         new Color(GOLD_PARTICLE.getRed(), GOLD_PARTICLE.getGreen(), GOLD_PARTICLE.getBlue(), 255)
-
                 );
-
             }
         }
+
 
         // Logic for Activating Goldion Mode
         if (isActive) {

@@ -2,6 +2,8 @@ package data.weapons.scripts;
 
 import com.fs.starfarer.api.combat.*;
 import org.lazywizard.lazylib.MathUtils;
+import org.lwjgl.util.vector.Vector2f;
+
 public class AEG_4g_right_brokenmagnumEffect implements EveryFrameWeaponEffectPlugin, OnFireEffectPlugin {
 
     private boolean runOnce = false;
@@ -89,7 +91,8 @@ public class AEG_4g_right_brokenmagnumEffect implements EveryFrameWeaponEffectPl
 
         // Spawn Golden Blast
         int someValue = 1; // or whatever is appropriate for your use case
-        engine.addPlugin(new AEG_4g_right_helixBall(ship, weapon.getLocation(), weapon.getCurrAngle(), engine, ship.getId().hashCode()));
+        Vector2f firePoint = weapon.getFirePoint(0) != null ? weapon.getFirePoint(0) : weapon.getLocation();
+        engine.addPlugin(new AEG_4g_right_helixBall(ship, firePoint, weapon.getCurrAngle(), engine, ship.getId().hashCode()));
 
     }
 }
