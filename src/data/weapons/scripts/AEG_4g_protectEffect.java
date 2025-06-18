@@ -2,24 +2,13 @@ package data.weapons.scripts;
 
 import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.combat.*;
-import com.fs.starfarer.api.graphics.SpriteAPI;
 import com.fs.starfarer.api.util.IntervalUtil;
 import org.lazywizard.lazylib.MathUtils;
 import org.lwjgl.util.vector.Vector2f;
-import org.magiclib.util.MagicRender;
 
 import java.awt.Color;
 
 public class AEG_4g_protectEffect implements EveryFrameWeaponEffectPlugin {
-    //Fake Mini Gun Beam Generation Parameters
-    private boolean goldionModeActive = false;
-    private boolean goldionFiring = false;
-    private float timeSinceLastShot = 0f;
-    private float firingInterval = 0.2f; // start slow
-    private float firingRampRate = 0.005f; // how fast it speeds up
-    private float minFiringInterval = 0.03f; // fastest possible
-    private int beamShotsFired = 0;
-    private static final int MAX_BEAMS = 100;
     private int frameIndex = 0;
     private float frameDuration = 0.1f; // Duration for each frame
     private float timeSinceLastFrame = 0f;
@@ -38,11 +27,7 @@ public class AEG_4g_protectEffect implements EveryFrameWeaponEffectPlugin {
         if (engine.isPaused()) {
             return;
         }
-        ShipAPI ship = weapon.getShip();
-        if (ship == null || weapon == null) return;
 
-// Check if Goldion Armor is active
-        goldionModeActive = Boolean.TRUE.equals(ship.getCustomData().get("goldion_active"));
         float chargeLevel = weapon.getChargeLevel();
         timeSinceLastFrame += amount;
 
@@ -50,33 +35,12 @@ public class AEG_4g_protectEffect implements EveryFrameWeaponEffectPlugin {
         boolean isSelected = weapon == weapon.getShip().getSelectedGroupAPI().getActiveWeapon();
         boolean isActive = weapon.isFiring() || chargeLevel > 0;
 
-
         // Switch to frame 5 when the weapon is not selected and not active
         if (!isSelected && !isActive) {
             weapon.getAnimation().setFrame(5);
             return;  // Skip the rest of the logic as we already set the frame
         }
 
-        if (goldionModeActive && weapon.isFiring()) {
-            goldionFiring = true;
-            timeSinceLastShot += amount;
-
-            if (beamShotsFired < MAX_BEAMS && timeSinceLastShot >= firingInterval) {
-                fireMinigunBeam(ship, weapon);
-                beamShotsFired++;
-                timeSinceLastShot = 0f;
-
-                // Ramp up the firing speed
-                firingInterval = Math.max(minFiringInterval, firingInterval - firingRampRate);
-            }
-
-        } else {
-            // Reset when not firing or mode ends
-            goldionFiring = false;
-            timeSinceLastShot = 0f;
-            firingInterval = 0.2f;
-            beamShotsFired = 0;
-        }
         if (timeSinceLastFrame >= frameDuration) {
             timeSinceLastFrame = 0f;
 
@@ -206,81 +170,6 @@ public class AEG_4g_protectEffect implements EveryFrameWeaponEffectPlugin {
         for (BeamAPI beam : Global.getCombatEngine().getBeams()) {
             if (beam.getSource() != ship && MathUtils.getDistance(ship, beam.getTo()) < RADIUS) {
                 beam.getDamage().setDamage(beam.getDamage().getDamage() * 0.05f); // Reduce beam damage by 95%
-            }
-        }
-    }
-    private void fireMinigunBeam(ShipAPI ship, WeaponAPI weapon) {
-        CombatEngineAPI engine = Global.getCombatEngine();
-
-        Vector2f firePoint = weapon.getLocation();
-        float angle = weapon.getCurrAngle();
-        float spread = MathUtils.getRandomNumberInRange(-4f, 4f); // wider spread for chaotic beam storm
-        float facing = angle + spread;
-
-        // Length and direction of the beam
-        float beamLength = 600f;
-        Vector2f beamDir = MathUtils.getPointOnCircumference(null, beamLength, facing);
-        Vector2f beamTarget = Vector2f.add(firePoint, beamDir, null);
-
-        // Damage applied in a line (single point for now)
-        applyBeamDamageAlongPath(ship, firePoint, beamTarget, 100f);
-
-        // Visual beam flash - very fast fade
-        engine.addHitParticle(
-                firePoint,
-                new Vector2f(),
-                80f,
-                1.0f,
-                0.05f,
-                new Color(255, 180, 80, 255)
-        );
-
-        // Flash at the beam tip
-        engine.spawnExplosion(
-                beamTarget,
-                new Vector2f(),
-                new Color(255, 100, 30, 200),
-                40f,
-                0.2f
-        );
-
-        // Optional: lingering glow trail
-        MagicRender.battlespace(
-                Global.getSettings().getSprite("fx", "beam_light_400"),
-                Vector2f.add(firePoint, beamDir, null),
-                new Vector2f(),
-                new Vector2f(200f, 40f),
-                new Vector2f(250f, 60f),
-                angle,
-                0f,
-                new Color(255, 200, 80, 180),
-                true,
-                0.05f,
-                0f,
-                0.2f
-        );
-
-        // Optional: play sound
-        Global.getSoundPlayer().playSound("tachyon_lance_emp_impact", 1f, 0.6f, firePoint, ship.getVelocity());
-    }
-    private void applyBeamDamageAlongPath(ShipAPI ship, Vector2f from, Vector2f to, float damageAmount) {
-        CombatEngineAPI engine = Global.getCombatEngine();
-
-        for (ShipAPI target : engine.getShips()) {
-            if (target.getOwner() != ship.getOwner() && target.isAlive()) {
-                // Beam hits if close to line
-                if (MathUtils.getDistance(target.getLocation(), to) < 75f) {
-                    engine.applyDamage(
-                            target,
-                            target.getLocation(),
-                            damageAmount,
-                            DamageType.ENERGY,
-                            0f,
-                            false,
-                            false,
-                            ship
-                    );
-                }
             }
         }
     }

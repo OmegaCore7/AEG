@@ -26,7 +26,8 @@ public class AEG_4g_protect implements BeamEffectPlugin {
         weapon = beam.getWeapon();
         ShipAPI ship = weapon.getShip();
         if (!engine.isEntityInPlay(ship)) return; // skip if ship isn't fully initialized
-
+        // Skip if Goldion mode is active
+        if (Boolean.TRUE.equals(ship.getCustomData().get("goldion_active"))) return;
         // ✅ Safe shield radius fallback
         float shieldRadius = ship.getShield() != null ? ship.getShieldRadiusEvenIfNoShield() : 100f;
 
