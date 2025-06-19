@@ -6,7 +6,7 @@ import com.fs.starfarer.api.util.IntervalUtil;
 import org.lazywizard.lazylib.MathUtils;
 import org.lwjgl.util.vector.Vector2f;
 
-import java.awt.Color;
+import java.awt.*;
 
 public class AEG_4g_protectEffect implements EveryFrameWeaponEffectPlugin {
     private int frameIndex = 0;
@@ -102,21 +102,51 @@ public class AEG_4g_protectEffect implements EveryFrameWeaponEffectPlugin {
     }
 
     private void applyAoEDamage(ShipAPI ship, float amount) {
-        for (ShipAPI enemy : Global.getCombatEngine().getShips()) {
-            if (enemy.getOwner() != ship.getOwner() && enemy.isAlive() && MathUtils.getDistance(ship, enemy) < RADIUS) {
-                float damage = AOE_DAMAGE;
-                float flux = AOE_FLUX;
+        CombatEngineAPI engine = Global.getCombatEngine();
+        boolean isGoldion = Boolean.TRUE.equals(ship.getCustomData().get("goldion_active"));
 
-                if (enemy.isFighter() || enemy.isDrone()) {
-                    damage *= MULTIPLIER;
-                    flux *= MULTIPLIER;
+        float radius = isGoldion ? 800f : 500f;
+        float baseDamage = AOE_DAMAGE;
+        float baseFlux = AOE_FLUX;
+
+        for (ShipAPI enemy : engine.getShips()) {
+            if (enemy.getOwner() == ship.getOwner() || !enemy.isAlive()) continue;
+            if (MathUtils.getDistance(ship, enemy) > radius) continue;
+
+            float damage = baseDamage;
+            float flux = baseFlux;
+
+            if (enemy.isFighter() || enemy.isDrone()) {
+                damage *= MULTIPLIER;
+                flux *= MULTIPLIER;
+            } else if (isGoldion) {
+                switch (enemy.getHullSize()) {
+                    case FIGHTER:
+                    case FRIGATE:
+                        damage *= 3f;
+                        flux *= 3f;
+                        break;
+                    case DESTROYER:
+                        damage *= 2f;
+                        flux *= 2f;
+                        break;
+                    case CRUISER:
+                        damage *= 1.5f;
+                        flux *= 1.5f;
+                        break;
+                    default:
+                        break; // Capitals get normal damage
                 }
-
-                enemy.getFluxTracker().increaseFlux(flux * amount, true);
-                enemy.setHitpoints(enemy.getHitpoints() - damage * amount);
             }
+
+            enemy.getFluxTracker().increaseFlux(flux * amount, true);
+            enemy.setHitpoints(enemy.getHitpoints() - damage * amount);
+
+            // Add visual indicator
+            spawnHitEffect(enemy.getLocation(), isGoldion, engine);
         }
     }
+
 
     private void reflectProjectilesAndMissiles(ShipAPI ship) {
         for (DamagingProjectileAPI projectile : Global.getCombatEngine().getProjectiles()) {
@@ -172,5 +202,76 @@ public class AEG_4g_protectEffect implements EveryFrameWeaponEffectPlugin {
                 beam.getDamage().setDamage(beam.getDamage().getDamage() * 0.05f); // Reduce beam damage by 95%
             }
         }
+    }
+
+    private void spawnHitEffect(Vector2f location, boolean isGoldion, CombatEngineAPI engine) {
+        int totalParticles = isGoldion ? 10 : 5;
+        int centerParticles = Math.max(1, totalParticles / 3); // ~1/3 at center
+        int offsetParticles = totalParticles - centerParticles;
+
+        float baseSize = isGoldion ? 40f : 25f;
+        float duration = isGoldion ? 0.75f : 0.4f;
+        float spawnRadius = isGoldion ? 60f : 30f;
+
+        // --- Centered particles
+        for (int i = 0; i < centerParticles; i++) {
+            float size = baseSize * MathUtils.getRandomNumberInRange(0.8f, 1.2f);
+            Vector2f velocity = MathUtils.getPoint(new Vector2f(), MathUtils.getRandomNumberInRange(10f, 30f), (float)(Math.random() * 360f));
+            Color color = getParticleColor(isGoldion);
+
+            engine.spawnExplosion(location, new Vector2f(), color, size, duration);
+            engine.addSmoothParticle(location, velocity, size * 0.5f, 1.0f, duration, color);
+        }
+
+        // --- Offset particles
+        for (int i = 0; i < offsetParticles; i++) {
+            float angle = (float) (Math.random() * 360f);
+            float dist = MathUtils.getRandomNumberInRange(spawnRadius * 0.4f, spawnRadius);
+
+            Vector2f offset = MathUtils.getPointOnCircumference(location, dist, angle);
+            Vector2f velocity = MathUtils.getPoint(new Vector2f(), MathUtils.getRandomNumberInRange(15f, 40f), (float)(Math.random() * 360f));
+            float size = baseSize * MathUtils.getRandomNumberInRange(0.7f, 1.3f);
+            Color color = getParticleColor(isGoldion);
+
+            engine.spawnExplosion(offset, new Vector2f(), color, size, duration);
+            engine.addSmoothParticle(offset, velocity, size * 0.5f, 1.0f, duration, color);
+        }
+
+        // --- Optional: Goldion aura
+        if (isGoldion) {
+            for (int i = 0; i < 3; i++) {
+                Vector2f offset = MathUtils.getPointOnCircumference(location, MathUtils.getRandomNumberInRange(40f, 80f), (float) Math.random() * 360f);
+                Vector2f auraVelocity = MathUtils.getPoint(new Vector2f(), MathUtils.getRandomNumberInRange(5f, 15f), (float)(Math.random() * 360f));
+
+                float auraSize = MathUtils.getRandomNumberInRange(60f, 100f);
+                float endSizeMult = 0.9f + MathUtils.getRandom().nextFloat() * 0.4f;
+                float fullBrightnessFraction = 0.5f + MathUtils.getRandom().nextFloat() * 0.4f;
+                float auraDuration = MathUtils.getRandomNumberInRange(0.8f, 1.4f);
+
+                Color auraColor = new Color(
+                        255 - MathUtils.getRandom().nextInt(50),
+                        210 + MathUtils.getRandom().nextInt(30),
+                        80 + MathUtils.getRandom().nextInt(40),
+                        MathUtils.getRandomNumberInRange(100, 170)
+                );
+
+                engine.addNebulaParticle(
+                        offset,
+                        auraVelocity,
+                        auraSize,
+                        endSizeMult,
+                        0.5f,
+                        fullBrightnessFraction,
+                        auraDuration,
+                        auraColor
+                );
+            }
+        }
+    }
+
+    private Color getParticleColor(boolean isGoldion) {
+        return isGoldion
+                ? new Color(255, 200 + MathUtils.getRandom().nextInt(55), 60 + MathUtils.getRandom().nextInt(30), 150 + MathUtils.getRandom().nextInt(55))
+                : new Color(255, 100 + MathUtils.getRandom().nextInt(50), 50, 120 + MathUtils.getRandom().nextInt(50));
     }
 }
