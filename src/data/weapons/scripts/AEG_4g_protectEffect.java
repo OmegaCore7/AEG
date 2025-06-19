@@ -9,6 +9,7 @@ import org.lwjgl.util.vector.Vector2f;
 import java.awt.*;
 
 public class AEG_4g_protectEffect implements EveryFrameWeaponEffectPlugin {
+    private final IntervalUtil effectVisualInterval = new IntervalUtil(0.15f, 0.25f);
     private int frameIndex = 0;
     private float frameDuration = 0.1f; // Duration for each frame
     private float timeSinceLastFrame = 0f;
@@ -17,7 +18,7 @@ public class AEG_4g_protectEffect implements EveryFrameWeaponEffectPlugin {
     private IntervalUtil fluxIncreaseInterval = new IntervalUtil(2f, 2f); // Flux cost increases every 2 seconds
     private float fluxMultiplier = 1f;
     private float activationTime = 0f;
-    private static final float RADIUS = 500f; // Radius for the effects
+    private static final float RADIUS = 350f; // Radius for the effects
     private static final float AOE_DAMAGE = 50f; // Base AoE damage
     private static final float AOE_FLUX = 100f; // Base AoE flux increase
     private static final float MULTIPLIER = 5f; // Damage multiplier for fighters, bombers, drones, and strike craft
@@ -105,7 +106,7 @@ public class AEG_4g_protectEffect implements EveryFrameWeaponEffectPlugin {
         CombatEngineAPI engine = Global.getCombatEngine();
         boolean isGoldion = Boolean.TRUE.equals(ship.getCustomData().get("goldion_active"));
 
-        float radius = isGoldion ? 800f : 500f;
+        float radius = isGoldion ? 500f : 350f;
         float baseDamage = AOE_DAMAGE;
         float baseFlux = AOE_FLUX;
 
@@ -143,7 +144,10 @@ public class AEG_4g_protectEffect implements EveryFrameWeaponEffectPlugin {
             enemy.setHitpoints(enemy.getHitpoints() - damage * amount);
 
             // Add visual indicator
-            spawnHitEffect(enemy.getLocation(), isGoldion, engine);
+            effectVisualInterval.advance(amount); //Time interval for performance
+            if (effectVisualInterval.intervalElapsed()) {
+                spawnHitEffect(enemy.getLocation(), isGoldion, engine);
+            }
         }
     }
 
@@ -205,12 +209,12 @@ public class AEG_4g_protectEffect implements EveryFrameWeaponEffectPlugin {
     }
 
     private void spawnHitEffect(Vector2f location, boolean isGoldion, CombatEngineAPI engine) {
-        int totalParticles = isGoldion ? 10 : 5;
+        int totalParticles = isGoldion ? 4 : 2;
         int centerParticles = Math.max(1, totalParticles / 3); // ~1/3 at center
         int offsetParticles = totalParticles - centerParticles;
 
-        float baseSize = isGoldion ? 40f : 25f;
-        float duration = isGoldion ? 0.75f : 0.4f;
+        float baseSize = isGoldion ? 35f : 20f;
+        float duration = isGoldion ? 0.5f : 0.25f;
         float spawnRadius = isGoldion ? 60f : 30f;
 
         // --- Centered particles
@@ -239,20 +243,20 @@ public class AEG_4g_protectEffect implements EveryFrameWeaponEffectPlugin {
 
         // --- Optional: Goldion aura
         if (isGoldion) {
-            for (int i = 0; i < 3; i++) {
+            for (int i = 0; i < 2; i++) {
                 Vector2f offset = MathUtils.getPointOnCircumference(location, MathUtils.getRandomNumberInRange(40f, 80f), (float) Math.random() * 360f);
                 Vector2f auraVelocity = MathUtils.getPoint(new Vector2f(), MathUtils.getRandomNumberInRange(5f, 15f), (float)(Math.random() * 360f));
 
-                float auraSize = MathUtils.getRandomNumberInRange(60f, 100f);
+                float auraSize = MathUtils.getRandomNumberInRange(40f, 80f);
                 float endSizeMult = 0.9f + MathUtils.getRandom().nextFloat() * 0.4f;
                 float fullBrightnessFraction = 0.5f + MathUtils.getRandom().nextFloat() * 0.4f;
-                float auraDuration = MathUtils.getRandomNumberInRange(0.8f, 1.4f);
+                float auraDuration = MathUtils.getRandomNumberInRange(0.6f, 1.0f);
 
                 Color auraColor = new Color(
                         255 - MathUtils.getRandom().nextInt(50),
                         210 + MathUtils.getRandom().nextInt(30),
                         80 + MathUtils.getRandom().nextInt(40),
-                        MathUtils.getRandomNumberInRange(100, 170)
+                        MathUtils.getRandomNumberInRange(75, 175)
                 );
 
                 engine.addNebulaParticle(
