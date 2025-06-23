@@ -13,7 +13,7 @@ public class AEG_4g_helixSpear implements EveryFrameCombatPlugin {
     private final ShipAPI source;
     private final CombatEngineAPI engine;
 
-    private final float SPEED = 500f;              // faster than the ball
+    private final float SPEED = 800f;              // faster than the ball
     private final float MAX_DURATION = 6f;         // shorter lifetime for fast firing
     private final float DAMAGE = 250f;              // much lower damage per shot
     private final float EXPLOSION_RADIUS = 40f;    // smaller explosion radius
@@ -23,12 +23,12 @@ public class AEG_4g_helixSpear implements EveryFrameCombatPlugin {
     private boolean exploded = false;
 
     // Spiral params - tighter spiral for spear-like shape
-    private final float spiralRadius = 30f;
+    private final float spiralRadius = 20f;
     private final float spiralSpeed = 10f;
 
     // Homing params
     private final float HOMING_TURN_RATE = 90f;    // keep same turn rate
-    private final float HOMING_RANGE = 500f;
+    private final float HOMING_RANGE = 250f;
 
     private final Vector2f corePosition;
     private Vector2f coreVelocity;
