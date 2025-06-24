@@ -127,9 +127,8 @@ public class AEG_4g_GoldionCrusherEffect implements EveryFrameWeaponEffectPlugin
             return;
         }
 
-
+        //Animate Swing Method
         animateSwing(amount);
-
 
         if (Global.getCombatEngine().isPaused()) return;
 
@@ -158,10 +157,8 @@ public class AEG_4g_GoldionCrusherEffect implements EveryFrameWeaponEffectPlugin
             chargeLevel = 0f;
             reverse = 1f;
         }
-
     }
     private void animateSwing(float amount) {
-
 
         float global = ship.getFacing();
         float aim = MathUtils.getShortestRotation(global, weapon.getCurrAngle());
@@ -169,7 +166,6 @@ public class AEG_4g_GoldionCrusherEffect implements EveryFrameWeaponEffectPlugin
         // Common values
         float sineA = MagicAnim.smoothNormalizeRange(chargeLevel, 0.25f, 1f);
         float sinceG = MagicAnim.smoothNormalizeRange(chargeLevel, 0.0f, 0.25f) * reverse;
-
 
         // Adjust swing direction correction
         if (chargeLevel > 0.33f && sinceG > 0) {
@@ -277,13 +273,11 @@ public class AEG_4g_GoldionCrusherEffect implements EveryFrameWeaponEffectPlugin
             return angle;
         }
     }
-
     private float normalizeAngle(float angle) {
         angle = angle % 360f;
         if (angle < 0) angle += 360f;
         return angle;
     }
-
     private float shortestRotationDistance(float from, float to) {
         float diff = to - from;
         if (diff > 180) diff -= 360;
