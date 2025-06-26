@@ -179,22 +179,40 @@ public class AEG_4g_GoldionCrusherVisuals implements BeamEffectPlugin {
                 }
             }
         }
-        //Needs revision
+        //Needs revision!! More Dynamic Finale that Fakes Atomization of the targets within 800f Radius
+        //Between 800 and 1200 is just the push and flux damage
+        float innerRadius = 800f;
+        float outerRadius = 1200f;
         if (beam.getWeapon().getChargeLevel() <= 0f && !finalBurstTriggered) {
             finalBurstTriggered = true;
-
             engine.spawnExplosion(hitPoint, ship.getVelocity(), new Color(255, 180, 60), 300f, 0.6f);
-            engine.addSmoothParticle(hitPoint, ship.getVelocity(), 250f, 2f, 0.5f, Color.YELLOW);
 
             for (ShipAPI enemy : engine.getShips()) {
-                if (enemy.getOwner() == ship.getOwner()) continue;
-                if (MathUtils.getDistance(enemy, hitPoint) <= 1100f) {
+                if (enemy.getOwner() == ship.getOwner() || enemy.isHulk() || enemy.isStationModule()) continue;
+
+                float dist = MathUtils.getDistance(enemy, hitPoint);
+                if (dist <= 1200f) {
                     Vector2f push = Vector2f.sub(enemy.getLocation(), hitPoint, null);
                     push.normalise();
-                    push.scale(50f);
+                    push.scale(100f);
                     enemy.getVelocity().x += push.x;
                     enemy.getVelocity().y += push.y;
                     enemy.getFluxTracker().increaseFlux(300f, true);
+
+                    if (dist <= 800f) {
+                        engine.applyDamage(enemy, enemy.getLocation(), 5000f, DamageType.HIGH_EXPLOSIVE, 0f, true, false, ship);
+
+                        for (int i = 0; i < 80; i++) {
+                            Vector2f point = MathUtils.getRandomPointInCircle(enemy.getLocation(), 100f);
+                            engine.addHitParticle(point, MathUtils.getRandomPointInCircle(null, 150f), 25f, 2f, 1f, new Color(255, 200, 100));
+                        }
+
+                        WaveDistortion wave = new WaveDistortion(enemy.getLocation(), new Vector2f());
+                        wave.setSize(400f);
+                        wave.setIntensity(40f);
+                        wave.setLifetime(1f);
+                        DistortionShader.addDistortion(wave);
+                    }
                 }
             }
         }
