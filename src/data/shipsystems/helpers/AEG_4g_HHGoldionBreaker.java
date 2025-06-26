@@ -198,20 +198,30 @@ public class AEG_4g_HHGoldionBreaker {
             engine.getTimeMult().modifyMult("goldion_final_explosion_slowmo", 0.15f);
             engine.addPlugin(new BaseEveryFrameCombatPlugin() {
                 float time = 0f;
+                final float holdDuration = 0.5f;   // time to stay at 0.15x
+                final float totalDuration = 1.5f;  // total duration including ramp-up
+
                 @Override
                 public void advance(float amount, List<InputEventAPI> events) {
                     time += amount;
-                    if (time > 1.5f) {
+
+                    if (time < holdDuration) {
+                        // Hold slowmo
+                        engine.getTimeMult().modifyMult("goldion_final_explosion_slowmo", 0.15f);
+                    } else if (time < totalDuration) {
+                        // Ease out from 0.15 to 1.0 over remaining time
+                        float progress = (time - holdDuration) / (totalDuration - holdDuration);
+                        // Optional easing: quadratic ease-out
+                        float eased = 1f - (1f - progress) * (1f - progress);
+                        float timeMult = 0.15f + (1f - 0.15f) * eased;
+                        engine.getTimeMult().modifyMult("goldion_final_explosion_slowmo", timeMult);
+                    } else {
+                        // Done
                         engine.getTimeMult().unmodify("goldion_final_explosion_slowmo");
                         engine.removePlugin(this);
                     }
                 }
-                @Override public void processInputPreCoreControls(float amount, List<InputEventAPI> events) {}
-                @Override public void renderInWorldCoords(ViewportAPI viewport) {}
-                @Override public void renderInUICoords(ViewportAPI viewport) {}
-                @Override public void init(CombatEngineAPI engine) {}
             });
-
             // Play a dramatic explosion sound - replace with your preferred sound if needed
             Global.getSoundPlayer().playSound("realitydisruptor_emp_impact", 1f, 1f, loc, vel);
 
@@ -352,10 +362,7 @@ public class AEG_4g_HHGoldionBreaker {
                         engine.removePlugin(this);
                     }
                 }
-                public void processInputPreCoreControls(float amount, List<InputEventAPI> events) {}
-                public void renderInWorldCoords(ViewportAPI viewport) {}
-                public void renderInUICoords(ViewportAPI viewport) {}
-                public void init(CombatEngineAPI engine) {}
+
             });
 
             // Play dramatic sound

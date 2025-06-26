@@ -194,7 +194,7 @@ public class AEG_4g_GoldionCrusherVisuals implements BeamEffectPlugin {
                 if (dist <= 1200f) {
                     Vector2f push = Vector2f.sub(enemy.getLocation(), hitPoint, null);
                     push.normalise();
-                    push.scale(100f);
+                    push.scale(300f);
                     enemy.getVelocity().x += push.x;
                     enemy.getVelocity().y += push.y;
                     enemy.getFluxTracker().increaseFlux(300f, true);
