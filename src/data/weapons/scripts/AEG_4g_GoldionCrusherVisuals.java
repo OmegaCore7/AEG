@@ -8,10 +8,13 @@ import org.dark.shaders.distortion.WaveDistortion;
 import org.lazywizard.lazylib.MathUtils;
 import org.lwjgl.util.vector.Vector2f;
 import org.magiclib.util.MagicRender;
-
+import java.util.HashMap;
 import java.awt.*;
 
 public class AEG_4g_GoldionCrusherVisuals implements BeamEffectPlugin {
+    // Keeps track of the next time damage can be applied to each ship
+    private final HashMap<ShipAPI, Float> proximityDamageCooldown = new HashMap<>();
+
     private boolean isChargingUp = false;
     private float chargeUpTimer = 0f;
     private static final float CHARGE_UP_DURATION = 2f;
@@ -179,7 +182,7 @@ public class AEG_4g_GoldionCrusherVisuals implements BeamEffectPlugin {
                 }
             }
         }
-
+        //Final Burst of Weapon
         if (beam.getWeapon().getChargeLevel() <= 0f && !finalBurstTriggered) {
             finalBurstTriggered = true;
 
@@ -188,7 +191,7 @@ public class AEG_4g_GoldionCrusherVisuals implements BeamEffectPlugin {
 
             for (ShipAPI enemy : engine.getShips()) {
                 if (enemy.getOwner() == ship.getOwner()) continue;
-                if (MathUtils.getDistance(enemy, hitPoint) <= 600f) {
+                if (MathUtils.getDistance(enemy, hitPoint) <= 1000f) {
                     Vector2f push = Vector2f.sub(enemy.getLocation(), hitPoint, null);
                     push.normalise();
                     push.scale(300f);
@@ -203,7 +206,7 @@ public class AEG_4g_GoldionCrusherVisuals implements BeamEffectPlugin {
         }
     }
     private void spawnGoldenParticleRing(CombatEngineAPI engine, Vector2f center, Vector2f velocity, float radius, float intensity) {
-        int particleCount = 300;
+        int particleCount = 360;
         float angleStep = 360f / particleCount;
 
         float ratio = radius / RING_MAX_RADIUS;
@@ -243,11 +246,20 @@ public class AEG_4g_GoldionCrusherVisuals implements BeamEffectPlugin {
     }
 
     private void applyProximityEffect(CombatEngineAPI engine, ShipAPI target, float intensity, ShipAPI sourceShip) {
-        float jitterStrength = 10f + 30f * intensity; // nonlinear scaling
+        float currentTime = engine.getTotalElapsedTime(false);
+        float cooldownPeriod = 0.5f;
+
+        // Only apply if enough time has passed
+        Float lastTime = proximityDamageCooldown.get(target);
+        if (lastTime != null && currentTime - lastTime < cooldownPeriod) return;
+
+        // Update cooldown
+        proximityDamageCooldown.put(target, currentTime);
+
+        // Visual feedback
+        float jitterStrength = 10f + 30f * intensity;
         int jitterCount = (int)(2 + 6 * intensity);
-
         Color jitterColor = new Color(255, 220, 100, (int)(100 + 155 * intensity));
-
         target.setJitter(sourceShip, jitterColor, intensity, jitterCount, jitterStrength);
         target.setJitterUnder(sourceShip, new Color(255, 170, 50, 150), intensity * 0.5f, jitterCount, jitterStrength * 1.5f);
 
@@ -259,9 +271,9 @@ public class AEG_4g_GoldionCrusherVisuals implements BeamEffectPlugin {
             target.getVelocity().y += knock.y;
         }
 
+        // Damage
         float dmg = 200f * intensity;
         float emp = 150f * intensity;
-
         engine.applyDamage(target, target.getLocation(), dmg, DamageType.HIGH_EXPLOSIVE, emp, false, false, sourceShip);
         engine.addHitParticle(target.getLocation(), target.getVelocity(), 80f * intensity, 1f, 0.2f, Color.YELLOW);
     }
