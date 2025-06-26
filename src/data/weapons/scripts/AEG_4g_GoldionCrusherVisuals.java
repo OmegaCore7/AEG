@@ -179,7 +179,7 @@ public class AEG_4g_GoldionCrusherVisuals implements BeamEffectPlugin {
                 }
             }
         }
-
+        //Needs revision
         if (beam.getWeapon().getChargeLevel() <= 0f && !finalBurstTriggered) {
             finalBurstTriggered = true;
 
@@ -188,10 +188,10 @@ public class AEG_4g_GoldionCrusherVisuals implements BeamEffectPlugin {
 
             for (ShipAPI enemy : engine.getShips()) {
                 if (enemy.getOwner() == ship.getOwner()) continue;
-                if (MathUtils.getDistance(enemy, hitPoint) <= 600f) {
+                if (MathUtils.getDistance(enemy, hitPoint) <= 1100f) {
                     Vector2f push = Vector2f.sub(enemy.getLocation(), hitPoint, null);
                     push.normalise();
-                    push.scale(300f);
+                    push.scale(50f);
                     enemy.getVelocity().x += push.x;
                     enemy.getVelocity().y += push.y;
                     enemy.getFluxTracker().increaseFlux(300f, true);
@@ -203,7 +203,7 @@ public class AEG_4g_GoldionCrusherVisuals implements BeamEffectPlugin {
         }
     }
     private void spawnGoldenParticleRing(CombatEngineAPI engine, Vector2f center, Vector2f velocity, float radius, float intensity) {
-        int particleCount = 300;
+        int particleCount = 360;
         float angleStep = 360f / particleCount;
 
         float ratio = radius / RING_MAX_RADIUS;
