@@ -7,7 +7,9 @@ import org.lwjgl.util.vector.Vector2f;
 import java.awt.*;
 
 public class AEG_4g_left_boltdriver implements EveryFrameWeaponEffectPlugin {
-
+    private float chargeupTimer = 0f;
+    private final float chargeupDuration = 1.2f; // Duration of chargeup before burst starts
+    private boolean isCharging = false;
     private boolean isBurstActive = false;
     private int shotsRemaining = 0;
 
@@ -21,7 +23,7 @@ public class AEG_4g_left_boltdriver implements EveryFrameWeaponEffectPlugin {
     private final float heatDecayRate = 0.5f;
 
     private float postBurstCooldown = 0f;
-    private final float postBurstDuration = 1.5f;
+    private final float postBurstDuration = 5f;
 
     private final int BURST_SHOT_COUNT = 50;
 
@@ -43,12 +45,26 @@ public class AEG_4g_left_boltdriver implements EveryFrameWeaponEffectPlugin {
             return;
         }
 
-        // === START BURST WHEN FIRED ===
-        if (weapon.getChargeLevel() > 0f && !isBurstActive && postBurstCooldown <= 0f) {
-            isBurstActive = true;
-            shotsRemaining = BURST_SHOT_COUNT;
-            fireTimer = 0f;
-            fireInterval = 0.25f;
+
+        // === INITIATE CHARGEUP WHEN FIRED ===
+        if (weapon.getChargeLevel() > 0f && !isBurstActive && !isCharging && postBurstCooldown <= 0f) {
+            isCharging = true;
+            chargeupTimer = chargeupDuration;
+        }
+
+// === HANDLE CHARGEUP EFFECT ===
+        if (isCharging) {
+            chargeupTimer -= amount;
+
+            spawnChargeupFX(engine, weapon); // Visual or sound FX
+
+            if (chargeupTimer <= 0f) {
+                isCharging = false;
+                isBurstActive = true;
+                shotsRemaining = BURST_SHOT_COUNT;
+                fireTimer = 0f;
+                fireInterval = 0.25f;
+            }
         }
 
         // === HANDLE BURST LOGIC ===
@@ -132,14 +148,53 @@ public class AEG_4g_left_boltdriver implements EveryFrameWeaponEffectPlugin {
             engine.addNebulaParticle(loc, vel, 40f + (float) Math.random() * 40f, 1.5f, 0.3f, 0.4f, 1.5f, new Color(255, 255, 200, 180));
         }
     }
-
     private void resetState() {
         isBurstActive = false;
+        isCharging = false;
+        chargeupTimer = 0f;
         shotsRemaining = 0;
         fireTimer = 0f;
         fireInterval = 0.25f;
         heatLevel = 0f;
         postBurstCooldown = 0f;
     }
+
+    private void spawnChargeupFX(CombatEngineAPI engine, WeaponAPI weapon) {
+        Vector2f loc = weapon.getFirePoint(0);
+        if (loc == null) loc = weapon.getLocation();
+
+        float progress = 1f - (chargeupTimer / chargeupDuration); // 0 → 1 as it charges
+        float size = 40f + 80f * progress;
+        float alpha = 0.3f + 0.7f * progress;
+        float intensity = 1.2f + 1.0f * progress;
+
+        // Glow color shifts from blue to gold
+        Color color = new Color(
+                clamp((int)(100 + 155 * progress), 0, 255),
+                clamp((int)(150 + 100 * progress), 0, 255),
+                clamp((int)(255 - 155 * progress), 0, 255),
+                clamp((int)(200 * alpha), 0, 255)
+        );
+
+
+        engine.addSmoothParticle(loc, weapon.getShip().getVelocity(), size, intensity, 0.1f, color);
+
+        // Add some electric arc sparks at full charge
+        if (progress > 0.7f && Math.random() < 0.15f) {
+            Vector2f sparkVel = new Vector2f((float)(Math.random() - 0.5f) * 150f, (float)(Math.random() - 0.5f) * 150f);
+            engine.addHitParticle(loc, sparkVel, 20f + (float)Math.random() * 10f, 1.5f, 0.2f,
+                    new Color(255, 220, 150, 255));
+        }
+
+        // Play a rising pitch sound (optional, needs a loop or variant)
+        if (Math.random() < 0.1) {
+            float pitch = 0.8f + 0.4f * progress;
+            Global.getSoundPlayer().playSound("system_nova_burst_fire", 1f, pitch, loc, weapon.getShip().getVelocity());
+        }
+    }
+    private int clamp(int value, int min, int max) {
+        return Math.max(min, Math.min(max, value));
+    }
+
 }
 
