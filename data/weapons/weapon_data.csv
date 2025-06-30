@@ -115,6 +115,6 @@ Critical Laser,AEG_4g_head,,,,1500,300,,150,15,80,,,,,ENERGY,,225,,,,,,,,,100000
 ,AEG_4g_ship_backpack,,,500000,600,1,,,,1,,,,,,,,,,,,,,,,,,,,,,,,no_drop,,,,,,,,,,,,,,
 ,AEG_4g_legs,,,500000,600,1,,,,,,,,,,,,,,,,,,,,,,,,,,,,no_drop,,,,,,,,,,,,,,
 Bolting Driver,AEG_4g_left_boltingdriver,,,2250,1500,,275,400,40,80,,1,0.25,1,KINETIC,350,,0,2,1,,,,,,,1000,,,600,,,,"kinetic15, LR, no_drop",,,,Anti Shield,,,,,,,,,,5.5
-Protect Shade,AEG_4g_left_protectshade,,,500000,1,1,,,,80,,,,,ENERGY,,300,"	0.25	","	0.33",,,,,,,,,,,,,,,no_drop,,,,,,,,,,,,,,
+Protect Shade,AEG_4g_left_protectshade,,,500000,1,1,,,,80,,,,,ENERGY,,350,	0.25	,	0.33,,,,,,,,,,,,,,,no_drop,,,,,,,,,,,,,,
 Left Fist of Protection,AEG_4g_left_punch,,,500000,44,3000,,,20,80,,,,,KINETIC,,,0.33,0.33,0.6,,,,,,1000,,,,,,,,no_drop,,,,,,,,,,,,,,
 Right Spiral Drill,AEG_4g_rightkneedrill,,,,75,,200,,10,80,,"60	",1,60,HIGH_EXPLOSIVE,50,,0.33,0.33,60,0.1,"0	","10		",1,1,,1000,,,200,,,,,,,,,,,,,,,,,,
