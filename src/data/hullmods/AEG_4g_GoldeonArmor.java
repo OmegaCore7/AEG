@@ -19,7 +19,7 @@ public class AEG_4g_GoldeonArmor extends BaseHullMod {
     private static final String GOLDION_ACTIVE_KEY = "goldion_active";
     private static final String GAUGE_KEY = "goldion_gauge";
     private static final float MAX_GAUGE = 100f;
-    private static final float GAIN_PER_SECOND = 20f;
+    private static final float GAIN_PER_SECOND = 1f;
     private static final float GOLDION_DURATION = 20f;
     private static final String GOLDION_TIMER_KEY = "goldion_timer";
     private final Color GOLD_MAIN = new Color(255, 215, 0, 255);
